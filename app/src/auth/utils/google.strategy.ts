@@ -6,10 +6,10 @@ import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20'
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     constructor() {
         super({
-            clientID: '772240998393-tb8vbgp0disiu22sfokdej2dpu103cs3.apps.googleusercontent.com',
-            clientSecret: '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',
-            callbackURL: 'http://localhost:3000/auth/google/redirect',
-            scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar'],
+            clientID: 'clientId',
+            clientSecret: 'clientSecret',
+            callbackURL: 'callback URL',
+            scope: ['profile', 'email'],
             accessType: 'offline',
             prompt: 'consent',
         });
