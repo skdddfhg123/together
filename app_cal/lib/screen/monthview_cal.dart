@@ -77,9 +77,12 @@ class _AllCalendarState extends State<AllCalendar> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Icon(
-                Icons.calendar_month,
-                color: Colors.black,
+              const Padding(
+                padding: EdgeInsets.only(top: 2.5),
+                child: Icon(
+                  Icons.calendar_month,
+                  color: Color.fromARGB(255, 193, 193, 193),
+                ),
               ),
             ],
           ),
@@ -179,7 +182,10 @@ class _AllCalendarState extends State<AllCalendar> {
         initialSelectedDate: DateTime.now(),
         monthCellBuilder: (context, details) {
           // 평일 날짜 기본 컬러 블랙
-          TextStyle textStyle = const TextStyle(color: Colors.black);
+          TextStyle textStyle = const TextStyle(
+            color: Colors.black,
+            fontSize: 11,
+          );
 
           // 달력 셀의 기본 스타일 설정
           Color cellColor = Colors.transparent;
@@ -235,17 +241,20 @@ class _AllCalendarState extends State<AllCalendar> {
               children: [
                 if (isToday) // 오늘 날짜에 색이 채워진 동그라미를 그립니다.
                   Container(
-                    width: 30,
-                    height: 30,
+                    width: 23,
+                    height: 23,
                     decoration: const BoxDecoration(
-                      color:
-                          Color.fromARGB(255, 0, 0, 0), // 동그라미 안을 파란색으로 채웁니다.
+                      color: Color.fromARGB(255, 0, 0, 0),
                       shape: BoxShape.circle,
                     ),
                   ),
-                Text(
-                  details.date.day.toString(),
-                  style: textStyle,
+                Container(
+                  height: 21.5,
+                  alignment: Alignment.center,
+                  child: Text(
+                    details.date.day.toString(),
+                    style: textStyle,
+                  ),
                 ),
               ],
             ),

@@ -1,5 +1,6 @@
 import 'package:app_cal/app.dart';
 import 'package:app_cal/screen/monthview_cal.dart';
+import 'package:app_cal/screen/testcal.dart';
 import 'package:app_cal/screen/testscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -52,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _widgetOptions = [
     const AllCalendar(),
     const TestScreen(),
-    const TestScreen(),
+    const TestCal(),
     const TestScreen(),
     const TestScreen(),
   ];
