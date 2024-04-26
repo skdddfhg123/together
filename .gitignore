@@ -1,4 +1,6 @@
 /data
+/oauth2-test
+
 
 .env
 .postgres.env
