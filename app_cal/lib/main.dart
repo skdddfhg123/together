@@ -1,8 +1,9 @@
 import 'package:app_cal/app.dart';
-import 'package:app_cal/screen/all_calendar.dart';
+import 'package:app_cal/screen/monthview_cal.dart';
 import 'package:app_cal/screen/testscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 
 void main() {
@@ -19,7 +20,9 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
-        SfGlobalLocalizations.delegate
+        GlobalCupertinoLocalizations.delegate,
+        SfGlobalLocalizations.delegate,
+        MonthYearPickerLocalizations.delegate,
       ],
       supportedLocales: const [
         Locale('ko'),
