@@ -1,3 +1,4 @@
+import 'package:app_cal/app.dart';
 import 'package:app_cal/screen/all_calendar.dart';
 import 'package:app_cal/screen/testscreen.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +27,9 @@ class MyApp extends StatelessWidget {
       locale: const Locale('ko'),
       title: 'Together',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
+        fontFamily: App.font,
       ),
       home: const MyHomePage(),
     );
@@ -61,9 +63,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('캘린더 구현 연습'),
-      ),
       body: SafeArea(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
