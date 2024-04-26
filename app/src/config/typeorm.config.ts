@@ -26,4 +26,3 @@ export const typeORMConfig : TypeOrmModuleOptions = {
 }
 
 console.log(typeORMConfig);
-

@@ -13,10 +13,6 @@ services:
     ports:
       - "5432:5432"
     # 환경 변수 설정
-    # environment: 
-    #   # PostgreSQL 계정 및 패스워드 설정 옵션
-    #   POSTGRES_USER: jungle
-    #   POSTGRES_PASSWORD: wjdrmf!23
     env_file:
       - .postgres.env
     # 볼륨 설정
@@ -34,10 +30,7 @@ services:
     # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
     ports:
       - "5050:80"
-    # # 환경 변수 설정
-    # environment:
-    #   PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-    #   PGADMIN_DEFAULT_PASSWORD: password
+    # 환경 변수 설정
     env_file:
       - .postgres.env
     # 볼륨 설정
@@ -49,8 +42,6 @@ services:
       context: ./app
       dockerfile: Dockerfile
     container_name: nest-postgres
-    # environment:
-    #   - PORT=${PORT}
     env_file:
       - .env
     ports:
@@ -60,4 +51,14 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+  
+  redis:
+    image: redis
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASS"
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
 
