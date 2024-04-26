@@ -48,7 +48,7 @@ export class AuthService {
     }
 
     async fetchCalendarEvents(accessToken: string): Promise<any> {
-        const url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+        const url = 'URL';
     
         try {
           const response = await firstValueFrom(this.httpService.get(url, {

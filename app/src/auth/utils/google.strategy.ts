@@ -4,16 +4,7 @@ import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20'
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-    constructor() {
-        super({
-            clientID: 'clientId',
-            clientSecret: 'clientSecret',
-            callbackURL: 'callback URL',
-            scope: ['profile', 'email'],
-            accessType: 'offline',
-            prompt: 'consent',
-        });
-    }
+    // constructor() {}
 
     async validate (accessToken: string, refreshToken: string, profile: Profile) {
         const { id, displayName, emails } = profile;
