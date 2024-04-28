@@ -3,12 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
-import { AuthModule } from './auth/auth.module';
+import { KakaoModule } from './kakao/kakao.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeORMConfig),
-    AuthModule,
+    KakaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
