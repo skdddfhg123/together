@@ -1,9 +1,12 @@
+import 'package:app_cal/widget/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
 class AllCalendar extends StatefulWidget {
-  const AllCalendar({super.key});
+  static final GlobalKey<_AllCalendarState> calendarKey =
+      GlobalKey<_AllCalendarState>();
+  AllCalendar({super.key});
 
   @override
   State<AllCalendar> createState() => _AllCalendarState();
@@ -17,8 +20,16 @@ class _AllCalendarState extends State<AllCalendar> {
   @override
   void initState() {
     super.initState();
-    // 초기 날짜를 현재 날짜로 설정합니다.
     appBarTitle = formatDate(selectedDate);
+  }
+
+  void moveToToday() {
+    DateTime today = DateTime.now();
+    setState(() {
+      selectedDate = today;
+      appBarTitle = formatDate(selectedDate);
+      _calendarController.displayDate = selectedDate;
+    });
   }
 
   String formatDate(DateTime date) {
@@ -66,16 +77,35 @@ class _AllCalendarState extends State<AllCalendar> {
     return Scaffold(
       appBar: AppBar(
         title: TextButton(
+          onPressed: () => _selectDate(context),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                appBarTitle,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // 윤곽선을 그리는 텍스트
+                  Text(
+                    appBarTitle,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 3
+                        ..color = Colors.white, // 윤곽선의 색상
+                    ),
+                  ),
+                  // 실제 텍스트
+                  Text(
+                    appBarTitle,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black, // 텍스트의 색상
+                    ),
+                  ),
+                ],
               ),
               const Padding(
                 padding: EdgeInsets.only(top: 2.5),
@@ -86,49 +116,34 @@ class _AllCalendarState extends State<AllCalendar> {
               ),
             ],
           ),
-          onPressed: () => _selectDate(context),
+        ),
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.search,
+                color: Colors.white,
+              )),
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.chat,
+                color: Colors.white,
+              )),
+        ],
+        flexibleSpace: Opacity(
+          opacity: 1,
+          child: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/test.gif'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: const <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'Drawer Header',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.message),
-              title: Text(
-                'Messages',
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text(
-                'Profile',
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text(
-                'Settings',
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
-        ),
-      ),
+      drawer: const CustomDrawer(),
       body: SfCalendar(
         view: CalendarView.month,
         headerHeight: 0,

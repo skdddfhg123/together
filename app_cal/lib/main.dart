@@ -1,5 +1,6 @@
 import 'package:app_cal/app.dart';
 import 'package:app_cal/screen/monthview_cal.dart';
+import 'package:app_cal/screen/shadertest.dart';
 import 'package:app_cal/screen/testcal.dart';
 import 'package:app_cal/screen/testscreen.dart';
 import 'package:flutter/material.dart';
@@ -51,8 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = [
-    const AllCalendar(),
-    const TestScreen(),
+    AllCalendar(key: AllCalendar.calendarKey),
+    OutlinedText(),
     const TestCal(),
     const TestScreen(),
     const TestScreen(),
@@ -60,7 +61,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      if (_selectedIndex == index && index == 0) {
+        // '일정' 탭이 0번 인덱스
+        AllCalendar.calendarKey.currentState
+            ?.moveToToday(); // moveToToday 메소드 호출
+      } else {
+        _selectedIndex = index;
+      }
     });
   }
 
