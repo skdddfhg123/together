@@ -6,6 +6,7 @@ import { typeORMConfig } from './config/typeorm.config';
 import { RedisService } from './redis/redis.service';
 import { RedisController } from './redis/redis.controller';
 import { CacheModule } from '@nestjs/cache-manager';
+import { UserModule } from './user/user.module';
 import * as redisStore from 'cache-manager-ioredis';
 
 @Module({
@@ -15,9 +16,10 @@ import * as redisStore from 'cache-manager-ioredis';
       isGlobal: true,
       store: redisStore,
       host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT,
+      port: parseInt(process.env.REDIS_PORT),
       password: process.env.REDIS_PASS,
-    })
+    }),
+    UserModule
   ],
   controllers: [
     AppController,
