@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './calendar.css';
 
 // import type { CalendarProps } from "../../common/types/index"
 
@@ -9,7 +10,7 @@ type CalendarProps = {
   isNextMonth: boolean;
 };
 
-export default function Calendar({
+export default function calendar({
   selectedDay,
   setSelectedDay,
   isPrevMonth,
@@ -23,7 +24,7 @@ export default function Calendar({
 
   const isSameDay = (toDay: Date, compareDay?: Date | null) => {
     if (
-      today.getFullYear() === compareDay?.getFullYear() &&
+      toDay.getFullYear() === compareDay?.getFullYear() &&
       toDay.getMonth() === compareDay?.getMonth() &&
       toDay.getDate() === compareDay?.getDate()
     ) {
@@ -118,34 +119,33 @@ export default function Calendar({
 
   const buildCalendarTag = (calendarDays: Date[]) => {
     return calendarDays.map((day: Date, i: number) => {
+      const isToday = isSameDay(day, today);
       if (day.getMonth() < currentMonth.getMonth()) {
         return (
-          <td key={i} id="prevMonthDay">
-            {isPrevMonth ? day.getDate() : ''}
+          <td key={i} className="prevMonthDay">
+            <div>{isPrevMonth ? day.getDate() : ''}</div>
           </td>
         );
       }
       if (day.getMonth() > currentMonth.getMonth()) {
         return (
-          <td key={i} id="nextMonthDay">
-            {isNextMonth ? day.getDate() : ''}
+          <td key={i} className="nextMonthDay">
+            <div>{isNextMonth ? day.getDate() : ''}</div>
           </td>
         );
       }
-      if (day < today) {
-        return (
-          <td key={i} id="prevDay">
-            {day.getDate()}
-          </td>
-        );
+
+      let calendarDay = '';
+      if (isToday) {
+        calendarDay += 'today';
       }
       return (
         <td
           key={i}
-          id={`futureDay ${isSameDay(day, selectedDay) && 'choiceDay'}`}
+          className={`Day ${isSameDay(day, selectedDay) && 'choiceDay'}`}
           // onClick={() => onClickDay(day)}
         >
-          {day.getDate()}
+          <div id={calendarDay}>{day.getDate()}</div>
         </td>
       );
     });
@@ -167,17 +167,18 @@ export default function Calendar({
   const calendarRows = divideWeek(calendarTags);
 
   return (
-    <div id="calender">
-      <section id="calenderNav">
-        <span id="calenderNav-title">
+    <div className="calendar">
+      <section className="calendarNav">
+        <h2>Toogether</h2>
+        <div id="calendarNav-title">
           {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
-        </span>
-        <div id="calendarNav-button">
-          <button data-testid="prevMonth" onClick={prevCalendar}>
-            &lt;
+        </div>
+        <div className="calendarNav-button">
+          <button id="prevMonth-button" onClick={prevCalendar}>
+            ◀
           </button>
-          <button data-testid="nextMonth" onClick={nextCalendar}>
-            &gt;
+          <button id="nextMonth-button" onClick={nextCalendar}>
+            ▶
           </button>
         </div>
       </section>
@@ -185,9 +186,7 @@ export default function Calendar({
         <thead>
           <tr>
             {daysOfWeek.map((day, i) => (
-              <th key={i} data-testid="calendarHead">
-                {day}
-              </th>
+              <th key={i}>{day}</th>
             ))}
           </tr>
         </thead>

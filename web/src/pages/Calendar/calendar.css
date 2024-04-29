@@ -1,0 +1,117 @@
+table {
+  width: 85%;
+  height: 85%;
+  margin-bottom: 5rem;
+
+  border-collapse: collapse;
+}
+
+thead {
+  margin: 5rem;
+}
+
+tr {
+  display: flex;
+  justify-content: space-around;
+}
+
+td {
+  width: calc(100% / 7);
+  height: 10rem;
+
+  border-top: 3px solid rgb(242, 242, 242);
+}
+
+.calendar {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.calendarNav {
+  gap: 3rem;
+
+  width: 85%;
+  height: 5rem;
+  margin-bottom: 2rem; 
+
+  display: flex;
+  align-items: center;
+}
+
+h2 {
+  color:#0086FF;
+  text-shadow: -1px 0 darkblue, 0 1px darkblue, 1px 0 darkblue, 0 -1px darkblue;
+}
+
+#calendarNav-title {
+  font-size: larger;
+  font-weight: 700;
+}
+
+.calendarNav-button {
+  height: 2.6rem;
+  width: 4rem;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  border: 1px solid lightgray;
+  border-radius: 5px;
+
+  color: rgb(160, 160, 160);
+  font-size: 1.5rem;
+}
+
+#prevMonth-button {
+  width: 4rem;
+  padding-bottom: 0.3rem;
+
+  border-radius: 4px 0 0 4px;
+}
+
+#nextMonth-button{
+  width: 4rem;
+  padding-bottom: 0.3rem;
+
+  border-radius: 0 5px 5px 0;
+}
+
+#prevMonth-button:hover, #nextMonth-button:hover {
+  color: #0086FF;
+  background-color: #badfff;
+}
+
+.prevMonthDay,
+.nextMonthDay {
+  color: lightgray;
+  font-weight: 200;
+}
+
+.prevMonthDay div,
+.nextMonthDay div,
+.Day div {
+  margin: 0.2rem;
+  padding: 0 0.5rem;
+}
+
+.Day:hover,
+.today:hover {
+  box-shadow: 0 0 0 3px #0086FF inset;
+  cursor: pointer;
+}
+
+#today {
+  background-color: #badfff; 
+  color: #333; 
+  font-weight: bold; 
+}
+
+.choiceDay {
+  color: #0086FF;
+  cursor: pointer;
+}

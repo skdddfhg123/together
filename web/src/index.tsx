@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 // import QueryProvider from './queryProvider';
 import { Router } from './common/routes';
 
-// import './style/global.css';
+import './common/style/global.css';
 // import './style/font.css';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
