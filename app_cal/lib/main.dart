@@ -1,6 +1,8 @@
 import 'package:app_cal/app.dart';
+import 'package:app_cal/screen/login_page.dart';
 import 'package:app_cal/screen/monthview_cal.dart';
 import 'package:app_cal/screen/shadertest.dart';
+import 'package:app_cal/screen/signup_page.dart';
 import 'package:app_cal/screen/testcal.dart';
 import 'package:app_cal/screen/testscreen.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +38,12 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: App.font,
       ),
-      home: const MyHomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => LoginPage(), // 로그인 페이지를 초기 페이지로 설정
+        '/home': (context) => const MyHomePage(), // 메인 홈 페이지
+        '/signup': (context) => SignupPage(), // 회원가입 페이지
+      },
     );
   }
 }
