@@ -1,20 +1,22 @@
+import { Navigate } from 'react-router-dom';
 import { Routes } from './types';
 
 import Main from '../../pages/main';
-import ErrorPage from '../../pages/error.page';
+import LogIn from '../../pages/User/logIn';
 // import Contact from './routes/contact/contact';
 
 const routes: Routes = [
   {
     path: '/',
+    element: <Navigate to="/signin" />,
+  },
+  {
+    path: '/main',
     element: <Main />,
-    errorElement: <ErrorPage />,
-    // children: [
-    //   {
-    //     path: 'contacts/:contactId',
-    //     element: <Contact />,
-    //   },
-    // ],
+  },
+  {
+    path: '/signin',
+    element: <LogIn />,
   },
 ];
 
