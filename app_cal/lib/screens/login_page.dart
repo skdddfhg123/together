@@ -1,6 +1,6 @@
+import 'package:app_cal/api/auth_api_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:get/get.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -8,23 +8,19 @@ class LoginPage extends StatelessWidget {
 
   LoginPage({super.key});
 
-  Future<void> loginUser(BuildContext context) async {
-    var response = await http.post(
-      Uri.parse('http://your-backend-url/api/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'useremail': emailController.text,
-        'password': passwordController.text,
-      }),
+  Future<void> loginUser() async {
+    bool loginSuccess = await AuthAPIService.login(
+      emailController.text,
+      passwordController.text,
     );
 
-    if (response.statusCode == 200) {
-      Navigator.pushReplacementNamed(context, '/home');
+    if (loginSuccess) {
+      Get.offAllNamed('/home'); // 로그인 성공 후 홈 페이지로 이동
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to login')),
+      Get.snackbar(
+        'Login Failed',
+        'Please check your credentials',
+        snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
@@ -47,11 +43,11 @@ class LoginPage extends StatelessWidget {
               obscureText: true,
             ),
             ElevatedButton(
-              onPressed: () => loginUser(context),
+              onPressed: loginUser,
               child: const Text('Login'),
             ),
             TextButton(
-              onPressed: () => Navigator.pushNamed(context, '/signup'),
+              onPressed: () => Get.toNamed('/signup'),
               child: const Text('Sign up'),
             ),
           ],

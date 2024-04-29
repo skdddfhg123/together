@@ -22,7 +22,7 @@ class SignupPage extends StatelessWidget {
       }),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       Navigator.pushReplacementNamed(context, '/login');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
