@@ -1,11 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 //import { UserRepository } from './user.repository';
-import { UserCredentialsDto } from './dto/user-credential.dto';
 import { Repository } from 'typeorm';
-//import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserDTO } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -13,45 +13,57 @@ export class UserService {
     constructor(
         @ InjectRepository(User)
         private readonly userRepository: Repository<User>,
-        private jwtService: JwtService
     ) {}
 
-    async signUp(userCredentialsDto: UserCredentialsDto): Promise<User> {
+    async signUp(userDTO: CreateUserDTO): Promise<User> {
+        const existingEmail = await this.userRepository.findOne({ where: { email: userDTO.email } });
+        if (existingEmail) {
+            throw new ConflictException('Email already exists');
+        }
 
-        //const salt = await bcrypt.genSalt();
-        //const hashedPassword = await bcrypt.hash(userCredentialsDto.password, salt);
-        
-        const signUpInfo = this.userRepository.create(
-            {   
-                email : userCredentialsDto.userEmail, 
-                prePwd: null,
-                pwd : userCredentialsDto.password,
-                phone: null,
-                nickname : userCredentialsDto.nickname,
-                thumbnail : null,
-                registerdAt : new Date(),
-                changedAt : null,
-                // settings : 'settings',
-                birthDay : null, 
-                birthDayFlag : false, 
-            }
-        );
+        const existingNickname = await this.userRepository.findOne({ where: { nickname: userDTO.nickname } });
+        if (existingNickname) {
+            throw new ConflictException('Username already exists');
+        }
 
-        return this.userRepository.save(signUpInfo);
-    } 
+        const user = new User();
+        user.email = userDTO.email;
+        user.nickname = userDTO.nickname;
 
-    async signIn(authCredentialsDto: UserCredentialsDto): Promise<{accessToken: string}> {
+        const salt = await bcrypt.genSalt();
+        user.pwd = await bcrypt.hash(userDTO.pwd, salt);
 
-        const {userEmail, password} = authCredentialsDto;
-        const user = await this.userRepository.findOne( {where : {email : userEmail}});
-        
-        if(password === user.pwd){
-            const payload = { userEmail };
-            const accessToken = await this.jwtService.sign(payload);
-            
-            return { accessToken }
-        } else {
-            throw new UnauthorizedException('login failed')
+        try {
+            const savedUser = await this.userRepository.save(user);
+            delete savedUser.pwd;
+            return savedUser;
+        } catch (e) {
+            throw new InternalServerErrorException('Failed to create user');
         }
     } 
+
+    async findOne(data: Partial<User>): Promise<User> {
+        // console.log(data)
+        const user = await this.userRepository.findOneBy({ email: data.email });
+        // console.log(user)
+        if (!user) {
+            throw new UnauthorizedException('Could not find user');
+        }
+        return user;
+    }
+
+    // async signIn(authCredentialsDto: UserCredentialsDto): Promise<{accessToken: string}> {
+
+    //     const {userEmail, password} = authCredentialsDto;
+    //     const user = await this.userRepository.findOne( {where : {email : userEmail}});
+        
+    //     if(password === user.pwd){
+    //         const payload = { userEmail };
+    //         const accessToken = await this.jwtService.sign(payload);
+            
+    //         return { accessToken }
+    //     } else {
+    //         throw new UnauthorizedException('login failed')
+    //     }
+    // } 
 }
