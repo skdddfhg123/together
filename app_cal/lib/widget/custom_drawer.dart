@@ -1,9 +1,9 @@
 import 'package:app_cal/screens/calendar_detail_page.dart';
 import 'package:app_cal/screens/home_page.dart';
-import 'package:app_cal/screens/monthview_cal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_cal/controllers/calendar_controller.dart';
+import '../controllers/auth_controller.dart';
 
 class CustomDrawer extends StatelessWidget {
   CustomDrawer({Key? key}) : super(key: key);
@@ -84,6 +84,13 @@ class CustomDrawer extends StatelessWidget {
                   );
                 },
               );
+            },
+          ),
+          ListTile(
+            title: const Text('임시 로그아웃'),
+            onTap: () {
+              Get.find<AuthController>().logout();
+              Get.offAllNamed('/');
             },
           ),
         ],

@@ -6,7 +6,7 @@ import '../controllers/auth_controller.dart';
 class AuthAPIService {
   static Future<bool> login(String email, String password) async {
     var response = await http.post(
-      Uri.parse('http://192.168.1.49/auth/login'),
+      Uri.parse('http://192.168.1.49:3000/auth/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -16,8 +16,10 @@ class AuthAPIService {
       }),
     );
 
+    print(response.body);
+
     if (response.statusCode == 201) {
-      var token = json.decode(response.body)['token'];
+      var token = json.decode(response.body)['accessToken'];
       Get.find<AuthController>().setAccessToken(token);
       return true;
     } else {

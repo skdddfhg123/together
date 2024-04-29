@@ -1,3 +1,4 @@
+import 'package:app_cal/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -11,7 +12,7 @@ class SignupPage extends StatelessWidget {
 
   Future<void> registerUser(BuildContext context) async {
     var response = await http.post(
-      Uri.parse('http://192.168.1.49/auth/signup'),
+      Uri.parse('http://192.168.1.49:3000/auth/signup'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
@@ -23,7 +24,14 @@ class SignupPage extends StatelessWidget {
     );
 
     if (response.statusCode == 201) {
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return child;
+          },
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to register')),
