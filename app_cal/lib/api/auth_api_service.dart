@@ -1,12 +1,12 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:get/get.dart';
-import '../provider/auth_controller.dart';
+import '../controllers/auth_controller.dart';
 
 class AuthAPIService {
   static Future<bool> login(String email, String password) async {
     var response = await http.post(
-      Uri.parse('http://your-backend-url/api/login'),
+      Uri.parse('http://192.168.1.49/auth/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

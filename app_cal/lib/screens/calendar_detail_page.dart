@@ -1,40 +1,24 @@
+import 'package:app_cal/controllers/calendar_detail_controller.dart';
 import 'package:app_cal/widget/custom_drawer.dart';
-import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:month_year_picker/month_year_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-class AllCalendar extends StatefulWidget {
-  static final GlobalKey<_AllCalendarState> calendarKey =
-      GlobalKey<_AllCalendarState>();
-  AllCalendar({super.key});
+class CalendarDetailPage extends StatefulWidget {
+  final String calendarName;
+
+  CalendarDetailPage({Key? key, required this.calendarName}) : super(key: key);
 
   @override
-  State<AllCalendar> createState() => _AllCalendarState();
+  State<CalendarDetailPage> createState() => _CalendarDetailPageState();
 }
 
-class _AllCalendarState extends State<AllCalendar> {
-  String appBarTitle = 'Calendar';
+class _CalendarDetailPageState extends State<CalendarDetailPage> {
   DateTime selectedDate = DateTime.now();
+  String appBarTitle = 'Calendar';
+  final controller = Get.put(CalendarDetailController());
   final CalendarController _calendarController = CalendarController();
-
-  @override
-  void initState() {
-    super.initState();
-    appBarTitle = formatDate(selectedDate);
-  }
-
-  void moveToToday() {
-    DateTime today = DateTime.now();
-    setState(() {
-      selectedDate = today;
-      appBarTitle = formatDate(selectedDate);
-      _calendarController.displayDate = selectedDate;
-    });
-  }
-
-  String formatDate(DateTime date) {
-    return '${date.year}년 ${date.month}월';
-  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showMonthYearPicker(
@@ -60,7 +44,7 @@ class _AllCalendarState extends State<AllCalendar> {
       setState(
         () {
           selectedDate = picked;
-          appBarTitle = formatDate(selectedDate);
+          appBarTitle = controller.formatDate(selectedDate);
           _calendarController.displayDate = selectedDate;
           if (selectedDate.month != DateTime.now().month) {
             _calendarController.selectedDate = selectedDate;
@@ -76,59 +60,61 @@ class _AllCalendarState extends State<AllCalendar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: TextButton(
-          onPressed: () => _selectDate(context),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // 윤곽선을 그리는 텍스트
-                      Text(
-                        appBarTitle,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          foreground: Paint()
-                            ..style = PaintingStyle.stroke
-                            ..strokeWidth = 3
-                            ..color = Colors.white, // 윤곽선의 색상
+        title: Obx(
+          () => TextButton(
+            onPressed: () => _selectDate(context),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // 윤곽선을 그리는 텍스트
+                        Text(
+                          controller.appBarTitle.value,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            foreground: Paint()
+                              ..style = PaintingStyle.stroke
+                              ..strokeWidth = 3
+                              ..color = Colors.white, // 윤곽선의 색상
+                          ),
                         ),
-                      ),
-                      // 실제 텍스트
-                      Text(
-                        appBarTitle,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black, // 텍스트의 색상
+                        // 실제 텍스트
+                        Text(
+                          appBarTitle,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black, // 텍스트의 색상
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 2.5),
-                    child: Icon(
-                      Icons.calendar_month,
-                      color: Color.fromARGB(255, 193, 193, 193),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              const Text(
-                '모든 캘린더',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
-                  color: Color.fromARGB(255, 114, 113, 113),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 2.5),
+                      child: Icon(
+                        Icons.calendar_month,
+                        color: Color.fromARGB(255, 193, 193, 193),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                Text(
+                  widget.calendarName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color.fromARGB(255, 114, 113, 113),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -150,7 +136,7 @@ class _AllCalendarState extends State<AllCalendar> {
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/test.gif'),
+                image: AssetImage('assets/images/fam.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -191,7 +177,7 @@ class _AllCalendarState extends State<AllCalendar> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
             setState(() {
-              appBarTitle = formatDate(firstDateOfMonth);
+              appBarTitle = controller.formatDate(firstDateOfMonth);
               if (isCurrentMonth) {
                 // 현재 월일 경우 오늘 날짜를 선택
                 if (_calendarController.selectedDate != today) {

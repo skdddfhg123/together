@@ -1,11 +1,16 @@
+import 'package:app_cal/controllers/calendar_detail_controller.dart';
+import 'package:app_cal/screens/calendar_detail_page.dart';
 import 'package:app_cal/screens/monthview_cal.dart';
 import 'package:app_cal/screens/shadertest.dart';
 import 'package:app_cal/screens/testcal.dart';
 import 'package:app_cal/screens/testscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  const MyHomePage({super.key, this.initialIndex = 0});
+
+  final int initialIndex;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -14,8 +19,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
+  final CalendarDetailController calendarController =
+      Get.find<CalendarDetailController>();
+
   final List<Widget> _widgetOptions = [
-    AllCalendar(key: AllCalendar.calendarKey),
+    AllCalendar(),
     OutlinedText(),
     const TestCal(),
     const TestScreen(),
@@ -24,12 +32,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      if (_selectedIndex == index && index == 0) {
-        // '일정' 탭이 0번 인덱스
-        AllCalendar.calendarKey.currentState
-            ?.moveToToday(); // moveToToday 메소드 호출
-      } else {
-        _selectedIndex = index;
+      _selectedIndex = index;
+      if (index == 0) {
+        calendarController.moveToToday(); // 컨트롤러를 통해 moveToToday 호출
       }
     });
   }

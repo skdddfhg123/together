@@ -1,5 +1,6 @@
-import 'package:app_cal/app.dart';
-import 'package:app_cal/provider/auth_controller.dart';
+import 'package:app_cal/controllers/calendar_detail_controller.dart';
+import 'package:app_cal/models/app.dart';
+import 'package:app_cal/controllers/auth_controller.dart';
 import 'package:app_cal/screens/home_page.dart';
 import 'package:app_cal/screens/login_page.dart';
 import 'package:app_cal/screens/signup_page.dart';
@@ -25,7 +26,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Get.put(AuthController());
+    Get.lazyPut(() => AuthController(), fenix: true);
+    Get.lazyPut(() => CalendarDetailController(), fenix: true);
     return GetMaterialApp(
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -44,7 +46,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: App.font,
       ),
-      initialRoute: '/',
+      initialRoute: token != null ? '/home' : '/',
       routes: {
         '/': (context) => LoginPage(), // 로그인 페이지를 초기 페이지로 설정
         '/home': (context) => const MyHomePage(), // 메인 홈 페이지

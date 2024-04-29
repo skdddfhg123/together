@@ -11,9 +11,9 @@ class SignupPage extends StatelessWidget {
 
   Future<void> registerUser(BuildContext context) async {
     var response = await http.post(
-      Uri.parse('http://your-backend-url/api/register'),
+      Uri.parse('http://192.168.1.49/auth/signup'),
       headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+        'Content-Type': 'application/json',
       },
       body: jsonEncode(<String, String>{
         'useremail': emailController.text,
