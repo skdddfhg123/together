@@ -6,7 +6,6 @@ import { User } from "../user/entities/user.entity";
 import { SocialEvent } from "./entities/socialEvent.entity";
 import { SocialEventDto } from "./dtos/socialEvent.dto";
 import { UserService } from "../user/user.service";
-import * as moment from "moment-timezone";
 
 @Injectable()
 export class UserCalendarService {
@@ -32,7 +31,6 @@ export class UserCalendarService {
         }
     } 
 
-
     // 소셜 event 추가
     async saveSocialCalendar(calendar: SocialEventDto/*, user: User*/): Promise<SocialEvent> {
         try{
@@ -40,8 +38,8 @@ export class UserCalendarService {
             const userInfo = await this.userService.findOne({userId: tempUID});
             const calendarInfo = await this.findOneByUID(userInfo.userId)
             const socialCalendar = new SocialEvent();
-            socialCalendar.startAt = this.convertUtcToKst(calendar.startAt);
-            socialCalendar.endAt = this.convertUtcToKst(calendar.endAt);
+            socialCalendar.startAt = calendar.startAt;
+            socialCalendar.endAt = calendar.endAt;
             if(calendar.title != null){
                 socialCalendar.title = calendar.title;
             }
@@ -68,14 +66,6 @@ export class UserCalendarService {
             throw new UnauthorizedException('Could not find user');
         }
         return user;
-    }
-
-    convertUtcToKst(utcDate: Date): Date{
-        const utcMoment = moment.utc(utcDate);
-        // 한국 시간대로 설정
-        const kstMoment = utcMoment.tz('Asia/Seoul');
-        // JavaScript의 Date 객체로 반환
-        return kstMoment.toDate();
     }
 
     async findOneByUID(data: string): Promise<UserCalendar> {
