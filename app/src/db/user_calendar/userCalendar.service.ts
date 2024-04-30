@@ -4,13 +4,17 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
 import { UserService } from "../user/user.service";
+import { Calendar } from "src/calendar/entities/calendar.entity";
+import { PayloadResponse } from "src/auth/dtos/payload-response";
 
 @Injectable()
 export class UserCalendarService {
     constructor (
         @ InjectRepository(UserCalendar)
         private readonly userCalendarRepository: Repository<UserCalendar>,
-        private userService: UserService,
+        // @InjectRepository(Calendar)
+        // private calendarRepository: Repository<Calendar>,
+        // private userService: UserService,
     ) {}
 
     // create (계정 생성 시 불러와질 함수)
@@ -63,4 +67,26 @@ export class UserCalendarService {
             throw new InternalServerErrorException('Failed to find user calendar');
         }
     }
+
+    // async findGroupCalendar(payload: PayloadResponse): Promise<Calendar[] | void> {
+    //     try {
+    //         // 먼저, 사용자 ID에 연결된 UserCalendar를 조회
+    //         const userCalendars = await this.userCalendarRepository.find({
+    //             where: { user: { userId: payload.userCalendarId } },
+    //             relations: ['calendars']
+    //         });
+    
+    //         // UserCalendar가 없는 경우 빈 배열 반환
+    //         if (!userCalendars || userCalendars.length === 0) {
+    //             return [];
+    //         }
+    
+    //         // 모든 UserCalendar에 연결된 Calendar 목록을 합친다
+    //         const calendars = userCalendars.flatMap(uc => uc.calendars);
+    //         return calendars;
+    //     } catch (error) {
+    //         console.error('Error occurred:', error);
+    //         throw new InternalServerErrorException('Failed to find calendars');
+    //     }
+    // }
 }

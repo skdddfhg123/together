@@ -1,6 +1,6 @@
 import { Calendar } from "src/calendar/entities/calendar.entity";
 import { User } from "src/db/user/entities/user.entity";
-import { Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('user_calendar')
 export class UserCalendar {
@@ -11,7 +11,7 @@ export class UserCalendar {
     @JoinColumn({ name: 'userId'})
     user: User
 
-    @ManyToMany(() => Calendar, calendar => calendar.userCalendars )
-    // @JoinTable()
-    calendars: Calendar[];
+    @OneToMany(() => Calendar, calendar => calendar.author )
+    @JoinColumn({ name: 'userCalendars'})
+    groupCalendar: Calendar[];
 }
