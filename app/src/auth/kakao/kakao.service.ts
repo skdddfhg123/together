@@ -2,14 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
-export interface KakaoUser {
-    email: string;
-    name: string;
-    password: string;
-    accessToken: string;
-    refreshToken: string;
-}
-
 @Injectable()
 export class KakaoService {
     constructor(
@@ -30,10 +22,10 @@ export class KakaoService {
                 'preset': 'THIS_MONTH'
             },
           }));
-          console.log((response.data))
+          // console.log((response.data))
           // console.log((response.data.events))
           // console.log((response))
-          return response.data;
+          return response.data.events;
         } catch (error) {
           console.error('Error fetching calendar events:', error);
           throw new Error('Failed to fetch calendar events' + error);
