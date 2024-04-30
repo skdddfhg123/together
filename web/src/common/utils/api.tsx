@@ -21,7 +21,7 @@ async function get(endpoint: string, params?: Params) {
   return axios.get(serverUrl + endpoint, {
     // JWT 토큰을 헤더에 담아 백엔드 서버에 보냄.
     headers: {
-      // Authorization: `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
     },
     params: params,
   });
@@ -37,7 +37,7 @@ async function post(endpoint: string, data: Data) {
   return axios.post(serverUrl + endpoint, bodyData, {
     headers: {
       'Content-Type': 'application/json',
-      // Authorization: `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
     },
   });
 }
@@ -52,7 +52,7 @@ async function patch(endpoint: string, data: Data) {
   return axios.patch(serverUrl + endpoint, bodyData, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
     },
   });
 }
@@ -66,7 +66,7 @@ async function del(endpoint: string, params = '') {
   );
   return axios.delete(serverUrl + endpoint + '/' + params, {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
     },
   });
 }

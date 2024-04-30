@@ -35,6 +35,7 @@ export default function LogInPage() {
       });
       if (!res) throw new Error('가입 실패');
       console.log(res); //debug//
+      localStorage.setItem('accessToken', res.data.accessToken);
       alert('로그인 성공');
       navigate('/main');
     } catch (e) {
