@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 
-import Calendar from './Calendar/calendar';
-import CanlendarList from '../common/components/Canlendar/CanlendarList';
+import Calendar from '@pages/Calendar/calendar';
+import CanlendarList from '@components/Canlendar/CanlendarList';
 
-import '../common/style/main.css';
-import menuImg from '../common/assets/calendar_menu.webp';
+import useToggle from '@hooks/useToggle';
+import menuImg from '@assets/calendar_menu.webp';
+import '@styles/main.css';
 
-export default function Main() {
-  const [isCalendarList, setIsCanlendarList] = useState<boolean>(false);
+export default function MainPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
-  const date: unknown = undefined;
-  const [selectedDay, setSelectedDay] = useState<Date>(date as Date);
+  const { isOn, toggle } = useToggle(false);
 
   const prevCalendar = () => {
     setCurrentMonth(
@@ -35,12 +34,7 @@ export default function Main() {
   return (
     <>
       <header id="calHeader">
-        <button
-          id="calHeader-leftExp"
-          onClick={() => {
-            setIsCanlendarList(!isCalendarList);
-          }}
-        >
+        <button id="calHeader-leftExp" onClick={toggle}>
           <img id="listImg-button" src={menuImg} alt="calendarList" />
         </button>
         <h1 id="calendarLogo">Toogether</h1>
@@ -57,18 +51,10 @@ export default function Main() {
         </nav>
       </header>
       <main id="mainSection">
-        <aside
-          id={isCalendarList ? 'calendarList-entering' : 'calendarList-exiting'}
-        >
-          {isCalendarList && <CanlendarList isOpen={isCalendarList} />}
+        <aside id={isOn ? 'calendarList-entering' : 'calendarList-exiting'}>
+          {isOn && <CanlendarList isOpen={isOn} />}
         </aside>
-        <Calendar
-          selectedDay={selectedDay}
-          setSelectedDay={null}
-          isPrevMonth
-          isNextMonth
-          currentMonth={currentMonth}
-        />
+        <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
       </main>
     </>
   );

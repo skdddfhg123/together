@@ -1,21 +1,17 @@
-import { Route, Routes } from 'react-router-dom';
+// import { Route, Routes } from 'react-router-dom';
 
-import { routes } from './routes';
-import ErrorPage from '../../pages/error.page';
+// import { routes } from './routes';
+// import ErrorPage from '../../pages/errorPage';
 
 const Router = () => {
-  return (
-    <Routes>
-      {routes.map(({ path, element }) => (
-        <Route
-          key={path}
-          path={path}
-          element={element}
-          errorElement={<ErrorPage />}
-        ></Route>
-      ))}
-    </Routes>
-  );
+  // return (
+  //   <Routes>
+  //     {routes.map(({ path, element }) => (
+  //       <Route key={path} path={path} element={element}></Route>
+  //     ))}
+  //     <Route path="*" element={<ErrorPage />} />
+  //   </Routes>
+  // );
 };
 
 export { Router };

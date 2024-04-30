@@ -1,8 +1,9 @@
 import React from 'react';
 
-import SignUp from '../../common/components/User/SignUp';
-import SignIn from '../../common/components/User/SignIn';
-import useToggle from '../../common/hooks/useToggle';
+import SignUp from '@components/User/SignUp';
+import SignIn from '@components/User/SignIn';
+
+import useToggle from '@hooks/useToggle';
 
 interface SignInForm {
   useremail: string;
@@ -13,7 +14,7 @@ interface SignUpForm extends SignInForm {
   nickname: string;
 }
 
-export default function SignInPage() {
+export default function LogInPage() {
   const { isOn, toggle } = useToggle(false);
 
   const handleLogIn = async (formData: SignInForm) => {
@@ -33,7 +34,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="h-160 w-3/5 flex flex-col mx-auto items-center justify-center">
+    <div>
       <section>
         <button id="singin" onClick={toggle}>
           {isOn ? '로그인으로' : '회원가입으로'}

@@ -55,11 +55,19 @@ td {
 
 #today {
   background-color: #badfff; 
-  color: #333; 
   font-weight: bold; 
 }
 
-.choiceDay {
+.day {
+  font-size: large;
+}
+
+.choiceDay .day {
   color: #0086FF;
-  cursor: pointer;
+  font-size: x-large;
+
+}
+
+td.choiceDay #today {
+  color: white;
 }

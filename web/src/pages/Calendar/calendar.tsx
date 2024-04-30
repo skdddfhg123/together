@@ -1,25 +1,33 @@
-import React, { useState } from 'react';
-import './calendar.css';
+import React from 'react';
 
-// import type { CalendarProps } from "../../common/types/index"
+import { useSetDay } from '@store/index';
+import '@styles/calendar.css';
 
 type CalendarProps = {
-  selectedDay: Date | null;
-  setSelectedDay: null;
   isPrevMonth: boolean;
   isNextMonth: boolean;
   currentMonth: Date;
 };
 
-export default function calendar({
-  selectedDay,
-  setSelectedDay,
+export default function CalendarPage({
   isPrevMonth,
   isNextMonth,
   currentMonth,
 }: CalendarProps) {
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-  // const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const { selectedDay, setSelectedDay } = useSetDay((state) => ({
+    selectedDay: state.selectedDay,
+    setSelectedDay: state.setSelectedDay,
+  }));
+
+  const onClickDay = (day: Date) => {
+    if (isSameDay(day, selectedDay)) {
+      setSelectedDay(null);
+    } else {
+      setSelectedDay(day);
+      console.log(`SELECTED DAY : ${day}`);
+    }
+  };
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -34,14 +42,6 @@ export default function calendar({
     }
     return false;
   };
-
-  // const onClickDay = (day: Date) => {
-  //   if (isSameDay(day, selectedDay)) {
-  //     setSelectedDay(null);
-  //   } else {
-  //     setSelectedDay(day);
-  //   }
-  // };
 
   const buildCalendarDays = () => {
     const curMonthStartDate = new Date(
@@ -125,9 +125,11 @@ export default function calendar({
         <td
           key={i}
           className={`Day ${isSameDay(day, selectedDay) && 'choiceDay'}`}
-          // onClick={() => onClickDay(day)}
+          onClick={() => onClickDay(day)}
         >
-          <div id={calendarDay}>{day.getDate()}</div>
+          <div className="day" id={calendarDay}>
+            {day.getDate()}
+          </div>
         </td>
       );
     });
