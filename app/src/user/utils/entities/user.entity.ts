@@ -1,83 +1,53 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
-import { IsNotEmpty, IsString } from "class-validator";
-import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { UserCalendarEntity } from "./user.calendar.entity";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
-@Entity({name: 'user'})
-export class UserEntity {
-    
-    // ======================================================================================================================
-    // Required Column
-    // ======================================================================================================================
+@Entity()
+@Unique(['useremail', 'nickname'])
+export class User extends BaseEntity{
+    @PrimaryGeneratedColumn()
+    userId : number;
 
-    @PrimaryColumn()
-    user_id: string;
+    @Column({ nullable: false })
+    useremail: string;
 
-    @Column()
-    @IsNotEmpty()
-    @IsString()
-    email: string;
-    
-    @CreateDateColumn()
-    registered_at: Date;
-
-    @UpdateDateColumn()
-    changed_at: Date;
-    
-    @Column()
-    @IsNotEmpty()
-    @IsString()
+    @Column({ nullable: false })
     @Exclude()
-    pwd: string;
+    password: string;
     
-    @Column()
-    @IsNotEmpty()
-    @IsString()
-    settings: object;
+    @Column({ nullable: true, default: null })
+    @Exclude()
+    prePwd: string | null;
 
-    @OneToMany(() => UserCalendarEntity, (calendar) => calendar.user)
-    @IsNotEmpty()
-    user_calenders: UserCalendarEntity[];
+    @Column({ nullable: true, default: null })
+    phone: string | null;
 
-    // @OneToOne()
-    // @IsNotEmpty()
-    // settings: 
-
-    // @OneToOne()
-    // @IsNotEmpty()
-    // platform_connection: 
-
-    // @OneToMany()
-    // @IsNotEmpty()
-    // feed_reply: 
-
-    // @OneToMany()
-    // @IsNotEmpty()
-    // feed: 
-
-    // ======================================================================================================================
-    // Optional Column
-    // ======================================================================================================================
-
-    @Column()
-    @IsString()
-    pre_pwd: string;
-
-    @Column()
-    @IsString()
-    phone: string;
-
-    @Column()
-    @IsString()
+    @Column({ nullable: false })
     nickname: string;
 
-    @Column()
-    @IsString()
-    thumbnail: string;
+    @Column({ nullable: true, default: null })
+    thumbnail: string | null;
 
-    @Column()
-    birth_day: Date;
+    @CreateDateColumn()
+    registerdAt: Date;
 
-    @Column()
-    birth_day_flag: boolean;
+    @UpdateDateColumn()
+    updatedAt: Date;
+
+    @DeleteDateColumn()
+    @ApiProperty({ description: 'The date when the user was deleted', example: '2023-01-03T00:00:00.000Z' })
+    deletedAt?: Date;
+
+    //@Column({ nullable: false })
+    //settings: string;
+
+    @Column({ nullable: true })
+    birthDay: Date | null;
+
+    @Column({ nullable: false, default: false })
+    birthDayFlag: boolean;
+   
+    // Relation
+    //@OneToMany(type => Board, board => board.user, {eager : true})
+    //boards: Board[]
 }

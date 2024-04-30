@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { lastValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { UserService } from 'src/user/user.service';
-import { LoginDTO } from './dto/login.dto';
+import { LoginDTO } from './dtos/login.dto';
 import * as bcrypt from "bcryptjs";
 
 @Injectable()
@@ -31,10 +31,10 @@ export class AuthService {
 
         // console.log(user);
 
-        const passwordMatched = await bcrypt.compare( loginDTO.pwd, user.pwd );
+        const passwordMatched = await bcrypt.compare( loginDTO.password, user.password );
 
         if (passwordMatched) {
-            const payload = { nickname: user.nickname, sub: user.email };
+            const payload = { nickname: user.nickname, sub: user.useremail };
             console.log(payload);
             return {accessToken: this.jwtService.sign(payload)};
         } else {

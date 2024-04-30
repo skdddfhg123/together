@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user.entity';
+import { User } from './utils/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 
 const jwtConfig = 'together';

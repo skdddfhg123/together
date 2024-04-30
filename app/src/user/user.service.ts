@@ -1,11 +1,11 @@
 import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
+import { User } from './utils/entities/user.entity';
 //import { UserRepository } from './user.repository';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDTO } from './dto/create-user.dto';
+import { CreateUserDTO } from './dtos/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -16,7 +16,7 @@ export class UserService {
     ) {}
 
     async signUp(userDTO: CreateUserDTO): Promise<User> {
-        const existingEmail = await this.userRepository.findOne({ where: { email: userDTO.email } });
+        const existingEmail = await this.userRepository.findOne({ where: { useremail: userDTO.useremail } });
         if (existingEmail) {
             throw new ConflictException('Email already exists');
         }
@@ -27,15 +27,15 @@ export class UserService {
         }
 
         const user = new User();
-        user.email = userDTO.email;
+        user.useremail = userDTO.useremail;
         user.nickname = userDTO.nickname;
 
         const salt = await bcrypt.genSalt();
-        user.pwd = await bcrypt.hash(userDTO.pwd, salt);
+        user.password = await bcrypt.hash(userDTO.password, salt);
 
         try {
             const savedUser = await this.userRepository.save(user);
-            delete savedUser.pwd;
+            delete savedUser.password;
             return savedUser;
         } catch (e) {
             throw new InternalServerErrorException('Failed to create user');
@@ -44,7 +44,7 @@ export class UserService {
 
     async findOne(data: Partial<User>): Promise<User> {
         // console.log(data)
-        const user = await this.userRepository.findOneBy({ email: data.email });
+        const user = await this.userRepository.findOneBy({ useremail: data.useremail });
         // console.log(user)
         if (!user) {
             throw new UnauthorizedException('Could not find user');

@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { UserCalendarEntity } from "src/user/utils/entities/user.calendar.entity";
 import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from "typeorm";
 
 

@@ -8,7 +8,7 @@ export class CreateUserDTO {
     })
     @IsString()
     @IsEmail()
-    email: string;
+    useremail: string;
 
     @ApiProperty({
         description: 'Username of the new user',
@@ -29,5 +29,5 @@ export class CreateUserDTO {
     @Matches(/^[a-zA-Z0-9]*$/, {
         message: 'password only accepts english and number'
     })
-    pwd: string;
+    password: string;
 }
