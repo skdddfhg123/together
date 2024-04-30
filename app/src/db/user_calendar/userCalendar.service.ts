@@ -3,12 +3,14 @@ import { UserCalendar } from "./entities/userCalendar.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
+import { UserService } from "../user/user.service";
 
 @Injectable()
 export class UserCalendarService {
     constructor (
         @ InjectRepository(UserCalendar)
         private readonly userCalendarRepository: Repository<UserCalendar>,
+        private userService: UserService,
     ) {}
 
     // create (계정 생성 시 불러와질 함수)
@@ -40,5 +42,25 @@ export class UserCalendarService {
             throw new UnauthorizedException('Could not find user');
         }
         return user;
+    }
+
+    async findCalendarByUserId(userId: string): Promise<UserCalendar> {
+        try {
+            const userCalendar = await this.userCalendarRepository.findOne({
+                where: {
+                    user: { userId: userId }
+                },
+                relations: ['user']
+            });
+        
+            if (!userCalendar) {
+                throw new UnauthorizedException(`UserCalendar not found for user ID: ${userId}`);
+            }
+        
+            return userCalendar;
+        } catch (error) {
+            console.error('Error occurred:', error);
+            throw new InternalServerErrorException('Failed to find user calendar');
+        }
     }
 }

@@ -25,9 +25,9 @@ export class Calendar{
     @IsString()
     type: string;
 
-    // @ManyToMany(() => UserCalendar, (userCalendar) => userCalendar.calendars)
-    // @JoinColumn()
-    // userCalendars: UserCalendar[];
+    @ManyToMany(() => UserCalendar, (userCalendar) => userCalendar.calendars)
+    @JoinColumn()
+    userCalendars: UserCalendar[];
 
     // @OneToMany(() => ) // 그룹 이벤트
 }

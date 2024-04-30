@@ -11,6 +11,6 @@ export class UserCalendar {
     @JoinColumn({ name: 'userId'})
     user: User
 
-    // @ManyToMany(() => Calendar, calendar => calendar.userCalendars )
-    // calendars: Calendar[];
+    @ManyToMany(() => Calendar, calendar => calendar.userCalendars )
+    calendars: Calendar[];
 }

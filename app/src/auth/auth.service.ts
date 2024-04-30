@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { UserService } from 'src/db/user/user.service';
 import { LoginDTO } from './dtos/login.dto';
 import * as bcrypt from "bcryptjs";
+import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
         private userService: UserService,
         private jwtService: JwtService,
         private configService: ConfigService,
+        private userCalendarService: UserCalendarService,
     ) { }
 
     getEnvVariables() {
@@ -28,15 +30,24 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException("User not found");
         }
-
-        // console.log(user);
-
-        const passwordMatched = await bcrypt.compare( loginDTO.password, user.password );
-
+    
+        // 비밀번호 확인
+        const passwordMatched = await bcrypt.compare(loginDTO.password, user.password);
+    
         if (passwordMatched) {
-            const payload = { nickname: user.nickname, sub: user.useremail };
+            // userCalendar 정보를 가져오는 로직 추가 (가정)
+            const userCalendar = await this.userCalendarService.findCalendarByUserId(user.userId);
+    
+            // 페이로드에 username, useremail, userCalendar 정보 포함
+            console.log(userCalendar);
+
+            const payload = {
+                nickname: user.nickname,
+                useremail: user.useremail,
+                userCalendarId: userCalendar?.userCalendarId
+            };
             console.log(payload);
-            return {accessToken: this.jwtService.sign(payload)};
+            return { accessToken: this.jwtService.sign(payload) };
         } else {
             throw new UnauthorizedException("Password does not match");
         }

@@ -7,6 +7,6 @@ export class CalendarCreateDto extends PickType(Calendar, [
     'type',
 ]as const) {
     
-    @IsString()
-    attendees: string[];
+    // @IsString()
+    // attendees: string[];
 }
