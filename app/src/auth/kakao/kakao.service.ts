@@ -30,10 +30,10 @@ export class KakaoService {
                 'preset': 'THIS_MONTH'
             },
           }));
-          console.log((response.data))
+          // console.log((response.data))
           // console.log((response.data.events))
           // console.log((response))
-          return response.data;
+          return response.data.events;
         } catch (error) {
           console.error('Error fetching calendar events:', error);
           throw new Error('Failed to fetch calendar events' + error);
