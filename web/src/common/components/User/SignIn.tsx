@@ -37,26 +37,33 @@ export default function SignIn({ onSubmit }: SignInProps) {
       className="h-5/6 flex flex-col items-center justify-center"
       ref={formRef}
     >
-      <section className="h-5/6 flex flex-col items-center justify-center">
+      <fieldset className="h-5/6 flex flex-col items-center justify-center">
+        <label className="w-full mb-2" htmlFor="email">
+          EMAIL
+        </label>
         <input
-          className="formInput"
-          id="id"
-          type="id"
+          className="formInput mb-10 transition duration-300 
+          focus:border-blue-600 focus:border-2 focus:outline-none"
+          id="email"
+          type="email"
           ref={useremailRef}
-          placeholder="Id"
+          placeholder="krafton@jungle.com"
           autoComplete="off"
           required
         />
-
+        <label className="w-full mb-2 " htmlFor="password">
+          PASSWORD
+        </label>
         <input
-          className="formInput"
+          className="formInput transition duration-300 
+          focus:border-blue-600 focus:border-2 focus:outline-none"
           id="password"
           type="password"
           ref={passwordRef}
-          placeholder="Password"
+          placeholder="****"
           required
         />
-      </section>
+      </fieldset>
       <button onClick={submitForm}>로그인</button>
     </form>
   );
