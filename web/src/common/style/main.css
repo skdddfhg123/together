@@ -1,0 +1,75 @@
+/* ************************* header ************************* */
+#calHeader {
+  width: 100%;
+  height: 5rem;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid rgb(242, 242, 242);
+}
+
+#calHeader > *:not(:first-child):not(:last-child) {
+  margin: 0 2rem;
+}
+
+#calHeader-leftExp  {
+  width: 2.5rem;
+
+  margin-top: 0.5rem;
+  margin-left: 1rem;
+}
+
+#calendarLogo {
+  color:#0086FF;
+  text-shadow: -1px 0 darkblue, 0 1px darkblue, 1px 0 darkblue, 0 -1px darkblue;
+}
+
+#calHeader-title {
+  padding-top: 0.5rem;
+  
+  font-size: larger;
+  font-weight: 700;
+}
+
+.calHeader-button {  
+  height: 2rem;
+  width: 4rem;
+  margin-top: 0.7rem;
+  margin-left: 2rem;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  border: 1px solid lightgray;
+  border-radius: 5px;
+
+  color: rgb(160, 160, 160);
+  font-weight:900;
+}
+
+#prevMonth-button {
+  height: 2rem;
+  width: 4rem;
+
+  border-radius: 4px 0 0 4px;
+}
+
+#nextMonth-button{
+  height: 2rem;
+  width: 4rem;
+
+  border-radius: 0 5px 5px 0;
+}
+
+#prevMonth-button:hover, #nextMonth-button:hover {
+  color: #0086FF;
+  background-color: #badfff;
+}
+
+/* ************************* main ************************* */
+#mainSection {
+  display: flex;
+  flex-direction: row;
+}

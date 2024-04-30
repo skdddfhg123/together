@@ -33,7 +33,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div>
+    <div className="h-160 w-3/5 flex flex-col mx-auto items-center justify-center">
       <section>
         <button id="singin" onClick={toggle}>
           {isOn ? '로그인으로' : '회원가입으로'}

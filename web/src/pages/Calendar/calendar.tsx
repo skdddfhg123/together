@@ -8,6 +8,7 @@ type CalendarProps = {
   setSelectedDay: null;
   isPrevMonth: boolean;
   isNextMonth: boolean;
+  currentMonth: Date;
 };
 
 export default function calendar({
@@ -15,9 +16,10 @@ export default function calendar({
   setSelectedDay,
   isPrevMonth,
   isNextMonth,
+  currentMonth,
 }: CalendarProps) {
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  // const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -40,26 +42,6 @@ export default function calendar({
   //     setSelectedDay(day);
   //   }
   // };
-
-  const prevCalendar = () => {
-    setCurrentMonth(
-      new Date(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth() - 1,
-        currentMonth.getDate(),
-      ),
-    );
-  };
-
-  const nextCalendar = () => {
-    setCurrentMonth(
-      new Date(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth() + 1,
-        currentMonth.getDate(),
-      ),
-    );
-  };
 
   const buildCalendarDays = () => {
     const curMonthStartDate = new Date(
@@ -168,20 +150,6 @@ export default function calendar({
 
   return (
     <div className="calendar">
-      <section className="calendarNav">
-        <h2>Toogether</h2>
-        <div id="calendarNav-title">
-          {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
-        </div>
-        <div className="calendarNav-button">
-          <button id="prevMonth-button" onClick={prevCalendar}>
-            ◀
-          </button>
-          <button id="nextMonth-button" onClick={nextCalendar}>
-            ▶
-          </button>
-        </div>
-      </section>
       <table>
         <thead>
           <tr>

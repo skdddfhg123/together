@@ -19,7 +19,59 @@ code {
     monospace;
 }
 
-h2 {
-  font-size: xx-large;
+h1 {
+  font-size:xx-large;
   font-weight: 700;
+}
+
+h2 {
+  font-size: x-large;
+  font-weight: 700;
+}
+
+@layer components {
+  .formInput {
+    width: 40rem;
+    height: 3rem;
+
+    padding-left: 1rem;
+    margin-bottom: 3rem;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+    width: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    width: 30%;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    width: 30%;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+    width: 0;
+  }
+}
+
+#calendarList-entering {
+  border-right: 1px solid rgb(242, 242, 242);
+  animation: slideIn 0.5s ease forwards;
+}
+
+#calendarList-exiting {
+  animation: slideOut 0.5s ease forwards;
 }
