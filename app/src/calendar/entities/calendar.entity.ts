@@ -1,41 +1,33 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from "typeorm";
+import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
+import { Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
 
 
 @Entity()
-export class CalendarEntity{
-
-    // ======================================================================================================================
-    // Require Column
-    // ======================================================================================================================
-
-    @PrimaryColumn()
-    calendar_id: string;
+export class Calendar{
+    @PrimaryColumn('uuid')
+    calendarId: string;
 
     @Column()
     @IsNotEmpty()
     @IsString()
     title: string;
 
-    // ======================================================================================================================
-    // Optional Column
-    // ======================================================================================================================
-    
-    @Column()
+    @Column({ nullable: true })
     @IsString()
-    cover_image: string;
+    coverImage: string;
 
-    @Column()
+    @Column({ nullable: true })
     @IsString()
-    banner_image: string;
+    bannerImage: string;
 
-    @Column()
+    @Column({ nullable: true })
     @IsString()
     type: string;
 
-    // @ManyToMany(() => UserCalendarEntity, (userCalendar) => userCalendar.calendar)
+    // @ManyToMany(() => UserCalendar, (userCalendar) => userCalendar.calendars)
     // @JoinColumn()
-    // user_calendar: UserCalendarEntity[];
+    // userCalendars: UserCalendar[];
 
     // @OneToMany(() => ) // 그룹 이벤트
 }

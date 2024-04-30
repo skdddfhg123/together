@@ -4,7 +4,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JWTStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from 'src/db/user/user.module';
+import { UserCalendarModule } from 'src/db/user_calendar/userCalendar.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserModule } from 'src/user/user.module';
       inject: [ConfigService],
       }),
     UserModule,
+    UserCalendarModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, ConfigService, JWTStrategy],
