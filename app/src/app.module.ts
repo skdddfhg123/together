@@ -4,10 +4,12 @@ import { typeORMConfig } from './config/typeorm.config';
 import { RedisService } from './redis/redis.service';
 import { RedisController } from './redis/redis.controller';
 import { CacheModule } from '@nestjs/cache-manager';
-import { UserModule } from './user/user.module';
 import * as redisStore from 'cache-manager-ioredis';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { KakaoModule } from './kakao/kakao.module';
+import { CalendarModule } from './calendar/calendar.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -24,7 +26,11 @@ import { ConfigModule } from '@nestjs/config';
       password: process.env.REDIS_PASS,
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    
+    KakaoModule,
+    CalendarModule,
+    UserModule,
   ],
   controllers: [RedisController],
   providers: [RedisService],
