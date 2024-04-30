@@ -23,7 +23,7 @@ export class UserService {
 
         const existingNickname = await this.userRepository.findOne({ where: { nickname: userDTO.nickname } });
         if (existingNickname) {
-            throw new ConflictException('Username already exists');
+            throw new ConflictException('Nickname already exists');
         }
 
         const user = new User();

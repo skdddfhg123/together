@@ -6,14 +6,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Calendar } from './entities/calendar.entity';
 import { User } from 'src/db/user/entities/user.entity';
 import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
+import { UserModule } from 'src/db/user/user.module';
+import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
+import { UserCalendarModule } from 'src/db/user_calendar/userCalendar.module';
+import { JWTStrategy } from 'src/auth/jwt.strategy';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Calendar]),
-    TypeOrmModule.forFeature([User]),
-    TypeOrmModule.forFeature([UserCalendar]),  
+    TypeOrmModule.forFeature([Calendar, User, UserCalendar]),
+    UserModule,
+    UserCalendarModule,
   ],
   controllers: [CalendarController],
-  providers: [CalendarService]
+  providers: [CalendarService, JWTStrategy]
 })
 export class CalendarModule {}

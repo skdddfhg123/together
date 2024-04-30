@@ -11,7 +11,6 @@ import { User } from '../user/entities/user.entity';
   imports: [
     TypeOrmModule.forFeature([UserCalendar]),
     TypeOrmModule.forFeature([User]),
-    // UserModule
   ],
   providers: [
         UserCalendarService,
