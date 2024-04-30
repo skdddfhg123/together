@@ -12,6 +12,7 @@ import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './db/user/user.module';
 import { DataSource } from 'typeorm';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
+import { GoogleModule } from './auth/google/google.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
     AuthModule,
     
     KakaoModule,
+    GoogleModule,
     CalendarModule,
     UserModule,
   ],

@@ -2,7 +2,9 @@ import { Body, Controller, Get, Post, UploadedFile, UploadedFiles, UseIntercepto
 import { CalendarService } from './calendar.service';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('calendar')
 @Controller('calendar')
 export class CalendarController {
     constructor(
@@ -10,7 +12,7 @@ export class CalendarController {
     ) {}
 
     @Get()
-    async getUsers() {
+    async getSocialSchedule() {
         return 'Get Users';
     }
 

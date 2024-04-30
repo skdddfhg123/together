@@ -3,12 +3,19 @@ import { UserCalendar } from "./entities/userCalendar.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
+import { SocialEvent } from "./entities/socialEvent.entity";
+import { SocialEventDto } from "./dtos/socialEvent.dto";
+import { UserService } from "../user/user.service";
+import * as moment from "moment-timezone";
 
 @Injectable()
 export class UserCalendarService {
     constructor (
         @ InjectRepository(UserCalendar)
         private readonly userCalendarRepository: Repository<UserCalendar>,
+        @InjectRepository(SocialEvent)
+        private readonly socialEventRepository: Repository<SocialEvent>,
+        private userService: UserService,
     ) {}
 
     // create (계정 생성 시 불러와질 함수)
@@ -27,7 +34,28 @@ export class UserCalendarService {
 
 
     // 소셜 event 추가
-    
+    async saveSocialCalendar(calendar: SocialEventDto/*, user: User*/): Promise<SocialEvent> {
+        try{
+            const tempUID = '5fcb0643-5458-406e-bf42-cbcf4603a61d';
+            const userInfo = await this.userService.findOne({userId: tempUID});
+            const calendarInfo = await this.findOneByUID(userInfo.userId)
+            const socialCalendar = new SocialEvent();
+            socialCalendar.startAt = this.convertUtcToKst(calendar.startAt);
+            socialCalendar.endAt = this.convertUtcToKst(calendar.endAt);
+            if(calendar.title != null){
+                socialCalendar.title = calendar.title;
+            }
+            socialCalendar.social = calendar.social;
+            socialCalendar.userCalendar = calendarInfo;
+        
+            const savedGoogleUser = await this.socialEventRepository.save(socialCalendar);
+            return savedGoogleUser;
+        }
+        catch(err)
+        {
+            console.log(err)
+        }
+    }
 
     // 그룹 event 추가
 
@@ -35,6 +63,28 @@ export class UserCalendarService {
     // find
     async findOne(data: Partial<UserCalendar>): Promise<UserCalendar> {
         const user = await this.userCalendarRepository.findOneBy({ userCalendarId: data.userCalendarId });
+
+        if (!user) {
+            throw new UnauthorizedException('Could not find user');
+        }
+        return user;
+    }
+
+    convertUtcToKst(utcDate: Date): Date{
+        const utcMoment = moment.utc(utcDate);
+        // 한국 시간대로 설정
+        const kstMoment = utcMoment.tz('Asia/Seoul');
+        // JavaScript의 Date 객체로 반환
+        return kstMoment.toDate();
+    }
+
+    async findOneByUID(data: string): Promise<UserCalendar> {
+        const user = await this.userCalendarRepository.findOne({
+            where: {
+                user: { userId: data }
+            },
+            relations: ['user']
+        });
 
         if (!user) {
             throw new UnauthorizedException('Could not find user');
