@@ -8,7 +8,7 @@ import { CalendarCreateDto } from './dtos/calendar.create.dto';
 export class CalendarService {
     constructor(
         @InjectRepository(Calendar) 
-        private readonly calendarRepository: Repository<Calendar>
+        private calendarRepository: Repository<Calendar>,
     ) {}
 
     async createCalendar(body: CalendarCreateDto, cover_image, banner_image): Promise<Calendar> {

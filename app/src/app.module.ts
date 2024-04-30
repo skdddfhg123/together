@@ -12,6 +12,7 @@ import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './db/user/user.module';
 import { DataSource } from 'typeorm';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
+import { GroupEventModule } from './db/event/group_event/groupEvent.module';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
     
     KakaoModule,
     CalendarModule,
-    UserModule,
+    // GroupEventModule,
   ],
   controllers: [RedisController],
   providers: [RedisService],
