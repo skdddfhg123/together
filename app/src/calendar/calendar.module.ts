@@ -17,6 +17,7 @@ import { JWTStrategy } from 'src/auth/jwt.strategy';
     TypeOrmModule.forFeature([Calendar, User, UserCalendar]),
     UserModule,
     UserCalendarModule,
+    GroupEventModule,
   ],
   controllers: [CalendarController],
   providers: [CalendarService, JWTStrategy]

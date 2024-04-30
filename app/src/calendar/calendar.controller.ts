@@ -86,20 +86,20 @@ export class CalendarController {
     // }
 
     
-    @Post('group/create')
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
-    async createGroupEvent(
-        // @Body() groupEventDTO: CreateGroupEventDTO
-    )/*: Promise<GroupEvent>*/{
-        // try {
-        //     const groupEvent = await this.groupEventService.createGroupEvent(groupEventDTO);
-        //     return groupEvent;
-        // } catch (e) {
-        //     throw e; 
-        // }
-        return 'Create Group Event'
-    }
+    // @Post('group/create')
+    // @ApiBearerAuth('JWT-auth')
+    // @UseGuards(JwtAuthGuard)
+    // async createGroupEvent(
+    //     // @Body() groupEventDTO: CreateGroupEventDTO
+    // )/*: Promise<GroupEvent>*/{
+    //     // try {
+    //     //     const groupEvent = await this.groupEventService.createGroupEvent(groupEventDTO);
+    //     //     return groupEvent;
+    //     // } catch (e) {
+    //     //     throw e; 
+    //     // }
+    //     return 'Create Group Event'
+    // }
 
     /*
     @Get('group/update')
