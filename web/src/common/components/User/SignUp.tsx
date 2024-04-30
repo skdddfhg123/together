@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 
 interface SignUpProps {
   onSubmit: (formData: SignUpForm) => void;
@@ -17,6 +17,30 @@ export default function SignUp({ onSubmit }: SignUpProps) {
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
+  const [emailValid, setEmailValid] = useState<boolean>(true);
+  const [nicknameValid, setNicknameValid] = useState<boolean>(true);
+  const [passwordValid, setPasswordValid] = useState<boolean>(true);
+  const [passwordsMatch, setPasswordsMatch] = useState<boolean>(true);
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  const handleInputChange = (ref: React.RefObject<HTMLInputElement>) => {
+    const value = ref.current?.value ?? '';
+    if (ref === useremailRef) {
+      setEmailValid(emailRegex.test(value));
+    }
+    if (ref === nicknameRef) {
+      setNicknameValid(value.length >= 4 && value.length <= 10);
+    }
+    const password = passwordRef.current?.value ?? '';
+    const confirmPassword = confirmPasswordRef.current?.value ?? '';
+    if (ref === passwordRef) {
+      setPasswordValid(password.length >= 4);
+    }
+    if (ref === confirmPasswordRef) {
+      setPasswordsMatch(password === confirmPassword);
+    }
+  };
+
   const submitForm = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
@@ -25,17 +49,18 @@ export default function SignUp({ onSubmit }: SignUpProps) {
     const password = passwordRef.current?.value;
     const confirmPassword = confirmPasswordRef.current?.value;
 
-    if (!useremail || !nickname || !password) {
+    if (!useremail || !nickname || !password || !confirmPassword) {
       alert('폼을 모두 채워주세요.');
       return;
     }
 
-    if (confirmPassword !== password) {
-      confirmPasswordRef.current?.setCustomValidity('Different from password');
-      confirmPasswordRef.current?.reportValidity();
+    if (!passwordsMatch) {
+      alert('비밀번호가 일치하지 않습니다.');
       return;
-    } else {
-      confirmPasswordRef.current?.setCustomValidity(''); // 이전 검증 상태 초기화
+    }
+    if (!emailValid || !nicknameValid || !passwordValid || !passwordsMatch) {
+      alert('양식에 맞춰 다시 작성해주세요.');
+      return;
     }
 
     const formData = {
@@ -45,7 +70,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
     };
 
     onSubmit(formData);
-    // formRef.current.reset();
+    formRef.current?.reset();
   };
 
   return (
@@ -53,44 +78,84 @@ export default function SignUp({ onSubmit }: SignUpProps) {
       className="h-5/6 flex flex-col items-center justify-center"
       ref={formRef}
     >
-      <section className="h-5/6 flex flex-col items-center justify-center">
+      <fieldset className="h-5/6 flex flex-col items-center justify-center">
+        <label className="w-full mb-2" htmlFor="email">
+          EMAIL
+        </label>
         <input
-          className="formInput"
+          className={`formInput transition duration-300 
+          focus:border-blue-600 focus:border-2 focus:outline-none ${
+            emailValid ? '' : 'focus:border-red-500'
+          }`}
           id="useremail"
           type="email"
+          maxLength={50}
           ref={useremailRef}
-          placeholder="Email"
+          onChange={() => handleInputChange(useremailRef)}
+          placeholder="krafton@jungle.com"
           autoComplete="off"
           required
         />
+        <div className="h-10 flex items-center mb-4">
+          {emailValid ? '' : '유효하지 않은 이메일 형식입니다.'}
+        </div>
+        <label className="w-full mb-2" htmlFor="nickname">
+          NICKNAME
+        </label>
         <input
-          className="formInput"
+          className={`formInput transition duration-300 
+          focus:border-blue-600 focus:border-2 focus:outline-none ${
+            nicknameValid ? '' : 'focus:border-red-500'
+          }`}
           id="nickname"
           type="nickname"
+          maxLength={11}
           ref={nicknameRef}
-          placeholder="Nickname"
+          onChange={() => handleInputChange(nicknameRef)}
+          placeholder="난정글러"
           autoComplete="off"
           required
         />
-
+        <div className="h-10 flex items-center mb-4">
+          {nicknameValid ? '' : '4~10자 사이여야 합니다.'}
+        </div>
+        <label className="w-full mb-2" htmlFor="password">
+          PASSWORD
+        </label>
         <input
-          className="formInput"
+          className={`formInput transition duration-300 
+          focus:border-blue-600 focus:border-2 focus:outline-none ${
+            passwordValid ? '' : 'focus:border-red-500'
+          }`}
           id="password"
           type="password"
           ref={passwordRef}
-          placeholder="Password"
+          onChange={() => handleInputChange(passwordRef)}
+          placeholder="****"
           required
         />
-
+        <div className="h-10 flex items-center mb-4">
+          {passwordValid ? '' : '4글자 이상 입력해주세요.'}
+        </div>
+        <label className="w-full mb-2" htmlFor="confirmPassword">
+          CONFIRM PASSWORD
+        </label>
         <input
-          className="formInput"
+          className={`formInput transition duration-300 
+          focus:border-blue-600 focus:border-2 focus:outline-none ${
+            passwordsMatch ? '' : 'focus:border-red-500'
+          }`}
           id="confirmPassword"
           type="password"
           ref={confirmPasswordRef}
-          placeholder="Confirm Password"
+          onChange={() => handleInputChange(confirmPasswordRef)}
+          placeholder="****"
           required
         />
-      </section>
+        <div className="h-10 flex items-center mb-4">
+          {passwordsMatch ? '' : '비밀번호가 서로 일치하지 않습니다.'}
+        </div>
+      </fieldset>
       <button onClick={submitForm}>회원가입</button>
     </form>
   );
