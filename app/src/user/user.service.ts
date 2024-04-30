@@ -1,7 +1,6 @@
 import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './utils/entities/user.entity';
-//import { UserRepository } from './user.repository';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -51,19 +50,4 @@ export class UserService {
         }
         return user;
     }
-
-    // async signIn(authCredentialsDto: UserCredentialsDto): Promise<{accessToken: string}> {
-
-    //     const {userEmail, password} = authCredentialsDto;
-    //     const user = await this.userRepository.findOne( {where : {email : userEmail}});
-        
-    //     if(password === user.pwd){
-    //         const payload = { userEmail };
-    //         const accessToken = await this.jwtService.sign(payload);
-            
-    //         return { accessToken }
-    //     } else {
-    //         throw new UnauthorizedException('login failed')
-    //     }
-    // } 
 }
