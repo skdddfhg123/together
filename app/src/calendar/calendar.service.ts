@@ -1,17 +1,17 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CalendarEntity } from './entities/calendar.entity';
+import { Calendar } from './entities/calendar.entity';
 import { Repository } from 'typeorm';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 
 @Injectable()
 export class CalendarService {
     constructor(
-        @InjectRepository(CalendarEntity) 
-        private readonly calendarRepository: Repository<CalendarEntity>
+        @InjectRepository(Calendar) 
+        private readonly calendarRepository: Repository<Calendar>
     ) {}
 
-    async createCalendar(body: CalendarCreateDto, cover_image, banner_image): Promise<CalendarEntity> {
+    async createCalendar(body: CalendarCreateDto, cover_image, banner_image): Promise<Calendar> {
         try{
             const { title, type, attendees } = body;
             

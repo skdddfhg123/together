@@ -1,12 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity()
 @Unique(['useremail', 'nickname'])
 export class User extends BaseEntity{
-    @PrimaryGeneratedColumn()
-    userId : number;
+    @PrimaryGeneratedColumn('uuid')
+    userId : string;
 
     @Column({ nullable: false })
     useremail: string;
@@ -29,7 +30,7 @@ export class User extends BaseEntity{
     thumbnail: string | null;
 
     @CreateDateColumn()
-    registerdAt: Date;
+    registeredAt: Date;
 
     @UpdateDateColumn()
     updatedAt: Date;
@@ -47,6 +48,10 @@ export class User extends BaseEntity{
     @Column({ nullable: false, default: false })
     birthDayFlag: boolean;
    
+    @OneToOne(() => UserCalendar, userCalendar => userCalendar.user)
+    @JoinColumn({ name: 'userCalendarId' })
+    userCalendars: UserCalendar
+
     // Relation
     //@OneToMany(type => Board, board => board.user, {eager : true})
     //boards: Board[]

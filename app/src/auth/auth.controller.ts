@@ -1,16 +1,19 @@
 import { Body, Controller, Get, Post, Req, UseGuards, ValidationPipe } from '@nestjs/common';import { AuthService } from './auth.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/db/user/user.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateUserDTO } from 'src/user/dtos/create-user.dto';
-import { User } from 'src/user/utils/entities/user.entity';
+import { CreateUserDTO } from 'src/db/user/dtos/create-user.dto';
+import { User } from 'src/db/user/entities/user.entity';
 import { LoginDTO } from './dtos/login.dto';
+import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
+import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 
 @ApiTags("auth")
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private userCalendarService: UserCalendarService,
   ) {}
 
   @ApiResponse({
@@ -19,9 +22,11 @@ export class AuthController {
     type: CreateUserDTO
   })
   @Post('signup')
-  signUp(@Body(ValidationPipe) userDTO: CreateUserDTO): Promise<User> {
+  async signUp(@Body(ValidationPipe) userDTO: CreateUserDTO): Promise<User> {
       try {
-          return this.userService.signUp(userDTO);
+          const user = await this.userService.signUp(userDTO);
+          await this.userCalendarService.userCalendarCreate(user);
+          return user;
       } catch (e) {
           throw e;
       }

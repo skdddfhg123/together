@@ -1,8 +1,8 @@
 import { PickType } from "@nestjs/swagger";
-import { CalendarEntity } from "../entities/calendar.entity";
+import { Calendar } from "../entities/calendar.entity";
 import { IsString } from "class-validator";
 
-export class CalendarCreateDto extends PickType(CalendarEntity, [
+export class CalendarCreateDto extends PickType(Calendar, [
     'title',
     'type',
 ]as const) {

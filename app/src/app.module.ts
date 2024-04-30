@@ -7,9 +7,9 @@ import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { KakaoModule } from './kakao/kakao.module';
+import { KakaoModule } from './auth/kakao/kakao.module';
 import { CalendarModule } from './calendar/calendar.module';
-import { UserModule } from './user/user.module';
+import { UserModule } from './db/user/user.module';
 import { DataSource } from 'typeorm';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 

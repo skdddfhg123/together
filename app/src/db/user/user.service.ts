@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './utils/entities/user.entity';
+import { User } from './entities/user.entity';
 //import { UserRepository } from './user.repository';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';

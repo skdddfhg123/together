@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { lastValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/db/user/user.service';
 import { LoginDTO } from './dtos/login.dto';
 import * as bcrypt from "bcryptjs";
 
