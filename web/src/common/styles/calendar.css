@@ -53,21 +53,28 @@ td {
   cursor: pointer;
 }
 
-#today {
-  background-color: #badfff; 
-  font-weight: bold; 
-}
-
 .day {
   font-size: large;
+}
+
+th.day-0, .day-0 .day { /* 일요일 */
+  color: rgb(212, 85, 85);
+}
+
+th.day-6, .day-6 .day { /* 토요일 */
+  color: rgb(70, 70, 186);
+}
+
+.today .day {
+  background-color: #badfff;
+  font-weight: bold;
 }
 
 .choiceDay .day {
   color: #0086FF;
   font-size: x-large;
-
 }
 
-td.choiceDay #today {
+.choiceDay.today .day { /* choiceDay와 today 클래스가 같은 요소에 적용될 때 */
   color: white;
 }

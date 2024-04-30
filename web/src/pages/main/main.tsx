@@ -52,7 +52,7 @@ export default function MainPage() {
       </header>
       <main id="mainSection">
         <aside id={isOn ? 'calendarList-entering' : 'calendarList-exiting'}>
-          {isOn && <CanlendarList isOpen={isOn} />}
+          {isOn && <CanlendarList />}
         </aside>
         <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
       </main>

@@ -1,10 +1,6 @@
 import React from 'react';
 
-interface CalendarListProps {
-  isOpen: boolean;
-}
-
-export default function CanlendarList({ isOpen }: CalendarListProps) {
+export default function CanlendarList() {
   return (
     <section>
       <h1>Hello Calendar !!!</h1>

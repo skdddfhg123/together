@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
+import CalSchedule from '@components/Canlendar/CalSchedule';
+import Schedule from '@components/Canlendar/Schedule';
 import { useSetDay } from '@store/index';
 import '@styles/calendar.css';
 
@@ -19,15 +21,9 @@ export default function CalendarPage({
     selectedDay: state.selectedDay,
     setSelectedDay: state.setSelectedDay,
   }));
-
-  const onClickDay = (day: Date) => {
-    if (isSameDay(day, selectedDay)) {
-      setSelectedDay(null);
-    } else {
-      setSelectedDay(day);
-      console.log(`SELECTED DAY : ${day}`);
-    }
-  };
+  const [schedule, setSchedule] = useState<{ [key: string]: JSX.Element[] }>(
+    {},
+  );
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -41,6 +37,28 @@ export default function CalendarPage({
       return true;
     }
     return false;
+  };
+
+  const onClickDay = (day: Date) => {
+    if (isSameDay(day, selectedDay)) {
+      setSelectedDay(null);
+    } else {
+      const dayKey = day.toISOString().split('T')[0]; // 날짜를 YYYY-MM-DD 형식으로 키 생성
+      setSelectedDay(day);
+      addSchedule(dayKey);
+      console.log(`SELECTED DAY : ${day}`);
+    }
+  };
+
+  const addSchedule = (dayKey: string) => {
+    const newSchedule = (
+      <Schedule key={dayKey + (schedule[dayKey]?.length || 0)} />
+    );
+    const updatedSchedules = {
+      ...schedule,
+      [dayKey]: [...(schedule[dayKey] || []), newSchedule],
+    };
+    setSchedule(updatedSchedules);
   };
 
   const buildCalendarDays = () => {
@@ -101,11 +119,14 @@ export default function CalendarPage({
 
   const buildCalendarTag = (calendarDays: Date[]) => {
     return calendarDays.map((day: Date, i: number) => {
-      const isToday = isSameDay(day, today);
+      const dayKey = day.toISOString().split('T')[0];
+      const daySchedules = schedule[dayKey] || [];
+
       if (day.getMonth() < currentMonth.getMonth()) {
         return (
           <td key={i} className="prevMonthDay">
             <div>{isPrevMonth ? day.getDate() : ''}</div>
+            <CalSchedule schedule={daySchedules} day={day} />
           </td>
         );
       }
@@ -113,23 +134,21 @@ export default function CalendarPage({
         return (
           <td key={i} className="nextMonthDay">
             <div>{isNextMonth ? day.getDate() : ''}</div>
+            <CalSchedule schedule={daySchedules} day={day} />
           </td>
         );
       }
 
-      let calendarDay = '';
-      if (isToday) {
-        calendarDay += 'today';
-      }
+      const dayOfWeek = day.getDay();
+      const isToday = isSameDay(day, today);
+      let dayClasses = `Day day-${dayOfWeek}`;
+      if (isToday) dayClasses += ' today';
+      if (isSameDay(day, selectedDay)) dayClasses += ' choiceDay';
+
       return (
-        <td
-          key={i}
-          className={`Day ${isSameDay(day, selectedDay) && 'choiceDay'}`}
-          onClick={() => onClickDay(day)}
-        >
-          <div className="day" id={calendarDay}>
-            {day.getDate()}
-          </div>
+        <td key={i} className={dayClasses} onClick={() => onClickDay(day)}>
+          <div className="day">{day.getDate()}</div>
+          <CalSchedule schedule={daySchedules} day={day} />
         </td>
       );
     });
@@ -156,7 +175,9 @@ export default function CalendarPage({
         <thead>
           <tr>
             {daysOfWeek.map((day, i) => (
-              <th key={i}>{day}</th>
+              <th key={i} className={`day-${i}`}>
+                {day}
+              </th>
             ))}
           </tr>
         </thead>

@@ -35,7 +35,7 @@ h2 {
     height: 3rem;
 
     padding-left: 1rem;
-    margin-bottom: 3rem;
+    /* margin-bottom: 3rem; */
     border: 1px solid lightgray;
     border-radius: 5px;
   }
