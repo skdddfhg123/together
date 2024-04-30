@@ -33,9 +33,13 @@ export default function SignIn({ onSubmit }: SignInProps) {
     // formRef.current.reset();
   };
   return (
-    <div>
-      <form ref={formRef}>
+    <form
+      className="h-5/6 flex flex-col items-center justify-center"
+      ref={formRef}
+    >
+      <section className="h-5/6 flex flex-col items-center justify-center">
         <input
+          className="formInput"
           id="id"
           type="id"
           ref={useremailRef}
@@ -45,15 +49,15 @@ export default function SignIn({ onSubmit }: SignInProps) {
         />
 
         <input
+          className="formInput"
           id="password"
           type="password"
           ref={passwordRef}
           placeholder="Password"
           required
         />
-
-        <button onClick={submitForm}>로그인</button>
-      </form>
-    </div>
+      </section>
+      <button onClick={submitForm}>로그인</button>
+    </form>
   );
 }

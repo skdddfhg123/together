@@ -49,16 +49,24 @@ export default function SignUp({ onSubmit }: SignUpProps) {
   };
 
   return (
-    <>
-      <form ref={formRef}>
+    <form
+      className="h-5/6 flex flex-col items-center justify-center"
+      ref={formRef}
+    >
+      <section className="h-5/6 flex flex-col items-center justify-center">
         <input
+          className="formInput"
+          id="useremail"
+          type="email"
           ref={useremailRef}
           placeholder="Email"
           autoComplete="off"
           required
         />
         <input
-          type="Nickname"
+          className="formInput"
+          id="nickname"
+          type="nickname"
           ref={nicknameRef}
           placeholder="Nickname"
           autoComplete="off"
@@ -66,6 +74,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
         />
 
         <input
+          className="formInput"
           id="password"
           type="password"
           ref={passwordRef}
@@ -74,13 +83,15 @@ export default function SignUp({ onSubmit }: SignUpProps) {
         />
 
         <input
+          className="formInput"
+          id="confirmPassword"
           type="password"
           ref={confirmPasswordRef}
           placeholder="Confirm Password"
           required
         />
-        <button onClick={submitForm}>회원가입</button>
-      </form>
-    </>
+      </section>
+      <button onClick={submitForm}>회원가입</button>
+    </form>
   );
 }

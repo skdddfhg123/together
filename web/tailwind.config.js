@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {},
@@ -20,7 +20,8 @@ module.exports = {
       },
       colors: {
         custom: {
-          to: '#0086FF',
+          main: '#0086FF',
+          line: 'rgb(242, 242, 242)',
         },
       },
     },
