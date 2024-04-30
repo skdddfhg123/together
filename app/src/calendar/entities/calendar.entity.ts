@@ -4,12 +4,7 @@ import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class CalendarEntity{
-
-    // ======================================================================================================================
-    // Require Column
-    // ======================================================================================================================
-
-    @PrimaryColumn()
+    @PrimaryColumn('uuid')
     calendar_id: string;
 
     @Column()
@@ -17,10 +12,6 @@ export class CalendarEntity{
     @IsString()
     title: string;
 
-    // ======================================================================================================================
-    // Optional Column
-    // ======================================================================================================================
-    
     @Column()
     @IsString()
     cover_image: string;

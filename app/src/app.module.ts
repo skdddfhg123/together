@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
 import { RedisService } from './redis/redis.service';
@@ -10,6 +10,8 @@ import { ConfigModule } from '@nestjs/config';
 import { KakaoModule } from './kakao/kakao.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './user/user.module';
+import { DataSource } from 'typeorm';
+import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 
 @Module({
   imports: [
@@ -36,4 +38,11 @@ import { UserModule } from './user/user.module';
   providers: [RedisService],
   exports: [RedisService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  constructor(private dataSource: DataSource) {
+    console.log(dataSource.driver.database);
+  }
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
+  }
+}
