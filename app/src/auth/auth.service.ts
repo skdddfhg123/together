@@ -37,9 +37,6 @@ export class AuthService {
         if (passwordMatched) {
             // userCalendar 정보를 가져오는 로직 추가 (가정)
             const userCalendar = await this.userCalendarService.findCalendarByUserId(user.userId);
-    
-            // 페이로드에 username, useremail, userCalendar 정보 포함
-            console.log(userCalendar);
 
             const payload = {
                 nickname: user.nickname,

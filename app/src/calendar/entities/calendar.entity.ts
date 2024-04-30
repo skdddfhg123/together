@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from "class-validator";
+import { User } from "src/db/user/entities/user.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
 import { Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
 
@@ -7,6 +8,9 @@ import { Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryColumn } from
 export class Calendar{
     @PrimaryColumn('uuid')
     calendarId: string;
+
+    // @Column({ nullable: false })
+    // author: User;
 
     @Column()
     @IsNotEmpty()

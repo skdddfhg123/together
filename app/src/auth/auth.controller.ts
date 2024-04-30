@@ -6,8 +6,9 @@ import { User } from 'src/db/user/entities/user.entity';
 import { LoginDTO } from './dtos/login.dto';
 import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
-import { SignUpResponse } from './dtos/signup-response';
+import { PayloadResponse } from './dtos/payload-response';
 import { JwtAuthGuard } from './jwt.guard';
+import { getPayload } from './getPayload.decorator';
 
 @ApiTags("auth")
 @Controller('auth')
@@ -24,7 +25,7 @@ export class AuthController {
     type: CreateUserDTO
   })
   @Post('signup')
-  async signUp(@Body(ValidationPipe) userDTO: CreateUserDTO): Promise<SignUpResponse> {
+  async signUp(@Body(ValidationPipe) userDTO: CreateUserDTO): Promise<PayloadResponse> {
       try {
           const user = await this.userService.signUp(userDTO);
           const userCalendar = await this.userCalendarService.userCalendarCreate(user);
@@ -50,18 +51,12 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
-  @Get('profile')
+  @Get('token-test')
   @UseGuards(JwtAuthGuard)
-  profile(@Req() req: any): any {
-    // 사용자 정보나 필요한 데이터만 추출
-
-    console.log(req.user)
-    console.log(req.userCalendar)
-
-    return {
-        nickname: req.user?.nickname,
-        useremail: req.user?.useremail,
-        userCalendarId: req.user?.userCalendarId
-    };
+  tokenTest (
+    @getPayload() payload: PayloadResponse
+  ): any {
+    // console.log(payload);
+    return payload;
   }
 }

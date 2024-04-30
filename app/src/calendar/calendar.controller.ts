@@ -1,10 +1,9 @@
 import { Body, Controller, Get, Post, Req, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { GetUser } from 'src/db/user/getUser.decorator';
-import { User } from 'src/db/user/entities/user.entity';
+import { getPayload } from 'src/auth/getPayload.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { PayloadResponse } from 'src/auth/dtos/payload-response';
 
 @ApiTags("calendar")
 @Controller('calendar')
@@ -13,15 +12,15 @@ export class CalendarController {
     //     private calendarService: CalendarService,
     // ) {}
 
-    // @Post()
-    // createGroupCalendar(
-    //     @Req() req: any,
-    //     @Body() caleanderCreateDto : CalendarCreateDto,
-    //     @GetUser() user: User
-    // ): Promise<void> {
-
-    //     return ;
-    // }
+    @Post()
+    createGroupCalendar(
+        @Req() req: any,
+        @Body() caleanderCreateDto : CalendarCreateDto,
+        @getPayload() payload: PayloadResponse
+    ): Promise<void> {
+        console.log(payload);
+        return ;
+    }
 
     // @Get()
     // async getUsers() {

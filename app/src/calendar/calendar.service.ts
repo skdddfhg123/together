@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { User } from 'src/db/user/entities/user.entity';
 import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
+import { PayloadResponse } from 'src/auth/dtos/payload-response';
 
 @Injectable()
 export class CalendarService {
@@ -17,12 +18,14 @@ export class CalendarService {
         private readonly userCalendarRepository: Repository<UserCalendar>,
     ) {}
 
-    async createGroupCalendar(body: CalendarCreateDto, user: User): Promise<Calendar> {
+    async createGroupCalendar(body: CalendarCreateDto, payload: PayloadResponse): Promise<Calendar> {
         const { title, type } = body;
 
         const newGroupCalendar = new Calendar();
+        // newGroupCalendar.author = 
         newGroupCalendar.title = title;
         newGroupCalendar.type = type;
+        newGroupCalendar.userCalendars 
 
         const savedGroupCalendar = await this.calendarRepository.save(newGroupCalendar);
 
