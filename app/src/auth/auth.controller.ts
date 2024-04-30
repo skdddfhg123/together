@@ -1,11 +1,14 @@
 import { Body, Controller, Get, Post, Req, UseGuards, ValidationPipe } from '@nestjs/common';import { AuthService } from './auth.service';
 import { UserService } from 'src/db/user/user.service';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDTO } from 'src/db/user/dtos/create-user.dto';
 import { User } from 'src/db/user/entities/user.entity';
 import { LoginDTO } from './dtos/login.dto';
 import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
+import { PayloadResponse } from './dtos/payload-response';
+import { JwtAuthGuard } from './jwt.guard';
+import { getPayload } from './getPayload.decorator';
 
 @ApiTags("auth")
 @Controller('auth')
@@ -22,11 +25,15 @@ export class AuthController {
     type: CreateUserDTO
   })
   @Post('signup')
-  async signUp(@Body(ValidationPipe) userDTO: CreateUserDTO): Promise<User> {
+  async signUp(@Body(ValidationPipe) userDTO: CreateUserDTO): Promise<PayloadResponse> {
       try {
           const user = await this.userService.signUp(userDTO);
-          await this.userCalendarService.userCalendarCreate(user);
-          return user;
+          const userCalendar = await this.userCalendarService.userCalendarCreate(user);
+          return {
+            useremail: user.useremail,
+            nickname: user.nickname,
+            userCalendarId: userCalendar.userCalendarId
+          };
       } catch (e) {
           throw e;
       }
@@ -43,5 +50,13 @@ export class AuthController {
       return this.authService.login(loginDTO);
   }
 
-
+  @ApiBearerAuth('JWT-auth')
+  @Get('token-test')
+  @UseGuards(JwtAuthGuard)
+  tokenTest (
+    @getPayload() payload: PayloadResponse
+  ): any {
+    // console.log(payload);
+    return payload;
+  }
 }
