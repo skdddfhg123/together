@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post, Req, UploadedFile, UploadedF
 import { CalendarService } from './calendar.service';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { getPayload } from 'src/auth/getPayload.decorator';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { Calendar } from './entities/calendar.entity';
@@ -74,16 +74,26 @@ export class CalendarController {
     }
 
 
-    @Get('group/get/:groupeventid')
+    // @Get('group/get/:groupeventid')
+    // @ApiBearerAuth('JWT-auth')
+    // @UseGuards(JwtAuthGuard)
+    // async getOneGroupEvent(@Param('groupeventid') groupEventId: string): Promise<GroupEvent>{
+    //     try {
+    //     const groupEvent = await this.groupEventService.getGroupEvent(groupEventId);
+    //         return groupEvent;
+    //     } catch (e) {
+    //         throw e; 
+    //     }
+    // }
+
+    @Get('group/get/:calendarid')
+    @ApiParam({ name: 'calendarid', required: true, description: 'Calendar ID', type: String })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
-    async getGroupEvent(@Param('groupeventid') groupEventId: string): Promise<GroupEvent>{
-        try {
-        const groupEvent = await this.groupEventService.getGroupEvent(groupEventId);
-            return groupEvent;
-        } catch (e) {
-            throw e; 
-        }
+    async getAllGroupEvent(
+        @Param('calendarid') calendarid: string,
+    ): Promise<GroupEvent[]>{
+        return await this.groupEventService.getAllGroupEventsByCalendarId(calendarid);
     }
 
 

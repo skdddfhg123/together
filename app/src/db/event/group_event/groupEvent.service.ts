@@ -75,6 +75,32 @@ export class GroupEventService {
     
     }
 
+    async getAllGroupEventsByCalendarId(calendarId: string): Promise<GroupEvent[]> {
+        try {
+            console.log(calendarId)
+          const groupEvents = await this.groupEventRepository.find({
+            where: {
+              calendarId: calendarId,
+              deactivatedAt: false
+            },
+            order: {
+              createdAt: 'DESC'
+            }
+          });
+          console.log(groupEvents);
+    
+          if (groupEvents.length === 0) {
+            // 빈 배열을 반환하거나 더 명확한 오류를 던질 수 있습니다.
+            console.log(`No group events found for calendar ID ${calendarId}`);
+          }
+          
+          return groupEvents;
+        } catch (e) {
+          console.error('Error occurred:', e);
+          throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}`);
+        }
+    }
+
 
      async getGroupEvent( groupEventId : string ): Promise<GroupEvent> {
     
