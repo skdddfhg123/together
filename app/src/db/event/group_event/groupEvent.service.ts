@@ -56,9 +56,9 @@ export class GroupEventService {
         groupEvent.endAt = endAt;
 
         try {
-            console.log(groupEvent);
+            // console.log(groupEvent);
             const savedGroupEventEvent = await this.groupEventRepository.save(groupEvent);
-            console.log('Saved Group Event:', savedGroupEventEvent);
+            // console.log('Saved Group Event:', savedGroupEventEvent);
             return savedGroupEventEvent;
         } catch (e) {
             console.error('Error saving group calendar:', e);

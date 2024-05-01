@@ -4,10 +4,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
 import { UserService } from "../user/user.service";
-import { Calendar } from "src/calendar/entities/calendar.entity";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
-import { SocialEvent } from "../event/group_event/entities/socialEvent.entity";
-import { SocialEventDto } from "./dtos/socialEvent.dto";
+import { SocialEvent } from "../event/socialEvent/entities/socialEvent.entity";
 
 @Injectable()
 export class UserCalendarService {
@@ -32,40 +30,6 @@ export class UserCalendarService {
             throw new InternalServerErrorException('Failed to create user calendar');
         }
     } 
-
-
-    // 소셜 event 추가
-    async saveSocialCalendar(calendar: SocialEventDto/*, user: User*/): Promise<SocialEvent> {
-        try{
-            const tempUID = '5fcb0643-5458-406e-bf42-cbcf4603a61d';
-            const userInfo = await this.userService.findOne({userId: tempUID});
-            const calendarInfo = await this.findOneByUID(userInfo.userId)
-            const socialCalendar = new SocialEvent();
-            socialCalendar.startAt = calendar.startAt;
-            socialCalendar.endAt = calendar.endAt;
-            if(calendar.title != null) {
-                socialCalendar.title = calendar.title;
-            }
-            socialCalendar.social = calendar.social;
-            socialCalendar.userCalendar = calendarInfo;
-
-            const endTime = new Date(socialCalendar.endAt);
-            const curTime = new Date();
-            if(endTime < curTime) {
-                socialCalendar.deactivatedAt = true;
-            }
-        
-            const savedGoogleUser = await this.socialEventRepository.save(socialCalendar);
-            return savedGoogleUser;
-        }
-        catch(err)
-        {
-            console.log(err)
-        }
-    }
-
-    // 그룹 event 추가
-
 
     // find
     async findOne(data: Partial<UserCalendar>): Promise<UserCalendar> {
@@ -97,17 +61,20 @@ export class UserCalendarService {
         }
     }
 
-    async findOneByUID(data: string): Promise<UserCalendar> {
-        const user = await this.userCalendarRepository.findOne({
-            where: {
-                user: { userId: data }
-            },
-            relations: ['user']
-        });
-
-        if (!user) {
-            throw new UnauthorizedException('Could not find user');
+    async findCalendarByUserCalendarId(userCalendarId: string): Promise<UserCalendar> {
+        try {
+            const userCalendar = await this.userCalendarRepository.findOne({
+                where:{ userCalendarId: userCalendarId } 
+            });
+        
+            if (!userCalendar) {
+                throw new UnauthorizedException(`UserCalendar not found for user ID: ${userCalendarId}`);
+            }
+        
+            return userCalendar;
+        } catch (error) {
+            console.error('Error occurred:', error);
+            throw new InternalServerErrorException('Failed to find user calendar');
         }
-        return user;
     }
 }

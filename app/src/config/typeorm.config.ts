@@ -25,4 +25,4 @@ export const typeORMConfig : TypeOrmModuleOptions = {
     synchronize: true,
 }
 
-console.log(typeORMConfig);
+// console.log(typeORMConfig);

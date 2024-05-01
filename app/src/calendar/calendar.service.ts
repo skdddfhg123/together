@@ -31,7 +31,7 @@ export class CalendarService {
         newGroupCalendar.attendees = [payload.userCalendarId];
         
         const userCalendar = await this.userCalendarService.findOne({ userCalendarId: payload.userCalendarId });
-        console.log('UserCalendar ID:', userCalendar.userCalendarId);
+        // console.log('UserCalendar ID:', userCalendar.userCalendarId);
         if (!userCalendar) {
             throw new UnauthorizedException("UserCalendar not found");
         }
@@ -40,7 +40,7 @@ export class CalendarService {
 
         try {
             const savedGroupCalendar = await this.calendarRepository.save(newGroupCalendar);
-            console.log('Saved Group Calendar:', savedGroupCalendar);
+            // console.log('Saved Group Calendar:', savedGroupCalendar);
             return savedGroupCalendar;
         } catch (e) {
             console.error('Error saving group calendar:', e);

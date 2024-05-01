@@ -14,6 +14,7 @@ import { DataSource } from 'typeorm';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GroupEventModule } from './db/event/group_event/groupEvent.module';
 import { GoogleModule } from './auth/google/google.module';
+import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { GoogleModule } from './auth/google/google.module';
     KakaoModule,
     CalendarModule,
     GroupEventModule,
+    SocialEventModule,
   ],
   controllers: [RedisController],
   providers: [RedisService],

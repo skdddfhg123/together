@@ -6,8 +6,9 @@ export class LoggerMiddleware implements NestMiddleware {
 
     use(req: Request, res: Response, next: NextFunction) {
         console.log(`[Request] ${req.method} - ${req.url}`);
+        // console.log(`[Request] ${req.headers}`);
         res.on('finish', () => {
-          console.log(`[Response] ${req.method} - ${req.url} - Status: ${res.statusCode}`);
+          // console.log(`[Response] ${req.method} - ${req.url} - Status: ${res.statusCode}`);
         });
         next();
     }

@@ -16,6 +16,48 @@ export class KakaoService {
         private httpService: HttpService,
     ) {}
 
+    /** 카카오 엑세스 토큰 재발급 */
+    async refreshKakaoToken(refreshToken: string): Promise<string> {
+      const url = 'https://kauth.kakao.com/oauth/token';
+      const params = new URLSearchParams();
+      params.append('grant_type', 'refresh_token');
+      params.append('client_id', 'YOUR_REST_API_KEY');
+      params.append('refresh_token', refreshToken);
+  
+      try {
+          const response = await firstValueFrom(
+              this.httpService.post(url, params.toString(), {
+                  headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded'
+                  }
+              })
+          );
+          const data = response.data;
+          return data.access_token;
+      } catch (error) {
+          console.error('Error refreshing Kakao token:', error);
+          throw new Error('Unable to refresh token');
+      }
+    }
+
+    async verifyKakaoToken(accessToken: string): Promise<boolean> {
+      const url = 'https://kapi.kakao.com/v1/user/access_token_info';
+      try {
+          const response = await firstValueFrom(
+              this.httpService.get(url, {
+                  headers: {
+                      Authorization: `Bearer ${accessToken}`
+                      // Authorization: accessToken
+                  }
+              })
+          );
+          return response.status === 200;
+      } catch (error) {
+          console.error('Invalid Kakao access token:', error);
+          return false;
+      }
+    }
+
     async fetchCalendarEvents(accessToken: string, month:string, day: number): Promise<Array<any>> {
       const url = 'https://kapi.kakao.com/v2/api/calendar/events';
   
@@ -23,6 +65,7 @@ export class KakaoService {
         const response = await firstValueFrom(this.httpService.get(url, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
+            // 'Authorization': accessToken,
           },
           params: {
               // 'filter': 'USER',
