@@ -6,6 +6,7 @@ import { GroupEvent } from "./entities/groupEvent.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Between, Repository } from "typeorm";
 import { CalendarService } from "src/calendar/calendar.service";
+import { UserCalendarService } from "src/db/user_calendar/userCalendar.service";
 // import { InjectRepository } from "@nestjs/typeorm";
 // import { Repository } from "typeorm";
 // import { GroupEvent } from "./entities/groupEvent.entity";
@@ -23,11 +24,15 @@ export class GroupEventService {
         private readonly groupEventRepository: Repository<GroupEvent>,
         private userService: UserService,
         private calendarService: CalendarService,
+        private userCalendarService: UserCalendarService,
     ) {}
 
     // create (그룹 이벤트 생성)
-    async createGroupEvent( userCreateGroupEventDTO : CreateGroupEventDTO, payload: PayloadResponse, calendarId: string): Promise<GroupEvent> {
-        
+    async createGroupEvent(
+        userCreateGroupEventDTO: CreateGroupEventDTO,
+        payload: PayloadResponse,
+        calendarId: string
+    ): Promise<GroupEvent> {
         // nullable : member, alerts, attetchment
         // auto : groupEventId, pinned, createdAt, updatedAt, deactivatedAt
         // relation : calendarId
@@ -38,9 +43,11 @@ export class GroupEventService {
         // get author by JWT
         const user = await this.userService.findOne({ useremail: payload.useremail })
         if (!user) {
-            throw new UnauthorizedException("User not found");
+            throw new UnauthorizedException("createGroupEvent User not found");
         }
+
         groupEvent.author = user.userId;
+
         // get calendarId by relation
         if (!calendarId) {
             throw new NotFoundException('Calendar not found');
@@ -48,12 +55,13 @@ export class GroupEventService {
         groupEvent.calendarId = calendarId;
         
         // get DTO
-        const {group, title, color, startAt, endAt} = userCreateGroupEventDTO;
-        groupEvent.groupName = group;
+        const { title, color, startAt, endAt, emails} = userCreateGroupEventDTO;
         groupEvent.title = title;
         groupEvent.color = color;
         groupEvent.startAt = startAt;
         groupEvent.endAt = endAt;
+        groupEvent.member = emails;
+
 
         try {
             console.log(groupEvent);

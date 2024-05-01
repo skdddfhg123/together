@@ -16,9 +16,6 @@ export class GroupEvent {
     member: string[];
 
     @Column()
-    groupName: string;
-
-    @Column()
     title: string;
 
     @Column()

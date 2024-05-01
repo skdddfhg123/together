@@ -43,50 +43,6 @@ export class CalendarController {
     ): Promise<{status: number, message: string}> {
         return this.calendarService.addAttendeeToCalendar(calendarId, payload);
     }
-    // @Get('/groupCalendar')
-    // @ApiBearerAuth('JWT-auth')
-    // @UseGuards(JwtAuthGuard)
-    // async findAllGroupCalendar(
-    //     @getPayload() payload: PayloadResponse
-    // ): Promise<Calendar[] | void> {
-        
-    //     return await this.userCalendarService.findGroupCalendar(payload);
-    // }
-
-    // @Get()
-    // async getUsers() {
-    //     return 'Get Users';
-    // }
-
-    // @Post()
-    // async createSchedule() {
-    //     return 'Create Schedule';
-    // }
-
-    // @Post('/:id')
-    // @UseInterceptors(FileFieldsInterceptor([
-    //     {name: 'cover_image', maxCount: 1},
-    //     {name: 'banner_image', maxCount: 1}
-    // ]))
-    // async createCalendar(
-    //     @Body() body: CalendarCreateDto, 
-    //     @UploadedFile() cover_image?: Express.Multer.File,
-    //     @UploadedFile() banner_image?: Express.Multer.File
-    // ) {
-    // @Post('/:id')
-    // @UseInterceptors(FileFieldsInterceptor([
-    //     {name: 'cover_image', maxCount: 1},
-    //     {name: 'banner_image', maxCount: 1}
-    // ]))
-    // async createCalendar(
-    //     @Body() body: CalendarCreateDto, 
-    //     @UploadedFile() cover_image?: Express.Multer.File,
-    //     @UploadedFile() banner_image?: Express.Multer.File
-    // ) {
-
-    //     return this.calendarService.createCalendar(body, cover_image, banner_image);
-    // }
-
     
     @Post('group/create/:calendarid')
     @ApiBearerAuth('JWT-auth')
@@ -132,10 +88,13 @@ export class CalendarController {
 
 
     
-    @Get('group/update/:groupeventid')
+    @Patch('group/update/:groupeventid')
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
-    async getGroupEventUpdateForm(@Param('groupeventid') groupEventId: string): Promise<GroupEvent>{
+    async getGroupEventUpdateForm(
+        @Param('groupeventid') groupEventId: string,
+        // @getPayload() payload: PayloadResponse
+    ): Promise<GroupEvent>{
         try {
         const groupEvent = await this.groupEventService.getGroupEventUpdateForm(groupEventId);
             return groupEvent;
@@ -150,7 +109,8 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     async updateGroupEvent(
         @Param('groupeventid') groupEventId: string, 
-        @Body() groupEventDTO: CreateGroupEventDTO): Promise<GroupEvent>{
+        @Body() groupEventDTO: CreateGroupEventDTO
+    ): Promise<GroupEvent>{
         try {
         const groupEvent = await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
             return groupEvent;
