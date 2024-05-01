@@ -1,11 +1,14 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString } from "class-validator";
+import { GroupEvent } from "src/db/event/group_event/entities/groupEvent.entity";
+import { User } from "src/db/user/entities/user.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
-import { Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
 @Entity()
 export class Calendar{
-    @PrimaryColumn('uuid')
+    @PrimaryGeneratedColumn('uuid')
     calendarId: string;
 
     @Column()
@@ -25,9 +28,23 @@ export class Calendar{
     @IsString()
     type: string;
 
-    // @ManyToMany(() => UserCalendar, (userCalendar) => userCalendar.calendars)
-    // @JoinColumn()
-    // userCalendars: UserCalendar[];
+    @ManyToOne(() => UserCalendar, (userCalendar) => userCalendar.groupCalendar)
+    @JoinColumn({ name: 'calendars'})
+    author: UserCalendar;
 
-    // @OneToMany(() => ) // 그룹 이벤트
+    @Column("uuid", { array: true })
+    attendees: string[];
+
+    @CreateDateColumn()
+    registeredAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
+
+    @DeleteDateColumn()
+    @ApiProperty({ description: 'The date when the user was deleted', example: '2023-01-03T00:00:00.000Z' })
+    deletedAt?: Date;
+
+    @OneToMany(() => GroupEvent, (groupEvent) => groupEvent.calendarId) // 그룹 이벤트
+    groupEvents: GroupEvent[];
 }

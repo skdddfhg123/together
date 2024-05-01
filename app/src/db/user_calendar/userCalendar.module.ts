@@ -2,18 +2,22 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserCalendar } from './entities/userCalendar.entity';
 import { UserCalendarService } from './userCalendar.service';
-import { GoogleModule } from 'src/auth/google/google.module';
-import { SocialEvent } from './entities/socialEvent.entity';
+import { SocialEvent } from '../event/socialEvent/entities/socialEvent.entity';
 import { User } from '../user/entities/user.entity';
 import { UserModule } from '../user/user.module';
+import { UserService } from '../user/user.service';
+import { Calendar } from 'src/calendar/entities/calendar.entity';
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserCalendar, SocialEvent, User]),
+    TypeOrmModule.forFeature([UserCalendar, SocialEvent, User, Calendar]),
     UserModule,
   ],
-  providers: [UserCalendarService],
+  providers: [
+        UserCalendarService,
+        UserService,
+    ],
   exports: [UserCalendarService]
 
 })

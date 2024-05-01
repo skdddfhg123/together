@@ -8,10 +8,30 @@ export class GoogleService {
     constructor(
         private httpService: HttpService,
     ) {}
-    async findByProviderIdOrSave(googleUser: GoogleUser) {
-        // 액세스 토큰 반환 및 리프레쉬토큰 저장용 함수
 
-        return googleUser as GoogleUser;
+    /** 구글 엑세스 토큰 재발급 */
+    async refreshGoogleToken(refreshToken: string): Promise<string> {
+        const url = 'https://oauth2.googleapis.com/token';
+        const body = new URLSearchParams();
+        body.append('client_id', 'YOUR_CLIENT_ID');
+        body.append('client_secret', 'YOUR_CLIENT_SECRET');
+        body.append('refresh_token', refreshToken);
+        body.append('grant_type', 'refresh_token');
+    
+        try {
+            const response = await firstValueFrom(
+                this.httpService.post(url, body.toString(), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+            );
+            const data = response.data;
+            return data.access_token; // 새로 발급받은 액세스 토큰 반환
+        } catch (error) {
+            console.error('Error refreshing Google token:', error);
+            throw new Error('Unable to refresh token');
+        }
     }
 
     async verifyToken(accessToken: string): Promise<boolean> {
@@ -34,9 +54,7 @@ export class GoogleService {
                 'Authorization': `Bearer ${accessToken}`
                 }
             }));
-        //   console.log('Events:', response.data.items);
         // console.log(response.data.items)
-        
             return response.data.items;
         } catch (error) {
             console.error('Error fetching calendar events:', error.response?.data);

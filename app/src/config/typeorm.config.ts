@@ -26,4 +26,4 @@ export const typeORMConfig : TypeOrmModuleOptions = {
     // timezone: 'local',
 }
 
-console.log(typeORMConfig);
+// console.log(typeORMConfig);

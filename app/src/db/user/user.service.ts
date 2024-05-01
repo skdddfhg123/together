@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 //import { UserRepository } from './user.repository';
@@ -6,6 +6,10 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from './dtos/create-user.dto';
+import { PayloadResponse } from 'src/auth/dtos/payload-response';
+import { Calendar } from 'src/calendar/entities/calendar.entity';
+import { UserCalendar } from '../user_calendar/entities/userCalendar.entity';
+import { UserCalendarService } from '../user_calendar/userCalendar.service';
 
 @Injectable()
 export class UserService {
@@ -23,7 +27,7 @@ export class UserService {
 
         const existingNickname = await this.userRepository.findOne({ where: { nickname: userDTO.nickname } });
         if (existingNickname) {
-            throw new ConflictException('Username already exists');
+            throw new ConflictException('Nickname already exists');
         }
 
         const user = new User();
@@ -51,6 +55,10 @@ export class UserService {
         }
         return user;
     }
+
+    // async findGroupCalendar(payload: PayloadResponse): Promise<Calendar[] | void> {
+        
+    // }
 
     // async signIn(authCredentialsDto: UserCredentialsDto): Promise<{accessToken: string}> {
 
