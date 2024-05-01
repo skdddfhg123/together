@@ -18,26 +18,50 @@ export class CalendarService {
         private userCalendarService: UserCalendarService,
     ) {}
 
+    // async createGroupCalendar(body: CalendarCreateDto, payload: PayloadResponse): Promise<Calendar> {
+    //     const { title, type } = body;
+
+    //     const newGroupCalendar = new Calendar();
+    //     const author = await this.userService.findOne({ useremail: payload.useremail });
+    //     if (!author) {
+    //         throw new UnauthorizedException("User not found");
+    //     }
+    //     newGroupCalendar.title = title;
+    //     newGroupCalendar.type = type;
+    //     newGroupCalendar.attendees = [payload.userCalendarId];
+    //     newGroupCalendar.author = author;
+        
+    //     const userCalendar = await this.userCalendarService.findOne({ userCalendarId: payload.userCalendarId });
+    //     console.log('UserCalendar ID:', userCalendar.userCalendarId);
+    //     if (!userCalendar) {
+    //         throw new UnauthorizedException("UserCalendar not found");
+    //     }
+        
+    //     newGroupCalendar.author = userCalendar;
+
+    //     try {
+    //         const savedGroupCalendar = await this.calendarRepository.save(newGroupCalendar);
+    //         console.log('Saved Group Calendar:', savedGroupCalendar);
+    //         return savedGroupCalendar;
+    //     } catch (e) {
+    //         console.error('Error saving group calendar:', e);
+    //         throw new InternalServerErrorException('Error saving group calendar');
+    //     }
+    // }
     async createGroupCalendar(body: CalendarCreateDto, payload: PayloadResponse): Promise<Calendar> {
         const { title, type } = body;
-
-        const newGroupCalendar = new Calendar();
-        const author = await this.userService.findOne({ useremail: payload.useremail });
+    
+        const author = await this.userCalendarService.findOne({ userCalendarId: payload.userCalendarId });
         if (!author) {
-            throw new UnauthorizedException("User not found");
+            throw new NotFoundException("UserCalendar not found");
         }
+    
+        const newGroupCalendar = new Calendar();
         newGroupCalendar.title = title;
         newGroupCalendar.type = type;
         newGroupCalendar.attendees = [payload.userCalendarId];
-        
-        const userCalendar = await this.userCalendarService.findOne({ userCalendarId: payload.userCalendarId });
-        console.log('UserCalendar ID:', userCalendar.userCalendarId);
-        if (!userCalendar) {
-            throw new UnauthorizedException("UserCalendar not found");
-        }
-        
-        newGroupCalendar.author = userCalendar;
-
+        newGroupCalendar.author = author;  // 할당된 UserCalendar 인스턴스 사용
+    
         try {
             const savedGroupCalendar = await this.calendarRepository.save(newGroupCalendar);
             console.log('Saved Group Calendar:', savedGroupCalendar);
@@ -47,6 +71,25 @@ export class CalendarService {
             throw new InternalServerErrorException('Error saving group calendar');
         }
     }
+
+    async findCalendarsByUserCalendarId(userCalendarId: string): Promise<Calendar[]> {
+        try {
+          const calendars = await this.calendarRepository
+            .createQueryBuilder("calendar")
+            .leftJoinAndSelect("calendar.author", "author")
+            .where("author.userCalendarId = :userCalendarId", { userCalendarId })
+            .orWhere(":userCalendarId = ANY(calendar.attendees)", { userCalendarId })
+            .getMany();
+    
+          if (calendars.length === 0) {
+            throw new NotFoundException(`No calendars found associated with userCalendarId ${userCalendarId}`);
+          }
+          return calendars;
+        } catch (e) {
+          console.error('Error occurred while fetching calendars:', e);
+          throw new InternalServerErrorException('Failed to fetch calendars');
+        }
+      }
 
     async addAttendeeToCalendar(calendarId: string, payload: PayloadResponse):Promise<{status: number, message: string}> {
         const calendar = await this.calendarRepository.findOne({

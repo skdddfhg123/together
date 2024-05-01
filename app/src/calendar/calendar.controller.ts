@@ -34,6 +34,19 @@ export class CalendarController {
         return await this.calendarService.createGroupCalendar(calendarCreateDto, payload);
     }
 
+    @Get('get_calendar')
+    @ApiOperation({ summary: 'Get all group calendars for a user' })
+    @ApiResponse({ status: 200, description: 'Calendars retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'Calendars not found' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async getGroupCalendar(
+        @getPayload() payload: PayloadResponse
+    ): Promise<Calendar[]> {
+        return await this.calendarService.findCalendarsByUserCalendarId(payload.userCalendarId);
+    }
+
     @Patch('add_attendee/:calendarId')
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
