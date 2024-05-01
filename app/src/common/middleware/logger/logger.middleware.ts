@@ -1,5 +1,4 @@
 import { Injectable, Module, NestMiddleware } from '@nestjs/common';
-import { TextChannel } from 'discord.js';
 import { Request, Response, NextFunction } from 'express';
 import { DiscordBotService } from 'src/discordBot.service';
 

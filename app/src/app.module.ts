@@ -15,6 +15,7 @@ import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GroupEventModule } from './db/event/group_event/groupEvent.module';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
+import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { DiscordBotService } from './discordBot.service';
     KakaoModule,
     CalendarModule,
     GroupEventModule,
+    SocialEventModule,
   ],
   controllers: [RedisController],
   providers: [RedisService, DiscordBotService],

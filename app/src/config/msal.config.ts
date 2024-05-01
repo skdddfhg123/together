@@ -9,7 +9,7 @@ export default registerAs('msal', () => ({
   system: {
     loggerOptions: {
       loggerCallback: (logLevel, message, containsPii) => {
-        console.log(message);
+        // console.log(message);
       },
       piiLoggingEnabled: false,
       logLevel: "Verbose",
