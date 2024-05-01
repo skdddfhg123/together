@@ -4,26 +4,6 @@ import { IsArray, IsBoolean, IsDate, IsEmail, IsInt, IsNotEmpty, IsOptional, IsS
 import { CreateDateColumn } from "typeorm";
 
 export class CreateGroupEventDTO {
-
-    /*
-    @ApiPropertyOptional({
-        description: 'List of member UUIDs participating in the event',
-        type: [String],
-        example: ['123e4567-e89b-12d3-a456-426614174000'],
-    })
-    @IsOptional()
-    @IsArray()
-    @IsUUID(undefined, { each: true }) 
-    members?: string[];
-    */
-
-    @ApiProperty({
-        description: 'UUID of the group associated with the event',
-        example: '123e4567-e89b-12d3-a456-426614174000',
-    })
-    @IsString()
-    group: string;
-
     @ApiProperty({
         description: 'Title of the event',
         example: 'Team Meeting',
@@ -60,4 +40,12 @@ export class CreateGroupEventDTO {
     @Type(() => Date)
     endAt: Date;
 
+    @ApiProperty({
+        description: 'Array of emails for participants',
+        example: ['user1@example.com', 'user2@example.com'],
+        isArray: true,
+    })
+    @IsArray()
+    @IsString({ each: true })
+    emails: string[];
 }

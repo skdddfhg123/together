@@ -50,7 +50,7 @@ export class User extends BaseEntity{
    
     @OneToOne(() => UserCalendar, userCalendar => userCalendar.user)
     @JoinColumn({ name: 'userCalendarId' })
-    userCalendars: UserCalendar
+    userCalendarId: UserCalendar
 
     // Relation
     //@OneToMany(type => Board, board => board.user, {eager : true})

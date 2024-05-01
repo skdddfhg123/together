@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 //import { UserRepository } from './user.repository';
@@ -8,6 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { Calendar } from 'src/calendar/entities/calendar.entity';
+import { UserCalendar } from '../user_calendar/entities/userCalendar.entity';
+import { UserCalendarService } from '../user_calendar/userCalendar.service';
 
 @Injectable()
 export class UserService {

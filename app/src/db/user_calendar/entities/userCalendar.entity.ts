@@ -9,7 +9,7 @@ export class UserCalendar {
     @PrimaryGeneratedColumn('uuid')
     userCalendarId: string;
     
-    @OneToOne(() => User, user => user.userCalendars)
+    @OneToOne(() => User, user => user.userCalendarId)
     @JoinColumn({ name: 'userId'})
     user: User
 
