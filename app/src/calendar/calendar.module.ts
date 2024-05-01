@@ -11,10 +11,11 @@ import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { UserCalendarModule } from 'src/db/user_calendar/userCalendar.module';
 import { GroupEventModule } from 'src/db/event/group_event/groupEvent.module';
 import { JWTStrategy } from 'src/auth/jwt.strategy';
+import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Calendar, User, UserCalendar]),
+    TypeOrmModule.forFeature([Calendar, User, UserCalendar, GroupEvent]),
     UserModule,
     UserCalendarModule,
     GroupEventModule,

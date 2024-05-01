@@ -5,6 +5,7 @@ import { CreateDateColumn } from "typeorm";
 
 export class CreateGroupEventDTO {
 
+    /*
     @ApiPropertyOptional({
         description: 'List of member UUIDs participating in the event',
         type: [String],
@@ -14,12 +15,13 @@ export class CreateGroupEventDTO {
     @IsArray()
     @IsUUID(undefined, { each: true }) 
     members?: string[];
+    */
 
     @ApiProperty({
         description: 'UUID of the group associated with the event',
         example: '123e4567-e89b-12d3-a456-426614174000',
     })
-    @IsUUID()
+    @IsString()
     group: string;
 
     @ApiProperty({
@@ -36,33 +38,6 @@ export class CreateGroupEventDTO {
     @IsString()
     color: string;
 
-    @ApiPropertyOptional({
-        description: 'Pin status of the event',
-        example: false,
-    })
-    //@IsOptional()
-    @IsBoolean()
-    pinned: boolean;
-
-
-
-
-    @ApiPropertyOptional({
-        description: 'Number of alerts set for the event',
-        example: 2,
-    })
-    @IsOptional()
-    @IsInt()
-    alerts?: number;
-
-    @ApiPropertyOptional({
-        description: 'Attachment details for the event',
-        type: 'object',
-    })
-    @IsOptional()
-    attachment?: any;
-
-    
     
     @ApiProperty({
         description: 'Start date and time of the event',
@@ -75,9 +50,6 @@ export class CreateGroupEventDTO {
     startAt: Date;
 
 
-
-
-
     @ApiProperty({
         description: 'End date and time of the event',
         type: 'string',
@@ -87,7 +59,5 @@ export class CreateGroupEventDTO {
     @IsDate()
     @Type(() => Date)
     endAt: Date;
-
-
 
 }
