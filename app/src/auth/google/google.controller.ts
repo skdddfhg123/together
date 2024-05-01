@@ -20,50 +20,38 @@ export class GoogleController {
         private socialEventService: SocialEventService,
     ) {}
 
-    // @Get('login')
-    // @UseGuards(AuthGuard('google'))
-    // async logInGoogleAuth(): Promise<void> {
-    // }
+    @Get('login')
+    @UseGuards(AuthGuard('google'))
+    async logInGoogleAuth(): Promise<void> {
+    }
 
-    // @Get('redirect')
-    // // @UseGuards(JwtAuthGuard)
-    // @UseGuards(AuthGuard('google'))
-    // async googleAuthCallback(@Req() req, @Res() res: Response/*, @GetUser() user: User*/): Promise<Array<SocialEvent>> {
+    @Get('redirect')
+    // @UseGuards(JwtAuthGuard)
+    @UseGuards(AuthGuard('google'))
+    async googleAuthCallback(@Req() req, @Res() res: Response/*, @GetUser() user: User*/) {
         
-    //     const googleUser = req.user as GoogleUser
+        const googleUser = req.user as GoogleUser
         
-    //     // const savedUser = await this.googleService.findByProviderIdOrSave(googleUser); // refresh Token bisuness logic
+        // const savedUser = await this.googleService.findByProviderIdOrSave(googleUser); // refresh Token bisuness logic
 
-    //     const isValid = await this.googleService.verifyToken(googleUser.accessToken);
+        // console.log(googleUser.refreshToken);
 
-        
-    //     if(isValid)
-    //     {
-    //         const googleCalendars = await this.googleService.fetchCalendarEvents(googleUser.accessToken);
+        const url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+    
+        // try {
+        //     const response = await firstValueFrom(this.httpService.get(url, {
+        //         headers: {
+        //         'Authorization': `Bearer ${accessToken}`
+        //         }
+        //     }));
+        // // console.log(response.data.items)
+        //     return response.data.items;
+        // } catch (error) {
+        //     console.error('Error fetching calendar events:', error.response?.data);
+        //   throw new InternalServerErrorException('Failed to fetch calendar events');
+        // }
 
-    //         await this.socialEventService.deleteAll('google')
-    //         // console.log(googleCalendars)
-    //         const savePromises = googleCalendars.map(event => {
-    //             const socialEvent = new SocialEventDto();
-    //             socialEvent.social = 'google';
-    //             socialEvent.title = event.summary;
-    //             socialEvent.startAt = event.start.date || event.start.dateTime;
-    //             socialEvent.endAt = event.end.date || event.end.dateTime;
-    //             const isSaved =  this.socialEventService.saveSocialCalendar(socialEvent/*, user*/);
-    //             if(isSaved != null)
-    //                 return isSaved
-    //         })
-
-    //         const resultArray = await Promise.all(savePromises);
-
-    //         return resultArray;
-    //     }
-    //     else
-    //     {
-    //         // console.log('invalid token');
-    //         throw new UnauthorizedException('Invalid Access Token');
-    //     }
-    // }
+    }
 
     @ApiResponse({
         status: 201,

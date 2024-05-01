@@ -75,20 +75,23 @@ export class CalendarService {
     }
 
     async updateGroupCalendar(calendarId: string, body: CalendarUpdateDto, payload: PayloadResponse): Promise<Calendar> {
-        const calendar = await this.calendarRepository.findOne({
-            where: {
-                calendarId: calendarId,
-                attendees: Raw(alias => `'${payload.userCalendarId}' = ANY(${alias})`)
-            },
-        });
-    
+        // Ensure payload is not null and has all required properties
+        if (!payload || typeof payload.userCalendarId !== 'string') {
+            throw new Error('Invalid payload: Payload is missing or userCalendarId is not provided');
+        }
+        // Using QueryBuilder to safely query arrays with parameters
+        const calendar = await this.calendarRepository.createQueryBuilder("calendar")
+            .where("calendar.calendarId = :calendarId", { calendarId })
+            .andWhere(":userCalendarId = ANY(calendar.attendees)", { userCalendarId: payload.userCalendarId })
+            .getOne();
         if (!calendar) {
             throw new NotFoundException(`Calendar with ID ${calendarId} not found`);
         }
-        if (calendar.author.userCalendarId !== payload.userCalendarId) {
-            throw new ForbiddenException("You do not have permission to update this calendar.");
-        }
+        // if (calendar.author?.userCalendarId !== payload.userCalendarId) {
+        //     throw new ForbiddenException("You do not have permission to update this calendar.");
+        // }
     
+        // Update fields if they are present in the body
         if (body.title) {
             calendar.title = body.title;
         }
@@ -96,9 +99,11 @@ export class CalendarService {
             calendar.type = body.type;
         }
     
+        // Try to save the updated calendar
         try {
-            return await this.calendarRepository.save(calendar);;
+            return await this.calendarRepository.save(calendar);
         } catch (e) {
+            console.error("Error updating calendar:", e);
             throw new InternalServerErrorException('Error updating group calendar');
         }
     }
