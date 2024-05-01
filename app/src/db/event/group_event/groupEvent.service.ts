@@ -69,7 +69,7 @@ export class GroupEventService {
             const groupEvents = await this.groupEventRepository.find({
                 where: {
                 calendarId: calendarId,
-                deactivatedAt: false
+                isDeleted: false
                 },
                 order: {
                     startAt: 'ASC'
@@ -94,7 +94,7 @@ export class GroupEventService {
             try {
             
             const groupEvent = await this.groupEventRepository.findOne({
-                where: { groupEventId: groupEventId, deactivatedAt : false 
+                where: { groupEventId: groupEventId, isDeleted : false 
                  },
                 
             });
@@ -123,57 +123,54 @@ export class GroupEventService {
         } catch (e) {
             throw new InternalServerErrorException('Failed to modify group event');
         }
-     }
+    }
 
-
-    
-    //그룹 이벤트 수정 
-    
-    async updateGroupEvent(groupEventId : string, updateData: Partial<GroupEvent>): Promise<GroupEvent> {
+    async updateGroupEvent(groupEventId: string, updateData: Partial<GroupEvent>): Promise<GroupEvent> {
         try {
             // 해당 ID의 GroupEvent를 찾습니다.
-            const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId: updateData.groupEventId }  });
-
+            const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId } });
+    
             if (!groupEventToUpdate) {
-                throw new Error('Group event not found');
+                throw new NotFoundException('Group event not found');
             }
-
+    
             // 찾은 GroupEvent의 속성을 업데이트합니다.
             const updatedGroupEvent = this.groupEventRepository.merge(groupEventToUpdate, updateData);
-            updatedGroupEvent.updatedAt = new Date();
+            updatedGroupEvent.updatedAt = new Date();  // 갱신 시간 업데이트
             // 변경된 GroupEvent를 저장합니다.
-            const modifiedGroupEvent = await this.groupEventRepository.save(updatedGroupEvent);
-            return modifiedGroupEvent;
+            return await this.groupEventRepository.save(updatedGroupEvent);
         } catch (e) {
-            console.error('Error occurred:', e);
+            console.error('Error occurred while updating the group event:', e);
             throw new InternalServerErrorException('Failed to modify group event');
         }
     }
+    
 
 
 
     // 그룹 이벤트 삭제
-    async removeGroupEvent( groupEventId : string ): Promise<GroupEvent> {
+    async removeGroupEvent(groupEventId: string): Promise<GroupEvent> {
         try {
-        
             const groupEvent = await this.groupEventRepository.findOne({
-                where: { groupEventId: groupEventId },
+                where: { groupEventId },
             });
-
+    
             if (!groupEvent) {
-                throw new Error('Group event not found');
+                throw new NotFoundException('Group event not found');
             }
-
-            if (groupEvent.deactivatedAt === true) {
-                throw new Error('Already removed group event');
+    
+            if (groupEvent.isDeleted) {
+                throw new Error('Group event is already marked as deleted');
             }
-            groupEvent.deactivatedAt = true;
-
+    
+            groupEvent.isDeleted = true;
+            groupEvent.deletedAt = new Date();  // 설정 삭제 시간
+    
             const updatedGroupEvent = await this.groupEventRepository.save(groupEvent);
             return updatedGroupEvent;
         } catch (e) {
             console.error('Error occurred:', e);
-            throw new InternalServerErrorException('Failed to deactivate group event');
+            throw new InternalServerErrorException('Failed to mark group event as deleted');
         }
     }
     

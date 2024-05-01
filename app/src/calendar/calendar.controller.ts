@@ -6,11 +6,11 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { Calendar } from './entities/calendar.entity';
-import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { GroupEventService } from 'src/db/event/group_event/groupEvent.service';
 import { CreateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.create.dto';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
 import { CalendarUpdateDto } from './dtos/calendar.update.dto';
+import { UpdateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.update.dto';
 
 @ApiTags("calendar")
 @Controller('calendar')
@@ -62,9 +62,18 @@ export class CalendarController {
         return await this.calendarService.updateGroupCalendar(calendarId, calendarUpdateDto, payload);
     }
 
-    // 캘린더 삭제 (하위 그룹 이벤트 순회 돌면서 일정 삭제)
+    @Patch('delete/:calendarId')
+    @ApiOperation({ summary: 'Delete a calendar and its associated group events' })
+    @ApiResponse({ status: 200, description: 'Calendar and associated group events deleted successfully' })
+    @ApiResponse({ status: 404, description: 'Calendar not found' })
+    @ApiResponse({ status: 500, description: 'Failed to delete calendar' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async deleteCalendar(@Param('calendarId') calendarId: string): Promise<void> {
+        await this.calendarService.deleteCalendar(calendarId);
+    }
 
-    @Patch('add_attendee/:calendarId')
+    @Patch('participate/:calendarId')
     @ApiOperation({ summary: '그룹 캘린더 참여하기' })
     @ApiResponse({ status: 200, description: 'Attendee added successfully' })
     @ApiResponse({ status: 404, description: 'CalendarId is not found' })
@@ -76,6 +85,20 @@ export class CalendarController {
         @getPayload() payload: PayloadResponse
     ): Promise<string> {
         return this.calendarService.addAttendeeToCalendar(calendarId, payload);
+    }
+
+    @Patch('withdraw/:calendarId')
+    @ApiOperation({ summary: '그룹 캘린더 나가기' })
+    @ApiResponse({ status: 200, description: 'Attendee removed successfully' })
+    @ApiResponse({ status: 404, description: 'CalendarId is not found' })
+    @ApiResponse({ status: 409, description: 'Attendee does not exist.' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async subAttendee(
+        @Param('calendarId') calendarId: string,
+        @getPayload() payload: PayloadResponse
+    ): Promise<string> {
+        return this.calendarService.removeAttendeeFromCalendar(calendarId, payload.userCalendarId);
     }
     
     @Post('group/create/:calendarId')
@@ -95,7 +118,7 @@ export class CalendarController {
     }
 
     @Get('group/get/:calendarId')
-    @ApiOperation({ summary: '그룹 이벤트 가져오기' })
+    @ApiOperation({ summary: '캘린더 그룹 이벤트 가져오기' })
     @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
     @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
     @ApiBearerAuth('JWT-auth')
@@ -114,6 +137,32 @@ export class CalendarController {
         @Param('groupeventid') groupEventId: string,
     ): Promise<GroupEvent>{
         return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
+    }
+
+    @Patch('group/update/:groupeventid')
+    @ApiOperation({ summary: '그룹 이벤트 업데이트' })
+    @ApiResponse({ status: 200, description: 'Group event updated successfully' })
+    @ApiResponse({ status: 404, description: 'Group event not found' })
+    @ApiResponse({ status: 500, description: 'Error updating group event' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async updateGroupEvent(
+        @Param('groupeventid') groupEventId: string, 
+        @Body() groupEventDTO: UpdateGroupEventDTO
+    ): Promise<GroupEvent> {
+            return await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
+    }
+
+    @Patch('group/remove/:groupeventid')
+    @ApiOperation({ summary: '그룹 이벤트 제거' })
+    @ApiResponse({ status: 200, description: 'Group event removed successfully' })
+    @ApiResponse({ status: 403, description: 'You do not have permission to remove this event' })
+    @ApiResponse({ status: 404, description: 'Group event not found' })
+    @ApiResponse({ status: 500, description: 'Error removing group event' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async removeGroupEvent(@Param('groupeventid') groupEventId: string): Promise<GroupEvent> {
+        return await this.groupEventService.removeGroupEvent(groupEventId);
     }
 
     // @Get('group/get/')
@@ -140,39 +189,4 @@ export class CalendarController {
     //         throw e; 
     //     }
     // }
-
-    @Post('group/update/:groupeventid')
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
-    async updateGroupEvent(
-        @Param('groupeventid') groupEventId: string, 
-        @Body() groupEventDTO: CreateGroupEventDTO
-    ): Promise<GroupEvent>{
-        try {
-        const groupEvent = await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
-            return groupEvent;
-        } catch (e) {
-            throw e; 
-        }
-    }
-
-    @Patch('group/remove/:groupeventid')
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
-    async removeGroupEvent(@Param('groupeventid') groupEventId: string): Promise<GroupEvent>{
-        try {
-        const groupEvent = await this.groupEventService.removeGroupEvent(groupEventId);
-            return groupEvent;
-        } catch (e) {
-            throw e; 
-        }
-    }
-
-    
-
-    // 
-
-
-
-
 }

@@ -10,6 +10,7 @@ import { UserService } from 'src/db/user/user.service';
 import { CalendarService } from 'src/calendar/calendar.service';
 import { SocialEventService } from './socialEvent.service';
 import { SocialEvent } from './entities/socialEvent.entity';
+import { GroupEventModule } from '../group_event/groupEvent.module';
 
 
 @Module({
@@ -17,6 +18,7 @@ import { SocialEvent } from './entities/socialEvent.entity';
     TypeOrmModule.forFeature([ SocialEvent ,User, UserCalendar, Calendar]),
     UserModule,
     UserCalendarModule,
+    GroupEventModule
     //CalendarModule,
   ],
   providers: [SocialEventService, UserService, CalendarService],

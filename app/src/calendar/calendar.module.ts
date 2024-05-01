@@ -15,7 +15,8 @@ import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Calendar, User, UserCalendar, GroupEvent]),
+    TypeOrmModule.forFeature([Calendar, GroupEvent]),
+    CalendarModule,
     UserModule,
     UserCalendarModule,
     GroupEventModule,

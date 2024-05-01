@@ -47,4 +47,7 @@ export class Calendar{
 
     @OneToMany(() => GroupEvent, (groupEvent) => groupEvent.calendarId) // 그룹 이벤트
     groupEvents: GroupEvent[];
+
+    @Column({ default: false })
+    isDeleted: boolean;
 }
