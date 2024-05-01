@@ -1,16 +1,5 @@
 import create from 'zustand';
-
-interface BearState {
-  bears: number;
-  increasePopulation: () => void;
-  removeAllBears: () => void;
-}
-
-export const useStore = create<BearState>((set) => ({
-  bears: 0,
-  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
-  removeAllBears: () => set({ bears: 0 }),
-}));
+import { KakaoEvent } from '@type/index';
 
 interface CalendarState {
   selectedDay: Date | null;
@@ -20,4 +9,24 @@ interface CalendarState {
 export const useSetDay = create<CalendarState>((set) => ({
   selectedDay: null,
   setSelectedDay: (day: Date | null) => set({ selectedDay: day }),
+}));
+
+interface SocialEvent {
+  title?: string;
+  startAt: string;
+  endAt: string;
+  isPast: boolean;
+  userCalendarId?: string;
+  social: string;
+  socialEventId: string;
+}
+
+interface SocialEventState {
+  socialEvents: SocialEvent[];
+  setSocialEvents: (events: SocialEvent[]) => void;
+}
+
+export const useSocialEventStore = create<SocialEventState>((set) => ({
+  socialEvents: [],
+  setSocialEvents: (events) => set({ socialEvents: events }),
 }));

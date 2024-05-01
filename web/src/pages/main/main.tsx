@@ -6,11 +6,11 @@ import UserModal from '@components/User/Profile/UserModal';
 
 import { useToggle } from '@hooks/useToggle';
 import * as KAKAO from '@services/KakaoAPI';
-
+import { useSocialEventStore } from '@store/index';
+import { KakaoEvent } from '@type/index';
 import menuImg from '@assets/calendar_menu.webp';
 import syncImg from '@assets/sync.png';
-import { KakaoEvent } from '@type/index';
-import { transToKorDate } from '@utils/dateTranslate';
+
 import '@styles/main.css';
 
 export default function MainPage() {
@@ -46,15 +46,17 @@ export default function MainPage() {
       const eventLists = res.data.map(
         (event: any): KakaoEvent => ({
           title: event.title || '카카오톡 일정',
-          startAt: transToKorDate(event.startAt, 9),
-          endAt: transToKorDate(event.endAt, 9),
+          // startAt: transToKorDate(event.startAt, 9),
+          // endAt: transToKorDate(event.endAt, 9),
+          startAt: event.startAt,
+          endAt: event.endAt,
           isPast: event.deactivatedAt,
           userCalendarId: event.userCalendar?.userCalendarId,
           social: event.social,
           socialEventId: event.socialEventId,
         }),
       );
-      setSocialEvents(eventLists);
+      useSocialEventStore.getState().setSocialEvents(eventLists);
     } catch (e) {
       console.error('Failed to fetch social events:', e);
     }

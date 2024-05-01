@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 
 import CalSchedule from '@components/Canlendar/CalSchedule';
 import Schedule from '@components/Canlendar/Schedule';
-import { useSetDay } from '@store/index';
+import ScheduleModal from '@components/Canlendar/ScheduleModal';
+
+import { useToggle } from '@hooks/useToggle';
+import { useSetDay, useSocialEventStore } from '@store/index';
 import { KakaoEvent } from '@type/index';
 
 import '@styles/calendar.css';
@@ -18,16 +21,18 @@ export default function CalendarPage({
   isPrevMonth,
   isNextMonth,
   currentMonth,
-  socialEvents,
 }: CalendarProps) {
+  const { isOn, toggle } = useToggle(false);
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+  const [schedule, setSchedule] = useState<{ [key: string]: JSX.Element[] }>(
+    {},
+  );
   const { selectedDay, setSelectedDay } = useSetDay((state) => ({
     selectedDay: state.selectedDay,
     setSelectedDay: state.setSelectedDay,
   }));
-  const [schedule, setSchedule] = useState<{ [key: string]: JSX.Element[] }>(
-    {},
-  );
+  const [currentDayKey, setCurrentDayKey] = useState<string>('');
+  const socialEvents = useSocialEventStore((state) => state.socialEvents);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -44,25 +49,27 @@ export default function CalendarPage({
   };
 
   const onClickDay = (day: Date) => {
-    if (isSameDay(day, selectedDay)) {
-      setSelectedDay(null);
-    } else {
-      const dayKey = day.toISOString().split('T')[0]; // 날짜를 YYYY-MM-DD 형식으로 키 생성
-      setSelectedDay(day);
-      addSchedule(dayKey);
-      console.log(`SELECTED DAY : ${day}`);
-    }
+    const dayKey = day.toISOString().split('T')[0];
+    setCurrentDayKey(dayKey);
+    setSelectedDay(day);
+    toggle(); // Open or close the modal
   };
 
-  const addSchedule = (dayKey: string) => {
+  const addSchedule = (title: string) => {
     const newSchedule = (
-      <Schedule key={dayKey + (schedule[dayKey]?.length || 0)} />
+      <div
+        key={currentDayKey + (schedule[currentDayKey]?.length || 0)}
+        className="event-title"
+      >
+        {title}
+      </div>
     );
     const updatedSchedules = {
       ...schedule,
-      [dayKey]: [...(schedule[dayKey] || []), newSchedule],
+      [currentDayKey]: [...(schedule[currentDayKey] || []), newSchedule],
     };
     setSchedule(updatedSchedules);
+    toggle(); // Close the modal after adding the schedule
   };
 
   const buildCalendarDays = () => {
@@ -126,10 +133,24 @@ export default function CalendarPage({
       const dayKey = day.toISOString().split('T')[0];
       const daySchedules = schedule[dayKey] || [];
 
+      //* 소셜 일정 render *//
+      const eventsForDay = socialEvents.filter((event) => {
+        const eventDate = new Date(event.startAt).toISOString().split('T')[0];
+        return eventDate === dayKey;
+      });
+
+      const eventElements = eventsForDay.map((event, idx) => (
+        <div key={idx} className="event-title">
+          {event.title || 'No Title'}
+        </div>
+      ));
+      //* *************** *//
+
       if (day.getMonth() < currentMonth.getMonth()) {
         return (
           <td key={i} className="prevMonthDay">
             <div>{isPrevMonth ? day.getDate() : ''}</div>
+            {eventElements}
             <CalSchedule schedule={daySchedules} day={day} />
           </td>
         );
@@ -138,6 +159,7 @@ export default function CalendarPage({
         return (
           <td key={i} className="nextMonthDay">
             <div>{isNextMonth ? day.getDate() : ''}</div>
+            {eventElements}
             <CalSchedule schedule={daySchedules} day={day} />
           </td>
         );
@@ -152,6 +174,7 @@ export default function CalendarPage({
       return (
         <td key={i} className={dayClasses} onClick={() => onClickDay(day)}>
           <div className="day">{day.getDate()}</div>
+          {eventElements}
           <CalSchedule schedule={daySchedules} day={day} />
         </td>
       );
@@ -191,6 +214,11 @@ export default function CalendarPage({
           ))}
         </tbody>
       </table>
+      <ScheduleModal
+        isOpen={isOn}
+        onClose={() => toggle()}
+        onSave={(title) => addSchedule(title)}
+      />
     </div>
   );
 }
