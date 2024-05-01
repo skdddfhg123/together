@@ -14,6 +14,7 @@ import { DataSource } from 'typeorm';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GroupEventModule } from './db/event/group_event/groupEvent.module';
 import { GoogleModule } from './auth/google/google.module';
+import { DiscordBotService } from './discordBot.service';
 
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { GoogleModule } from './auth/google/google.module';
     GroupEventModule,
   ],
   controllers: [RedisController],
-  providers: [RedisService],
+  providers: [RedisService, DiscordBotService],
   exports: [RedisService],
 })
 export class AppModule implements NestModule {
