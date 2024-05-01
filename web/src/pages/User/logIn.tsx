@@ -7,7 +7,8 @@ import SignIn from '@components/User/SignIn';
 
 import useToggle from '@hooks/useToggle';
 import * as API from '@utils/api';
-// import chkErrMsg from '@utils/error';
+import { Cookie } from '../../common/types';
+import { setCookie } from '@utils/cookie';
 
 interface SignInForm {
   useremail: string;
@@ -35,7 +36,19 @@ export default function LogInPage() {
       });
       if (!res) throw new Error('가입 실패');
       console.log(res); //debug//
-      localStorage.setItem('accessToken', res.data.accessToken);
+
+      const loginCookie: Cookie = {
+        name: 'accessToken',
+        value: res.data.accessToken,
+        options: {
+          path: '/',
+          maxAge: 3600,
+          secure: true,
+          sameSite: 'strict',
+        },
+      };
+      setCookie(loginCookie);
+
       alert('로그인 성공');
       navigate('/main');
     } catch (e) {

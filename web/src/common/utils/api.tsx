@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCookie } from '@utils/cookie';
 // axios.defaults.withCredentials = true;
 
 const serverUrl = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
@@ -16,12 +17,15 @@ interface Data {
 //     const response = await get('/login');
 
 async function get(endpoint: string, params?: Params) {
+  const accessToken = getCookie('accessToken');
+
   console.log(`%cGET 요청 ${serverUrl + endpoint}`, 'color: #a25cd1;');
 
   return axios.get(serverUrl + endpoint, {
     // JWT 토큰을 헤더에 담아 백엔드 서버에 보냄.
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      // Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      Authorization: `Bearer ${accessToken}`,
     },
     params: params,
   });
@@ -30,14 +34,16 @@ async function get(endpoint: string, params?: Params) {
 async function post(endpoint: string, data: Data) {
   // JSON.stringify 함수: Javascript 객체를 JSON 형태로 변환함.
   // 예시: {name: "Kim"} => {"name": "Kim"}
+  const accessToken = getCookie('accessToken');
   const bodyData = JSON.stringify(data);
+
   console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
   console.log(`%cPOST 요청 데이터: ${bodyData}`, 'color: #296aba;');
 
   return axios.post(serverUrl + endpoint, bodyData, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 }
@@ -45,6 +51,7 @@ async function post(endpoint: string, data: Data) {
 async function patch(endpoint: string, data: Data) {
   // JSON.stringify 함수: Javascript 객체를 JSON 형태로 변환함.
   // 예시: {name: "Kim"} => {"name": "Kim"}
+  const accessToken = getCookie('accessToken');
   const bodyData = JSON.stringify(data);
   console.log(`%cPUT 요청: ${serverUrl + endpoint}`, 'color: #059c4b;');
   console.log(`%cPUT 요청 데이터: ${bodyData}`, 'color: #059c4b;');
@@ -52,7 +59,7 @@ async function patch(endpoint: string, data: Data) {
   return axios.patch(serverUrl + endpoint, bodyData, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 }
@@ -60,13 +67,14 @@ async function patch(endpoint: string, data: Data) {
 // 아래 함수명에 관해, delete 단어는 자바스크립트의 reserved 단어이기에,
 // 여기서는 우선 delete 대신 del로 쓰고 아래 export 시에 delete로 alias 함.
 async function del(endpoint: string, params = '') {
+  const accessToken = getCookie('accessToken');
   console.log(
     `%cDELETE 요청 ${serverUrl + endpoint + '/' + params}`,
     'color: #c36999',
   );
   return axios.delete(serverUrl + endpoint + '/' + params, {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 }

@@ -5,12 +5,32 @@ import CanlendarList from '@components/Canlendar/CanlendarList';
 
 import useToggle from '@hooks/useToggle';
 import menuImg from '@assets/calendar_menu.webp';
+import * as API from '@utils/api';
 import '@styles/main.css';
 
+function getCookie(name: string) {
+  const matches = document.cookie.match(
+    new RegExp(
+      '(?:^|; )' +
+        name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') +
+        '=([^;]*)',
+    ),
+  );
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+const accessToken = getCookie('accessToken');
 export default function MainPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   const { isOn, toggle } = useToggle(false);
+
+  const getProfile = async () => {
+    try {
+      const res = await API.get(`/auth/token-test`);
+      console.log(res);
+    } catch (e) {}
+  };
 
   const prevCalendar = () => {
     setCurrentMonth(
@@ -49,6 +69,7 @@ export default function MainPage() {
             ▶
           </button>
         </nav>
+        <button onClick={getProfile}>쿠키</button>
       </header>
       <main id="mainSection">
         <aside id={isOn ? 'calendarList-entering' : 'calendarList-exiting'}>
