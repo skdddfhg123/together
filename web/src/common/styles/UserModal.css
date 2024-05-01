@@ -1,0 +1,18 @@
+.modal {
+  position: absolute;
+  left: -50%;
+  top: 100%;
+
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  opacity: 0; 
+  transition: opacity 0.2s, transform 0.2s;
+  transform: translateX(-50%); 
+}
+
+.modal.open {
+  opacity: 1; 
+  transform: translateX(-50%) translateY(-10px); 
+  pointer-events: auto;
+}

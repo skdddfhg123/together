@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "tsconfig.paths.json"],
+  "include": ["src", "tsconfig.paths.json", "src/common/type/kakao.d.ts"],
   "extends": "./tsconfig.paths.json"
 }

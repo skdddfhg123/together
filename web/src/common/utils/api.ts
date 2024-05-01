@@ -17,16 +17,25 @@ interface Data {
 //     const response = await get('/login');
 
 async function get(endpoint: string, params?: Params) {
-  const accessToken = getCookie('accessToken');
-
   console.log(`%cGET 요청 ${serverUrl + endpoint}`, 'color: #a25cd1;');
 
+  // if (endpoint.includes('kakao')) {
+  //   return axios.get(serverUrl + endpoint, {
+  //     headers: {
+  //       Authorization: `Bearer ${getCookie('accessToken')}`,
+  //       'X-Kakao-Token': getCookie('kakaoToken'),
+  //     },
+  //     withCredentials: true,
+  //     params: params,
+  //   });
+  // }
+
   return axios.get(serverUrl + endpoint, {
-    // JWT 토큰을 헤더에 담아 백엔드 서버에 보냄.
     headers: {
       // Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${getCookie('accessToken')}`,
     },
+    withCredentials: true,
     params: params,
   });
 }
@@ -34,7 +43,6 @@ async function get(endpoint: string, params?: Params) {
 async function post(endpoint: string, data: Data) {
   // JSON.stringify 함수: Javascript 객체를 JSON 형태로 변환함.
   // 예시: {name: "Kim"} => {"name": "Kim"}
-  const accessToken = getCookie('accessToken');
   const bodyData = JSON.stringify(data);
 
   console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
@@ -43,7 +51,7 @@ async function post(endpoint: string, data: Data) {
   return axios.post(serverUrl + endpoint, bodyData, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${getCookie('accessToken')}`,
     },
   });
 }

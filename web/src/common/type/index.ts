@@ -13,3 +13,13 @@ interface CookieOptions {
   httpOnly?: boolean;
   sameSite?: 'lax' | 'strict' | 'none';
 }
+
+export interface KakaoEvent {
+  title?: string;
+  startAt: string;
+  endAt: string;
+  isPast: boolean;
+  userCalendarId: string;
+  social: string;
+  socialEventId: string;
+}

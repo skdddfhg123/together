@@ -7,7 +7,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 // import { Router } from './common/routes';
 
 import { routes } from '@routes/index';
-import ErrorPage from '@pages/main/errorPage';
+import ErrorPage from '@pages/main/error';
 
 import '@styles/global.css';
 // import './style/font.css';

@@ -18,6 +18,7 @@
 
   margin-top: 0.5rem;
   margin-left: 1rem;
+  cursor:pointer;
 }
 
 #calendarLogo {
@@ -65,6 +66,24 @@
 
 #prevMonth-button:hover, #nextMonth-button:hover {
   color: #0086FF;
+  background-color: #badfff;
+}
+
+#right-menu {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 2rem;
+}
+
+#sync-button {
+  width: 2.3rem;
+  height: 2.5rem;
+  margin-right: 5rem;
+  cursor: pointer;
+}
+#sync-button:hover {
+  border-radius: 33%;
   background-color: #badfff;
 }
 

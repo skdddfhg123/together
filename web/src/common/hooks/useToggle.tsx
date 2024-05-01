@@ -7,10 +7,14 @@ import { useState } from 'react';
   <button onClick={toggle} />
 */
 
-export default function useToggle(initialValue: boolean) {
+export function useToggle(initialValue: boolean): {
+  isOn: boolean;
+  toggle: () => void;
+} {
   const [isOn, setIsOn] = useState<boolean>(initialValue);
+
   const toggle = () => {
-    setIsOn((curr: boolean) => !curr);
+    setIsOn((curr) => !curr);
   };
 
   return { isOn, toggle };

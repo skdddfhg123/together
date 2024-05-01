@@ -17,26 +17,22 @@ export default function SignUp({ onSubmit }: SignUpProps) {
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
-  const [emailValid, setEmailValid] = useState<boolean>(true);
-  const [nicknameValid, setNicknameValid] = useState<boolean>(true);
-  const [passwordValid, setPasswordValid] = useState<boolean>(true);
-  const [passwordsMatch, setPasswordsMatch] = useState<boolean>(true);
+  const [emailValid, setEmailValid] = useState<boolean | null>(true);
+  const [nicknameValid, setNicknameValid] = useState<boolean | null>(true);
+  const [passwordValid, setPasswordValid] = useState<boolean | null>(true);
+  const [passwordsMatch, setPasswordsMatch] = useState<boolean | null>(true);
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const handleInputChange = (ref: React.RefObject<HTMLInputElement>) => {
     const value = ref.current?.value ?? '';
     if (ref === useremailRef) {
       setEmailValid(emailRegex.test(value));
-    }
-    if (ref === nicknameRef) {
+    } else if (ref === nicknameRef) {
       setNicknameValid(value.length >= 4 && value.length <= 10);
-    }
-    const password = passwordRef.current?.value ?? '';
-    const confirmPassword = confirmPasswordRef.current?.value ?? '';
-    if (ref === passwordRef) {
+    } else if (ref === passwordRef || ref === confirmPasswordRef) {
+      const password = passwordRef.current?.value ?? '';
+      const confirmPassword = confirmPasswordRef.current?.value ?? '';
       setPasswordValid(password.length >= 4);
-    }
-    if (ref === confirmPasswordRef) {
       setPasswordsMatch(password === confirmPassword);
     }
   };
@@ -54,10 +50,6 @@ export default function SignUp({ onSubmit }: SignUpProps) {
       return;
     }
 
-    if (!passwordsMatch) {
-      alert('비밀번호가 일치하지 않습니다.');
-      return;
-    }
     if (!emailValid || !nicknameValid || !passwordValid || !passwordsMatch) {
       alert('양식에 맞춰 다시 작성해주세요.');
       return;
@@ -85,13 +77,14 @@ export default function SignUp({ onSubmit }: SignUpProps) {
         <input
           className={`formInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
-            emailValid ? '' : 'focus:border-red-500'
+            emailValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
           id="useremail"
           type="email"
           maxLength={50}
           ref={useremailRef}
           onChange={() => handleInputChange(useremailRef)}
+          aria-invalid={!emailValid}
           placeholder="krafton@jungle.com"
           autoComplete="off"
           required
@@ -105,13 +98,14 @@ export default function SignUp({ onSubmit }: SignUpProps) {
         <input
           className={`formInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
-            nicknameValid ? '' : 'focus:border-red-500'
+            nicknameValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
           id="nickname"
           type="nickname"
           maxLength={11}
           ref={nicknameRef}
           onChange={() => handleInputChange(nicknameRef)}
+          aria-invalid={!nicknameValid}
           placeholder="난정글러"
           autoComplete="off"
           required
@@ -125,12 +119,13 @@ export default function SignUp({ onSubmit }: SignUpProps) {
         <input
           className={`formInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
-            passwordValid ? '' : 'focus:border-red-500'
+            passwordValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
           id="password"
           type="password"
           ref={passwordRef}
           onChange={() => handleInputChange(passwordRef)}
+          aria-invalid={!passwordValid}
           placeholder="****"
           required
         />
@@ -143,12 +138,13 @@ export default function SignUp({ onSubmit }: SignUpProps) {
         <input
           className={`formInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
-            passwordsMatch ? '' : 'focus:border-red-500'
+            passwordsMatch ? '' : 'border-red-500 focus:border-red-500'
           }`}
           id="confirmPassword"
           type="password"
           ref={confirmPasswordRef}
           onChange={() => handleInputChange(confirmPasswordRef)}
+          aria-invalid={!passwordsMatch}
           placeholder="****"
           required
         />

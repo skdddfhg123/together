@@ -1,38 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Calendar from '@pages/Calendar/calendar';
-import CanlendarList from '@components/Canlendar/CanlendarList';
+import CalendarList from '@components/Canlendar/CalendarList';
+import UserModal from '@components/User/Profile/UserModal';
 
-import useToggle from '@hooks/useToggle';
+import { useToggle } from '@hooks/useToggle';
+import * as KAKAO from '@services/KakaoAPI';
+
 import menuImg from '@assets/calendar_menu.webp';
-import * as API from '@utils/api';
+import syncImg from '@assets/sync.png';
+import { KakaoEvent } from '@type/index';
+import { transToKorDate } from '@utils/dateTranslate';
 import '@styles/main.css';
 
-function getCookie(name: string) {
-  const matches = document.cookie.match(
-    new RegExp(
-      '(?:^|; )' +
-        name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') +
-        '=([^;]*)',
-    ),
-  );
-  return matches ? decodeURIComponent(matches[1]) : undefined;
-}
-
-const accessToken = getCookie('accessToken');
 export default function MainPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [socialEvents, setSocialEvents] = useState<KakaoEvent[]>([]);
 
   const { isOn, toggle } = useToggle(false);
 
-  const getProfile = async () => {
-    try {
-      const res = await API.get(`/auth/token-test`);
-      console.log(res);
-    } catch (e) {}
-  };
-
-  const prevCalendar = () => {
+  const prevCalendar = (): void => {
     setCurrentMonth(
       new Date(
         currentMonth.getFullYear(),
@@ -42,7 +29,7 @@ export default function MainPage() {
     );
   };
 
-  const nextCalendar = () => {
+  const nextCalendar = (): void => {
     setCurrentMonth(
       new Date(
         currentMonth.getFullYear(),
@@ -51,12 +38,42 @@ export default function MainPage() {
       ),
     );
   };
+
+  const getSocialEvents = async () => {
+    try {
+      const res = await KAKAO.GetEvents();
+      console.log(res.data);
+      const eventLists = res.data.map(
+        (event: any): KakaoEvent => ({
+          title: event.title || '카카오톡 일정',
+          startAt: transToKorDate(event.startAt, 9),
+          endAt: transToKorDate(event.endAt, 9),
+          isPast: event.deactivatedAt,
+          userCalendarId: event.userCalendar?.userCalendarId,
+          social: event.social,
+          socialEventId: event.socialEventId,
+        }),
+      );
+      setSocialEvents(eventLists);
+    } catch (e) {
+      console.error('Failed to fetch social events:', e);
+    }
+  };
+
+  useEffect(() => {
+    console.log('socialEvents updated:', socialEvents);
+  }, [socialEvents]);
+
   return (
     <>
       <header id="calHeader">
-        <button id="calHeader-leftExp" onClick={toggle}>
-          <img id="listImg-button" src={menuImg} alt="calendarList" />
-        </button>
+        <section id="left-Menu"></section>
+        <img
+          id="calHeader-leftExp"
+          src={menuImg}
+          alt="calendarList-button"
+          onClick={toggle}
+        />
         <h1 id="calendarLogo">Toogether</h1>
         <div id="calHeader-title">
           {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
@@ -69,13 +86,32 @@ export default function MainPage() {
             ▶
           </button>
         </nav>
-        <button onClick={getProfile}>쿠키</button>
+        <div id="right-menu">
+          <img
+            id="sync-button"
+            src={syncImg}
+            alt="syncCalendar-button"
+            onClick={getSocialEvents}
+          />
+          <UserModal />
+        </div>
       </header>
       <main id="mainSection">
-        <aside id={isOn ? 'calendarList-entering' : 'calendarList-exiting'}>
-          {isOn && <CanlendarList />}
+        <aside
+          className="left-sideBar"
+          id={isOn ? 'calendarList-entering' : 'calendarList-exiting'}
+        >
+          {isOn && <CalendarList />}
         </aside>
-        <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
+        <Calendar
+          isPrevMonth
+          isNextMonth
+          currentMonth={currentMonth}
+          socialEvents={socialEvents}
+        />
+        <aside className="right-sideBar">
+          <div>right SideBar</div>
+        </aside>
       </main>
     </>
   );

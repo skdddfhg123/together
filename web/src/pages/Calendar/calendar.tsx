@@ -3,18 +3,22 @@ import React, { useState } from 'react';
 import CalSchedule from '@components/Canlendar/CalSchedule';
 import Schedule from '@components/Canlendar/Schedule';
 import { useSetDay } from '@store/index';
+import { KakaoEvent } from '@type/index';
+
 import '@styles/calendar.css';
 
 type CalendarProps = {
   isPrevMonth: boolean;
   isNextMonth: boolean;
   currentMonth: Date;
+  socialEvents: KakaoEvent[];
 };
 
 export default function CalendarPage({
   isPrevMonth,
   isNextMonth,
   currentMonth,
+  socialEvents,
 }: CalendarProps) {
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
   const { selectedDay, setSelectedDay } = useSetDay((state) => ({

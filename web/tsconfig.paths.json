@@ -6,8 +6,10 @@
       "@components/*": ["common/components/*"],
       "@hooks/*": ["common/hooks/*"],
       "@routes/*": ["common/routes/*"],
+      "@services/*": ["common/services/*"],
       "@store/*": ["common/store/*"],
       "@styles/*": ["common/styles/*"],
+      "@type/*": ["common/type/*"],
       "@utils/*": ["common/utils/*"],
       "@pages/*": ["pages/*"]
     }

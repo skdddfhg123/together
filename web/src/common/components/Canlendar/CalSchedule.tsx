@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 // import Schedule from './Schedule';
 
 interface scheduleProps {
-  day: Date;
   schedule: any[];
+  day: Date;
 }
 
 export default function CalSchedule({ schedule, day }: scheduleProps) {

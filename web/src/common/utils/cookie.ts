@@ -1,4 +1,4 @@
-import { Cookie } from '../types';
+import { Cookie } from '@type/index';
 
 export function setCookie(cookie: Cookie): void {
   const { name, value, options } = cookie;

@@ -4,11 +4,11 @@ import { AxiosError } from 'axios';
 
 import SignUp from '@components/User/SignUp';
 import SignIn from '@components/User/SignIn';
+import { useToggle } from '@hooks/useToggle';
 
-import useToggle from '@hooks/useToggle';
 import * as API from '@utils/api';
-import { Cookie } from '../../common/types';
 import { setCookie } from '@utils/cookie';
+import { Cookie } from '../../common/type';
 
 interface SignInForm {
   useremail: string;
@@ -44,7 +44,7 @@ export default function LogInPage() {
           path: '/',
           maxAge: 3600,
           secure: true,
-          sameSite: 'strict',
+          sameSite: 'none',
         },
       };
       setCookie(loginCookie);

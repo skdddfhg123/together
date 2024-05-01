@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function CanlendarList() {
+export default function CalendarList() {
   return (
     <section>
       <h1>Hello Calendar !!!</h1>
