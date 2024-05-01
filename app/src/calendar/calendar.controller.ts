@@ -43,50 +43,6 @@ export class CalendarController {
     ): Promise<{status: number, message: string}> {
         return this.calendarService.addAttendeeToCalendar(calendarId, payload);
     }
-    // @Get('/groupCalendar')
-    // @ApiBearerAuth('JWT-auth')
-    // @UseGuards(JwtAuthGuard)
-    // async findAllGroupCalendar(
-    //     @getPayload() payload: PayloadResponse
-    // ): Promise<Calendar[] | void> {
-        
-    //     return await this.userCalendarService.findGroupCalendar(payload);
-    // }
-
-    // @Get()
-    // async getUsers() {
-    //     return 'Get Users';
-    // }
-
-    // @Post()
-    // async createSchedule() {
-    //     return 'Create Schedule';
-    // }
-
-    // @Post('/:id')
-    // @UseInterceptors(FileFieldsInterceptor([
-    //     {name: 'cover_image', maxCount: 1},
-    //     {name: 'banner_image', maxCount: 1}
-    // ]))
-    // async createCalendar(
-    //     @Body() body: CalendarCreateDto, 
-    //     @UploadedFile() cover_image?: Express.Multer.File,
-    //     @UploadedFile() banner_image?: Express.Multer.File
-    // ) {
-    // @Post('/:id')
-    // @UseInterceptors(FileFieldsInterceptor([
-    //     {name: 'cover_image', maxCount: 1},
-    //     {name: 'banner_image', maxCount: 1}
-    // ]))
-    // async createCalendar(
-    //     @Body() body: CalendarCreateDto, 
-    //     @UploadedFile() cover_image?: Express.Multer.File,
-    //     @UploadedFile() banner_image?: Express.Multer.File
-    // ) {
-
-    //     return this.calendarService.createCalendar(body, cover_image, banner_image);
-    // }
-
     
     @Post('group/create/:calendarid')
     @ApiBearerAuth('JWT-auth')
@@ -117,7 +73,6 @@ export class CalendarController {
         }
     }
 
-
     @Get('group/get/:groupeventid')
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
@@ -129,8 +84,6 @@ export class CalendarController {
             throw e; 
         }
     }
-
-
     
     @Get('group/update/:groupeventid')
     @ApiBearerAuth('JWT-auth')
@@ -144,7 +97,6 @@ export class CalendarController {
         }
     }
     
-
     @Post('group/update/:groupeventid')
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
@@ -159,7 +111,6 @@ export class CalendarController {
         }
     }
 
-
     @Patch('group/remove/:groupeventid')
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
@@ -171,12 +122,4 @@ export class CalendarController {
             throw e; 
         }
     }
-
-    
-
-    // 
-
-
-
-
 }

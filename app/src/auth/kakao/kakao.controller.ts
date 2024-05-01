@@ -6,6 +6,7 @@ import { KakaoUser } from './utils/interface/kakao.interface';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { SocialEventDto } from 'src/db/user_calendar/dtos/socialEvent.dto';
+import { SocialEvent } from 'src/db/event/group_event/entities/socialEvent.entity';
 
 @ApiTags('kakao')
 @Controller('kakao')
@@ -33,33 +34,21 @@ export class KakaoController {
     @Get('redirect')
     // @UseGuards(JwtAuthGuard)
     @UseGuards(AuthGuard('kakao'))
-    async redirectKakaoLogIn(@Req() req, @Res() res: Response): Promise<void> {
+    async redirectKakaoLogIn(@Req() req, @Res() res: Response): Promise<Array<SocialEvent>> {
         const kakaoUser = req.user as KakaoUser;
 
-        const tempArray = []
+        const kakaoEventArray = await this.kakaoService.getKakaoEvents(kakaoUser.accessToken);
 
-        for (let i = 1; i <= 12; i++) {
-            let month = '' + i;
-            let day = 31;
-
-            if((i - 10) <= -1) {
-                month = '0' + i;
-            }
-
-            const KakaoCalendars = await this.kakaoService.fetchCalendarEvents(kakaoUser.accessToken, month, day);
-            
-            if(KakaoCalendars.length != 0) {
-                tempArray.push(...KakaoCalendars)
-            }
-        }
-        // console.log(KakaoCalendars)
-        for (let i = 0; i < tempArray.length; i++) {
-            const event = tempArray[i];
+        const savePromises = kakaoEventArray.map(event => {
             const socialEvent = new SocialEventDto();
             socialEvent.social = 'kakao';
             socialEvent.startAt = event.time.start_at;
             socialEvent.endAt = event.time.end_at;
-            await this.userCalendarService.saveSocialCalendar(socialEvent/*, user*/);
-        }
+            return this.userCalendarService.saveSocialCalendar(socialEvent/*, user*/);
+        })
+
+        const resultArray = await Promise.all(savePromises);
+
+        return resultArray;
     }
 }

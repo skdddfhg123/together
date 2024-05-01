@@ -6,7 +6,7 @@ import { User } from "../user/entities/user.entity";
 import { UserService } from "../user/user.service";
 import { Calendar } from "src/calendar/entities/calendar.entity";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
-import { SocialEvent } from "./entities/socialEvent.entity";
+import { SocialEvent } from "../event/group_event/entities/socialEvent.entity";
 import { SocialEventDto } from "./dtos/socialEvent.dto";
 
 @Injectable()
@@ -43,11 +43,17 @@ export class UserCalendarService {
             const socialCalendar = new SocialEvent();
             socialCalendar.startAt = calendar.startAt;
             socialCalendar.endAt = calendar.endAt;
-            if(calendar.title != null){
+            if(calendar.title != null) {
                 socialCalendar.title = calendar.title;
             }
             socialCalendar.social = calendar.social;
             socialCalendar.userCalendar = calendarInfo;
+
+            const endTime = new Date(socialCalendar.endAt);
+            const curTime = new Date();
+            if(endTime < curTime) {
+                socialCalendar.deactivatedAt = true;
+            }
         
             const savedGoogleUser = await this.socialEventRepository.save(socialCalendar);
             return savedGoogleUser;
@@ -105,26 +111,3 @@ export class UserCalendarService {
         return user;
     }
 }
-
-    // async findGroupCalendar(payload: PayloadResponse): Promise<Calendar[] | void> {
-    //     try {
-    //         // 먼저, 사용자 ID에 연결된 UserCalendar를 조회
-    //         const userCalendars = await this.userCalendarRepository.find({
-    //             where: { user: { userId: payload.userCalendarId } },
-    //             relations: ['calendars']
-    //         });
-    
-    //         // UserCalendar가 없는 경우 빈 배열 반환
-    //         if (!userCalendars || userCalendars.length === 0) {
-    //             return [];
-    //         }
-    
-    //         // 모든 UserCalendar에 연결된 Calendar 목록을 합친다
-    //         const calendars = userCalendars.flatMap(uc => uc.calendars);
-    //         return calendars;
-    //     } catch (error) {
-    //         console.error('Error occurred:', error);
-    //         throw new InternalServerErrorException('Failed to find calendars');
-    //     }
-    // }
-
