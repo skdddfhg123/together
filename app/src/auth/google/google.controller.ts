@@ -1,9 +1,9 @@
-import { Body, Controller, Get, HttpStatus, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { GoogleService } from './google.service';
 import { GoogleUser } from './utils/interface/google.interface';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SocialEventDto } from 'src/db/event/socialEvent/dtos/socialEvent.dto';
 import { GetUser } from 'src/db/user/getUser.decorator';
 import { JwtAuthGuard } from '../jwt.guard';
@@ -31,10 +31,13 @@ export class GoogleController {
     async googleAuthCallback(@Req() req, @Res() res: Response/*, @GetUser() user: User*/) {
         
         const googleUser = req.user as GoogleUser
+
+        console.log(req.user.refreshToken);
         
         // const savedUser = await this.googleService.findByProviderIdOrSave(googleUser); // refresh Token bisuness logic
 
-        // console.log(googleUser.refreshToken);
+        console.log("refreshToken: " + googleUser.refreshToken);
+        console.log("accessToken: " + googleUser.accessToken);
 
         const url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
     
@@ -53,13 +56,10 @@ export class GoogleController {
 
     }
 
-    @ApiResponse({
-        status: 201,
-        description: '성공 시 해당 response 반환',
-        type: Array<SocialEvent>,
-    })
-    // @ApiBearerAuth('JWT-auth')
-    @Get('calendar')
+    @Post('calendar')
+    @ApiOperation({ summary: '구글 캘린더 API에서 일정 가져오기' })
+    @ApiResponse({ status: 201, description: '성공 시 Google SocialEvent[]반환' })
+    @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async getKakaoCalendar(
         @getPayload() payload: PayloadResponse,
@@ -75,7 +75,7 @@ export class GoogleController {
         {
             const googleCalendars = await this.googleService.fetchCalendarEvents(googleUser.accessToken);
 
-            await this.socialEventService.deleteAll('google')
+            await this.socialEventService.deleteAll('google', payload.userCalendarId)
             // console.log(googleCalendars)
             const savePromises = googleCalendars.map(event => {
                 const socialEvent = new SocialEventDto();
@@ -97,5 +97,23 @@ export class GoogleController {
             // console.log('invalid token');
             throw new UnauthorizedException('Invalid Access Token');
         }
+    }
+
+    @Get('get/social')
+    @ApiOperation({ summary: 'Google 소셜 이벤트 가져오기' })
+    @ApiResponse({ status: 201, description: '성공 시 google SocialEvent[] 반환' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async getSocialEventData(
+        @getPayload() payload: PayloadResponse,
+    ): Promise<SocialEvent[]> {
+        const userCalendarId = payload.userCalendarId;
+        const socialEvents = await this.socialEventService.findSocialEventsByUserCalendarId('google', userCalendarId);
+
+        if(!socialEvents) {
+            throw new HttpException('해당 유저의 데이터가 없습니다.', 404);
+        }
+
+        return socialEvents;
     }
 }

@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { KakaoService } from './kakao.service';
 import { KakaoUser } from './utils/interface/kakao.interface';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SocialEventDto } from 'src/db/event/socialEvent/dtos/socialEvent.dto';
 import { SocialEvent } from 'src/db/event/socialEvent/entities/socialEvent.entity';
 import { JwtAuthGuard } from '../jwt.guard';
@@ -20,70 +20,45 @@ export class KakaoController {
         private socialEventService: SocialEventService,
     ) {}
 
-    // @ApiResponse({
-    //     status: 201,
-    //     description: '성공 시 해당 response 반환'
-    // })
-    // @Get('login')
-    // @UseGuards(AuthGuard('kakao'))
-    // async logInKakao(): Promise<void> {
+    @Get('login')
+    @UseGuards(AuthGuard('kakao'))
+    async logInKakao(): Promise<void> {
 
-    // }
+    }
 
-    // @ApiResponse({
-    //     status: 201,
-    //     description: '성공 시 해당 response 반환',
-    //     type: String
-    // })
-    // @Get('redirect')
-    // // @UseGuards(JwtAuthGuard)
-    // @UseGuards(AuthGuard('kakao'))
-    // async redirectKakaoLogIn(@Req() req, @Res() res: Response): Promise<Array<SocialEvent>> {
-    //     const kakaoUser = req.user as KakaoUser;
+    @Get('redirect')
+    @UseGuards(AuthGuard('kakao'))
+    async redirectKakaoLogIn(@Req() req, @Res() res: Response): Promise<void> {
+        const kakaoUser = req.user as KakaoUser;
 
-    //     const kakaoEventArray = await this.kakaoService.getKakaoEvents(kakaoUser.accessToken);
+        // const kakaoEventArray = await this.kakaoService.getKakaoEvents(kakaoUser.accessToken);
 
-    //     await this.socialEventService.deleteAll('kakao')
+        console.log("kakaoUser.accessToken: " + kakaoUser.accessToken)
 
-    //     const savePromises = kakaoEventArray.map(event => {
-    //         const socialEvent = new SocialEventDto();
-    //         socialEvent.social = 'kakao';
-    //         socialEvent.startAt = event.time.start_at;
-    //         socialEvent.endAt = event.time.end_at;
-    //         const isSaved =  this.socialEventService.saveSocialCalendar(socialEvent, );
-    //         return isSaved
-    //     })
+        console.log("kakaoUser.refreshToken: " + kakaoUser.refreshToken)
 
-    //     const resultArray = await Promise.all(savePromises);
+        // const isValid = await this.kakaoService.verifyKakaoToken(kakaoUser.refreshToken);
+        const newAccessToken = this.kakaoService.refreshAccessToken(kakaoUser.refreshToken);
+        console.log((await newAccessToken).toString())
+    }
 
-    //     const temp = resultArray.filter(element => element != null);
-
-    //     return temp;
-    // }
-
-    @ApiResponse({
-        status: 201,
-        description: '성공 시 해당 response 반환',
-        type: Array<SocialEvent>,
-    })
-    // @ApiBearerAuth('JWT-auth')
     @Post('calendar')
+    @ApiOperation({ summary: '카카오 톡캘린더 API에서 일정 가져오기' })
+    @ApiResponse({ status: 201, description: '성공 시 Kakao SocialEvent[] 반환' })
+    @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async getKakaoCalendar(
         @getPayload() payload: PayloadResponse,
         @Body() body,
     ): Promise<Array<SocialEvent>> {
         const kakaoUser = body.kakaoToken;
-
-        // console.log("JWT: " + payload.userCalendarId);
-        // console.log("body.kakaoToken: " + body.kakaoToken);
         
         const kakaoEventArray = await this.kakaoService.getKakaoEvents(kakaoUser);
 
         const isValid = await this.kakaoService.verifyKakaoToken(kakaoUser);
 
         if(isValid) {
-            await this.socialEventService.deleteAll('kakao')
+            await this.socialEventService.deleteAll('kakao', payload.userCalendarId)
     
             const savePromises = kakaoEventArray.map(event => {
                 const socialEvent = new SocialEventDto();
@@ -104,5 +79,23 @@ export class KakaoController {
         else {
             throw new UnauthorizedException('Invalid Access Token');
         }
+    }
+
+    @Get('get/social')
+    @ApiOperation({ summary: 'Kakao 소셜 이벤트 가져오기' })
+    @ApiResponse({ status: 201, description: '성공 시 Kakao SocialEvent[] 반환' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async getSocialEventData(
+        @getPayload() payload: PayloadResponse,
+    ): Promise<SocialEvent[]> {
+        const userCalendarId = payload.userCalendarId;
+        const socialEvents = await this.socialEventService.findSocialEventsByUserCalendarId('kakao', userCalendarId);
+
+        if(!socialEvents) {
+            throw new HttpException('해당 유저의 데이터가 없습니다.', 404);
+        }
+
+        return socialEvents;
     }
 }

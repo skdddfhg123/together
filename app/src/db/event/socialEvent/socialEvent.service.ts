@@ -4,7 +4,6 @@ import { SocialEvent } from "./entities/socialEvent.entity";
 import { Repository } from "typeorm";
 import { SocialEventDto } from "./dtos/socialEvent.dto";
 import { UserService } from "src/db/user/user.service";
-import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
 import { UserCalendarService } from "src/db/user_calendar/userCalendar.service";
 
 @Injectable()
@@ -50,13 +49,27 @@ export class SocialEventService {
         }
     }
     
-    async deleteAll(socialName: string): Promise<boolean> {
+    async deleteAll(socialName: string, userCalendarId: string): Promise<void> {
         try {
-            await this.socialEventRepository.delete({social: socialName})
-            return true;
+            const userCalendar = await this.userCalendarService.findCalendarByUserCalendarId(userCalendarId)
+            if(userCalendar) {
+                await this.socialEventRepository.delete({social: socialName, userCalendar: userCalendar})
+            }
         }
         catch(err){
-            return false;
+            console.log(err)
+        }
+    }
+
+    async findSocialEventsByUserCalendarId(provider: string, userCalendarId: string): Promise<SocialEvent[]> {
+        try {
+            const userCalendar = await this.userCalendarService.findCalendarByUserCalendarId(userCalendarId)
+            if(userCalendar) {
+                return await this.socialEventRepository.findBy({social: provider, userCalendar: userCalendar})
+            }
+        }
+        catch(err) {
+            console.log(err)
         }
     }
 }

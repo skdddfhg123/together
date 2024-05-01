@@ -5,7 +5,7 @@ import { UserCalendar } from "../../../user_calendar/entities/userCalendar.entit
 import { IsNotEmpty, IsOptional } from "class-validator";
 
 @Entity('social_event')
-@Unique(['social', 'startAt', 'endAt'] )
+@Unique(['social', 'startAt', 'endAt', 'userCalendar'] )
 export class SocialEvent {
 
     @PrimaryGeneratedColumn('uuid')
