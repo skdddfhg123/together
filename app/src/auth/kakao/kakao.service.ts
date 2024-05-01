@@ -16,7 +16,7 @@ export class KakaoService {
         private httpService: HttpService,
     ) {}
 
-    async fetchCalendarEvents(accessToken: string): Promise<any> {
+    async fetchCalendarEvents(accessToken: string, month:string, day: number): Promise<Array<any>> {
         const url = 'https://kapi.kakao.com/v2/api/calendar/events';
     
         try {
@@ -26,8 +26,11 @@ export class KakaoService {
             },
             params: {
                 // 'filter': 'USER',
-                'calender_id': ['User Calender Key'],
-                'preset': 'THIS_MONTH'
+                // 'calender_id': ['User Calender Key'],
+                // 'preset': 'THIS_MONTH',
+                from: `2024-${month}-01T00:00:00Z`,
+                to: `2024-${month}-${day}T23:59:00Z`,
+                limit: 1000,
             },
           }));
           // console.log((response.data))
