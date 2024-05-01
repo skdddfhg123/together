@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { CreateGroupEventDTO } from "./dtos/groupEvent.create.dto";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
 import { UserService } from "src/db/user/user.service";
@@ -7,6 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Between, Repository } from "typeorm";
 import { CalendarService } from "src/calendar/calendar.service";
 import { UserCalendarService } from "src/db/user_calendar/userCalendar.service";
+import { Calendar } from "src/calendar/entities/calendar.entity";
 // import { InjectRepository } from "@nestjs/typeorm";
 // import { Repository } from "typeorm";
 // import { GroupEvent } from "./entities/groupEvent.entity";
@@ -22,39 +23,30 @@ export class GroupEventService {
     constructor (
         @ InjectRepository(GroupEvent)
         private readonly groupEventRepository: Repository<GroupEvent>,
+        @ InjectRepository(Calendar)
+        private readonly calendarRepository: Repository<Calendar>,
         private userService: UserService,
         private calendarService: CalendarService,
         private userCalendarService: UserCalendarService,
     ) {}
 
-    // create (그룹 이벤트 생성)
     async createGroupEvent(
         userCreateGroupEventDTO: CreateGroupEventDTO,
         payload: PayloadResponse,
         calendarId: string
     ): Promise<GroupEvent> {
-        // nullable : member, alerts, attetchment
-        // auto : groupEventId, pinned, createdAt, updatedAt, deactivatedAt
-        // relation : calendarId
-        // token : author
-        // dto : group, title, color, startAt, endAt, 
-
-        const groupEvent = new GroupEvent();
-        // get author by JWT
-        const user = await this.userService.findOne({ useremail: payload.useremail })
-        if (!user) {
-            throw new UnauthorizedException("createGroupEvent User not found");
-        }
-
-        groupEvent.author = user.userId;
-
-        // get calendarId by relation
-        if (!calendarId) {
+        const calendar = await this.calendarRepository.findOneBy({ calendarId: calendarId });
+        if (!calendar) {
             throw new NotFoundException('Calendar not found');
         }
+        if (!calendar.attendees.includes(payload.userCalendarId)) {
+            throw new ForbiddenException('You do not have permission to add an event to this calendar');
+        }
+
+        const groupEvent = new GroupEvent();
+        groupEvent.author = payload.userCalendarId;
         groupEvent.calendarId = calendarId;
         
-        // get DTO
         const { title, color, startAt, endAt, emails} = userCreateGroupEventDTO;
         groupEvent.title = title;
         groupEvent.color = color;
@@ -62,11 +54,8 @@ export class GroupEventService {
         groupEvent.endAt = endAt;
         groupEvent.member = emails;
 
-
         try {
-            console.log(groupEvent);
             const savedGroupEventEvent = await this.groupEventRepository.save(groupEvent);
-            console.log('Saved Group Event:', savedGroupEventEvent);
             return savedGroupEventEvent;
         } catch (e) {
             console.error('Error saving group calendar:', e);
@@ -77,26 +66,18 @@ export class GroupEventService {
 
     async getAllGroupEventsByCalendarId(calendarId: string): Promise<GroupEvent[]> {
         try {
-            console.log(calendarId)
-          const groupEvents = await this.groupEventRepository.find({
-            where: {
-              calendarId: calendarId,
-              deactivatedAt: false
-            },
-            order: {
-              createdAt: 'DESC'
-            }
-          });
-          console.log(groupEvents);
-    
-          if (groupEvents.length === 0) {
-            // 빈 배열을 반환하거나 더 명확한 오류를 던질 수 있습니다.
-            console.log(`No group events found for calendar ID ${calendarId}`);
-          }
-          
-          return groupEvents;
-        } catch (e) {
-          console.error('Error occurred:', e);
+            const groupEvents = await this.groupEventRepository.find({
+                where: {
+                calendarId: calendarId,
+                deactivatedAt: false
+                },
+                order: {
+                    startAt: 'ASC'
+                }
+            });
+            return groupEvents;
+        } 
+        catch (e) {
           throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}`);
         }
     }
@@ -130,41 +111,6 @@ export class GroupEventService {
         }
      }
 
-
-     async getGroupEventbyMonth( /*yearmonth : string*/ ): Promise<GroupEvent[]> {
-    
-        // null : member, alerts, attetchment
-        // auto : groupEventId, pinned, createdAt, updatedAt, deactivatedAt
-        // relation : calendarId
-        // token : author
-        // dto : group, title, color, startAt, endAt, 
-    
-            try {
-                /*
-                let yearAndMonth = parseInt(yearmonth)
-                const year = ( yearAndMonth / 100); 
-                const month = (yearAndMonth % 100);
-                const firstDayOfMonth = new Date(year, month, 1);
-                const lastDayOfMonth = new Date(year, month + 1, 0);
-                */
-                const groupEvents = await this.groupEventRepository.find({
-                    /*
-                    where: {
-                        startAt: Between(firstDayOfMonth, lastDayOfMonth) 
-                    }
-                    */
-                });
-        
-                return groupEvents;
-            } catch (e) {
-                console.error('Error occurred:', e);
-                throw new InternalServerErrorException('Failed to fetch group events for the month');
-            }
-     }
-
-
-
-    //그룹 이벤트 수정 get
     async getGroupEventUpdateForm(groupEventId: string): Promise<GroupEvent> {
         try {
             // 해당 ID의 GroupEvent를 찾습니다.
@@ -173,10 +119,8 @@ export class GroupEventService {
             if (!groupEventToUpdate) {
                 throw new Error('Group event not found');
             }
-
             return groupEventToUpdate;
         } catch (e) {
-            console.error('Error occurred:', e);
             throw new InternalServerErrorException('Failed to modify group event');
         }
      }

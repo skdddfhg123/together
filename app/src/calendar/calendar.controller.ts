@@ -10,6 +10,7 @@ import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { GroupEventService } from 'src/db/event/group_event/groupEvent.service';
 import { CreateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.create.dto';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
+import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 
 @ApiTags("calendar")
 @Controller('calendar')
@@ -17,11 +18,10 @@ export class CalendarController {
     constructor(
         private calendarService: CalendarService,
         private groupEventService : GroupEventService,
-        // private userCalendarService: UserCalendarService,
     ) {}
 
-    @Post('/create')
-    @ApiOperation({ summary: 'Create a new group calendar' })
+    @Post('create')
+    @ApiOperation({ summary: '그룹 캘린더 생성' })
     @ApiResponse({ status: 201, description: 'Calendar created successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiBearerAuth('JWT-auth')
@@ -35,7 +35,7 @@ export class CalendarController {
     }
 
     @Get('get_calendar')
-    @ApiOperation({ summary: 'Get all group calendars for a user' })
+    @ApiOperation({ summary: '전체 그룹 캘린더 가져오기' })
     @ApiResponse({ status: 200, description: 'Calendars retrieved successfully' })
     @ApiResponse({ status: 404, description: 'Calendars not found' })
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
@@ -47,44 +47,86 @@ export class CalendarController {
         return await this.calendarService.findCalendarsByUserCalendarId(payload.userCalendarId);
     }
 
+    @Patch('update/:calendarId')
+    @ApiOperation({ summary: '캘린더 정보 업데이트' })
+    @ApiResponse({ status: 200, description: 'Calendar updated successfully' })
+    @ApiResponse({ status: 404, description: 'Calendar not found' })
+    @ApiResponse({ status: 403, description: 'Forbidden Permission Error' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async updateGroupCalendar(
+        @Param('calendarId') calendarId: string,
+        @Body() calendarUpdateDto: CalendarUpdateDto,
+        @getPayload() payload: PayloadResponse
+    ): Promise<Calendar> {
+        return await this.calendarService.updateGroupCalendar(calendarId, calendarUpdateDto, payload);
+    }
+
+    // 캘린더 삭제 (하위 그룹 이벤트 순회 돌면서 일정 삭제)
+
     @Patch('add_attendee/:calendarId')
+    @ApiOperation({ summary: '그룹 캘린더 참여하기' })
+    @ApiResponse({ status: 200, description: 'Attendee added successfully' })
+    @ApiResponse({ status: 404, description: 'CalendarId is not found' })
+    @ApiResponse({ status: 409, description: 'Attendee already exists.' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async addAttendee(
         @Param('calendarId') calendarId: string,
         @getPayload() payload: PayloadResponse
-    ): Promise<{status: number, message: string}> {
+    ): Promise<string> {
         return this.calendarService.addAttendeeToCalendar(calendarId, payload);
     }
     
-    @Post('group/create/:calendarid')
+    @Post('group/create/:calendarId')
+    @ApiOperation({ summary: '그룹 이벤트 만들기' })
+    @ApiResponse({ status: 201, description: 'GroupEvent added successfully' })
+    @ApiResponse({ status: 403, description: 'You do not have permission to add an event to this calendar' })
+    @ApiResponse({ status: 404, description: "Calendar not found" })
+    @ApiResponse({ status: 500, description: 'Error saving group event' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async createGroupEvent(
          @Body() groupEventDTO: CreateGroupEventDTO,
          @getPayload() payload: PayloadResponse,
-         @Param('calendarid') calendarId: string 
+         @Param('calendarId') calendarId: string 
     ): Promise<GroupEvent>{
-        try {
-            const groupEvent = await this.groupEventService.createGroupEvent(groupEventDTO, payload, calendarId);
-            return groupEvent;
-        } catch (e) {
-            throw e; 
-        }
-       
+        return await this.groupEventService.createGroupEvent(groupEventDTO, payload, calendarId);
     }
 
-    @Get('group/get/')
+    @Get('group/get/:calendarId')
+    @ApiOperation({ summary: '그룹 이벤트 가져오기' })
+    @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
-    async getGroupEventByMonth(/*@Param('yearmonth') yearmonth: string*/): Promise<GroupEvent[]>{
-        try {
-        const groupEvent = await this.groupEventService.getGroupEventbyMonth(/*yearmonth*/);
-            return groupEvent;
-        } catch (e) {
-            throw e; 
-        }
+    async getAllGroupEvent(
+        @Param('calendarid') calendarid: string,
+    ): Promise<GroupEvent[]>{
+        return await this.groupEventService.getAllGroupEventsByCalendarId(calendarid);
     }
+
+    @Get('group/get/:groupeventid')
+    @ApiOperation({ summary: '특정 그룹 이벤트 가져오기' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async getGroupEventUpdateForm(
+        @Param('groupeventid') groupEventId: string,
+    ): Promise<GroupEvent>{
+        return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
+    }
+
+    // @Get('group/get/')
+    // @ApiBearerAuth('JWT-auth')
+    // @UseGuards(JwtAuthGuard)
+    // async getGroupEventByMonth(/*@Param('yearmonth') yearmonth: string*/): Promise<GroupEvent[]>{
+    //     try {
+    //     const groupEvent = await this.groupEventService.getGroupEventbyMonth(/*yearmonth*/);
+    //         return groupEvent;
+    //     } catch (e) {
+    //         throw e; 
+    //     }
+    // }
 
 
     // @Get('group/get/:groupeventid')
@@ -98,34 +140,6 @@ export class CalendarController {
     //         throw e; 
     //     }
     // }
-
-    @Get('group/get/:calendarid')
-    @ApiParam({ name: 'calendarid', required: true, description: 'Calendar ID', type: String })
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
-    async getAllGroupEvent(
-        @Param('calendarid') calendarid: string,
-    ): Promise<GroupEvent[]>{
-        return await this.groupEventService.getAllGroupEventsByCalendarId(calendarid);
-    }
-
-
-    
-    @Patch('group/update/:groupeventid')
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
-    async getGroupEventUpdateForm(
-        @Param('groupeventid') groupEventId: string,
-        // @getPayload() payload: PayloadResponse
-    ): Promise<GroupEvent>{
-        try {
-        const groupEvent = await this.groupEventService.getGroupEventUpdateForm(groupEventId);
-            return groupEvent;
-        } catch (e) {
-            throw e; 
-        }
-    }
-    
 
     @Post('group/update/:groupeventid')
     @ApiBearerAuth('JWT-auth')
@@ -154,12 +168,5 @@ export class CalendarController {
             throw e; 
         }
     }
-
-    
-
-    // 
-
-
-
 
 }
