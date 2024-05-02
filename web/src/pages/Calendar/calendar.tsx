@@ -14,7 +14,6 @@ type CalendarProps = {
   isPrevMonth: boolean;
   isNextMonth: boolean;
   currentMonth: Date;
-  socialEvents: KakaoEvent[];
 };
 
 export default function CalendarPage({
@@ -214,11 +213,7 @@ export default function CalendarPage({
           ))}
         </tbody>
       </table>
-      <ScheduleModal
-        isOpen={isOn}
-        onClose={() => toggle()}
-        onSave={(title) => addSchedule(title)}
-      />
+      <ScheduleModal isOpen={isOn} onSave={(title) => addSchedule(title)} />
     </div>
   );
 }
