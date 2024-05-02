@@ -1,10 +1,11 @@
 import 'dart:convert'; // jsonEncode를 사용하기 위해 필요
+import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:calendar/screens/all_calendar.dart';
 
 class KakaoAuthService {
   final String serverUrl = "http://15.164.174.224:3000/kakao/calendar";
+  final MeetingController meetingController = Get.find<MeetingController>();
 
   Future<void> sendTokensToServer(
       String jwtToken, String accessToken, String? refreshToken) async {
@@ -23,6 +24,7 @@ class KakaoAuthService {
 
       if (response.statusCode == 201) {
         // 서버로부터 응답 처리
+        meetingController.syncSocialEvents(response.body);
         print(response.body);
         print('Tokens successfully sent to the server');
       } else {

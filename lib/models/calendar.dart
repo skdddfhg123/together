@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class Calendar {
   final String title;
-  final String type;
   final List<String> attendees;
   final String? coverImage;
   final String? bannerImage;
@@ -10,11 +10,11 @@ class Calendar {
   final DateTime registeredAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
+  final Color color;
   List<Appointment> appointment;
 
   Calendar({
     required this.title,
-    required this.type,
     required this.attendees,
     this.coverImage,
     this.bannerImage,
@@ -23,12 +23,13 @@ class Calendar {
     required this.updatedAt,
     this.deletedAt,
     this.appointment = const [],
+    this.color = Colors.blue,
   });
 
   factory Calendar.fromJson(Map<String, dynamic> json) {
     return Calendar(
       title: json['title'],
-      type: json['type'],
+      color: _parseColor(json['type']),
       attendees: List<String>.from(json['attendees']),
       coverImage: json['coverImage'],
       bannerImage: json['bannerImage'],
@@ -38,5 +39,12 @@ class Calendar {
       deletedAt:
           json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
     );
+  }
+  static Color _parseColor(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll('#', '');
+    if (hexColor.length == 6) {
+      hexColor = 'FF' + hexColor; // 색상 코드에 투명도 값이 없다면 FF를 추가
+    }
+    return Color(int.parse(hexColor, radix: 16));
   }
 }

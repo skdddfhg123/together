@@ -1,5 +1,6 @@
 // calendar_create_api_service.dart
 import 'package:calendar/models/calendar.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,8 +20,13 @@ class CalendarCreateApiService {
     _token = prefs.getString('token');
   }
 
+  // 색상 객체를 16진수 문자열로 변환하는 함수
+  String colorToHex(Color color) {
+    return '#${color.value.toRadixString(16).padLeft(8, '0')}';
+  }
+
   // 캘린더 생성 함수
-  Future<Calendar?> createCalendar(String title, String type) async {
+  Future<Calendar?> createCalendar(String title, Color color) async {
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -30,7 +36,7 @@ class CalendarCreateApiService {
         },
         body: json.encode({
           'title': title,
-          'type': type,
+          'type': colorToHex(color),
         }),
       );
 

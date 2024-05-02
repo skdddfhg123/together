@@ -1,10 +1,13 @@
+import 'package:calendar/api/event_creates_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart'; // CalendarController를 가져옵니다.
-import 'package:calendar/controllers/metting_controller.dart';
+import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/meeting_data.dart';
 import 'package:calendar/screens/all_calendar.dart';
 import 'package:calendar/screens/sync_login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
 
@@ -24,57 +27,97 @@ class CalendarDetailView extends StatelessWidget {
       (cal) => cal.calendarId == calendarId,
     );
 
-    void _showAddAppointmentDialog(DateTime selectedDate) {
+    void _showAddAppointmentDialog(
+        BuildContext context, DateTime selectedDate) {
       final TextEditingController _subjectController = TextEditingController();
-      final TextEditingController _startTimeController = TextEditingController(
-        text: DateFormat('yyyy-MM-dd HH:mm').format(selectedDate),
-      );
-      final TextEditingController _endTimeController = TextEditingController(
-        text: DateFormat('yyyy-MM-dd HH:mm')
-            .format(selectedDate.add(Duration(hours: 1))),
-      );
+      Color _selectedColor = selectedCalendar.color;
+      DateTime _selectedStartTime = selectedDate;
+      DateTime _selectedEndTime = selectedDate.add(Duration(hours: 1));
+
+      // 시간 선택기를 표시하는 함수
+      Future<void> _pickDateTime(BuildContext context, bool isStartTime) async {
+        final TimeOfDay? pickedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.fromDateTime(
+              isStartTime ? _selectedStartTime : _selectedEndTime),
+        );
+        if (pickedTime != null) {
+          final updatedDateTime = DateTime(
+            isStartTime ? _selectedStartTime.year : _selectedEndTime.year,
+            isStartTime ? _selectedStartTime.month : _selectedEndTime.month,
+            isStartTime ? _selectedStartTime.day : _selectedEndTime.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          if (isStartTime) {
+            _selectedStartTime = updatedDateTime;
+          } else {
+            _selectedEndTime = updatedDateTime;
+          }
+        }
+      }
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Add Appointment'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  controller: _subjectController,
-                  decoration: const InputDecoration(hintText: "Subject"),
-                ),
-                TextField(
-                  controller: _startTimeController,
-                  decoration: const InputDecoration(
-                      hintText: "Start Time (YYYY-MM-DD HH:MM)"),
-                ),
-                TextField(
-                  controller: _endTimeController,
-                  decoration: const InputDecoration(
-                      hintText: "End Time (YYYY-MM-DD HH:MM)"),
-                ),
-              ],
+            content: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  TextField(
+                    controller: _subjectController,
+                    decoration: const InputDecoration(labelText: "Subject"),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.timer),
+                    title: const Text("Start Time"),
+                    subtitle: Text(DateFormat('yyyy-MM-dd HH:mm')
+                        .format(_selectedStartTime)),
+                    onTap: () => _pickDateTime(context, true),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.timer_off),
+                    title: const Text("End Time"),
+                    subtitle: Text(DateFormat('yyyy-MM-dd HH:mm')
+                        .format(_selectedEndTime)),
+                    onTap: () => _pickDateTime(context, false),
+                  ),
+                ],
+              ),
             ),
             actions: <Widget>[
               TextButton(
                 child: const Text('Add'),
-                onPressed: () {
-                  DateTime startTime =
-                      DateTime.parse(_startTimeController.text);
-                  DateTime endTime = DateTime.parse(_endTimeController.text);
-                  Appointment newAppointment = Appointment(
-                    startTime: startTime,
-                    endTime: endTime,
-                    subject: _subjectController.text,
-                    color: Colors.blue,
-                    id: calendarId.toString(),
+                onPressed: () async {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  String? token = prefs.getString('token');
+
+                  // 백엔드에 일정 추가 요청
+                  bool isCreated = await CalendarEventService().createEvent(
+                    _subjectController.text,
+                    _selectedStartTime,
+                    _selectedEndTime,
+                    calendarId,
+                    token!,
+                    _selectedColor,
                   );
-                  meetingController.addCalendarAppointment(
-                      newAppointment, calendarId);
-                  Navigator.pop(context);
+
+                  if (isCreated) {
+                    Appointment newAppointment = Appointment(
+                      startTime: _selectedStartTime,
+                      endTime: _selectedEndTime,
+                      subject: _subjectController.text,
+                      color: _selectedColor,
+                      id: calendarId.toString(),
+                    );
+                    meetingController.addCalendarAppointment(
+                        newAppointment, calendarId);
+                    Navigator.pop(context);
+                  } else {
+                    Get.snackbar("Error", "Failed to create event");
+                  }
                 },
               ),
             ],
@@ -87,7 +130,7 @@ class CalendarDetailView extends StatelessWidget {
       if (details.targetElement == CalendarElement.calendarCell ||
           details.targetElement == CalendarElement.appointment) {
         final DateTime selectedDate = details.date!;
-        _showAddAppointmentDialog(selectedDate); // 선택한 날짜를 다이얼로그에 전달
+        _showAddAppointmentDialog(context, selectedDate); // 선택한 날짜를 다이얼로그에 전달
       }
     }
 
@@ -151,6 +194,9 @@ class CalendarDetailView extends StatelessWidget {
         return SfCalendar(
           view: CalendarView.month,
           firstDayOfWeek: 7,
+          monthViewSettings: const MonthViewSettings(
+            appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
+          ),
           dataSource: dataSource,
           onTap: _onCalendarTapped,
         );

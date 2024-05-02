@@ -1,4 +1,5 @@
 import 'package:calendar/controllers/calendar_controller.dart';
+import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:get/get.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,11 +25,6 @@ class AuthController extends GetxController {
     await prefs.remove('token');
     isLoggedIn.value = false;
 
-    try {
-      await UserApi.instance.logout();
-      print('로그아웃 성공, SDK에서 토큰 삭제');
-    } catch (error) {
-      print('로그아웃 실패, SDK에서 토큰 삭제 $error');
-    }
+    Get.find<MeetingController>().clearAppointments();
   }
 }
