@@ -6,7 +6,7 @@ export class GroupEvent {
     @PrimaryGeneratedColumn('uuid')
     groupEventId: string;
 
-    @ManyToOne(() => Calendar, (calendar) => calendar.calendarId)
+    @ManyToOne(() => Calendar, (calendar) => calendar.calendarId, {eager: true,})
     calendarId: string;
 
     @Column()

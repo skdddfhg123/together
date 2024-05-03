@@ -124,22 +124,23 @@ export class CalendarController {
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async getAllGroupEvent(
-        @Param('calendarid') calendarid: string,
+        @Param('calendarId') calendarId: string,
     ): Promise<GroupEvent[]>{
-        return await this.groupEventService.getAllGroupEventsByCalendarId(calendarid);
+        console.log(calendarId);
+        return await this.groupEventService.getAllGroupEventsByCalendarId(calendarId);
     }
 
-    @Get('group/get/:groupeventid')
+    @Get('group/get/:groupeventId')
     @ApiOperation({ summary: '특정 그룹 이벤트 가져오기' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async getGroupEventUpdateForm(
-        @Param('groupeventid') groupEventId: string,
+        @Param('groupeventId') groupEventId: string,
     ): Promise<GroupEvent>{
         return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
     }
 
-    @Patch('group/update/:groupeventid')
+    @Patch('group/update/:groupeventId')
     @ApiOperation({ summary: '그룹 이벤트 업데이트' })
     @ApiResponse({ status: 200, description: 'Group event updated successfully' })
     @ApiResponse({ status: 404, description: 'Group event not found' })
@@ -147,13 +148,13 @@ export class CalendarController {
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async updateGroupEvent(
-        @Param('groupeventid') groupEventId: string, 
+        @Param('groupeventId') groupEventId: string, 
         @Body() groupEventDTO: UpdateGroupEventDTO
     ): Promise<GroupEvent> {
             return await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
     }
 
-    @Patch('group/remove/:groupeventid')
+    @Patch('group/remove/:groupeventId')
     @ApiOperation({ summary: '그룹 이벤트 제거' })
     @ApiResponse({ status: 200, description: 'Group event removed successfully' })
     @ApiResponse({ status: 403, description: 'You do not have permission to remove this event' })
@@ -161,7 +162,9 @@ export class CalendarController {
     @ApiResponse({ status: 500, description: 'Error removing group event' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
-    async removeGroupEvent(@Param('groupeventid') groupEventId: string): Promise<GroupEvent> {
+    async removeGroupEvent(
+        @Param('groupeventId') groupEventId: string
+    ): Promise<GroupEvent> {
         return await this.groupEventService.removeGroupEvent(groupEventId);
     }
 

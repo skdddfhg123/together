@@ -64,12 +64,13 @@ export class GroupEventService {
     
     }
 
-    async getAllGroupEventsByCalendarId(calendarId: string): Promise<GroupEvent[]> {
+    async getAllGroupEventsByCalendarId(CalendarId: string): Promise<GroupEvent[]> {
         try {
+            console.log(CalendarId)
             const groupEvents = await this.groupEventRepository.find({
                 where: {
-                calendarId: calendarId,
-                isDeleted: false
+                    calendarId: CalendarId,
+                    isDeleted: false
                 },
                 order: {
                     startAt: 'ASC'
@@ -78,7 +79,7 @@ export class GroupEventService {
             return groupEvents;
         } 
         catch (e) {
-          throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}`);
+          throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${CalendarId}`);
         }
     }
 
