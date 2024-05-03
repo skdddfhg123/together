@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-// import Schedule from './Schedule';
+import React from 'react';
 
 interface scheduleProps {
   schedule: any[];
@@ -7,12 +6,6 @@ interface scheduleProps {
 }
 
 export default function CalSchedule({ schedule, day }: scheduleProps) {
-  // const [story, setStory] = useState<any[]>([<Schedule key={0} />]);
-
-  // const addStory = () => {
-  //   setStory(story.concat(<Schedule key={story.length} />));
-  // };
-
   const Day: Date = day;
   return <div>{schedule.slice(0, 4)}</div>;
 }

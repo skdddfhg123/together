@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 
 import CalSchedule from '@components/Canlendar/CalSchedule';
-import Schedule from '@components/Canlendar/Schedule';
 import ScheduleModal from '@components/Canlendar/ScheduleModal';
 
 import { useToggle } from '@hooks/useToggle';
-import { useSetDay, useSocialEventStore } from '@store/index';
-import { KakaoEvent } from '@type/index';
+import { useSetDayStore, useSocialEventStore } from '@store/index';
 
 import '@styles/calendar.css';
 
@@ -26,11 +24,12 @@ export default function CalendarPage({
   const [schedule, setSchedule] = useState<{ [key: string]: JSX.Element[] }>(
     {},
   );
-  const { selectedDay, setSelectedDay } = useSetDay((state) => ({
+  const [currentDayKey, setCurrentDayKey] = useState<string>('');
+
+  const { selectedDay, setSelectedDay } = useSetDayStore((state) => ({
     selectedDay: state.selectedDay,
     setSelectedDay: state.setSelectedDay,
   }));
-  const [currentDayKey, setCurrentDayKey] = useState<string>('');
   const socialEvents = useSocialEventStore((state) => state.socialEvents);
 
   const today = new Date();
@@ -51,7 +50,7 @@ export default function CalendarPage({
     const dayKey = day.toISOString().split('T')[0];
     setCurrentDayKey(dayKey);
     setSelectedDay(day);
-    toggle(); // Open or close the modal
+    toggle();
   };
 
   const addSchedule = (title: string) => {
@@ -68,7 +67,7 @@ export default function CalendarPage({
       [currentDayKey]: [...(schedule[currentDayKey] || []), newSchedule],
     };
     setSchedule(updatedSchedules);
-    toggle(); // Close the modal after adding the schedule
+    toggle();
   };
 
   const buildCalendarDays = () => {

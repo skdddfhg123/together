@@ -6,50 +6,17 @@ import SignUp from '@components/User/SignUp';
 import SignIn from '@components/User/SignIn';
 import { useToggle } from '@hooks/useToggle';
 
-import * as API from '@utils/api';
-import { setCookie } from '@utils/cookie';
-import { Cookie } from '../../common/type';
-
-interface SignInForm {
-  useremail: string;
-  password: string;
-}
-
-interface SignUpForm extends SignInForm {
-  nickname: string;
-}
-
-interface ErrorResponse {
-  message: string;
-}
+import * as USER from '@services/userAPI';
+import { SignUpForm, SignInForm, ErrorResponse } from '@type/index';
 
 export default function LogInPage() {
   const navigate = useNavigate();
   const { isOn, toggle } = useToggle(false);
 
   const handleLogIn = async (formData: SignInForm) => {
-    const { useremail, password } = formData;
     try {
-      const res = await API.post(`/auth/login`, {
-        useremail,
-        password,
-      });
-      if (!res) throw new Error('가입 실패');
-      console.log(res); //debug//
-
-      const loginCookie: Cookie = {
-        name: 'accessToken',
-        value: res.data.accessToken,
-        options: {
-          path: '/',
-          maxAge: 3600,
-          secure: true,
-          sameSite: 'none',
-        },
-      };
-      setCookie(loginCookie);
-
-      const user = await API.get(`/auth/token-test`);
+      await USER.logIn(formData);
+      await USER.getInfo();
 
       alert('로그인 성공');
       navigate('/main');
@@ -63,24 +30,10 @@ export default function LogInPage() {
     }
   };
 
-  const getProfile = async () => {
-    try {
-      const res = await API.get(`/auth/token-test`);
-      // setProfile(res.data);
-      console.log(res);
-    } catch (e) {}
-  };
-
   const handleSingUp = async (formData: SignUpForm) => {
-    const { useremail, nickname, password } = formData;
     try {
-      const res = await API.post(`/auth/signup`, {
-        useremail,
-        nickname,
-        password,
-      });
-      if (!res) throw new Error('가입 실패');
-      console.log(res); //debug//
+      await USER.signUp(formData);
+
       alert('정상적으로 가입되었습니다! ');
       toggle();
     } catch (e) {

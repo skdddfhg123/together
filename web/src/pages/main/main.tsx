@@ -7,7 +7,8 @@ import RightMenuTap from '@components/Menu/RightMenuTap';
 import { useToggle } from '@hooks/useToggle';
 
 import * as KAKAO from '@services/KakaoAPI';
-import { useSocialEventStore } from '@store/index';
+import { transToKorDate } from '@utils/dateTranslate';
+import { useSocialEventStore, useUserInfoStore } from '@store/index';
 import { KakaoEvent } from '@type/index';
 import menuImg from '@assets/calendar_menu.webp';
 import syncImg from '@assets/sync.png';
@@ -17,6 +18,12 @@ import '@styles/main.css';
 export default function MainPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const { isOn, toggle } = useToggle(false);
+
+  const userInfo = useUserInfoStore((state) => state.userInfo);
+
+  useEffect(() => {
+    console.log(userInfo);
+  }, []);
 
   const prevCalendar = (): void => {
     setCurrentMonth(
@@ -41,14 +48,15 @@ export default function MainPage() {
   const getSocialEvents = async () => {
     try {
       const res = await KAKAO.GetEvents();
+
       console.log(res.data);
       const eventLists = res.data.map(
         (event: any): KakaoEvent => ({
           title: event.title || '카카오톡 일정',
-          // startAt: transToKorDate(event.startAt, 9),
-          // endAt: transToKorDate(event.endAt, 9),
-          startAt: event.startAt,
-          endAt: event.endAt,
+          startAt: transToKorDate(event.startAt, 9),
+          endAt: transToKorDate(event.endAt, 9),
+          // startAt: event.startAt,
+          // endAt: event.endAt,
           isPast: event.deactivatedAt,
           userCalendarId: event.userCalendar?.userCalendarId,
           social: event.social,

@@ -23,3 +23,16 @@ export interface KakaoEvent {
   social: string;
   socialEventId: string;
 }
+
+export interface SignInForm {
+  useremail: string;
+  password: string;
+}
+
+export interface SignUpForm extends SignInForm {
+  nickname: string;
+}
+
+export interface ErrorResponse {
+  message: string;
+}
