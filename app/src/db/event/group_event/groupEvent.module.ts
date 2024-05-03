@@ -20,7 +20,7 @@ import { CalendarService } from 'src/calendar/calendar.service';
     //CalendarModule,
   ],
   providers: [GroupEventService, UserService, CalendarService],
-  exports: [GroupEventService,TypeOrmModule]
+  exports: [GroupEventService, TypeOrmModule ]
 
 })
 export class GroupEventModule {}
