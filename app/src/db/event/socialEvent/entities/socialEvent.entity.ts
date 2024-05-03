@@ -1,5 +1,3 @@
-import { Calendar } from "src/calendar/entities/calendar.entity";
-import { User } from "src/db/user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserCalendar } from "../../../user_calendar/entities/userCalendar.entity";
 import { IsNotEmpty, IsOptional } from "class-validator";

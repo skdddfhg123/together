@@ -1,8 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { lastValueFrom } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { UserService } from 'src/db/user/user.service';
 import { LoginDTO } from './dtos/login.dto';
 import * as bcrypt from "bcryptjs";
@@ -24,14 +22,12 @@ export class AuthService {
     }
 
     async login(loginDTO: LoginDTO): Promise<{ accessToken: string }> {
-        // console.log(loginDTO);
         const user = await this.userService.findOne(loginDTO);
         
         if (!user) {
             throw new UnauthorizedException("User not found");
         }
     
-        // 비밀번호 확인
         const passwordMatched = await bcrypt.compare(loginDTO.password, user.password);
     
         if (passwordMatched) {

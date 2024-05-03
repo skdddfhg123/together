@@ -6,7 +6,6 @@ import { JWTStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/db/user/user.module';
 import { UserCalendarModule } from 'src/db/user_calendar/userCalendar.module';
-import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 
 @Module({
   imports: [

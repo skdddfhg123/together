@@ -3,8 +3,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { SocialEvent } from "./entities/socialEvent.entity";
 import { Repository } from "typeorm";
 import { SocialEventDto } from "./dtos/socialEvent.dto";
-import { UserService } from "src/db/user/user.service";
-import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
 import { UserCalendarService } from "src/db/user_calendar/userCalendar.service";
 
 @Injectable()
@@ -13,8 +11,6 @@ export class SocialEventService {
     constructor(
         @InjectRepository(SocialEvent)
         private socialEventRepository: Repository<SocialEvent>,
-
-        private userService: UserService,
         private userCalendarService: UserCalendarService,
     ) {}
 
@@ -46,7 +42,6 @@ export class SocialEventService {
             if(err.code === '23505') {
                 return null;
             }
-            // console.log(err)
         }
     }
     

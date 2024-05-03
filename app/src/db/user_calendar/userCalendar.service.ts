@@ -3,9 +3,6 @@ import { UserCalendar } from "./entities/userCalendar.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
-import { UserService } from "../user/user.service";
-import { PayloadResponse } from "src/auth/dtos/payload-response";
-import { SocialEvent } from "../event/socialEvent/entities/socialEvent.entity";
 
 @Injectable()
 export class UserCalendarService {
@@ -14,12 +11,8 @@ export class UserCalendarService {
         private readonly userCalendarRepository: Repository<UserCalendar>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-        @InjectRepository(SocialEvent)
-        private readonly socialEventRepository: Repository<SocialEvent>,
-        private userService: UserService,
     ) {}
 
-    // create (계정 생성 시 불러와질 함수)
     async userCalendarCreate( user : User ): Promise<UserCalendar> {
         const userCalendar = new UserCalendar();
         userCalendar.user = user;
@@ -39,7 +32,6 @@ export class UserCalendarService {
         }
     } 
 
-    // find
     async findOne(data: Partial<UserCalendar>): Promise<UserCalendar> {
         const user = await this.userCalendarRepository.findOneBy({ userCalendarId: data.userCalendarId });
 

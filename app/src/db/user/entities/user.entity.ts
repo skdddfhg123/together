@@ -39,9 +39,6 @@ export class User extends BaseEntity{
     @ApiProperty({ description: 'The date when the user was deleted', example: '2023-01-03T00:00:00.000Z' })
     deletedAt?: Date;
 
-    //@Column({ nullable: false })
-    //settings: string;
-
     @Column({ nullable: true })
     birthDay: Date | null;
 
@@ -51,8 +48,4 @@ export class User extends BaseEntity{
     @OneToOne(() => UserCalendar, userCalendar => userCalendar.user)
     @JoinColumn({ name: 'userCalendarId' })
     userCalendarId: UserCalendar
-
-    // Relation
-    //@OneToMany(type => Board, board => board.user, {eager : true})
-    //boards: Board[]
 }

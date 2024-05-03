@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { getPayload } from 'src/auth/getPayload.decorator';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { Calendar } from './entities/calendar.entity';
@@ -167,29 +167,4 @@ export class CalendarController {
     ): Promise<GroupEvent> {
         return await this.groupEventService.removeGroupEvent(groupEventId);
     }
-
-    // @Get('group/get/')
-    // @ApiBearerAuth('JWT-auth')
-    // @UseGuards(JwtAuthGuard)
-    // async getGroupEventByMonth(/*@Param('yearmonth') yearmonth: string*/): Promise<GroupEvent[]>{
-    //     try {
-    //     const groupEvent = await this.groupEventService.getGroupEventbyMonth(/*yearmonth*/);
-    //         return groupEvent;
-    //     } catch (e) {
-    //         throw e; 
-    //     }
-    // }
-
-
-    // @Get('group/get/:groupeventid')
-    // @ApiBearerAuth('JWT-auth')
-    // @UseGuards(JwtAuthGuard)
-    // async getOneGroupEvent(@Param('groupeventid') groupEventId: string): Promise<GroupEvent>{
-    //     try {
-    //     const groupEvent = await this.groupEventService.getGroupEvent(groupEventId);
-    //         return groupEvent;
-    //     } catch (e) {
-    //         throw e; 
-    //     }
-    // }
 }

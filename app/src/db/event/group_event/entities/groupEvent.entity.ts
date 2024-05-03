@@ -1,12 +1,12 @@
 import { Calendar } from 'src/calendar/entities/calendar.entity';
-import { Entity, Column, ManyToOne, JoinColumn, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 
 @Entity('group_event')
 export class GroupEvent {
     @PrimaryGeneratedColumn('uuid')
     groupEventId: string;
 
-    @ManyToOne(() => Calendar, (calendar) => calendar.calendarId, {eager: true,})
+    @ManyToOne(() => Calendar, (calendar) => calendar.calendarId)
     calendarId: string;
 
     @Column()

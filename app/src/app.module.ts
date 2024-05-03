@@ -33,12 +33,9 @@ import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
     }),
     UserModule,
     AuthModule,
-    
+    CalendarModule,
     GoogleModule,
     KakaoModule,
-    CalendarModule,
-    GroupEventModule,
-    SocialEventModule,
   ],
   controllers: [RedisController],
   providers: [RedisService, DiscordBotService],

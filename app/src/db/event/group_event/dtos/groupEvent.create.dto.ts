@@ -1,7 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsArray, IsBoolean, IsDate, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Matches, MaxLength, MinLength } from "class-validator";
-import { CreateDateColumn } from "typeorm";
+import { IsArray, IsDate, IsString } from "class-validator";
 
 export class CreateGroupEventDTO {
     @ApiProperty({

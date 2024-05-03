@@ -74,9 +74,6 @@ export class KakaoController {
         @Body() body,
     ): Promise<Array<SocialEvent>> {
         const kakaoUser = body.kakaoToken;
-
-        // console.log("JWT: " + payload.userCalendarId);
-        // console.log("body.kakaoToken: " + body.kakaoToken);
         
         const kakaoEventArray = await this.kakaoService.getKakaoEvents(kakaoUser);
 
