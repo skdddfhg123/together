@@ -48,7 +48,4 @@ export class User extends BaseEntity{
     @OneToOne(() => UserCalendar, userCalendar => userCalendar.user)
     @JoinColumn({ name: 'userCalendarId' })
     userCalendarId: UserCalendar
-
-    @Column({ nullable: true, default: null })
-    kakaoAuthorizationCode: string | null;
 }
