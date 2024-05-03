@@ -14,9 +14,6 @@ export class UserCalendarService {
         private readonly userCalendarRepository: Repository<UserCalendar>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-        @InjectRepository(SocialEvent)
-        private readonly socialEventRepository: Repository<SocialEvent>,
-        private userService: UserService,
     ) {}
 
     // create (계정 생성 시 불러와질 함수)
@@ -49,6 +46,7 @@ export class UserCalendarService {
         return user;
     }
 
+    /** user ID를 통한 유저-캘린더 조회 */
     async findCalendarByUserId(userId: string): Promise<UserCalendar> {
         try {
             const userCalendar = await this.userCalendarRepository.findOne({
@@ -69,20 +67,21 @@ export class UserCalendarService {
         }
     }
 
-    async findCalendarByUserCalendarId(userCalendarId: string): Promise<UserCalendar> {
+    /** userCalendar ID를 통한 유저-캘린더 테이블 조회 */
+    async findUserCalendarById(userCalendarId: string): Promise<UserCalendar> {
         try {
-            const userCalendar = await this.userCalendarRepository.findOne({
+            const userCalendarInfo = await this.userCalendarRepository.findOne({
                 where:{ userCalendarId: userCalendarId } 
             });
         
-            if (!userCalendar) {
-                throw new UnauthorizedException(`UserCalendar not found for user ID: ${userCalendarId}`);
+            if (!userCalendarInfo) {
+                throw new UnauthorizedException(`UserCalendarInfo not found for user-calendar ID: ${userCalendarId}`);
             }
         
-            return userCalendar;
+            return userCalendarInfo;
         } catch (error) {
             console.error('Error occurred:', error);
-            throw new InternalServerErrorException('Failed to find user calendar');
+            throw new InternalServerErrorException('Failed to find user calendar Info');
         }
     }
 }

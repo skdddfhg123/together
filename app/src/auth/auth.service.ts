@@ -23,7 +23,7 @@ export class AuthService {
         };
     }
 
-    async login(loginDTO: LoginDTO): Promise<{ accessToken: string }> {
+    async login(loginDTO: LoginDTO): Promise<{ accessToken: string, refreshToken: string }> {
         // console.log(loginDTO);
         const user = await this.userService.findOne(loginDTO);
         
@@ -43,8 +43,14 @@ export class AuthService {
                 useremail: user.useremail,
                 userCalendarId: userCalendar?.userCalendarId
             };
-            console.log(payload);
-            return { accessToken: this.jwtService.sign(payload) };
+
+            const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+            const refreshToken = this.jwtService.sign(payload, { expiresIn: '60d' });
+            // console.log(payload);
+            return { 
+                accessToken,
+                refreshToken
+            };
         } else {
             throw new UnauthorizedException("Password does not match");
         }

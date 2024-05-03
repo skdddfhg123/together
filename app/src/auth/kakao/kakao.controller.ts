@@ -10,6 +10,7 @@ import { JwtAuthGuard } from '../jwt.guard';
 import { SocialEventService } from 'src/db/event/socialEvent/socialEvent.service';
 import { getPayload } from '../getPayload.decorator';
 import { PayloadResponse } from '../dtos/payload-response';
+import { GetTokenDto } from '../dtos/getToken.dto';
 
 
 @ApiTags('kakao')
@@ -50,7 +51,7 @@ export class KakaoController {
     @UseGuards(JwtAuthGuard)
     async getKakaoCalendar(
         @getPayload() payload: PayloadResponse,
-        @Body() body,
+        @Body() body: GetTokenDto,
     ): Promise<Array<SocialEvent>> {
         const kakaoUser = body.kakaoToken;
         
@@ -59,23 +60,21 @@ export class KakaoController {
         const isValid = await this.kakaoService.verifyKakaoToken(kakaoUser);
 
         if(isValid) {
-            await this.socialEventService.deleteAll('kakao', payload.userCalendarId)
+            await this.socialEventService.deleteSocialEvents('kakao', payload.userCalendarId)
     
             const savePromises = kakaoEventArray.map(event => {
                 const socialEvent = new SocialEventDto();
                 socialEvent.social = 'kakao';
                 socialEvent.startAt = event.time.start_at;
                 socialEvent.endAt = event.time.end_at;
-                const isSaved =  this.socialEventService.saveSocialCalendar(socialEvent, payload.userCalendarId);
-                if(isSaved != null)
-                    return isSaved
+                return this.socialEventService.saveSocialCalendar(socialEvent, payload.userCalendarId);
             })
     
             const resultArray = await Promise.all(savePromises);
     
-            const temp = resultArray.filter(element => element != null);
+            // const temp = resultArray.filter(element => element != null);
     
-            return temp;
+            return resultArray;
         }
         else {
             throw new UnauthorizedException('Invalid Access Token');

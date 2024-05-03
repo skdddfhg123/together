@@ -13,7 +13,7 @@ export class KakaoService {
       const url = 'https://kauth.kakao.com/oauth/token';
       const body = new URLSearchParams({
         grant_type: 'refresh_token',
-        client_id: process.env.KAKAO_CLIENT_REST_KEY, // Your Kakao app client ID
+        client_id: process.env.KAKAO_CLIENT_REST_KEY,
         client_secret: process.env.KAKAO_CLIENT_SECRET,
         refresh_token: refreshToken,
       }).toString();
@@ -53,7 +53,6 @@ export class KakaoService {
               this.httpService.get(url, {
                   headers: {
                       Authorization: `Bearer ${accessToken}`
-                      // Authorization: accessToken
                   }
               })
           );
@@ -71,7 +70,6 @@ export class KakaoService {
         const response = await firstValueFrom(this.httpService.get(url, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
-            // 'Authorization': accessToken,
           },
           params: {
               // 'filter': 'USER',

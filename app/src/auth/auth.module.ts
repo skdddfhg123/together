@@ -14,9 +14,6 @@ import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: '1d',
-        },
       }),
       inject: [ConfigService],
     }),

@@ -46,7 +46,7 @@ export class AuthController {
   })
   @Post('login')
   login(
-      @Body(ValidationPipe) loginDTO: LoginDTO): Promise<{ accessToken: string }> {
+      @Body(ValidationPipe) loginDTO: LoginDTO): Promise<{ accessToken: string, refreshToken: string }> {
       return this.authService.login(loginDTO);
   }
 
