@@ -16,6 +16,7 @@ import { GroupEventModule } from './db/event/group_event/groupEvent.module';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
 import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
     CalendarModule,
     GoogleModule,
     KakaoModule,
+    AwsModule,
   ],
   controllers: [RedisController],
   providers: [RedisService, DiscordBotService],

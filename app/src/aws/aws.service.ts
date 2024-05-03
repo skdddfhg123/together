@@ -28,7 +28,7 @@ export class AwsService {
       Bucket: this.configService.get('AWS_S3_BUCKET_NAME'), // S3 버킷 이름
       Key: fileName, // 업로드될 파일의 이름
       Body: file.buffer, // 업로드할 파일
-      ACL: 'public-read', // 파일 접근 권한
+    //   ACL: 'public-read', // 파일 접근 권한
       ContentType: `image/${ext}`, // 파일 타입
     });
 
@@ -36,6 +36,6 @@ export class AwsService {
     await this.s3Client.send(command);
 
     // 업로드된 이미지의 URL을 반환합니다.
-    return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+    return `${process.env.AWS_S3_BUCKET_URL}/${fileName}`;
   }
 }
