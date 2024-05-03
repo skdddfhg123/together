@@ -16,9 +16,9 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(payload: { nickname: string; useremail: string, userCalendarId: string }) {
+    async validate(payload: { kakaoAuthorizationCode: string; useremail: string, userCalendarId: string }) {
         return { 
-            nickname: payload.nickname, 
+            kakaoAuthorizationCode: payload.kakaoAuthorizationCode, 
             useremail: payload.useremail, 
             userCalendarId: payload.userCalendarId 
         };

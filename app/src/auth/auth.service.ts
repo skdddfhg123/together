@@ -35,8 +35,8 @@ export class AuthService {
             const userCalendar = await this.userCalendarService.findCalendarByUserId(user.userId);
 
             const payload = {
-                nickname: user.nickname,
                 useremail: user.useremail,
+                kakaoAuthorizationCode: user?.kakaoAuthorizationCode,
                 userCalendarId: userCalendar?.userCalendarId
             };
             console.log(payload);
