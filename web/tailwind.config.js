@@ -5,6 +5,7 @@ module.exports = {
     extend: {
       fontFamily: {},
       width: {
+        100: '25rem',
         128: '32rem',
         160: '40rem',
         200: '48rem',

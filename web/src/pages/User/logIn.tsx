@@ -49,6 +49,8 @@ export default function LogInPage() {
       };
       setCookie(loginCookie);
 
+      const user = await API.get(`/auth/token-test`);
+
       alert('로그인 성공');
       navigate('/main');
     } catch (e) {
@@ -59,6 +61,14 @@ export default function LogInPage() {
         alert(data.message);
       }
     }
+  };
+
+  const getProfile = async () => {
+    try {
+      const res = await API.get(`/auth/token-test`);
+      // setProfile(res.data);
+      console.log(res);
+    } catch (e) {}
   };
 
   const handleSingUp = async (formData: SignUpForm) => {

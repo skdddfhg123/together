@@ -9,28 +9,31 @@ interface ScheduleModalProps {
 export default function ScheduleModal({ isOpen, onSave }: ScheduleModalProps) {
   const [title, setTitle] = useState<string>('');
 
-  if (!isOpen) return null;
-
   return (
     <div
-      className="w-1/5 flex flex-col"
-      id={isOpen ? 'slideRight-entering' : 'slideRight-exiting'}
+      className={`relative flex flex-col overflow-hidden transition-all duration-500 
+      ${isOpen ? 'w-80 ' : 'w-0'}`}
+      id={isOpen ? 'slideIn-right' : 'slideOut-right'}
     >
-      <h2>일정 등록</h2>
-      <input
-        type="text"
-        placeholder="Enter title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <button
-        onClick={() => {
-          onSave(title);
-          setTitle('');
-        }}
-      >
-        Save
-      </button>
+      {isOpen && (
+        <div className="w-80">
+          <h2>일정 등록</h2>
+          <input
+            type="text"
+            placeholder="Enter title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <button
+            onClick={() => {
+              onSave(title);
+              setTitle('');
+            }}
+          >
+            Save
+          </button>
+        </div>
+      )}
     </div>
   );
 }

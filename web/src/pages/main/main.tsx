@@ -4,6 +4,7 @@ import Calendar from '@pages/Calendar/calendar';
 import CalendarList from '@components/Canlendar/CalendarList';
 import UserModal from '@components/User/Profile/UserModal';
 import RightMenuTap from '@components/Menu/RightMenuTap';
+import { useToggle } from '@hooks/useToggle';
 
 import * as KAKAO from '@services/KakaoAPI';
 import { useSocialEventStore } from '@store/index';
@@ -15,17 +16,8 @@ import '@styles/main.css';
 
 export default function MainPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const { isOn, toggle } = useToggle(false);
 
-  const [leftToggle, setLeftToggle] = useState<boolean>(false);
-  const [rightToggle, setRightToggle] = useState<boolean>(false);
-
-  const handleSilde = (sildePosition: string): void => {
-    if (sildePosition === 'left') {
-      setLeftToggle(!leftToggle);
-    } else if (sildePosition === 'right') {
-      setRightToggle(!rightToggle);
-    }
-  };
   const prevCalendar = (): void => {
     setCurrentMonth(
       new Date(
@@ -76,7 +68,7 @@ export default function MainPage() {
           id="calHeader-leftSidebar"
           src={menuImg}
           alt="calendarList-button"
-          onClick={() => handleSilde('left')}
+          onClick={toggle}
         />
         <h1 id="calendarLogo">Toogether</h1>
         <div id="calHeader-title">
@@ -102,10 +94,11 @@ export default function MainPage() {
       </header>
       <main id="mainSection">
         <aside
-          className="left-sideBar"
-          id={leftToggle ? 'slideLeft-entering' : 'slideLeft-exiting'}
+          className={`left-sideBar relative flex flex-col overflow-hidden 
+            transition-all duration-500 ${isOn ? 'w-100' : 'w-0'}`}
+          id={isOn ? 'slideIn-left' : 'slideOut-left'}
         >
-          {leftToggle && <CalendarList />}
+          {isOn && <CalendarList isOpen={isOn} />}
         </aside>
         <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
         <aside className="right-sideBar">

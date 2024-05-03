@@ -3,7 +3,7 @@ import BookMarkTap from '@components/Menu/BookMarkTap';
 import ChatTap from '@components/Menu/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
 
-import '@styles/RightMenuTap.css';
+// import '@styles/RightMenuTap.css';
 
 export default function RightMenuTap() {
   const [bookMarkOn, setBookMarkOn] = useState<boolean>(false);
@@ -27,21 +27,36 @@ export default function RightMenuTap() {
     }
   };
 
+  const closeTap = (tap: 'bookmark' | 'chat' | 'member') => {
+    if (tap === 'bookmark') {
+      setBookMarkOn(false);
+    } else if (tap === 'chat') {
+      setChatOn(false);
+    } else if (tap === 'member') {
+      setMemberOn(false);
+    }
+  };
+
   return (
-    <div className="flex flex-row">
+    <div className="h-full flex flex-row border-l">
       <div className="flex flex-col">
         <button onClick={() => toggleTap('bookmark')}>Bookmark</button>
         <button onClick={() => toggleTap('chat')}>Chat</button>
         <button onClick={() => toggleTap('member')}>Member</button>
       </div>
       <section
-        className={`section-container ${bookMarkOn || chatOn || memberOn ? 'section-open' : ''}`}
+        className={`relative flex flex-col overflow-hidden transition-all duration-500 
+        ${bookMarkOn || chatOn || memberOn ? 'w-80 opacity-100' : 'w-0 opacity-0'}`}
       >
-        <div className={`${bookMarkOn ? 'slide-in' : 'slide-out '}`}>
-          Bookmark
+        <div id={`${bookMarkOn ? 'slideIn-right' : 'slideOut-right '}`}>
+          {bookMarkOn && <BookMarkTap onClose={() => closeTap('bookmark')} />}
         </div>
-        <div className={chatOn ? 'slide-in' : 'slide-out'}>Chat</div>
-        <div className={memberOn ? 'slide-in' : 'slide-out'}>Member</div>
+        <div id={chatOn ? 'slideIn-right' : 'slideOut-right '}>
+          {chatOn && <ChatTap onClose={() => closeTap('chat')} />}
+        </div>
+        <div id={memberOn ? 'slideIn-right' : 'slideOut-right '}>
+          {memberOn && <MemberTap onClose={() => closeTap('member')} />}
+        </div>
       </section>
     </div>
   );
