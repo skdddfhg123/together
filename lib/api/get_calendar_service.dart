@@ -69,27 +69,33 @@ class CalendarApiService {
   Future<void> loadAppointmentsForCalendar(
       Calendar calendar, String token) async {
     var response = await http.get(
-      Uri.parse("$apiUrl/group/get/${calendar.calendarId}"),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    print(response.body);
+        Uri.parse("$apiUrl/group/get/${calendar.calendarId}"),
+        headers: {'Authorization': 'Bearer $token'});
 
     if (response.statusCode == 200) {
       List<dynamic> appointmentData = json.decode(response.body);
-      List<Appointment> appointments = appointmentData.map((data) {
-        return Appointment(
-          startTime: DateTime.parse(data['startAt']),
-          endTime: DateTime.parse(data['endAt']),
-          subject: data['title'],
-          color: _parseColor(data['color']),
-        );
-      }).toList();
+      List<Appointment> appointments = [];
 
+      for (var data in appointmentData) {
+        var calId = data['calendarId']['calendarId']; // 캘린더 ID를 직접 추출
+        if (calId == calendar.calendarId) {
+          // 현재 로드 중인 캘린더와 일정의 캘린더 ID 비교
+          Appointment newAppointment = Appointment(
+            startTime: DateTime.parse(data['startAt']),
+            endTime: DateTime.parse(data['endAt']),
+            subject: data['title'],
+            color: _parseColor(data['color']),
+          );
+          appointments.add(newAppointment);
+        }
+      }
+
+      // 해당 캘린더 ID로 일정 추가
       appointments.forEach((appointment) {
         meetingController.addCalendarAppointment(
             appointment, calendar.calendarId);
       });
+      meetingController.update(); // 일정 추가 후 UI 업데이트
     } else {
       print('Failed to load appointments for calendar ${calendar.calendarId}');
     }
