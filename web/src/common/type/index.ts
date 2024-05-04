@@ -27,7 +27,7 @@ export interface ErrorResponse {
   message: string;
 }
 
-export interface SocialEvent {
+export type SocialEvent = {
   title?: string;
   startAt: string;
   endAt: string;
@@ -35,4 +35,25 @@ export interface SocialEvent {
   userCalendarId: string;
   social: string;
   socialEventId: string;
+};
+
+export interface Calendar {
+  attendees: string[];
+  author: {
+    userCalendarId: string;
+  };
+  bannerImage: string | null;
+  calendarId: string;
+  coverImage: string | null;
+  deletedAt: string | null;
+  isDeleted: boolean;
+  registeredAt: string;
+  title: string;
+  type: 'public' | 'private';
+  updatedAt: string;
+}
+
+export interface CreateGroupForm {
+  title: string;
+  type: 'public' | 'private';
 }

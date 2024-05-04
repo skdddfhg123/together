@@ -6,6 +6,7 @@ import LogIn from '@pages/User/logIn';
 import Test from '@pages/main/test';
 import UserInfo from '@pages/User/userInfo';
 import ConnectionPage from '@pages/User/connection';
+import CreateGroupPage from '@pages/Calendar/createGroup';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
   {
     path: '/connection',
     element: <ConnectionPage />,
+  },
+  {
+    path: '/createGroup',
+    element: <CreateGroupPage />,
   },
 ];
 

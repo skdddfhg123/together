@@ -9,12 +9,18 @@ import { useSetDayStore, useSocialEventStore } from '@store/index';
 import '@styles/calendar.css';
 
 type CalendarProps = {
+  calendarId: string | null;
   isPrevMonth: boolean;
   isNextMonth: boolean;
   currentMonth: Date;
 };
 
-export default function CalendarPage({ isPrevMonth, isNextMonth, currentMonth }: CalendarProps) {
+export default function CalendarPage({
+  calendarId,
+  isPrevMonth,
+  isNextMonth,
+  currentMonth,
+}: CalendarProps) {
   const { isOn, toggle } = useToggle(false);
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
   const [schedule, setSchedule] = useState<{ [key: string]: JSX.Element[] }>({});

@@ -68,8 +68,6 @@ async function getToken() {
     };
 
     setCookie(kakaoToken);
-    // const kakaoAccesstoken = await window.Kakao.Auth.getAccessToken();
-    // console.log(`kakaoAccesstoken`, kakaoAccesstoken); //debug//
   } catch (err) {
     console.error(err); //debug//
   }

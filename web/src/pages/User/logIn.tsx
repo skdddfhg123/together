@@ -16,6 +16,7 @@ export default function LogInPage() {
   const handleLogIn = async (formData: SignInForm) => {
     try {
       await USER.logIn(formData);
+      await USER.getInfo();
       alert('로그인 성공');
       navigate('/main');
     } catch (e) {

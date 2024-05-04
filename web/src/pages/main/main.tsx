@@ -9,20 +9,20 @@ import { useToggle } from '@hooks/useToggle';
 // import { transToKorDate } from '@utils/dateTranslate';
 import * as KAKAO from '@services/KakaoAPI';
 import { SocialEvent } from '@type/index';
-import { useSocialEventStore, useUserInfoStore } from '@store/index';
+import { useSocialEventStore } from '@store/index';
 import menuImg from '@assets/calendar_menu.webp';
 import syncImg from '@assets/sync.png';
 
 import '@styles/main.css';
 
 export default function MainPage() {
+  const [calendarID, setCalendarID] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const { isOn, toggle } = useToggle(false);
 
-  const userInfo = useUserInfoStore((state) => state.userInfo);
-
   useEffect(() => {
-    console.log(`userInfo :`, userInfo);
+    const id = sessionStorage.getItem('calendarID');
+    setCalendarID(id);
   }, []);
 
   const prevCalendar = (): void => {
@@ -86,13 +86,13 @@ export default function MainPage() {
       </header>
       <main id="mainSection">
         <aside
-          className={`left-sideBar relative flex flex-col overflow-hidden 
-            transition-all duration-500 ${isOn ? 'w-100' : 'w-0'}`}
+          className={`h-full left-sideBar flex flex-col overflow-hidden 
+            transition-all duration-500 ${isOn ? 'w-128' : 'w-0'}`}
           id={isOn ? 'slideIn-left' : 'slideOut-left'}
         >
           {isOn && <CalendarList isOpen={isOn} />}
         </aside>
-        <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
+        <Calendar calendarId={calendarID} isPrevMonth isNextMonth currentMonth={currentMonth} />
         <aside className="right-sideBar">
           <RightMenuTap />
         </aside>

@@ -1,8 +1,34 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { getCookie } from '@utils/cookie';
-// axios.defaults.withCredentials = true;
 
 const serverUrl = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
+
+const axiosInstance = axios.create({
+  baseURL: serverUrl,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+});
+
+axiosInstance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    if (config.url?.endsWith('/login')) {
+      return config;
+    }
+
+    const token = getCookie('accessToken');
+    if (!token) {
+      alert('로그인 세션이 만료되었습니다.');
+      window.location.href = 'http://localhost:3000/signin';
+    }
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error: AxiosError) => {
+    return Promise.reject(error);
+  },
+);
 
 interface Params {
   [key: string]: unknown;
@@ -16,20 +42,14 @@ interface Data {
 // ex) 로그인일 때, endpoint는 '/login'
 //     const response = await get('/login');
 
-async function get(endpoint: string, params?: Params) {
-  console.log(`%cGET 요청 ${serverUrl + endpoint}`, 'color: #a25cd1;');
+async function get(endpoint: string, params?: Params): Promise<AxiosResponse> {
+  if (params) console.log(`%cGET 요청 ${serverUrl + endpoint + '/' + params}`, 'color: #a25cd1;');
+  else console.log(`%cGET 요청 ${serverUrl + endpoint}`, 'color: #a25cd1;');
 
-  return axios.get(serverUrl + endpoint, {
-    headers: {
-      // Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      Authorization: `Bearer ${getCookie('accessToken')}`,
-    },
-    withCredentials: true,
-    params: params,
-  });
+  return axiosInstance.get(endpoint, { params });
 }
 
-async function post(endpoint: string, data: Data) {
+async function post(endpoint: string, data: Data): Promise<AxiosResponse> {
   // JSON.stringify 함수: Javascript 객체를 JSON 형태로 변환함.
   // 예시: {name: "Kim"} => {"name": "Kim"}
   const bodyData = JSON.stringify(data);
@@ -37,40 +57,25 @@ async function post(endpoint: string, data: Data) {
   console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
   console.log(`%cPOST 요청 데이터: ${bodyData}`, 'color: #296aba;');
 
-  return axios.post(serverUrl + endpoint, bodyData, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${getCookie('accessToken')}`,
-    },
-  });
+  return axiosInstance.post(endpoint, JSON.stringify(data));
 }
 
-async function patch(endpoint: string, data: Data) {
+async function patch(endpoint: string, data: Data): Promise<AxiosResponse> {
   // JSON.stringify 함수: Javascript 객체를 JSON 형태로 변환함.
   // 예시: {name: "Kim"} => {"name": "Kim"}
-  const accessToken = getCookie('accessToken');
   const bodyData = JSON.stringify(data);
+
   console.log(`%cPUT 요청: ${serverUrl + endpoint}`, 'color: #059c4b;');
   console.log(`%cPUT 요청 데이터: ${bodyData}`, 'color: #059c4b;');
 
-  return axios.patch(serverUrl + endpoint, bodyData, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  return axiosInstance.patch(endpoint, JSON.stringify(data));
 }
 
-// 아래 함수명에 관해, delete 단어는 자바스크립트의 reserved 단어이기에,
-// 여기서는 우선 delete 대신 del로 쓰고 아래 export 시에 delete로 alias 함.
-async function del(endpoint: string, params = '') {
-  const accessToken = getCookie('accessToken');
-  console.log(`%cDELETE 요청 ${serverUrl + endpoint + '/' + params}`, 'color: #c36999');
-  return axios.delete(serverUrl + endpoint + '/' + params, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+async function del(endpoint: string, params?: Params): Promise<AxiosResponse> {
+  if (params) console.log(`%cDELETE 요청 ${serverUrl + endpoint + '/' + params}`, 'color: #c36999');
+  else console.log(`%cDELETE 요청 ${serverUrl + endpoint}`, 'color: #c36999');
+
+  return axiosInstance.delete(endpoint, params);
 }
 
 // 아래처럼 export한 후, import * as API 방식으로 가져오면,

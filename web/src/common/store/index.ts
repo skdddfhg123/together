@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Calendar } from '@type/index';
 
 interface CalendarState {
   selectedDay: Date | null;
@@ -46,4 +47,18 @@ interface UserInfo {
 export const useUserInfoStore = create<User>((set) => ({
   userInfo: null,
   setUserInfo: (user: UserInfo | null) => set({ userInfo: user }),
+}));
+
+interface CalendarStore {
+  calendars: Calendar[];
+  isLoaded: boolean;
+  setCalendars: (calendars: Calendar[]) => void;
+  setIsLoaded: (isLoaded: boolean) => void;
+}
+
+export const useCalendarStore = create<CalendarStore>((set) => ({
+  calendars: [],
+  isLoaded: false,
+  setCalendars: (calendars) => set({ calendars }),
+  setIsLoaded: (isLoaded) => set({ isLoaded }),
 }));

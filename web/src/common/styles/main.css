@@ -90,6 +90,8 @@
 
 /* ************************* main ************************* */
 #mainSection {
+  height:89vh;
+
   display: flex;
   flex-direction: row;
 }

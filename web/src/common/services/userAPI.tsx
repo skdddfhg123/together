@@ -46,4 +46,10 @@ async function logIn(formData: SignInForm) {
   setCookie(refreshToken);
 }
 
-export { signUp, logIn };
+async function getInfo() {
+  const res = await API.get(`/auth/token-test`);
+  sessionStorage.setItem(`nickname`, res.data.nickanem);
+  sessionStorage.setItem('calendarID', res.data.userCalendarId);
+}
+
+export { signUp, logIn, getInfo };

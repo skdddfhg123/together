@@ -2,60 +2,47 @@ import React, { useState } from 'react';
 import BookMarkTap from '@components/Menu/BookMarkTap';
 import ChatTap from '@components/Menu/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
+import CalendarSetTap from '@components/Menu/CalenderSetTap';
 
-// import '@styles/RightMenuTap.css';
+type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
 export default function RightMenuTap() {
-  const [bookMarkOn, setBookMarkOn] = useState<boolean>(false);
-  const [chatOn, setChatOn] = useState<boolean>(false);
-  const [memberOn, setMemberOn] = useState<boolean>(false);
+  const [activeTap, setActiveTap] = useState<TapName | null>(null);
 
-  // 각 탭의 활성화를 토글하는 함수를 정의합니다.
-  const toggleTap = (tap: 'bookmark' | 'chat' | 'member') => {
-    if (tap === 'bookmark') {
-      setBookMarkOn(!bookMarkOn);
-      setChatOn(false);
-      setMemberOn(false);
-    } else if (tap === 'chat') {
-      setChatOn(!chatOn);
-      setBookMarkOn(false);
-      setMemberOn(false);
-    } else if (tap === 'member') {
-      setMemberOn(!memberOn);
-      setBookMarkOn(false);
-      setChatOn(false);
-    }
-  };
-
-  const closeTap = (tap: 'bookmark' | 'chat' | 'member') => {
-    if (tap === 'bookmark') {
-      setBookMarkOn(false);
-    } else if (tap === 'chat') {
-      setChatOn(false);
-    } else if (tap === 'member') {
-      setMemberOn(false);
-    }
+  const toggleTap = (tap: TapName) => {
+    setActiveTap(activeTap === tap ? null : tap);
   };
 
   return (
     <div className="h-full flex flex-row border-l">
       <div className="flex flex-col">
-        <button onClick={() => toggleTap('bookmark')}>Bookmark</button>
-        <button onClick={() => toggleTap('chat')}>Chat</button>
-        <button onClick={() => toggleTap('member')}>Member</button>
+        <button className={`py-4`} onClick={() => toggleTap('bookmark')}>
+          Bookmark
+        </button>
+        <button className={`py-4`} onClick={() => toggleTap('chat')}>
+          Chat
+        </button>
+        <button className={`py-4`} onClick={() => toggleTap('member')}>
+          Member
+        </button>
+        <button className={`py-4`} onClick={() => toggleTap('calendarSet')}>
+          CalendarSet
+        </button>
       </div>
       <section
-        className={`relative flex flex-col overflow-hidden transition-all duration-500 
-        ${bookMarkOn || chatOn || memberOn ? 'w-80 opacity-100' : 'w-0 opacity-0'}`}
+        className={`relative flex flex-col overflow-hidden transition-all duration-500 ${activeTap ? 'w-80 opacity-100' : 'w-0 opacity-0'}`}
       >
-        <div id={`${bookMarkOn ? 'slideIn-right' : 'slideOut-right '}`}>
-          {bookMarkOn && <BookMarkTap onClose={() => closeTap('bookmark')} />}
+        <div id={`${activeTap === 'bookmark' ? 'slideIn-right' : 'slideOut-right'}`}>
+          {activeTap === 'bookmark' && <BookMarkTap onClose={() => setActiveTap(null)} />}
         </div>
-        <div id={chatOn ? 'slideIn-right' : 'slideOut-right '}>
-          {chatOn && <ChatTap onClose={() => closeTap('chat')} />}
+        <div id={activeTap === 'chat' ? 'slideIn-right' : 'slideOut-right'}>
+          {activeTap === 'chat' && <ChatTap onClose={() => setActiveTap(null)} />}
         </div>
-        <div id={memberOn ? 'slideIn-right' : 'slideOut-right '}>
-          {memberOn && <MemberTap onClose={() => closeTap('member')} />}
+        <div id={activeTap === 'member' ? 'slideIn-right' : 'slideOut-right'}>
+          {activeTap === 'member' && <MemberTap onClose={() => setActiveTap(null)} />}
+        </div>
+        <div id={activeTap === 'calendarSet' ? 'slideIn-right' : 'slideOut-right'}>
+          {activeTap === 'calendarSet' && <CalendarSetTap onClose={() => setActiveTap(null)} />}
         </div>
       </section>
     </div>
