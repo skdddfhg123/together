@@ -77,17 +77,13 @@ class CalendarApiService {
       List<Appointment> appointments = [];
 
       for (var data in appointmentData) {
-        var calId = data['calendarId']['calendarId']; // 캘린더 ID를 직접 추출
-        if (calId == calendar.calendarId) {
-          // 현재 로드 중인 캘린더와 일정의 캘린더 ID 비교
-          Appointment newAppointment = Appointment(
-            startTime: DateTime.parse(data['startAt']),
-            endTime: DateTime.parse(data['endAt']),
-            subject: data['title'],
-            color: _parseColor(data['color']),
-          );
-          appointments.add(newAppointment);
-        }
+        Appointment newAppointment = Appointment(
+          startTime: DateTime.parse(data['startAt']),
+          endTime: DateTime.parse(data['endAt']),
+          subject: data['title'],
+          color: _parseColor(data['color']),
+        );
+        appointments.add(newAppointment);
       }
 
       // 해당 캘린더 ID로 일정 추가

@@ -2,6 +2,7 @@ import 'package:calendar/api/event_creates_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart'; // CalendarController를 가져옵니다.
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/meeting_data.dart';
+import 'package:calendar/screens/Main_page.dart';
 import 'package:calendar/screens/all_calendar.dart';
 import 'package:calendar/screens/sync_login_page.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,10 @@ import '../models/calendar.dart';
 
 class CalendarDetailView extends StatelessWidget {
   final String calendarId;
+  final Function(String) onCalendarChanged; // 페이지 변경을 위한 콜백
 
-  const CalendarDetailView({super.key, required this.calendarId});
+  const CalendarDetailView(
+      {super.key, required this.calendarId, required this.onCalendarChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -150,25 +153,28 @@ class CalendarDetailView extends StatelessWidget {
                     ),
                     child: Text('캘린더 목록'),
                   ),
-                  Obx(() => Column(
-                        children: List.generate(
-                            calendarController.calendars.length, (index) {
-                          final calendar = calendarController.calendars[index];
-                          return ListTile(
-                            title: Text(calendar.title),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CalendarDetailView(
-                                      calendarId: calendar.calendarId),
-                                ),
-                              );
-                            },
-                          );
-                        }),
-                      )),
+                  Obx(
+                    () => Column(
+                      children: List.generate(
+                          calendarController.calendars.length, (index) {
+                        final calendar = calendarController.calendars[index];
+                        return ListTile(
+                          title: Text(calendar.title),
+                          onTap: () {
+                            Navigator.pop(context);
+                            onCalendarChanged(calendar.calendarId);
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (_) => CalendarDetailView(
+                            //         calendarId: calendar.calendarId),
+                            //   ),
+                            // );
+                          },
+                        );
+                      }),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -177,11 +183,12 @@ class CalendarDetailView extends StatelessWidget {
               leading: const Icon(Icons.calendar_today), // 아이콘 추가
               onTap: () {
                 Navigator.pop(context); // Drawer 닫기
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => AllCalendar()), // AllCalendar 페이지로 이동
-                );
+                onCalendarChanged('all_calendar');
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (_) => AllCalendar()), // AllCalendar 페이지로 이동
+                // );
               },
             ),
           ],

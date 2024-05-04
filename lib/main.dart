@@ -1,6 +1,7 @@
 import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/api/kakao_auth_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
+import 'package:calendar/screens/Main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -9,7 +10,6 @@ import 'controllers/auth_controller.dart';
 import 'controllers/meeting_controller.dart';
 import 'screens/login_page.dart';
 import 'screens/signup_page.dart';
-import 'screens/all_calendar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,11 +40,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Group Calendar App',
-      initialRoute: token != null ? '/home' : '/',
+      // initialRoute: token != null ? '/home' : '/',
+      initialRoute: '/',
       getPages: [
         GetPage(name: '/', page: () => LoginPage()),
         GetPage(name: '/signup', page: () => SignupPage()),
-        GetPage(name: '/home', page: () => AllCalendar()),
+        GetPage(name: '/home', page: () => MainPage()),
       ],
     );
   }

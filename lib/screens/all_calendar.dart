@@ -13,7 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class AllCalendar extends StatelessWidget {
-  AllCalendar({Key? key}) : super(key: key);
+  final Function(String)? onCalendarChanged;
+
+  AllCalendar({super.key, this.onCalendarChanged});
 
   final KakaoAuthService kakaoAuthService = Get.find<KakaoAuthService>();
 
@@ -153,13 +155,14 @@ class AllCalendar extends StatelessWidget {
                             title: Text(calendar.title),
                             onTap: () {
                               Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CalendarDetailView(
-                                      calendarId: calendar.calendarId),
-                                ),
-                              );
+                              onCalendarChanged?.call(calendar.calendarId);
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (_) => CalendarDetailView(
+                              //         calendarId: calendar.calendarId),
+                              //   ),
+                              // );
                             },
                           );
                         }),
@@ -172,11 +175,12 @@ class AllCalendar extends StatelessWidget {
               leading: const Icon(Icons.calendar_today), // 아이콘 추가
               onTap: () {
                 Navigator.pop(context); // Drawer 닫기
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => AllCalendar()), // AllCalendar 페이지로 이동
-                );
+                onCalendarChanged?.call('all_calendar');
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (_) => AllCalendar()), // AllCalendar 페이지로 이동
+                // );
               },
             ),
             ListTile(
