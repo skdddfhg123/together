@@ -11,6 +11,7 @@ import { SocialEvent } from 'src/db/event/socialEvent/entities/socialEvent.entit
 import { getPayload } from '../getPayload.decorator';
 import { PayloadResponse } from '../dtos/payload-response';
 import { GetTokenDto } from '../dtos/getToken.dto';
+import { RefreshAuthGuard } from '../strategy/refresh.guard';
 
 @ApiTags('google')
 @Controller('google')
@@ -47,6 +48,7 @@ export class GoogleController {
     @ApiResponse({ status: 201, description: '성공 시 Google SocialEvent[]반환' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    @UseGuards(RefreshAuthGuard)
     async getKakaoCalendar(
         @getPayload() payload: PayloadResponse,
         @Body() body: GetTokenDto,
@@ -87,6 +89,7 @@ export class GoogleController {
     @ApiResponse({ status: 201, description: '성공 시 google SocialEvent[] 반환' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    @UseGuards(RefreshAuthGuard)
     async getSocialEventData(
         @getPayload() payload: PayloadResponse,
     ): Promise<SocialEvent[]> {

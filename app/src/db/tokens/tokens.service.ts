@@ -147,8 +147,6 @@ export class TokensService {
         if(!savedToken)
             throw new HttpException('Token not found', 400);
 
-        console.log(this.jwtService.decode(savedToken.jwtRefreshToken))
-
         const isMatch = this.isRefreshTokenMatch(refreshToken, savedToken.jwtRefreshToken);
         
         if(!isMatch)

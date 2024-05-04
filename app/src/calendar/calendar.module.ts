@@ -13,9 +13,19 @@ import { GroupEventModule } from 'src/db/event/group_event/groupEvent.module';
 import { JWTStrategy } from 'src/auth/strategy/jwt.strategy';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
 import { TokensModule } from 'src/db/tokens/tokens.module';
+import { RefreshStrategy } from 'src/auth/strategy/refresh.strategy';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+      }),
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forFeature([Calendar, GroupEvent]),
     CalendarModule,
     UserModule,
@@ -24,6 +34,6 @@ import { TokensModule } from 'src/db/tokens/tokens.module';
     GroupEventModule,
   ],
   controllers: [CalendarController],
-  providers: [CalendarService, JWTStrategy]
+  providers: [CalendarService, JWTStrategy, RefreshStrategy]
 })
 export class CalendarModule {}

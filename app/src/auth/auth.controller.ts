@@ -55,12 +55,13 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @Get('token-test')
   @UseGuards(JwtAuthGuard)
+  // @UseGuards(RefreshAuthGuard)
   tokenTest (
-    @getPayload() payload: PayloadResponse 
-    // @Request() req,
+    @getPayload() payload: PayloadResponse,
   ): any {
+    console.log("1111111")
     // console.log(payload);
-    // console.log(req)
+    // console.log(req.cookie)
     return payload;
   }
 }
