@@ -11,13 +11,10 @@ import { Calendar } from 'src/calendar/entities/calendar.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserCalendar, SocialEvent, User, Calendar]),
-    UserModule,
+  TypeOrmModule.forFeature([UserCalendar, User]),
+    // UserModule,
   ],
-  providers: [
-        UserCalendarService,
-        UserService,
-    ],
+  providers: [UserCalendarService],
   exports: [UserCalendarService]
 
 })

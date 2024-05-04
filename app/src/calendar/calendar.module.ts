@@ -10,8 +10,9 @@ import { UserModule } from 'src/db/user/user.module';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { UserCalendarModule } from 'src/db/user_calendar/userCalendar.module';
 import { GroupEventModule } from 'src/db/event/group_event/groupEvent.module';
-import { JWTStrategy } from 'src/auth/jwt.strategy';
+import { JWTStrategy } from 'src/auth/strategy/jwt.strategy';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
+import { TokensModule } from 'src/db/tokens/tokens.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity'
     CalendarModule,
     UserModule,
     UserCalendarModule,
+    TokensModule,
     GroupEventModule,
   ],
   controllers: [CalendarController],

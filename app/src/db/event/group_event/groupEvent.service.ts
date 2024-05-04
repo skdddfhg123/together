@@ -1,21 +1,10 @@
 import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { CreateGroupEventDTO } from "./dtos/groupEvent.create.dto";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
-import { UserService } from "src/db/user/user.service";
 import { GroupEvent } from "./entities/groupEvent.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Between, Repository } from "typeorm";
-import { CalendarService } from "src/calendar/calendar.service";
-import { UserCalendarService } from "src/db/user_calendar/userCalendar.service";
+import { Repository } from "typeorm";
 import { Calendar } from "src/calendar/entities/calendar.entity";
-// import { InjectRepository } from "@nestjs/typeorm";
-// import { Repository } from "typeorm";
-// import { GroupEvent } from "./entities/groupEvent.entity";
-// import { User } from "src/db/user/entities/user.entity";
-// import { JwtService } from "@nestjs/jwt";
-// import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
-// import { UserService } from "src/db/user/user.service";
-// import { UserCalendarService } from "src/db/user_calendar/userCalendar.service";
 
 
 @Injectable()
@@ -25,9 +14,6 @@ export class GroupEventService {
         private readonly groupEventRepository: Repository<GroupEvent>,
         @ InjectRepository(Calendar)
         private readonly calendarRepository: Repository<Calendar>,
-        private userService: UserService,
-        private calendarService: CalendarService,
-        private userCalendarService: UserCalendarService,
     ) {}
 
     async createGroupEvent(
@@ -84,12 +70,6 @@ export class GroupEventService {
 
 
      async getGroupEvent( groupEventId : string ): Promise<GroupEvent> {
-    
-        // null : member, alerts, attetchment
-        // auto : groupEventId, pinned, createdAt, updatedAt, deactivatedAt
-        // relation : calendarId
-        // token : author
-        // dto : group, title, color, startAt, endAt, 
     
             try {
             
@@ -174,32 +154,8 @@ export class GroupEventService {
         }
     }
     
-
-    // find
-    // async getGroupEvent( groupEventId : string, ): Promise<getGroupEventDTO> {
-    //     try {
-    //         // 기존의 GroupEvent 레코드를 조회합니다.
-    //         const groupEvent = await this.groupEventRepository.findOne({
-    //             where: { groupEventId: groupEventId },
-    //         });
-
-    //         if (!groupEvent) {
-    //             throw new Error('Group event not found');
-    //         }
-    //         return groupEvent;
-
-
-    //     } catch (e) {
-    //         console.error('Error occurred:', e);
-    //         throw new InternalServerErrorException('Failed to deactivate group event');
-    //     }
-    // }
-
-    
     async findOne(data: Partial<GroupEvent>): Promise<GroupEvent> {
-        // console.log(data)
         const groupEvent = await this.groupEventRepository.findOneBy({ groupEventId: data.groupEventId });
-        // console.log(user)
         if (!groupEvent) {
             throw new UnauthorizedException('Could not find group event');
         }

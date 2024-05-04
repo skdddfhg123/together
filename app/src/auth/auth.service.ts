@@ -1,12 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { lastValueFrom } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { UserService } from 'src/db/user/user.service';
 import { LoginDTO } from './dtos/login.dto';
 import * as bcrypt from "bcryptjs";
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
+import { TokensService } from 'src/db/tokens/tokens.service';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +14,8 @@ export class AuthService {
         private jwtService: JwtService,
         private configService: ConfigService,
         private userCalendarService: UserCalendarService,
-    ) { }
+        private tokensService: TokensService,
+    ) {}
 
     getEnvVariables() {
         return {
@@ -24,7 +24,6 @@ export class AuthService {
     }
 
     async login(loginDTO: LoginDTO): Promise<{ accessToken: string, refreshToken: string }> {
-        // console.log(loginDTO);
         const user = await this.userService.findOne(loginDTO);
         
         if (!user) {
@@ -46,7 +45,9 @@ export class AuthService {
 
             const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
             const refreshToken = this.jwtService.sign(payload, { expiresIn: '60d' });
-            // console.log(payload);
+
+            await this.tokensService.saveUserToken(user.userId, 'jwt', accessToken, refreshToken);
+
             return { 
                 accessToken,
                 refreshToken

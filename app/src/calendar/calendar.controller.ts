@@ -4,13 +4,14 @@ import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { getPayload } from 'src/auth/getPayload.decorator';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
-import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { JwtAuthGuard } from 'src/auth/strategy/jwt.guard';
 import { Calendar } from './entities/calendar.entity';
 import { GroupEventService } from 'src/db/event/group_event/groupEvent.service';
 import { CreateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.create.dto';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
 import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 import { UpdateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.update.dto';
+import { RefreshAuthGuard } from 'src/auth/strategy/refresh.guard';
 
 @ApiTags("calendar")
 @Controller('calendar')

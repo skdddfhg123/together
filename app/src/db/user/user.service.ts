@@ -10,6 +10,11 @@ import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { Calendar } from 'src/calendar/entities/calendar.entity';
 import { UserCalendar } from '../user_calendar/entities/userCalendar.entity';
 import { UserCalendarService } from '../user_calendar/userCalendar.service';
+import { UserAccessToken } from '../tokens/entities/userAccessToken.entity';
+import { UserRefreshToken } from '../tokens/entities/userRefreshToken.entity';
+import { SaveAccessTokenDto } from '../tokens/dtos/saveAccessToken.dto';
+import { SaveRefreshTokenDto } from '../tokens/dtos/saveRefreshToken.dto';
+import { TokensService } from '../tokens/tokens.service';
 
 @Injectable()
 export class UserService {
@@ -17,6 +22,8 @@ export class UserService {
     constructor(
         @ InjectRepository(User)
         private readonly userRepository: Repository<User>,
+
+        private readonly tokensService: TokensService
     ) {}
 
     async signUp(userDTO: CreateUserDTO): Promise<User> {
@@ -37,9 +44,19 @@ export class UserService {
         const salt = await bcrypt.genSalt();
         user.password = await bcrypt.hash(userDTO.password, salt);
 
+
         try {
             const savedUser = await this.userRepository.save(user);
             delete savedUser.password;
+
+            const accessTokenUser = new SaveAccessTokenDto();
+            const refreshTokenUser = new SaveRefreshTokenDto();
+            accessTokenUser.user = savedUser;
+            refreshTokenUser.user = savedUser;
+
+            const tokens = await this.tokensService.saveTokenUser(accessTokenUser, refreshTokenUser)
+            await this.userRepository.update(savedUser.userId, {accessToken: tokens[0], refreshToken: tokens[1]})
+            
             return savedUser;
         } catch (e) {
             throw new InternalServerErrorException('Failed to create user');
@@ -55,23 +72,4 @@ export class UserService {
         }
         return user;
     }
-
-    // async findGroupCalendar(payload: PayloadResponse): Promise<Calendar[] | void> {
-        
-    // }
-
-    // async signIn(authCredentialsDto: UserCredentialsDto): Promise<{accessToken: string}> {
-
-    //     const {userEmail, password} = authCredentialsDto;
-    //     const user = await this.userRepository.findOne( {where : {email : userEmail}});
-        
-    //     if(password === user.pwd){
-    //         const payload = { userEmail };
-    //         const accessToken = await this.jwtService.sign(payload);
-            
-    //         return { accessToken }
-    //     } else {
-    //         throw new UnauthorizedException('login failed')
-    //     }
-    // } 
 }

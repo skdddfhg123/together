@@ -1,12 +1,12 @@
 import { Body, Controller, Get, HttpException, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { KakaoService } from './kakao.service';
 import { KakaoUser } from './utils/interface/kakao.interface';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SocialEventDto } from 'src/db/event/socialEvent/dtos/socialEvent.dto';
 import { SocialEvent } from 'src/db/event/socialEvent/entities/socialEvent.entity';
-import { JwtAuthGuard } from '../jwt.guard';
+import { JwtAuthGuard } from '../strategy/jwt.guard';
 import { SocialEventService } from 'src/db/event/socialEvent/socialEvent.service';
 import { getPayload } from '../getPayload.decorator';
 import { PayloadResponse } from '../dtos/payload-response';
@@ -60,6 +60,8 @@ export class KakaoController {
         const isValid = await this.kakaoService.verifyKakaoToken(kakaoUser);
 
         if(isValid) {
+
+            // 저장된 access token 확인하는 함수 및 저장 함수(이건 서비스 로직으로?)
             await this.socialEventService.deleteSocialEvents('kakao', payload.userCalendarId)
     
             const savePromises = kakaoEventArray.map(event => {
