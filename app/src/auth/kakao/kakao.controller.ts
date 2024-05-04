@@ -12,6 +12,7 @@ import { getPayload } from '../getPayload.decorator';
 import { PayloadResponse } from '../dtos/payload-response';
 import { GetTokenDto } from '../dtos/getToken.dto';
 import { RefreshAuthGuard } from '../strategy/refresh.guard';
+import { TokensService } from 'src/db/tokens/tokens.service';
 
 
 @ApiTags('kakao')
@@ -20,6 +21,7 @@ export class KakaoController {
     constructor(
         private kakaoService: KakaoService,
         private socialEventService: SocialEventService,
+        private readonly tokenService: TokensService,
     ) {}
 
     @Get('login')
@@ -41,11 +43,11 @@ export class KakaoController {
         console.log("kakaoUser.refreshToken: " + kakaoUser.refreshToken)
 
         // const isValid = await this.kakaoService.verifyKakaoToken(kakaoUser.refreshToken);
-        const newAccessToken = this.kakaoService.refreshAccessToken(kakaoUser.refreshToken);
-        console.log((await newAccessToken).toString())
+        // const newAccessToken = this.kakaoService.refreshAccessToken(kakaoUser.refreshToken);
+        // console.log((await newAccessToken).toString())
     }
 
-    @Post('calendar')
+    @Post('get/calendar')
     @ApiOperation({ summary: '카카오 톡캘린더 API에서 일정 가져오기' })
     @ApiResponse({ status: 201, description: '성공 시 Kakao SocialEvent[] 반환' })
     @ApiBearerAuth('JWT-auth')
@@ -54,16 +56,14 @@ export class KakaoController {
     async getKakaoCalendar(
         @getPayload() payload: PayloadResponse,
         @Body() body: GetTokenDto,
-    ): Promise<Array<SocialEvent>> {
-        const kakaoUser = body.kakaoToken;
+    ): Promise<{ resultArray: Array<SocialEvent>, accessTokenCheck: string | null }> {
+        const kakaoAccess = body.kakaoAccessToken;
         
-        const kakaoEventArray = await this.kakaoService.getKakaoEvents(kakaoUser);
+        const accessTokenCheck = await this.kakaoService.getValidAccessToken(payload.useremail, 'kakao', kakaoAccess);
+        
+        if(accessTokenCheck) {
+            const kakaoEventArray = await this.kakaoService.getKakaoEvents(accessTokenCheck);
 
-        const isValid = await this.kakaoService.verifyKakaoToken(kakaoUser);
-
-        if(isValid) {
-
-            // 저장된 access token 확인하는 함수 및 저장 함수(이건 서비스 로직으로?)
             await this.socialEventService.deleteSocialEvents('kakao', payload.userCalendarId)
     
             const savePromises = kakaoEventArray.map(event => {
@@ -76,13 +76,26 @@ export class KakaoController {
     
             const resultArray = await Promise.all(savePromises);
     
-            // const temp = resultArray.filter(element => element != null);
-    
-            return resultArray;
+            return {resultArray, accessTokenCheck};
         }
         else {
-            throw new UnauthorizedException('Invalid Access Token');
+            throw new UnauthorizedException('Invalid Access Token and Expired Refresh Token');
         }
+    }
+
+    @Post('save/token')
+    @ApiOperation({ summary: '카카오 토큰 저장' })
+    @ApiResponse({ status: 201, description: '저장 성공 유무에 따라 boolean값 반환' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async saveKakaoToken(
+        @getPayload() payload: PayloadResponse,
+        @Body() body: GetTokenDto,
+    ): Promise<boolean> {
+        const kakaoAccess = body.kakaoAccessToken;
+        const kakaoRefresh = body.kakaoRefreshToken;
+        
+        return await this.tokenService.saveUserToken(payload.useremail, 'kakao', kakaoAccess, kakaoRefresh)
     }
 
     @Get('get/social')

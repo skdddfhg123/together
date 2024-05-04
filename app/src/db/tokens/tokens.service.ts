@@ -21,6 +21,7 @@ export class TokensService {
         private readonly jwtService: JwtService
     ) {}
 
+    /** 유저에 따른 Token Table 생성 및 저장 */
     async saveTokenUser(accessToken: Partial<UserAccessToken>, refreshToken: Partial<UserRefreshToken>): Promise<[UserAccessToken, UserRefreshToken]> {
         const saveAccess = await this.userAccessTokenRepository.save(accessToken);
 
@@ -33,11 +34,14 @@ export class TokensService {
         return [saveAccess, saveRefresh]
     }
 
-    async saveUserToken(userID: string, provider: string, accessToken: string, refreshToken: string): Promise<void> {
+    /** 클라이언트 측에서 보낸 각 토큰 저장 */
+    async saveUserToken(userEmail: string, provider: string, accessToken: string, refreshToken: string): Promise<boolean> {
 
-        const TokenTables = await this.findTokenTableByUserId(userID);
+        const TokenTables = await this.findTokenTableByUserEmail(userEmail);
         const accessTokenTable = TokenTables[0];
         const refreshTokenTable = TokenTables[1];
+
+        let isSaved = false;
 
         switch (provider){
             case 'jwt':
@@ -50,6 +54,8 @@ export class TokensService {
 
                 if(!jwtUpdate)
                     throw new InternalServerErrorException("refresh token update failed");
+
+                isSaved = true;
                 break;
             case 'kakao':
                 let kakaoUpdate = await this.userAccessTokenRepository.update(accessTokenTable.accessId, {kakaoAccessToken: accessToken});
@@ -61,6 +67,8 @@ export class TokensService {
 
                 if(!kakaoUpdate)
                     throw new InternalServerErrorException("refresh token update failed");
+
+                isSaved = true;
                 break;
             case 'google':
                 let googleUpdate = await this.userAccessTokenRepository.update(accessTokenTable.accessId, {googleAccessToken: accessToken});
@@ -72,6 +80,8 @@ export class TokensService {
 
                 if(!googleUpdate)
                     throw new InternalServerErrorException("refresh token update failed");
+
+                isSaved = true;
                 break;
             case 'outlook':
                 let outlookUpdate = await this.userAccessTokenRepository.update(accessTokenTable.accessId, {outlookAccessToken: accessToken});
@@ -83,6 +93,8 @@ export class TokensService {
 
                 if(!outlookUpdate)
                     throw new InternalServerErrorException("refresh token update failed");
+
+                isSaved = true;
                 break;
             case 'discord':
                 let discordUpdate = await this.userAccessTokenRepository.update(accessTokenTable.accessId, {discordAccessToken: accessToken});
@@ -94,32 +106,103 @@ export class TokensService {
 
                 if(!discordUpdate)
                     throw new InternalServerErrorException("refresh token update failed");
+
+                isSaved = true;
+                break;
+        }
+
+        return isSaved;
+    }
+
+    async findTokenTablesToEmpty(userEmail: string, provider: string) {
+        const tokenTables = await this.findTokenTableByUserEmail(userEmail);
+
+        const accessTable = tokenTables[0];
+        const refreshTable = tokenTables[1];
+
+        switch (provider){
+            case 'jwt':
+                let jwtUpdate = await this.userAccessTokenRepository.update(accessTable.accessId, {jwtAccessToken: null});
+
+                if(!jwtUpdate)
+                    throw new InternalServerErrorException("access token update to null failed");
+
+                jwtUpdate = await this.userRefreshTokenRepository.update(refreshTable.refreshId, {jwtRefreshToken: null});
+
+                if(!jwtUpdate)
+                    throw new InternalServerErrorException("refresh token update to null failed");
+                break;
+            case 'kakao':
+                let kakaoUpdate = await this.userAccessTokenRepository.update(accessTable.accessId, {kakaoAccessToken: null});
+
+                if(!kakaoUpdate)
+                    throw new InternalServerErrorException("access token update to null failed");
+
+                kakaoUpdate = await this.userRefreshTokenRepository.update(refreshTable.refreshId, {kakaoRefreshToken: null});
+
+                if(!kakaoUpdate)
+                    throw new InternalServerErrorException("refresh token update to null failed");
+                break;
+            case 'google':
+                let googleUpdate = await this.userAccessTokenRepository.update(accessTable.accessId, {googleAccessToken: null});
+
+                if(!googleUpdate)
+                    throw new InternalServerErrorException("access token update to null failed");
+
+                googleUpdate = await this.userRefreshTokenRepository.update(refreshTable.refreshId, {googleRefreshToken: null});
+
+                if(!googleUpdate)
+                    throw new InternalServerErrorException("refresh token update to null failed");
+                break;
+            case 'outlook':
+                let outlookUpdate = await this.userAccessTokenRepository.update(accessTable.accessId, {outlookAccessToken: null});
+
+                if(!outlookUpdate)
+                    throw new InternalServerErrorException("access token update to null failed");
+
+                outlookUpdate = await this.userRefreshTokenRepository.update(refreshTable.refreshId, {outlookRefreshToken: null});
+
+                if(!outlookUpdate)
+                    throw new InternalServerErrorException("refresh token update to null failed");
+                break;
+            case 'discord':
+                let discordUpdate = await this.userAccessTokenRepository.update(accessTable.accessId, {discordAccessToken: null});
+
+                if(!discordUpdate)
+                    throw new InternalServerErrorException("access token update to null failed");
+
+                discordUpdate = await this.userRefreshTokenRepository.update(refreshTable.refreshId, {discordRefreshToken: null});
+
+                if(!discordUpdate)
+                    throw new InternalServerErrorException("refresh token update to null failed");
                 break;
         }
     }
 
-    async findTokenTableByUserId(userId: string): Promise<[UserAccessToken, UserRefreshToken]> {
+    async findTokenTableByUserEmail(userEmail: string): Promise<[UserAccessToken, UserRefreshToken]> {
+        const userInfo = await this.userRepository.findOneBy({useremail: userEmail})
+
         try {
             const accessTokenInfo = await this.userAccessTokenRepository.findOne({
                 where: {
-                    user: { userId: userId }
+                    user: { userId: userInfo.userId }
                 },
                 relations: ['user']
             });
         
             if (!accessTokenInfo) {
-                throw new UnauthorizedException(`accessTokenInfo not found for user ID: ${userId}`);
+                throw new UnauthorizedException(`accessTokenInfo not found for user ID: ${userInfo.userId}`);
             }
 
             const refreshTokenInfo = await this.userRefreshTokenRepository.findOne({
                 where: {
-                    user: { userId: userId }
+                    user: { userId: userInfo.userId }
                 },
                 relations: ['user']
             });
         
             if (!refreshTokenInfo) {
-                throw new UnauthorizedException(`refreshTokenInfo not found for user ID: ${userId}`);
+                throw new UnauthorizedException(`refreshTokenInfo not found for user ID: ${userInfo.userId}`);
             }
         
             return [accessTokenInfo, refreshTokenInfo];

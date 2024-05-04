@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { TokensService } from 'src/db/tokens/tokens.service';
 
 @Injectable()
 export class KakaoService {
     constructor(
         private httpService: HttpService,
+        private tokenService: TokensService,
     ) {}
 
     /** 카카오 엑세스 토큰 재발급 */
-    async refreshAccessToken(refreshToken: string): Promise<string | null> {
+    async refreshAccessToken(userEmail: string, refreshToken: string): Promise<string | null> {
       const url = 'https://kauth.kakao.com/oauth/token';
       const body = new URLSearchParams({
         grant_type: 'refresh_token',
@@ -27,20 +29,40 @@ export class KakaoService {
           }),
         );
 
-        // console.log(response.data.access_token)
-
         const newAccessToken = response.data.access_token;
+
+        await this.tokenService.saveUserToken(userEmail, 'kakao', newAccessToken, refreshToken);
+        
         return newAccessToken;
       } catch (error) {
         console.error('Failed to refresh Kakao access token:', error);
+        await this.tokenService.findTokenTablesToEmpty(userEmail, 'kakao');
         return null;
       }
     }
   
-    async getValidAccessToken(accessToken: string, refreshToken: string): Promise<string | null> {
+    async getValidAccessToken(userEmail: string, provider: string, accessToken: string): Promise<string | null> {
       const isValid = await this.verifyKakaoToken(accessToken);
       if (!isValid) {
-        return await this.refreshAccessToken(refreshToken);
+        const tokenTables = await this.tokenService.findTokenTableByUserEmail(userEmail);
+        const refreshTable = tokenTables[1];
+        let refreshToken;
+
+        switch (provider){
+          case 'kakao':
+              refreshToken = refreshTable.kakaoRefreshToken;
+              break;
+          case 'google':
+              refreshToken = refreshTable.googleRefreshToken;
+              break;
+          case 'outlook':
+              refreshToken = refreshTable.outlookRefreshToken;
+              break;
+          case 'discord':
+              refreshToken = refreshTable.discordRefreshToken;
+              break;
+      }
+        return await this.refreshAccessToken(userEmail, refreshToken);
       }
       return accessToken;
     }

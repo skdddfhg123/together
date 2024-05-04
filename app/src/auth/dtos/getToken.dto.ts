@@ -4,17 +4,33 @@ import { IsOptional } from "class-validator";
 export class GetTokenDto {
     @ApiProperty()
     @IsOptional()
-    googleToken: string;
+    googleAccessToken: string;
 
     @ApiProperty()
     @IsOptional()
-    kakaoToken: string;
+    kakaoAccessToken: string;
 
     @ApiProperty()
     @IsOptional()
-    azureToken: string;
+    azureAccessToken: string;
 
     @ApiProperty()
     @IsOptional()
-    discordToken: string;
+    discordAccessToken: string;
+
+    @ApiProperty()
+    @IsOptional()
+    googleRefreshToken: string;
+
+    @ApiProperty()
+    @IsOptional()
+    kakaoRefreshToken: string;
+
+    @ApiProperty()
+    @IsOptional()
+    azureRefreshToken: string;
+
+    @ApiProperty()
+    @IsOptional()
+    discordRefreshToken: string;
 }

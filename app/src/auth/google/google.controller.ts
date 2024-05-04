@@ -53,7 +53,7 @@ export class GoogleController {
         @getPayload() payload: PayloadResponse,
         @Body() body: GetTokenDto,
     ): Promise<Array<SocialEvent>> {
-        const googleUser = body.googleToken;
+        const googleUser = body.googleAccessToken;
 
         const isValid = await this.googleService.verifyToken(googleUser);
 
