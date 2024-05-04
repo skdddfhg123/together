@@ -14,16 +14,6 @@ interface CookieOptions {
   sameSite?: 'lax' | 'strict' | 'none';
 }
 
-export interface KakaoEvent {
-  title?: string;
-  startAt: string;
-  endAt: string;
-  isPast: boolean;
-  userCalendarId: string;
-  social: string;
-  socialEventId: string;
-}
-
 export interface SignInForm {
   useremail: string;
   password: string;
@@ -35,4 +25,14 @@ export interface SignUpForm extends SignInForm {
 
 export interface ErrorResponse {
   message: string;
+}
+
+export interface SocialEvent {
+  title?: string;
+  startAt: string;
+  endAt: string;
+  isPast: boolean;
+  userCalendarId: string;
+  social: string;
+  socialEventId: string;
 }

@@ -14,16 +14,10 @@ type CalendarProps = {
   currentMonth: Date;
 };
 
-export default function CalendarPage({
-  isPrevMonth,
-  isNextMonth,
-  currentMonth,
-}: CalendarProps) {
+export default function CalendarPage({ isPrevMonth, isNextMonth, currentMonth }: CalendarProps) {
   const { isOn, toggle } = useToggle(false);
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-  const [schedule, setSchedule] = useState<{ [key: string]: JSX.Element[] }>(
-    {},
-  );
+  const [schedule, setSchedule] = useState<{ [key: string]: JSX.Element[] }>({});
   const [currentDayKey, setCurrentDayKey] = useState<string>('');
 
   const { selectedDay, setSelectedDay } = useSetDayStore((state) => ({
@@ -55,10 +49,7 @@ export default function CalendarPage({
 
   const addSchedule = (title: string) => {
     const newSchedule = (
-      <div
-        key={currentDayKey + (schedule[currentDayKey]?.length || 0)}
-        className="event-title"
-      >
+      <div key={currentDayKey + (schedule[currentDayKey]?.length || 0)} className="event-title">
         {title}
       </div>
     );
@@ -77,22 +68,10 @@ export default function CalendarPage({
       1,
     ).getDay();
 
-    const curMonthEndDate = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth() + 1,
-      0,
-    );
+    const curMonthEndDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
 
-    const prevMonthEndDate = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      0,
-    );
-    const nextMonthStartDate = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth() + 1,
-      1,
-    );
+    const prevMonthEndDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 0);
+    const nextMonthStartDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
     const days: Date[] = Array.from({ length: curMonthStartDate }, (_, i) => {
       return new Date(
         currentMonth.getFullYear(),
@@ -104,8 +83,7 @@ export default function CalendarPage({
     days.push(
       ...Array.from(
         { length: curMonthEndDate.getDate() },
-        (_, i) =>
-          new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i + 1),
+        (_, i) => new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i + 1),
       ),
     );
 
@@ -115,11 +93,7 @@ export default function CalendarPage({
         ...Array.from(
           { length: remainingDays },
           (_, i) =>
-            new Date(
-              nextMonthStartDate.getFullYear(),
-              nextMonthStartDate.getMonth(),
-              i + 1,
-            ),
+            new Date(nextMonthStartDate.getFullYear(), nextMonthStartDate.getMonth(), i + 1),
         ),
       );
     }
@@ -180,14 +154,11 @@ export default function CalendarPage({
   };
 
   const divideWeek = (calendarTags: JSX.Element[]) => {
-    return calendarTags.reduce(
-      (acc: JSX.Element[][], day: JSX.Element, i: number) => {
-        if (i % 7 === 0) acc.push([day]);
-        else acc[acc.length - 1].push(day);
-        return acc;
-      },
-      [],
-    );
+    return calendarTags.reduce((acc: JSX.Element[][], day: JSX.Element, i: number) => {
+      if (i % 7 === 0) acc.push([day]);
+      else acc[acc.length - 1].push(day);
+      return acc;
+    }, []);
   };
 
   const calendarDays = buildCalendarDays();

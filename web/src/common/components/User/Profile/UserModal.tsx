@@ -25,9 +25,7 @@ export default function UserModal() {
         onClick={handleToggle}
         alt="user-button"
       />
-      <section
-        className={`modal${modalOpen ? ' open' : ''} w-36 h-fit -left-full`}
-      >
+      <section className={`modal${modalOpen ? ' open' : ''} w-36 h-fit -left-full`}>
         {modalOpen && (
           <div className="flex flex-col items-center justify-center mx-auto">
             <button

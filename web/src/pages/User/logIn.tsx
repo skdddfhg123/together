@@ -16,8 +16,6 @@ export default function LogInPage() {
   const handleLogIn = async (formData: SignInForm) => {
     try {
       await USER.logIn(formData);
-      await USER.getInfo();
-
       alert('로그인 성공');
       navigate('/main');
     } catch (e) {
@@ -26,6 +24,7 @@ export default function LogInPage() {
         const data = err.response.data as ErrorResponse;
         console.log(data); //debug//
         alert(data.message);
+        return;
       }
     }
   };
@@ -33,9 +32,6 @@ export default function LogInPage() {
   const handleSingUp = async (formData: SignUpForm) => {
     try {
       await USER.signUp(formData);
-
-      alert('정상적으로 가입되었습니다! ');
-      toggle();
     } catch (e) {
       const err = e as AxiosError;
       if (err.response) {
@@ -44,6 +40,8 @@ export default function LogInPage() {
         alert(data.message);
       }
     }
+    alert('정상적으로 가입되었습니다! ');
+    toggle();
   };
 
   return (
@@ -53,11 +51,7 @@ export default function LogInPage() {
           {isOn ? '로그인으로' : '회원가입으로'}
         </button>
       </section>
-      {isOn ? (
-        <SignUp onSubmit={handleSingUp} />
-      ) : (
-        <SignIn onSubmit={handleLogIn} />
-      )}
+      {isOn ? <SignUp onSubmit={handleSingUp} /> : <SignIn onSubmit={handleLogIn} />}
     </div>
   );
 }

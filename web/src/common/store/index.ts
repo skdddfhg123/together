@@ -1,5 +1,4 @@
-import create from 'zustand';
-// import { KakaoEvent } from '@type/index';
+import { create } from 'zustand';
 
 interface CalendarState {
   selectedDay: Date | null;
@@ -31,15 +30,17 @@ export const useSocialEventStore = create<SocialEventState>((set) => ({
   setSocialEvents: (events) => set({ socialEvents: events }),
 }));
 
-interface UserInfo {
-  nickname: string;
-  useremail: string;
-  userCanlendarId: string;
-}
-
 interface User {
   userInfo: UserInfo | null;
   setUserInfo: (user: UserInfo | null) => void;
+}
+
+interface UserInfo {
+  nickname?: string;
+  useremail?: string;
+  userCalendarId?: string;
+  kakaoId?: number;
+  kakaoRefresh?: number;
 }
 
 export const useUserInfoStore = create<User>((set) => ({

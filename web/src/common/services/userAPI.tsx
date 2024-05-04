@@ -1,6 +1,5 @@
 import * as API from '@utils/api';
 import { setCookie } from '@utils/cookie';
-import { useUserInfoStore } from '@store/index';
 import { Cookie, SignInForm, SignUpForm } from '@type/index';
 
 async function signUp(formData: SignUpForm) {
@@ -23,7 +22,7 @@ async function logIn(formData: SignInForm) {
   if (!res) throw new Error('가입 실패');
   console.log(res); //debug//
 
-  const loginCookie: Cookie = {
+  const accessToken: Cookie = {
     name: 'accessToken',
     value: res.data.accessToken,
     options: {
@@ -33,18 +32,18 @@ async function logIn(formData: SignInForm) {
       sameSite: 'none',
     },
   };
-  setCookie(loginCookie);
+  const refreshToken: Cookie = {
+    name: 'refreshToken',
+    value: res.data.refreshToken,
+    options: {
+      path: '/',
+      maxAge: 5184000,
+      secure: true,
+      sameSite: 'none',
+    },
+  };
+  setCookie(accessToken);
+  setCookie(refreshToken);
 }
 
-async function getInfo() {
-  const { setUserInfo } = useUserInfoStore((state) => ({
-    setUserInfo: state.setUserInfo,
-  }));
-
-  const res = await API.get('/auth/token-test');
-  if (!res) throw new Error('유저 정보 받아오기 실패');
-  setUserInfo(res.data);
-  console.log(`userInfo Store : `, res.data);
-}
-
-export { signUp, logIn, getInfo };
+export { signUp, logIn };

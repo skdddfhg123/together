@@ -19,17 +19,6 @@ interface Data {
 async function get(endpoint: string, params?: Params) {
   console.log(`%cGET 요청 ${serverUrl + endpoint}`, 'color: #a25cd1;');
 
-  // if (endpoint.includes('kakao')) {
-  //   return axios.get(serverUrl + endpoint, {
-  //     headers: {
-  //       Authorization: `Bearer ${getCookie('accessToken')}`,
-  //       'X-Kakao-Token': getCookie('kakaoToken'),
-  //     },
-  //     withCredentials: true,
-  //     params: params,
-  //   });
-  // }
-
   return axios.get(serverUrl + endpoint, {
     headers: {
       // Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -76,10 +65,7 @@ async function patch(endpoint: string, data: Data) {
 // 여기서는 우선 delete 대신 del로 쓰고 아래 export 시에 delete로 alias 함.
 async function del(endpoint: string, params = '') {
   const accessToken = getCookie('accessToken');
-  console.log(
-    `%cDELETE 요청 ${serverUrl + endpoint + '/' + params}`,
-    'color: #c36999',
-  );
+  console.log(`%cDELETE 요청 ${serverUrl + endpoint + '/' + params}`, 'color: #c36999');
   return axios.delete(serverUrl + endpoint + '/' + params, {
     headers: {
       Authorization: `Bearer ${accessToken}`,

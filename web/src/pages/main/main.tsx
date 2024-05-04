@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import Calendar from '@pages/Calendar/calendar';
 import CalendarList from '@components/Canlendar/CalendarList';
@@ -6,10 +6,10 @@ import UserModal from '@components/User/Profile/UserModal';
 import RightMenuTap from '@components/Menu/RightMenuTap';
 import { useToggle } from '@hooks/useToggle';
 
+// import { transToKorDate } from '@utils/dateTranslate';
 import * as KAKAO from '@services/KakaoAPI';
-import { transToKorDate } from '@utils/dateTranslate';
+import { SocialEvent } from '@type/index';
 import { useSocialEventStore, useUserInfoStore } from '@store/index';
-import { KakaoEvent } from '@type/index';
 import menuImg from '@assets/calendar_menu.webp';
 import syncImg from '@assets/sync.png';
 
@@ -22,41 +22,34 @@ export default function MainPage() {
   const userInfo = useUserInfoStore((state) => state.userInfo);
 
   useEffect(() => {
-    console.log(userInfo);
+    console.log(`userInfo :`, userInfo);
   }, []);
 
   const prevCalendar = (): void => {
     setCurrentMonth(
-      new Date(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth() - 1,
-        currentMonth.getDate(),
-      ),
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, currentMonth.getDate()),
     );
   };
 
   const nextCalendar = (): void => {
     setCurrentMonth(
-      new Date(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth() + 1,
-        currentMonth.getDate(),
-      ),
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, currentMonth.getDate()),
     );
   };
 
   const getSocialEvents = async () => {
     try {
-      const res = await KAKAO.GetEvents();
+      const kakaoEvents = await KAKAO.GetEvents();
+      if (!kakaoEvents) throw new Error('카카오 일정 받아오기 실패');
 
-      console.log(res.data);
-      const eventLists = res.data.map(
-        (event: any): KakaoEvent => ({
-          title: event.title || '카카오톡 일정',
-          startAt: transToKorDate(event.startAt, 9),
-          endAt: transToKorDate(event.endAt, 9),
-          // startAt: event.startAt,
-          // endAt: event.endAt,
+      console.log(`kakao Events :`, kakaoEvents);
+      const eventLists = kakaoEvents.map(
+        (event: KakaoEvent): SocialEvent => ({
+          title: event.title || '카카오 일정',
+          // startAt: transToKorDate(event.startAt, 9),
+          // endAt: transToKorDate(event.endAt, 9),
+          startAt: event.startAt,
+          endAt: event.endAt,
           isPast: event.deactivatedAt,
           userCalendarId: event.userCalendar?.userCalendarId,
           social: event.social,
@@ -64,6 +57,7 @@ export default function MainPage() {
         }),
       );
       useSocialEventStore.getState().setSocialEvents(eventLists);
+      console.log(`eventLists`, eventLists);
     } catch (e) {
       console.error('Failed to fetch social events:', e);
     }
@@ -72,12 +66,7 @@ export default function MainPage() {
   return (
     <>
       <header id="calHeader">
-        <img
-          id="calHeader-leftSidebar"
-          src={menuImg}
-          alt="calendarList-button"
-          onClick={toggle}
-        />
+        <img id="calHeader-leftSidebar" src={menuImg} alt="calendarList-button" onClick={toggle} />
         <h1 id="calendarLogo">Toogether</h1>
         <div id="calHeader-title">
           {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
@@ -91,12 +80,7 @@ export default function MainPage() {
           </button>
         </nav>
         <div id="right-menu">
-          <img
-            id="sync-button"
-            src={syncImg}
-            alt="syncCalendar-button"
-            onClick={getSocialEvents}
-          />
+          <img id="sync-button" src={syncImg} alt="syncCalendar-button" onClick={getSocialEvents} />
           <UserModal />
         </div>
       </header>

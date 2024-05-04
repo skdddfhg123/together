@@ -1,108 +1,147 @@
 import * as API from '@utils/api';
+import axios, { AxiosError } from 'axios';
 
-import { Cookie } from 'common/type';
-import { setCookie, getCookie } from '@utils/cookie';
+import { setCookie, getCookie, deleteCookie } from '@utils/cookie';
+import { Cookie } from '@type/index';
+
+const headrOptions = {
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+  },
+};
 
 async function LogIn() {
-  window.Kakao.Auth.login({
-    success: function (authObj) {
-      console.log('kakao 로그인 성공', authObj);
-      const kakakoCookie: Cookie = {
-        name: 'kakaoToken',
-        value: authObj.access_token,
-        options: {
-          path: '/',
-          maxAge: 7199,
-          secure: false,
-          sameSite: 'lax',
-        },
-      };
-      setCookie(kakakoCookie);
-    },
-    fail: function (err) {
-      console.error('kakao 로그인 실패', err);
-    },
-  });
+  try {
+    const res = window.Kakao.Auth.authorize({
+      redirectUri: process.env.REACT_APP_REDIRECT_URI,
+      // prompt: 'select_account',
+    });
+    if (!res) throw new Error('로그인 실패');
+    alert('카카오톡 로그인 성공');
+  } catch (err) {
+    console.error(`로그인 에러 : `, err); //debug//
+  }
+}
+
+async function getToken() {
+  try {
+    const AUTHORIZATION_CODE = new URL(window.location.href).searchParams.get('code');
+
+    if (window.Kakao.Auth.getAccessToken()) return console.log('find kakako Token'); //debug//
+    if (!AUTHORIZATION_CODE) return console.log('Authorization code not found.'); //debug//
+
+    const getTokenURL = `https://kauth.kakao.com/oauth/token`;
+    const reqTokenData: reqTokenData = {
+      grant_type: 'authorization_code',
+      client_id: process.env.REACT_APP_KAKAO_CLIENT_REST,
+      redirect_uri: process.env.REACT_APP_REDIRECT_URI,
+      code: AUTHORIZATION_CODE,
+      client_secret: process.env.REACT_APP_KAKAO_CLIENT_SECRET,
+    };
+
+    const { data: getToken }: { data: KakaoTokenResponse } = await axios.post(
+      getTokenURL,
+      reqTokenData,
+      headrOptions,
+    );
+
+    console.log(`kakaoAPI - getToken =`, getToken); //debug//
+
+    const saveTokenRes = await API.post(`/kakao/save/token`, {
+      kakaoAccessToken: getToken.access_token,
+      kakaoRefreshToken: getToken.refresh_token,
+    });
+
+    if (!saveTokenRes) throw new Error('Refresh Token Registration Failed');
+    console.log(`kakaoAPI - saveToken`, saveTokenRes); //debug//
+
+    window.Kakao.Auth.setAccessToken(getToken.access_token, false);
+    const kakaoToken: Cookie = {
+      name: 'kakaoToken',
+      value: getToken.access_token,
+      options: {
+        path: '/',
+        maxAge: 21599,
+        secure: true,
+        sameSite: 'none',
+      },
+    };
+
+    setCookie(kakaoToken);
+    // const kakaoAccesstoken = await window.Kakao.Auth.getAccessToken();
+    // console.log(`kakaoAccesstoken`, kakaoAccesstoken); //debug//
+  } catch (err) {
+    console.error(err); //debug//
+  }
 }
 
 async function LogOut() {
-  window.Kakao.API.request({
-    url: '/v1/user/unlink',
-    success: function (response) {
-      console.log('kakao 연결 끊기 성공', response);
-    },
-    fail: function (error) {
-      console.error('kakao 연결 끊기 실패', error);
-    },
-  });
+  window.Kakao.Auth.logout()
+    .then((res: unknown) => {
+      deleteCookie(`kakaoToken`);
+      console.log(res); //debug//
+      alert(`로그아웃 완료`);
+    })
+    .catch(function () {
+      alert('로그인 정보가 없습니다.');
+    });
 }
 
 async function GetInfo() {
-  window.Kakao.API.request({
-    url: '/v2/user/me',
-    success: function (response: unknown) {
-      console.log(`kakao 정보`, response);
-    },
-    fail: function (error: unknown) {
-      console.log(`kakao 정보 받기 싫패`, error);
-    },
-  });
+  try {
+    const res = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      headers: {
+        Authorization: `Bearer ${window.Kakao.Auth.getAccessToken()}`,
+      },
+    });
+    alert(`받아오기 성공`);
+    console.log(`Kakao User`, res.data); // debug//
+  } catch (error) {
+    const err = error as AxiosError<KakaoErrorResponse>;
+    if (err.response?.status === 401) {
+      console.error(`토큰 유효 정보 없음:`, err.response); //debug//
+      alert(`로그인을 먼저 해주세요.`);
+    } else {
+      console.error(`유저 정보 받아오기 실패 :`, err); //debug//
+      alert(`카카오톡 유저정보를 받아오지 못했습니다.`);
+    }
+  }
 }
 
 async function GetEvents() {
-  return await API.post(`/kakao/calendar`, {
-    kakaoToken: getCookie('kakaoToken'),
-  });
+  const kakaoToken = getCookie('kakaoToken');
+
+  try {
+    if (!kakaoToken) {
+      const { data: res }: { data: KakaoEventsAndToken } = await API.post('/kakao/get/calendar', {
+        kakaoAccessToken: null,
+      });
+
+      const kakaoToken: Cookie = {
+        name: 'kakaoToken',
+        value: res.accessTokenCheck,
+        options: {
+          path: '/',
+          maxAge: 21599,
+          secure: true,
+          sameSite: 'none',
+        },
+      };
+
+      setCookie(kakaoToken);
+      return res.resultArray;
+    } else {
+      const { data: res }: { data: KakaoEventsAndToken } = await API.post('/kakao/get/calendar', {
+        kakaoAccessToken: getCookie('kakaoToken'),
+      });
+      return res.resultArray;
+    }
+  } catch (error) {
+    const err = error as AxiosError;
+    if (err.response) {
+      console.error(`이벤트 받아오기 실패 :`, error); //debug//
+    }
+  }
 }
 
-export { LogIn, LogOut, GetInfo, GetEvents };
-
-// import React, { useEffect } from 'react';
-
-// export default function KakaoSignIn() {
-//   const initKakao = () => {
-//     if (window.Kakao && window.Kakao.isInitialized()) {
-//       console.log('Kakao SDK Already Initialized');
-//       return;
-//     }
-//     const kakaoScript = document.createElement('script');
-//     kakaoScript.src = 'https://developers.kakao.com/sdk/js/kakao.js';
-//     document.head.appendChild(kakaoScript);
-
-//     kakaoScript.onload = () => {
-//       window.Kakao.init(`${process.env.REACT_APP_KAKAO_CLIENT_JS}`);
-//       if (window.Kakao.isInitialized()) {
-//         console.log('Kakao SDK Initialized');
-//       }
-//     };
-//   };
-
-//   useEffect(() => {
-//     initKakao();
-//   }, []);
-
-//   const kakaoLogIn = () => {
-//     window.Kakao.Auth.authorize({
-//       redirectUri: `${process.env.REACT_APP_REDIRECT_URI}`,
-//       scope: 'profile_nickname, account_email, name',
-//     });
-//   };
-
-//   const kakakoLogOut = () => {
-//     window.Kakao.API.request({
-//       url: '/v1/user/unlink',
-//       success: function (response) {
-//         console.log('연결 끊기 성공', response);
-//       },
-//       fail: function (error) {
-//         console.error('연결 끊기 실패', error);
-//       },
-//     });
-//   };
-//   return (
-//     <div>
-//       <button onClick={kakaoLogIn}>카카오 로그인</button>
-//       <button onClick={kakakoLogOut}>카카오 로그아웃</button>
-//     </div>
-//   );
-// }
+export { LogIn, getToken, LogOut, GetInfo, GetEvents };

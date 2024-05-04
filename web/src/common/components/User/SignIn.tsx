@@ -33,10 +33,7 @@ export default function SignIn({ onSubmit }: SignInProps) {
     // formRef.current.reset();
   };
   return (
-    <form
-      className="h-5/6 flex flex-col items-center justify-center"
-      ref={formRef}
-    >
+    <form className="h-5/6 flex flex-col items-center justify-center" ref={formRef}>
       <fieldset className="h-5/6 flex flex-col items-center justify-center">
         <label className="w-full mb-2" htmlFor="email">
           EMAIL
