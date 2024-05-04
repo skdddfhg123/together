@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString } from "class-validator";
 import { GroupEvent } from "src/db/event/group_event/entities/groupEvent.entity";
-import { User } from "src/db/user/entities/user.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 

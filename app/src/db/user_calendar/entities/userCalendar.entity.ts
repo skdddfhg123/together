@@ -1,7 +1,6 @@
 import { Calendar } from "src/calendar/entities/calendar.entity";
-import { GroupEvent } from "src/db/event/group_event/entities/groupEvent.entity";
 import { User } from "src/db/user/entities/user.entity";
-import { Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { SocialEvent } from "../../event/socialEvent/entities/socialEvent.entity";
 
 @Entity('user_calendar')

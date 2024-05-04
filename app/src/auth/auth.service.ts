@@ -30,7 +30,6 @@ export class AuthService {
             throw new UnauthorizedException("User not found");
         }
     
-        // 비밀번호 확인
         const passwordMatched = await bcrypt.compare(loginDTO.password, user.password);
     
         if (passwordMatched) {

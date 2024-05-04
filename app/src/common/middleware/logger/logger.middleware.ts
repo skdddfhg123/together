@@ -1,6 +1,7 @@
 import { Injectable, Module, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { DiscordBotService } from 'src/discordBot.service';
+import { TextChannel } from 'discord.js';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {

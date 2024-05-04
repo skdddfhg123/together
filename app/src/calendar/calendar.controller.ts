@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { getPayload } from 'src/auth/getPayload.decorator';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt.guard';
 import { Calendar } from './entities/calendar.entity';
@@ -133,23 +133,24 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async getAllGroupEvent(
-        @Param('calendarid') calendarid: string,
+        @Param('calendarId') calendarId: string,
     ): Promise<GroupEvent[]>{
-        return await this.groupEventService.getAllGroupEventsByCalendarId(calendarid);
+        console.log(calendarId);
+        return await this.groupEventService.getAllGroupEventsByCalendarId(calendarId);
     }
 
-    @Get('group/get/:groupeventid')
+    @Get('group/get/:groupeventId')
     @ApiOperation({ summary: '특정 그룹 이벤트 가져오기' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async getGroupEventUpdateForm(
-        @Param('groupeventid') groupEventId: string,
+        @Param('groupeventId') groupEventId: string,
     ): Promise<GroupEvent>{
         return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
     }
 
-    @Patch('group/update/:groupeventid')
+    @Patch('group/update/:groupeventId')
     @ApiOperation({ summary: '그룹 이벤트 업데이트' })
     @ApiResponse({ status: 200, description: 'Group event updated successfully' })
     @ApiResponse({ status: 404, description: 'Group event not found' })
@@ -158,13 +159,13 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async updateGroupEvent(
-        @Param('groupeventid') groupEventId: string, 
+        @Param('groupeventId') groupEventId: string, 
         @Body() groupEventDTO: UpdateGroupEventDTO
     ): Promise<GroupEvent> {
             return await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
     }
 
-    @Patch('group/remove/:groupeventid')
+    @Patch('group/remove/:groupeventId')
     @ApiOperation({ summary: '그룹 이벤트 제거' })
     @ApiResponse({ status: 200, description: 'Group event removed successfully' })
     @ApiResponse({ status: 403, description: 'You do not have permission to remove this event' })
@@ -173,7 +174,9 @@ export class CalendarController {
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
-    async removeGroupEvent(@Param('groupeventid') groupEventId: string): Promise<GroupEvent> {
+    async removeGroupEvent(
+        @Param('groupeventId') groupEventId: string
+    ): Promise<GroupEvent> {
         return await this.groupEventService.removeGroupEvent(groupEventId);
     }
 }

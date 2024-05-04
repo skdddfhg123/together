@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsBoolean, IsUUID, IsInt, ValidateNested, IsDate, IsArray } from 'class-validator';
+import { IsOptional, IsString, IsBoolean, IsUUID, IsInt, IsDate, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateGroupEventDTO {

@@ -14,6 +14,7 @@ import { DataSource } from 'typeorm';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -31,11 +32,10 @@ import { DiscordBotService } from './discordBot.service';
     }),
     UserModule,
     AuthModule,
-    
+    CalendarModule,
     GoogleModule,
     KakaoModule,
-    
-    CalendarModule,
+    AwsModule,
   ],
   controllers: [RedisController],
   providers: [RedisService, DiscordBotService],

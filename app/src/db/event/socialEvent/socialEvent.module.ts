@@ -9,7 +9,7 @@ import { SocialEvent } from './entities/socialEvent.entity';
   TypeOrmModule.forFeature([ SocialEvent ]),
     UserCalendarModule,
   ],
-  providers: [SocialEventService, /*UserService, CalendarService*/],
+  providers: [SocialEventService],
   exports: [SocialEventService]
 })
 export class SocialEventModule {}

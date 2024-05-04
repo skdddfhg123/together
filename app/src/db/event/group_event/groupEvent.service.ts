@@ -50,12 +50,13 @@ export class GroupEventService {
     
     }
 
-    async getAllGroupEventsByCalendarId(calendarId: string): Promise<GroupEvent[]> {
+    async getAllGroupEventsByCalendarId(CalendarId: string): Promise<GroupEvent[]> {
         try {
+            console.log(CalendarId)
             const groupEvents = await this.groupEventRepository.find({
                 where: {
-                calendarId: calendarId,
-                isDeleted: false
+                    calendarId: CalendarId,
+                    isDeleted: false
                 },
                 order: {
                     startAt: 'ASC'
@@ -64,7 +65,7 @@ export class GroupEventService {
             return groupEvents;
         } 
         catch (e) {
-          throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}`);
+          throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${CalendarId}`);
         }
     }
 
@@ -93,7 +94,6 @@ export class GroupEventService {
 
     async getGroupEventUpdateForm(groupEventId: string): Promise<GroupEvent> {
         try {
-            // 해당 ID의 GroupEvent를 찾습니다.
             const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId: groupEventId } });
 
             if (!groupEventToUpdate) {
@@ -107,17 +107,14 @@ export class GroupEventService {
 
     async updateGroupEvent(groupEventId: string, updateData: Partial<GroupEvent>): Promise<GroupEvent> {
         try {
-            // 해당 ID의 GroupEvent를 찾습니다.
             const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId } });
     
             if (!groupEventToUpdate) {
                 throw new NotFoundException('Group event not found');
             }
     
-            // 찾은 GroupEvent의 속성을 업데이트합니다.
             const updatedGroupEvent = this.groupEventRepository.merge(groupEventToUpdate, updateData);
-            updatedGroupEvent.updatedAt = new Date();  // 갱신 시간 업데이트
-            // 변경된 GroupEvent를 저장합니다.
+            updatedGroupEvent.updatedAt = new Date();
             return await this.groupEventRepository.save(updatedGroupEvent);
         } catch (e) {
             console.error('Error occurred while updating the group event:', e);
@@ -125,10 +122,6 @@ export class GroupEventService {
         }
     }
     
-
-
-
-    // 그룹 이벤트 삭제
     async removeGroupEvent(groupEventId: string): Promise<GroupEvent> {
         try {
             const groupEvent = await this.groupEventRepository.findOne({
@@ -144,7 +137,7 @@ export class GroupEventService {
             }
     
             groupEvent.isDeleted = true;
-            groupEvent.deletedAt = new Date();  // 설정 삭제 시간
+            groupEvent.deletedAt = new Date();
     
             const updatedGroupEvent = await this.groupEventRepository.save(groupEvent);
             return updatedGroupEvent;

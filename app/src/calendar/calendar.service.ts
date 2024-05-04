@@ -1,12 +1,9 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Calendar } from './entities/calendar.entity';
-import { Any, In, Raw, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
-import { User } from 'src/db/user/entities/user.entity';
-import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
-import { UserService } from 'src/db/user/user.service';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
@@ -18,7 +15,6 @@ export class CalendarService {
         private calendarRepository: Repository<Calendar>,
         @InjectRepository(GroupEvent)
         private groupEventRepository: Repository<GroupEvent>,
-        private userService: UserService,
         private userCalendarService: UserCalendarService,
     ) {}
 

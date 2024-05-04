@@ -1,17 +1,9 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-//import { UserRepository } from './user.repository';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from './dtos/create-user.dto';
-import { PayloadResponse } from 'src/auth/dtos/payload-response';
-import { Calendar } from 'src/calendar/entities/calendar.entity';
-import { UserCalendar } from '../user_calendar/entities/userCalendar.entity';
-import { UserCalendarService } from '../user_calendar/userCalendar.service';
-import { UserAccessToken } from '../tokens/entities/userAccessToken.entity';
-import { UserRefreshToken } from '../tokens/entities/userRefreshToken.entity';
 import { SaveAccessTokenDto } from '../tokens/dtos/saveAccessToken.dto';
 import { SaveRefreshTokenDto } from '../tokens/dtos/saveRefreshToken.dto';
 import { TokensService } from '../tokens/tokens.service';
@@ -64,9 +56,7 @@ export class UserService {
     } 
 
     async findOne(data: Partial<User>): Promise<User> {
-        // console.log(data)
         const user = await this.userRepository.findOneBy({ useremail: data.useremail });
-        // console.log(user)
         if (!user) {
             throw new UnauthorizedException('Could not find user');
         }

@@ -2,9 +2,7 @@ import { Body, Controller, Get, Post, Req, Request, UseGuards, ValidationPipe } 
 import { UserService } from 'src/db/user/user.service';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDTO } from 'src/db/user/dtos/create-user.dto';
-import { User } from 'src/db/user/entities/user.entity';
 import { LoginDTO } from './dtos/login.dto';
-import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { PayloadResponse } from './dtos/payload-response';
 import { JwtAuthGuard } from './strategy/jwt.guard';
