@@ -6,9 +6,8 @@ import 'package:calendar/screens/memo.dart';
 import 'package:calendar/widget/custom_bottom_navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'calendar_detail_view.dart'; // 상세 캘린더 뷰 임포트
-import 'all_calendar.dart'; // 모든 캘린더 페이지
+import 'calendar_detail_view.dart';
+import 'all_calendar.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -26,6 +25,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _pages = [
       AllCalendar(onCalendarChanged: _changePage),
+      const MemoPage(),
       const MemoPage(),
       const NotificationPage(),
       const MemoPage()
@@ -45,39 +45,40 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      if (index == 2) {
-        // '작성' 탭
-        final EventSelectionController eventController =
-            Get.find<EventSelectionController>();
-        if (eventController.selectedCalendarId.value != null &&
-            eventController.selectedDate.value != null) {
-          final calendarId = eventController.selectedCalendarId.value!;
-          final selectedDate = eventController.selectedDate.value!;
-          final UserCalendarController calendarController =
-              Get.find<UserCalendarController>();
-          final selectedCalendar = calendarController.calendars.firstWhere(
-            (cal) => cal.calendarId == calendarId,
-          );
+    if (index == 2) {
+      // '작성' 탭
+      final EventSelectionController eventController =
+          Get.find<EventSelectionController>();
+      if (eventController.selectedCalendarId.value != null &&
+          eventController.selectedDate.value != null) {
+        final calendarId = eventController.selectedCalendarId.value!;
+        final selectedDate = eventController.selectedDate.value!;
+        final UserCalendarController calendarController =
+            Get.find<UserCalendarController>();
+        final selectedCalendar = calendarController.calendars.firstWhere(
+          (cal) => cal.calendarId == calendarId,
+        );
 
-          if (selectedCalendar != null) {
-            DialogService.showAddAppointmentDialog(
-              context,
-              selectedDate,
-              selectedCalendar.color,
-              calendarId,
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Selected calendar not found")));
-          }
+        if (selectedCalendar != null) {
+          DialogService.showAddAppointmentDialog(
+            context,
+            selectedDate,
+            selectedCalendar.color,
+            calendarId,
+          );
         } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("No event selected")));
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Selected calendar not found")));
         }
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("No event selected")));
       }
-    });
+    } else {
+      setState(() {
+        _selectedIndex = index; // 다른 탭을 선택했을 때만 인덱스 변경
+      });
+    }
   }
 
   @override

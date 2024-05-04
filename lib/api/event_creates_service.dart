@@ -12,7 +12,7 @@ class CalendarEventService {
   }
 
   // 메서드에 token 파라미터 추가
-  Future<bool> createEvent(
+  Future<Map<String, dynamic>> createEvent(
     String title,
     DateTime startAt,
     DateTime endAt,
@@ -35,11 +35,13 @@ class CalendarEventService {
         }));
 
     if (response.statusCode == 201) {
+      var data = jsonDecode(response.body);
       print('Event created successfully');
-      return true;
+      // 서버에서 groupEventId 반환 예시, 실제 키는 응답 구조에 맞게 조정 필요
+      return {'isCreated': true, 'groupEventId': data['groupEventId'] ?? ''};
     } else {
       print('Failed to create event, status code: ${response.statusCode}');
-      return false;
+      return {'isCreated': false, 'message': 'Failed to create event'};
     }
   }
 }

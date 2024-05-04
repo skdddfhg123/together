@@ -42,8 +42,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Group Calendar App',
-      // initialRoute: token != null ? '/home' : '/',
-      initialRoute: '/',
+      initialRoute: token != null ? '/home' : '/',
+      // initialRoute: '/',
       getPages: [
         GetPage(name: '/', page: () => LoginPage()),
         GetPage(name: '/signup', page: () => SignupPage()),

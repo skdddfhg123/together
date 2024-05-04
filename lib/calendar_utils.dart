@@ -83,7 +83,7 @@ class DialogService {
                 String? token = prefs.getString('token');
 
                 // 백엔드에 일정 추가 요청
-                bool isCreated = await CalendarEventService().createEvent(
+                var result = await CalendarEventService().createEvent(
                   _subjectController.text,
                   _selectedStartTime,
                   _selectedEndTime,
@@ -92,7 +92,8 @@ class DialogService {
                   color,
                 );
 
-                if (isCreated) {
+                if (result['isCreated']) {
+                  String groupEventId = result['groupEventId'];
                   Appointment newAppointment = Appointment(
                     startTime: _selectedStartTime,
                     endTime: _selectedEndTime,
@@ -101,7 +102,7 @@ class DialogService {
                     id: calendarId.toString(),
                   );
                   meetingController.addCalendarAppointment(
-                      newAppointment, calendarId);
+                      newAppointment, calendarId, groupEventId);
                   Navigator.pop(context);
                 } else {
                   Get.snackbar("Error", "Failed to create event");

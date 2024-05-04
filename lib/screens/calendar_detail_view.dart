@@ -19,6 +19,7 @@ class CalendarDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final calendarController = Get.find<UserCalendarController>();
     final meetingController = Get.find<MeetingController>();
+    final eventController = Get.find<EventSelectionController>();
 
     Calendar? selectedCalendar = calendarController.calendars.firstWhere(
       (cal) => cal.calendarId == calendarId,
@@ -88,7 +89,6 @@ class CalendarDetailView extends StatelessWidget {
           firstDayOfWeek: 7,
           monthViewSettings: const MonthViewSettings(
             appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
-            showAgenda: true,
           ),
           dataSource: dataSource,
           onTap: _onCalendarTapped,

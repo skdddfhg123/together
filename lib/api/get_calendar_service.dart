@@ -83,14 +83,13 @@ class CalendarApiService {
           subject: data['title'],
           color: _parseColor(data['color']),
         );
-        appointments.add(newAppointment);
-      }
+        // 서버 응답에서 groupeventId 추출
+        String groupEventId = data['groupEventId'];
 
-      // 해당 캘린더 ID로 일정 추가
-      appointments.forEach((appointment) {
+        // 일정과 groupeventId를 meetingController에 추가
         meetingController.addCalendarAppointment(
-            appointment, calendar.calendarId);
-      });
+            newAppointment, calendar.calendarId, groupEventId);
+      }
       meetingController.update(); // 일정 추가 후 UI 업데이트
     } else {
       print('Failed to load appointments for calendar ${calendar.calendarId}');
