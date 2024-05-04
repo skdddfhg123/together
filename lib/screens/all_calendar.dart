@@ -13,14 +13,15 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class AllCalendar extends StatelessWidget {
   final Function(String)? onCalendarChanged;
+  DateTime? _lastTappedDate;
 
   AllCalendar({super.key, this.onCalendarChanged});
 
   final KakaoAuthService kakaoAuthService = Get.find<KakaoAuthService>();
+  final MeetingController meetingController = Get.find<MeetingController>();
 
   @override
   Widget build(BuildContext context) {
-    final MeetingController meetingController = Get.put(MeetingController());
     final UserCalendarController calendarController =
         Get.find<UserCalendarController>(); // CalendarController 인스턴스를 생성
 
@@ -187,6 +188,7 @@ class AllCalendar extends StatelessWidget {
           dataSource: MeetingDataSource(meetingController.getAllAppointments()),
           monthViewSettings: const MonthViewSettings(
             appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
+            showAgenda: true,
           ),
         ),
       ),

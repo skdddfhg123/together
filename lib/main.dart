@@ -1,6 +1,7 @@
 import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/api/kakao_auth_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
+import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/screens/Main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +24,7 @@ void main() async {
   Get.put(AuthController());
   Get.put(MeetingController());
   Get.put(KakaoAuthService());
+  Get.put(EventSelectionController());
 
   var calendarService = CalendarApiService();
   await calendarService.initializePrefs(); // 서비스 초기화 보장
@@ -45,7 +47,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/', page: () => LoginPage()),
         GetPage(name: '/signup', page: () => SignupPage()),
-        GetPage(name: '/home', page: () => MainPage()),
+        GetPage(name: '/home', page: () => const MainPage()),
       ],
     );
   }

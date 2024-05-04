@@ -1,7 +1,12 @@
+import 'package:calendar/calendar_utils.dart';
+import 'package:calendar/controllers/calendar_controller.dart';
+import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/screens/alarm.dart';
 import 'package:calendar/screens/memo.dart';
 import 'package:calendar/widget/custom_bottom_navbar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'calendar_detail_view.dart'; // 상세 캘린더 뷰 임포트
 import 'all_calendar.dart'; // 모든 캘린더 페이지
 
@@ -42,6 +47,36 @@ class _MainPageState extends State<MainPage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 2) {
+        // '작성' 탭
+        final EventSelectionController eventController =
+            Get.find<EventSelectionController>();
+        if (eventController.selectedCalendarId.value != null &&
+            eventController.selectedDate.value != null) {
+          final calendarId = eventController.selectedCalendarId.value!;
+          final selectedDate = eventController.selectedDate.value!;
+          final UserCalendarController calendarController =
+              Get.find<UserCalendarController>();
+          final selectedCalendar = calendarController.calendars.firstWhere(
+            (cal) => cal.calendarId == calendarId,
+          );
+
+          if (selectedCalendar != null) {
+            DialogService.showAddAppointmentDialog(
+              context,
+              selectedDate,
+              selectedCalendar.color,
+              calendarId,
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Selected calendar not found")));
+          }
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text("No event selected")));
+        }
+      }
     });
   }
 
