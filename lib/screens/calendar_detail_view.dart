@@ -1,12 +1,8 @@
 import 'package:calendar/api/event_creates_service.dart';
-import 'package:calendar/controllers/calendar_controller.dart'; // CalendarController를 가져옵니다.
+import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/meeting_data.dart';
-import 'package:calendar/screens/Main_page.dart';
-import 'package:calendar/screens/all_calendar.dart';
-import 'package:calendar/screens/sync_login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -163,13 +159,6 @@ class CalendarDetailView extends StatelessWidget {
                           onTap: () {
                             Navigator.pop(context);
                             onCalendarChanged(calendar.calendarId);
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (_) => CalendarDetailView(
-                            //         calendarId: calendar.calendarId),
-                            //   ),
-                            // );
                           },
                         );
                       }),
@@ -184,11 +173,6 @@ class CalendarDetailView extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context); // Drawer 닫기
                 onCalendarChanged('all_calendar');
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (_) => AllCalendar()), // AllCalendar 페이지로 이동
-                // );
               },
             ),
           ],

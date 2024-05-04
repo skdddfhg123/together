@@ -23,7 +23,7 @@ class CustomBottomNavBar extends StatelessWidget {
           label: '메모',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.edit),
+          icon: Icon(Icons.add_box),
           label: '작성',
         ),
         BottomNavigationBarItem(

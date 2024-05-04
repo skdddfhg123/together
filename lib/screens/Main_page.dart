@@ -2,7 +2,6 @@ import 'package:calendar/screens/alarm.dart';
 import 'package:calendar/screens/memo.dart';
 import 'package:calendar/widget/custom_bottom_navbar.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'calendar_detail_view.dart'; // 상세 캘린더 뷰 임포트
 import 'all_calendar.dart'; // 모든 캘린더 페이지
 
@@ -22,7 +21,6 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _pages = [
       AllCalendar(onCalendarChanged: _changePage),
-      const MemoPage(),
       const MemoPage(),
       const NotificationPage(),
       const MemoPage()
