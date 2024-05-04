@@ -50,7 +50,7 @@ export class KakaoController {
     @ApiResponse({ status: 201, description: '성공 시 Kakao SocialEvent[] 반환' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
-    @UseGuards(RefreshAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async getKakaoCalendar(
         @getPayload() payload: PayloadResponse,
         @Body() body: GetTokenDto,
@@ -90,7 +90,7 @@ export class KakaoController {
     @ApiResponse({ status: 201, description: '성공 시 Kakao SocialEvent[] 반환' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
-    @UseGuards(RefreshAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async getSocialEventData(
         @getPayload() payload: PayloadResponse,
     ): Promise<SocialEvent[]> {
