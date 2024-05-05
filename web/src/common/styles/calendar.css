@@ -14,7 +14,6 @@ table {
 
 thead {
   height: 3rem;
-  margin: 5rem;
 
   line-height: 3rem;
 }
@@ -28,7 +27,8 @@ tr {
 
 td {
   width: calc(100% / 7);
-
+  height: 100%;
+  
   border-top: 1px solid rgb(242, 242, 242);
 }
 
@@ -42,7 +42,7 @@ td {
 .nextMonthDay div,
 .Day div {
   margin: 0.2rem;
-  padding: 0 0.5rem;
+  padding: 0 0.2rem;
 }
 
 .Day:hover,
@@ -52,7 +52,7 @@ td {
 }
 
 .day {
-  font-size: large;
+  font-size: medium;
 }
 
 th.day-0, .day-0 .day { /* 일요일 */
@@ -64,15 +64,31 @@ th.day-6, .day-6 .day { /* 토요일 */
 }
 
 .today .day {
+  border-radius: 5px;
+
   background-color: #badfff;
   font-weight: bold;
 }
 
 .choiceDay .day {
   color: #0086FF;
-  font-size: x-large;
+  font-size: larger;
 }
 
 .choiceDay.today .day { /* choiceDay와 today 클래스가 같은 요소에 적용될 때 */
   color: white;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.kakao-title {
+  background: #F7E600;
+  border-radius: 5px;
 }

@@ -6,24 +6,24 @@ import UserModal from '@components/User/Profile/UserModal';
 import RightMenuTap from '@components/Menu/RightMenuTap';
 import { useToggle } from '@hooks/useToggle';
 
-// import { transToKorDate } from '@utils/dateTranslate';
 import * as KAKAO from '@services/KakaoAPI';
-import { SocialEvent } from '@type/index';
-import { useSocialEventStore } from '@store/index';
+import { useNowCalendarStore, useSocialEventStore } from '@store/index';
 import menuImg from '@assets/calendar_menu.webp';
 import syncImg from '@assets/sync.png';
 
 import '@styles/main.css';
 
 export default function MainPage() {
+  const { nowCalendar } = useNowCalendarStore();
   const [calendarID, setCalendarID] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const { isOn, toggle } = useToggle(false);
 
   useEffect(() => {
-    const id = sessionStorage.getItem('calendarID');
+    const id = nowCalendar || sessionStorage.getItem('MainCalendar');
+    console.log(`현재 보고있는 캘린더`, id);
     setCalendarID(id);
-  }, []);
+  }, [nowCalendar]);
 
   const prevCalendar = (): void => {
     setCurrentMonth(
@@ -37,31 +37,14 @@ export default function MainPage() {
     );
   };
 
-  const getSocialEvents = async () => {
+  const getSocialEvents = useCallback(async () => {
     try {
       const kakaoEvents = await KAKAO.GetEvents();
       if (!kakaoEvents) throw new Error('카카오 일정 받아오기 실패');
-
-      console.log(`kakao Events :`, kakaoEvents);
-      const eventLists = kakaoEvents.map(
-        (event: KakaoEvent): SocialEvent => ({
-          title: event.title || '카카오 일정',
-          // startAt: transToKorDate(event.startAt, 9),
-          // endAt: transToKorDate(event.endAt, 9),
-          startAt: event.startAt,
-          endAt: event.endAt,
-          isPast: event.deactivatedAt,
-          userCalendarId: event.userCalendar?.userCalendarId,
-          social: event.social,
-          socialEventId: event.socialEventId,
-        }),
-      );
-      useSocialEventStore.getState().setSocialEvents(eventLists);
-      console.log(`eventLists`, eventLists);
     } catch (e) {
       console.error('Failed to fetch social events:', e);
     }
-  };
+  }, [KAKAO, useSocialEventStore]);
 
   return (
     <>

@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { format, isSameDay, startOfMonth, endOfMonth, addDays } from 'date-fns';
+import EventModal from '@components/Canlendar/EventModal';
 
-import CalSchedule from '@components/Canlendar/CalSchedule';
-import ScheduleModal from '@components/Canlendar/ScheduleModal';
-
-import { useToggle } from '@hooks/useToggle';
-import { useSetDayStore, useSocialEventStore } from '@store/index';
+import * as CALENDAR from '@services/calendarAPI';
+import {
+  reqGroupEvent,
+  useGroupEventStore,
+  useSetDayStore,
+  useSocialEventStore,
+  useUserInfoStore,
+} from '@store/index';
 
 import '@styles/calendar.css';
 
@@ -15,121 +20,106 @@ type CalendarProps = {
   currentMonth: Date;
 };
 
-export default function CalendarPage({
+export default React.memo(function CalendarPage({
   calendarId,
   isPrevMonth,
   isNextMonth,
   currentMonth,
 }: CalendarProps) {
-  const { isOn, toggle } = useToggle(false);
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-  const [schedule, setSchedule] = useState<{ [key: string]: JSX.Element[] }>({});
-  const [currentDayKey, setCurrentDayKey] = useState<string>('');
-
   const { selectedDay, setSelectedDay } = useSetDayStore((state) => ({
     selectedDay: state.selectedDay,
     setSelectedDay: state.setSelectedDay,
   }));
   const socialEvents = useSocialEventStore((state) => state.socialEvents);
+  const groupEvents = useGroupEventStore((state) => state.groupEvents);
+
+  const userCalendarId = useUserInfoStore((state) => state.userInfo?.userCalendarId || null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const isSameDay = (toDay: Date, compareDay?: Date | null) => {
-    if (
-      toDay.getFullYear() === compareDay?.getFullYear() &&
-      toDay.getMonth() === compareDay?.getMonth() &&
-      toDay.getDate() === compareDay?.getDate()
-    ) {
-      return true;
+  useEffect(() => {
+    getCalendarEvent();
+  }, [calendarId, currentMonth]);
+
+  const getCalendarEvent = async () => {
+    if (!calendarId) return;
+    try {
+      await CALENDAR.getCalEvents(calendarId);
+    } catch (err) {
+      console.error(err);
     }
-    return false;
   };
 
-  const onClickDay = (day: Date) => {
-    const dayKey = day.toISOString().split('T')[0];
-    setCurrentDayKey(dayKey);
-    setSelectedDay(day);
-    toggle();
-  };
+  const handleDayClick = (day: Date, event: React.MouseEvent<HTMLTableCellElement>): void => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setModalPosition({ x: rect.left, y: rect.top });
 
-  const addSchedule = (title: string) => {
-    const newSchedule = (
-      <div key={currentDayKey + (schedule[currentDayKey]?.length || 0)} className="event-title">
-        {title}
-      </div>
-    );
-    const updatedSchedules = {
-      ...schedule,
-      [currentDayKey]: [...(schedule[currentDayKey] || []), newSchedule],
-    };
-    setSchedule(updatedSchedules);
-    toggle();
+    if (selectedDay && isSameDay(day, selectedDay)) {
+      setModalIsOpen(!modalIsOpen);
+    } else {
+      setSelectedDay(day);
+      setModalIsOpen(false);
+    }
   };
 
   const buildCalendarDays = () => {
-    const curMonthStartDate = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      1,
-    ).getDay();
+    const firstDayOfMonth = startOfMonth(currentMonth);
+    const lastDayOfMonth = endOfMonth(currentMonth);
 
-    const curMonthEndDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-
-    const prevMonthEndDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 0);
-    const nextMonthStartDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
-    const days: Date[] = Array.from({ length: curMonthStartDate }, (_, i) => {
-      return new Date(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth() - 1,
-        prevMonthEndDate.getDate() - i,
-      );
-    }).reverse();
-
-    days.push(
-      ...Array.from(
-        { length: curMonthEndDate.getDate() },
-        (_, i) => new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i + 1),
-      ),
-    );
-
-    const remainingDays = 7 - (days.length % 7);
-    if (remainingDays < 7) {
-      days.push(
-        ...Array.from(
-          { length: remainingDays },
-          (_, i) =>
-            new Date(nextMonthStartDate.getFullYear(), nextMonthStartDate.getMonth(), i + 1),
-        ),
-      );
+    const days: Date[] = [];
+    for (let day = firstDayOfMonth; day <= lastDayOfMonth; day = addDays(day, 1)) {
+      days.push(day);
     }
+
+    // Add days from previous and next months to fill the weeks
+    const startWeekday = firstDayOfMonth.getDay();
+    const endWeekday = lastDayOfMonth.getDay();
+    for (let i = 0; i < startWeekday; i++) {
+      days.unshift(addDays(firstDayOfMonth, -i - 1));
+    }
+    for (let i = 0; i < 6 - endWeekday; i++) {
+      days.push(addDays(lastDayOfMonth, i + 1));
+    }
+
     return days;
   };
 
   const buildCalendarTag = (calendarDays: Date[]) => {
-    return calendarDays.map((day: Date, i: number) => {
-      const dayKey = day.toISOString().split('T')[0];
-      const daySchedules = schedule[dayKey] || [];
+    const eventMap = new Map<string, JSX.Element[]>();
 
-      //* 소셜 일정 render *//
-      const eventsForDay = socialEvents.filter((event) => {
-        const eventDate = new Date(event.startAt).toISOString().split('T')[0];
-        return eventDate === dayKey;
-      });
+    const allEvent = [...socialEvents, ...groupEvents];
 
-      const eventElements = eventsForDay.map((event, idx) => (
-        <div key={idx} className="event-title">
+    allEvent.forEach((event) => {
+      const eventDate = event.startAt.split('T')[0];
+      const existingEvents = eventMap.get(eventDate) || [];
+      existingEvents.push(
+        <div className="kakao-title" key={existingEvents.length}>
           {event.title || 'No Title'}
-        </div>
-      ));
-      //* *************** *//
+        </div>,
+      );
+      eventMap.set(eventDate, existingEvents);
+    });
+
+    // groupEvents.forEach((event) => {});
+
+    return calendarDays.map((day: Date, i: number) => {
+      const localDayKey = [
+        day.getFullYear(),
+        ('0' + (day.getMonth() + 1)).slice(-2),
+        ('0' + day.getDate()).slice(-2),
+      ].join('-');
+
+      const eventElements = eventMap.get(localDayKey) || [];
 
       if (day.getMonth() < currentMonth.getMonth()) {
         return (
           <td key={i} className="prevMonthDay">
             <div>{isPrevMonth ? day.getDate() : ''}</div>
             {eventElements}
-            <CalSchedule schedule={daySchedules} day={day} />
           </td>
         );
       }
@@ -138,7 +128,6 @@ export default function CalendarPage({
           <td key={i} className="nextMonthDay">
             <div>{isNextMonth ? day.getDate() : ''}</div>
             {eventElements}
-            <CalSchedule schedule={daySchedules} day={day} />
           </td>
         );
       }
@@ -147,13 +136,12 @@ export default function CalendarPage({
       const isToday = isSameDay(day, today);
       let dayClasses = `Day day-${dayOfWeek}`;
       if (isToday) dayClasses += ' today';
-      if (isSameDay(day, selectedDay)) dayClasses += ' choiceDay';
+      if (selectedDay && isSameDay(day, selectedDay)) dayClasses += ' choiceDay';
 
       return (
-        <td key={i} className={dayClasses} onClick={() => onClickDay(day)}>
+        <td key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
           <div className="day">{day.getDate()}</div>
           {eventElements}
-          <CalSchedule schedule={daySchedules} day={day} />
         </td>
       );
     });
@@ -189,7 +177,13 @@ export default function CalendarPage({
           ))}
         </tbody>
       </table>
-      <ScheduleModal isOpen={isOn} onSave={(title) => addSchedule(title)} />
+      <EventModal
+        isOpen={modalIsOpen}
+        onClose={() => setModalIsOpen(false)}
+        selectedDay={selectedDay}
+        userCalendarId={userCalendarId}
+        position={modalPosition}
+      />
     </div>
   );
-}
+});

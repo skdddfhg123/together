@@ -1,8 +1,10 @@
 import * as API from '@utils/api';
 import axios, { AxiosError } from 'axios';
 
+import { transToKorDate } from '@utils/dateTranslate';
 import { setCookie, getCookie, deleteCookie } from '@utils/cookie';
-import { Cookie } from '@type/index';
+import { useSocialEventStore } from '@store/index';
+import { Cookie, SocialEvent } from '@type/index';
 
 const headrOptions = {
   headers: {
@@ -125,14 +127,45 @@ async function GetEvents() {
           sameSite: 'none',
         },
       };
-
       setCookie(kakaoToken);
-      return res.resultArray;
+
+      const eventLists = res.resultArray.map(
+        (event: KakaoEvent): SocialEvent => ({
+          title: event.title || '카카오 일정',
+          startAt: transToKorDate(event.startAt, 9),
+          endAt: transToKorDate(event.endAt, 9),
+          isPast: event.deactivatedAt,
+          userCalendarId: event.userCalendar?.userCalendarId,
+          social: event.social,
+          socialEventId: event.socialEventId,
+        }),
+      );
+      useSocialEventStore.getState().setSocialEvents(eventLists);
+      console.log(`eventLists`, eventLists);
+
+      return useSocialEventStore.getState();
     } else {
       const { data: res }: { data: KakaoEventsAndToken } = await API.post('/kakao/get/calendar', {
         kakaoAccessToken: getCookie('kakaoToken'),
       });
-      return res.resultArray;
+
+      console.log(`받아온 일정`, res.resultArray);
+
+      const eventLists = res.resultArray.map(
+        (event: KakaoEvent): SocialEvent => ({
+          title: event.title || '카카오 일정',
+          startAt: transToKorDate(event.startAt, 9),
+          endAt: transToKorDate(event.endAt, 9),
+          isPast: event.deactivatedAt,
+          userCalendarId: event.userCalendar?.userCalendarId,
+          social: event.social,
+          socialEventId: event.socialEventId,
+        }),
+      );
+      useSocialEventStore.getState().setSocialEvents(eventLists);
+      console.log(`eventLists`, eventLists);
+
+      return useSocialEventStore.getState();
     }
   } catch (error) {
     const err = error as AxiosError;

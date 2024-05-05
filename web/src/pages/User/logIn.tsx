@@ -17,6 +17,7 @@ export default function LogInPage() {
     try {
       await USER.logIn(formData);
       await USER.getInfo();
+
       alert('로그인 성공');
       navigate('/main');
     } catch (e) {

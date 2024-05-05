@@ -1,4 +1,5 @@
 import React from 'react';
+import '@styles/calendar.css';
 
 interface scheduleProps {
   schedule: any[];
@@ -7,5 +8,5 @@ interface scheduleProps {
 
 export default function CalSchedule({ schedule, day }: scheduleProps) {
   const Day: Date = day;
-  return <div>{schedule.slice(0, 4)}</div>;
+  return <section className={`h-16 overflow-y-scroll hide-scrollbar`}>{schedule}</section>;
 }

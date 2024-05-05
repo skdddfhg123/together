@@ -51,14 +51,49 @@ export const useUserInfoStore = create<User>((set) => ({
 
 interface CalendarStore {
   calendars: Calendar[];
-  isLoaded: boolean;
   setCalendars: (calendars: Calendar[]) => void;
-  setIsLoaded: (isLoaded: boolean) => void;
 }
 
-export const useCalendarStore = create<CalendarStore>((set) => ({
+export const useCalendarListStore = create<CalendarStore>((set) => ({
   calendars: [],
-  isLoaded: false,
   setCalendars: (calendars) => set({ calendars }),
-  setIsLoaded: (isLoaded) => set({ isLoaded }),
+}));
+
+interface NowCalendarStore {
+  nowCalendar: string | null;
+  setNowCalendar: (calendarId: string | null) => void;
+}
+
+export const useNowCalendarStore = create<NowCalendarStore>((set) => ({
+  nowCalendar: null,
+  setNowCalendar: (calendarId: string | null) => set({ nowCalendar: calendarId }),
+}));
+
+export interface reqGroupEvent {
+  groupCalendarId?: string;
+  title: string;
+  author: string;
+  color: string;
+  startAt: string;
+  endAt: string;
+  emails?: string[] | null;
+}
+
+interface resGroupEvent extends reqGroupEvent {
+  groupEventId: string;
+  member: string[];
+  alerts?: number | null;
+  pinned: boolean;
+  isDeleted: boolean;
+  deletedAt: null | string;
+}
+
+interface GroupEventsState {
+  groupEvents: resGroupEvent[];
+  setGroupEvents: (events: resGroupEvent[]) => void;
+}
+
+export const useGroupEventStore = create<GroupEventsState>((set) => ({
+  groupEvents: [],
+  setGroupEvents: (events: resGroupEvent[]) => set({ groupEvents: events }),
 }));

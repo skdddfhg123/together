@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AxiosError } from 'axios';
+import { Link } from 'react-router-dom';
 
 import * as CALENDAR from '@services/calendarAPI';
-import { useCalendarStore } from '@store/index';
+import { useCalendarListStore, useNowCalendarStore } from '@store/index';
 import { Calendar } from '@type/index';
 
 import defaultCover from '@assets/default_cover.png';
@@ -12,27 +11,28 @@ interface CalendarListProps {
 }
 
 export default function CalendarList({ isOpen }: CalendarListProps) {
-  const navigate = useNavigate();
-  const { calendars } = useCalendarStore();
+  const { calendars } = useCalendarListStore();
+  const { setNowCalendar } = useNowCalendarStore();
 
   useEffect(() => {
     try {
       CALENDAR.getAllCalendar();
-    } catch (error) {
-      if ((error as AxiosError).code === 'NO_TOKEN') {
-        navigate('/signin');
-      } else {
-        console.error('전체 캘린더 받아오기 실패', error);
-      }
+    } catch (err) {
+      console.error('전체 캘린더 받아오기 실패', err);
     }
   }, []);
+
+  const ChangeCalendar = (calendarId: string | null) => {
+    if (calendarId) setNowCalendar(calendarId);
+    else console.error('캘린더 아이디를 찾을 수 없습니다.');
+  };
 
   const renderCalendarList = () => {
     return calendars.length > 0 ? (
       calendars.map((calendar: Calendar, idx: number) => (
         <li
           className={`py-2 text-l cursor-pointer flex items-center`}
-          onClick={() => CALENDAR.getCalEvents(`${calendar.title} - ${idx}`)}
+          onClick={() => ChangeCalendar(calendar.calendarId)}
           key={idx}
         >
           <img className="m-2 w-36" src={calendar.coverImage || defaultCover} alt="no Img"></img>
@@ -55,7 +55,7 @@ export default function CalendarList({ isOpen }: CalendarListProps) {
       <ul className={`h-fit flex flex-col`}>
         <li
           className={`py-2 text-l cursor-pointer flex items-center`}
-          onClick={() => CALENDAR.getCalEvents('main')}
+          onClick={() => ChangeCalendar(sessionStorage.getItem('MainCalendar'))}
         >
           <img className="m-2 w-36" src={defaultCover} alt="no Img"></img>
           메인
