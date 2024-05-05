@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { useGroupEventStore } from '@store/index';
 
 interface EventDetailsProps {
@@ -7,10 +7,13 @@ interface EventDetailsProps {
   onClose: () => void;
 }
 
-export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsProps) {
+export default React.memo(function EventDetails({ isOpen, eventId, onClose }: EventDetailsProps) {
   const groupEvents = useGroupEventStore((state) => state.groupEvents);
 
-  const groupEvent = groupEvents.find((event) => event.groupEventId === eventId);
+  const groupEvent = useMemo(() => {
+    return groupEvents.find((event) => event.groupEventId === eventId);
+  }, [eventId, groupEvents]);
+
   console.log(`groupEvent 찾아보자`, groupEvent);
 
   return (
@@ -38,4 +41,4 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
       )}
     </div>
   );
-}
+});

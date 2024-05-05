@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { isSameDay, startOfMonth, endOfMonth, addDays } from 'date-fns';
 
 import EventModal from '@components/Canlendar/EventModal';
@@ -47,7 +47,7 @@ export default React.memo(function CalendarPage({
     if (nowCalendarId) {
       CALENDAR.getCalEvents(nowCalendarId).catch(console.error);
     }
-  }, [nowCalendarId, currentMonth]);
+  }, [nowCalendarId]);
 
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -61,9 +61,9 @@ export default React.memo(function CalendarPage({
     }
   };
 
-  const detailsClose = () => {
+  const detailsClose = useCallback(() => {
     setDetailsOn(false);
-  };
+  }, []);
 
   const handleDetails = (evnetId: string, e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();

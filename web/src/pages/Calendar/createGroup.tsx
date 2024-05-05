@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
 import * as CALENDAR from '@services/calendarAPI';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCalendarListStore } from '@store/index';
 
 export default function CreateGroupPage() {
   const titleRef = useRef<HTMLInputElement>(null);
   const [groupType, setGroupType] = useState<'public' | 'private'>('private');
   const navigate = useNavigate();
+  const setIsLoadedCalendarList = useCalendarListStore((state) => state.setIsLoaded);
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,6 +25,7 @@ export default function CreateGroupPage() {
       });
       if (!res) throw new Error('그룹 캘린더 생성 실패');
       alert('그룹 생성 성공');
+      setIsLoadedCalendarList(false);
       navigate('/main');
     } catch (err) {
       console.error(err);

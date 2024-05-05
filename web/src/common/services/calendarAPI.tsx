@@ -14,7 +14,7 @@ export async function getCalEvents(calendarId: string) {
 }
 
 export async function getAllCalendar() {
-  const { setCalendars } = useCalendarListStore.getState();
+  const { setCalendars, isLoaded } = useCalendarListStore.getState();
 
   const res = await API.get(`/calendar/get_calendar`);
   if (!res) throw new Error('캘린더 전체 받아오기 실패');

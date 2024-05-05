@@ -90,7 +90,7 @@ export default function MainPage() {
             transition-all duration-300 ${isOn ? 'w-128' : 'w-0'}`}
           id={isOn ? 'slideIn-left' : 'slideOut-left'}
         >
-          {isOn && <CalendarList isOpen={isOn} />}
+          {isOn && <CalendarList isOpen={isOn} onClose={toggle} />}
         </aside>
         <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
         <aside className="right-sideBar">

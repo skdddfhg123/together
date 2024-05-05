@@ -6,7 +6,7 @@ import CalendarSetTap from '@components/Menu/CalenderSetTap';
 
 type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
-export default function RightMenuTap() {
+export default React.memo(function RightMenuTap() {
   const [activeTap, setActiveTap] = useState<TapName | null>(null);
 
   const toggleTap = (tap: TapName) => {
@@ -47,4 +47,4 @@ export default function RightMenuTap() {
       </section>
     </div>
   );
-}
+});

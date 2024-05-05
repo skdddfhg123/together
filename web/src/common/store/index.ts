@@ -51,12 +51,16 @@ export const useUserInfoStore = create<User>((set) => ({
 
 interface CalendarStore {
   calendars: Calendar[];
+  isLoaded: boolean;
   setCalendars: (calendars: Calendar[]) => void;
+  setIsLoaded: (isLoaded: boolean) => void;
 }
 
 export const useCalendarListStore = create<CalendarStore>((set) => ({
   calendars: [],
+  isLoaded: false,
   setCalendars: (calendars) => set({ calendars }),
+  setIsLoaded: (isLoaded) => set((state) => ({ isLoaded })),
 }));
 
 interface NowCalendarStore {

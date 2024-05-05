@@ -8,7 +8,10 @@ interface DayPickerCompProps {
   setSelectedDay: (day: Date | null) => void;
 }
 
-export default function DayPickerComp({ selectedDay, setSelectedDay }: DayPickerCompProps) {
+export default React.memo(function DayPickerComp({
+  selectedDay,
+  setSelectedDay,
+}: DayPickerCompProps) {
   const [selected, setSelected] = React.useState<Date>();
 
   let footer = <p>Please pick a day.</p>;
@@ -23,4 +26,4 @@ export default function DayPickerComp({ selectedDay, setSelectedDay }: DayPicker
       footer={footer}
     />
   );
-}
+});

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import defaultUserImg from '@assets/default_user.png';
 import '@styles/UserModal.css';
 
-export default function UserModal() {
+export default React.memo(function UserModal() {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -45,4 +45,4 @@ export default function UserModal() {
       </section>
     </div>
   );
-}
+});

@@ -8,15 +8,24 @@ import { Calendar } from '@type/index';
 import defaultCover from '@assets/default_cover.png';
 interface CalendarListProps {
   isOpen: boolean;
+  onClose: () => void;
 }
 
-export default function CalendarList({ isOpen }: CalendarListProps) {
-  const { calendars } = useCalendarListStore();
+export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
+  const { calendars, isLoadedCalenderList, setIsLoadedCalendarList } = useCalendarListStore(
+    (state) => ({
+      calendars: state.calendars,
+      isLoadedCalenderList: state.isLoaded,
+      setIsLoadedCalendarList: state.setIsLoaded,
+    }),
+  );
   const { setNowCalendar } = useNowCalendarStore();
 
   useEffect(() => {
+    if (isLoadedCalenderList) return;
     try {
       CALENDAR.getAllCalendar();
+      setIsLoadedCalendarList(true);
     } catch (err) {
       console.error('전체 캘린더 받아오기 실패', err);
     }
@@ -25,6 +34,7 @@ export default function CalendarList({ isOpen }: CalendarListProps) {
   const ChangeCalendar = (calendarId: string | null) => {
     if (calendarId) setNowCalendar(calendarId);
     else console.error('캘린더 아이디를 찾을 수 없습니다.');
+    onClose();
   };
 
   const renderCalendarList = () => {
