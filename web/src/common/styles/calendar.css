@@ -45,8 +45,8 @@ td {
   padding: 0 0.2rem;
 }
 
-.Day:hover,
-.today:hover {
+td.Day:hover,
+td.today:hover {
   box-shadow: 0 0 0 3px #0086FF inset;
   cursor: pointer;
 }

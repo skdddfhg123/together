@@ -65,11 +65,11 @@ h2 {
 
 #slideIn-left {
   border-right: 1px solid rgb(242, 242, 242);
-  animation: slideInLeft 0.5s forwards;
+  animation: slideInLeft 0.3s forwards;
 }
 
 #slideOut-left {
-  animation: slideOutLeft 0.5s forwards;
+  animation: slideOutLeft 0.3s forwards;
 }
 
 
@@ -97,9 +97,9 @@ h2 {
 
 #slideIn-right {
   border-left: 1px solid rgb(242, 242, 242);
-  animation: slideInRight 0.5s forwards;
+  animation: slideInRight 0.3s forwards;
 }
 
 #slideOut-right {
-  animation: slideOutRight 0.5s forwards;
+  animation: slideOutRight 0.3s forwards;
 }

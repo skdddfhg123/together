@@ -30,7 +30,7 @@ export default function RightMenuTap() {
         </button>
       </div>
       <section
-        className={`relative flex flex-col overflow-hidden transition-all duration-500 ${activeTap ? 'w-80 opacity-100' : 'w-0 opacity-0'}`}
+        className={`flex flex-col overflow-hidden transition-all duration-300 ${activeTap ? 'w-80' : 'w-0'}`}
       >
         <div id={`${activeTap === 'bookmark' ? 'slideIn-right' : 'slideOut-right'}`}>
           {activeTap === 'bookmark' && <BookMarkTap onClose={() => setActiveTap(null)} />}

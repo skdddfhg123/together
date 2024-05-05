@@ -1,11 +1,6 @@
 import * as API from '@utils/api';
 
-import {
-  useCalendarListStore,
-  useGroupEventStore,
-  reqGroupEvent,
-  useNowCalendarStore,
-} from '@store/index';
+import { useCalendarListStore, useGroupEventStore, reqGroupEvent } from '@store/index';
 import { CreateGroupForm } from '@type/index';
 
 export async function getCalEvents(calendarId: string) {

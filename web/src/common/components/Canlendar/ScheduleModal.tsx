@@ -16,7 +16,7 @@ export default function ScheduleModal({ isOpen, onSave }: ScheduleModalProps) {
   }));
 
   const formatDate = (date: Date | null) => {
-    return date ? format(date, 'PPP') : ''; // 'PPP' 예: Jan 1, 2020
+    return date ? format(date, 'PPP') : '';
   };
 
   const toggleDayPicker = () => {
@@ -25,7 +25,7 @@ export default function ScheduleModal({ isOpen, onSave }: ScheduleModalProps) {
 
   return (
     <div
-      className={`relative flex flex-col overflow-hidden transition-all duration-500 
+      className={`flex flex-col overflow-hidden transition-all duration-500 
       ${isOpen ? 'w-80' : 'w-0'}`}
       id={isOpen ? 'slideIn-right' : 'slideOut-right'}
     >

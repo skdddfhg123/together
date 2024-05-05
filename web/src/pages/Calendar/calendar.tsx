@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { isSameDay, startOfMonth, endOfMonth, addDays } from 'date-fns';
-import EventModal from '@components/Canlendar/EventModal';
 
+import EventModal from '@components/Canlendar/EventModal';
+import EventDetails from '@components/Canlendar/EventDetails';
 import * as CALENDAR from '@services/calendarAPI';
 import {
   useGroupEventStore,
@@ -24,7 +25,6 @@ export default React.memo(function CalendarPage({
   isNextMonth,
   currentMonth,
 }: CalendarProps) {
-  const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
   const { selectedDay, setSelectedDay } = useSetDayStore((state) => ({
     selectedDay: state.selectedDay,
     setSelectedDay: state.setSelectedDay,
@@ -37,24 +37,20 @@ export default React.memo(function CalendarPage({
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
 
+  const [detailsOn, setDetailsOn] = useState<boolean>(false);
+  const [groupEventId, setGroupEventId] = useState<string | null>(null);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   useEffect(() => {
-    getCalendarEvent();
+    if (nowCalendarId) {
+      CALENDAR.getCalEvents(nowCalendarId).catch(console.error);
+    }
   }, [nowCalendarId, currentMonth]);
 
-  const getCalendarEvent = async () => {
-    if (!nowCalendarId) return '';
-    try {
-      await CALENDAR.getCalEvents(nowCalendarId);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDayClick = (day: Date, event: React.MouseEvent<HTMLTableCellElement>): void => {
-    const rect = event.currentTarget.getBoundingClientRect();
+  const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
+    const rect = e.currentTarget.getBoundingClientRect();
     setModalPosition({ x: rect.left, y: rect.top });
 
     if (selectedDay && isSameDay(day, selectedDay)) {
@@ -62,6 +58,22 @@ export default React.memo(function CalendarPage({
     } else {
       setSelectedDay(day);
       setModalIsOpen(false);
+    }
+  };
+
+  const detailsClose = () => {
+    setDetailsOn(false);
+  };
+
+  const handleDetails = (evnetId: string, e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
+    if (!groupEventId || evnetId !== groupEventId) {
+      setGroupEventId(evnetId);
+      setDetailsOn(true);
+    } else {
+      detailsClose();
+      setGroupEventId(null);
     }
   };
 
@@ -74,7 +86,6 @@ export default React.memo(function CalendarPage({
       days.push(day);
     }
 
-    // Add days from previous and next months to fill the weeks
     const startWeekday = firstDayOfMonth.getDay();
     const endWeekday = lastDayOfMonth.getDay();
     for (let i = 0; i < startWeekday; i++) {
@@ -90,9 +101,7 @@ export default React.memo(function CalendarPage({
   const buildCalendarTag = (calendarDays: Date[]) => {
     const eventMap = new Map<string, JSX.Element[]>();
 
-    const allEvent = [...socialEvents, ...groupEvents];
-
-    allEvent.forEach((event) => {
+    socialEvents.forEach((event) => {
       const eventDate = event.startAt.split('T')[0];
       const existingEvents = eventMap.get(eventDate) || [];
       existingEvents.push(
@@ -103,7 +112,23 @@ export default React.memo(function CalendarPage({
       eventMap.set(eventDate, existingEvents);
     });
 
-    // groupEvents.forEach((event) => {});
+    groupEvents.forEach((event) => {
+      const eventDate = event.startAt.split('T')[0];
+      const existingEvents = eventMap.get(eventDate) || [];
+      existingEvents.push(
+        <div
+          onMouseEnter={(e) => e.stopPropagation()}
+          onMouseLeave={(e) => e.stopPropagation()}
+          onClick={(e) => handleDetails(event.groupEventId, e)}
+          className="group-event rounded transform transition duration-300 hover:shadow-lg hover:-translate-y-1"
+          style={{ backgroundColor: `${event.color === 'blue' ? '#0086FF' : '${event.color}'}` }}
+          key={event.groupEventId}
+        >
+          {event.title || 'No Title'}
+        </div>,
+      );
+      eventMap.set(eventDate, existingEvents);
+    });
 
     return calendarDays.map((day: Date, i: number) => {
       const localDayKey = [
@@ -163,8 +188,8 @@ export default React.memo(function CalendarPage({
       <table>
         <thead>
           <tr>
-            {daysOfWeek.map((day, i) => (
-              <th key={i} className={`day-${i}`}>
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+              <th className={`Day= day-${idx}`} key={day}>
                 {day}
               </th>
             ))}
@@ -176,6 +201,7 @@ export default React.memo(function CalendarPage({
           ))}
         </tbody>
       </table>
+      <EventDetails isOpen={detailsOn} eventId={groupEventId} onClose={detailsClose} />
       <EventModal
         isOpen={modalIsOpen}
         onClose={() => setModalIsOpen(false)}

@@ -87,7 +87,7 @@ export default function MainPage() {
       <main id="mainSection">
         <aside
           className={`h-full left-sideBar flex flex-col overflow-hidden 
-            transition-all duration-500 ${isOn ? 'w-128' : 'w-0'}`}
+            transition-all duration-300 ${isOn ? 'w-128' : 'w-0'}`}
           id={isOn ? 'slideIn-left' : 'slideOut-left'}
         >
           {isOn && <CalendarList isOpen={isOn} />}
