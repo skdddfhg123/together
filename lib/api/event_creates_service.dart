@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CalendarEventService {
-  static const String baseUrl =
-      'http://15.164.174.224:3000/calendar/group/create/';
+  static const String baseUrl = 'http://15.164.174.224:3000/calendar/group/';
 
   // 색상 객체를 16진수 문자열로 변환하는 함수
   String colorToHex(Color color) {
@@ -20,7 +19,7 @@ class CalendarEventService {
     String token,
     Color color,
   ) async {
-    var url = Uri.parse(baseUrl + calendarId); // URL 구성
+    var url = Uri.parse(baseUrl + 'create/${calendarId}'); // URL 구성
     var response = await http.post(url,
         headers: {
           'Content-Type': 'application/json',

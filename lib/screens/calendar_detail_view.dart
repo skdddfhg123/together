@@ -19,7 +19,6 @@ class CalendarDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final calendarController = Get.find<UserCalendarController>();
     final meetingController = Get.find<MeetingController>();
-    final eventController = Get.find<EventSelectionController>();
 
     Calendar? selectedCalendar = calendarController.calendars.firstWhere(
       (cal) => cal.calendarId == calendarId,
@@ -38,6 +37,40 @@ class CalendarDetailView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(selectedCalendar.title),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              bool confirmDelete = await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("Confirm Delete"),
+                        content: const Text(
+                            "캘린더를 삭제 하면 캘린더의 일정이 모두 다 삭제 됩니다. 삭제 하시겠습니까?"),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text("취소"),
+                            onPressed: () => Navigator.of(context).pop(false),
+                          ),
+                          TextButton(
+                            child: const Text("삭제"),
+                            onPressed: () => Navigator.of(context).pop(true),
+                          ),
+                        ],
+                      );
+                    },
+                  ) ??
+                  false;
+
+              if (confirmDelete) {
+                await meetingController
+                    .deleteCalendarAndAppointments(calendarId);
+                onCalendarChanged('all_calendar'); // All Calendar 페이지로 리디렉션
+              }
+            },
+            icon: const Icon(Icons.delete_forever_rounded),
+          ),
+        ],
       ),
       drawer: Drawer(
         child: Column(

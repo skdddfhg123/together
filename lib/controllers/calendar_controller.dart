@@ -31,6 +31,12 @@ class UserCalendarController extends GetxController {
     }
   }
 
+  // 캘린더를 리스트에서 삭제하는 비동기 함수
+  void removeCalendar(String calendarId) {
+    calendars.removeWhere((calendar) => calendar.calendarId == calendarId);
+    update(); // GetX를 통해 상태 업데이트 및 UI 갱신
+  }
+
   Future<void> loadCalendars() async {
     List<Calendar>? loadedCalendars = await getapiService.loadCalendars();
     if (loadedCalendars != null) {

@@ -16,8 +16,6 @@ class AuthAPIService {
       }),
     );
 
-    print(response.body);
-
     if (response.statusCode == 201) {
       var token = json.decode(response.body)['accessToken'];
       Get.find<AuthController>().setAccessToken(token);

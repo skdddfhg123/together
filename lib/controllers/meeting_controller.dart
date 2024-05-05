@@ -1,7 +1,11 @@
 import 'dart:convert';
 
+import 'package:calendar/api/calendar_delete_service.dart';
+import 'package:calendar/api/delete_event_service.dart';
 import 'package:calendar/api/event_creates_service.dart';
+import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/models/social_event.dart';
+import 'package:calendar/screens/event_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -23,8 +27,9 @@ class CalendarAppointment {
 class MeetingController extends GetxController {
   final RxList<CalendarAppointment> calendarAppointments =
       <CalendarAppointment>[].obs;
-
+  final DeleteEventService deleteEventService = DeleteEventService();
   final CalendarEventService eventService = CalendarEventService();
+  final DeleteCalendarService deleteCalendarService = DeleteCalendarService();
 
   void addCalendarAppointment(
       Appointment appointment, String calendarId, String groupeventId) {
@@ -80,7 +85,7 @@ class MeetingController extends GetxController {
     return calendarAppointments.map((c) => c.appointment).toList();
   }
 
-  List<Appointment> getAppointmentsForCalendarAndDate(
+  List<CalendarAppointment> getAppointmentsForCalendarAndDate(
       String calendarId, DateTime date) {
     return calendarAppointments
         .where((appointment) =>
@@ -88,20 +93,50 @@ class MeetingController extends GetxController {
             appointment.appointment.startTime.day == date.day &&
             appointment.appointment.startTime.month == date.month &&
             appointment.appointment.startTime.year == date.year)
-        .map((calendarAppointment) => calendarAppointment.appointment)
         .toList();
   }
 
   // 특정 날짜에 해당하는 모든 일정을 가져오는 메소드
-  List<Appointment> getAppointmentsForDate(DateTime date) {
-    return calendarAppointments
-        .where((calendarAppointment) {
-          return calendarAppointment.appointment.startTime.day == date.day &&
-              calendarAppointment.appointment.startTime.month == date.month &&
-              calendarAppointment.appointment.startTime.year == date.year;
-        })
-        .map((calendarAppointment) => calendarAppointment.appointment)
-        .toList();
+  List<CalendarAppointment> getAppointmentsForDate(DateTime date) {
+    return calendarAppointments.where((calendarAppointment) {
+      return calendarAppointment.appointment.startTime.day == date.day &&
+          calendarAppointment.appointment.startTime.month == date.month &&
+          calendarAppointment.appointment.startTime.year == date.year;
+    }).toList();
+  }
+
+  Future<void> deleteCalendarAppointment(String groupEventId) async {
+    bool isDeleted = await deleteEventService.deleteEvent(groupEventId);
+    if (isDeleted) {
+      int index = calendarAppointments
+          .indexWhere((item) => item.groupeventId == groupEventId);
+      if (index != -1) {
+        calendarAppointments.removeAt(index);
+        update(); // GetX의 update 메서드를 호출하여 UI 갱신
+      }
+      Get.back(); // 현재 페이지 닫기
+      Get.snackbar('Success', 'Event deleted successfully.');
+    } else {
+      Get.snackbar('Error', 'Failed to delete event from server.',
+          snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  // 캘린더와 해당 일정들을 삭제하는 메서드
+  Future<void> deleteCalendarAndAppointments(String calendarId) async {
+    bool isDeleted = await deleteCalendarService.deleteCalendar(calendarId);
+    if (isDeleted) {
+      Get.find<UserCalendarController>().removeCalendar(calendarId);
+      // 로컬 상태에서 해당 캘린더의 일정들을 제거
+      calendarAppointments
+          .removeWhere((appointment) => appointment.calendarId == calendarId);
+      update(); // UI 갱신
+      Get.back(); // 현재 페이지 닫기
+      Get.snackbar(
+          'Success', 'Calendar and its appointments deleted successfully.');
+    } else {
+      Get.snackbar('Error', 'Failed to delete calendar and its appointments.');
+    }
   }
 
   // 일정 데이터를 초기화하는 메소드
@@ -149,7 +184,26 @@ class MeetingController extends GetxController {
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: InkWell(
                               onTap: () {
-                                // 여기에 일정 눌렀을 때 상세정보 나와야함 ( 피드 등록 등)
+                                // 이벤트 상세 페이지로 네비게이션
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EventDetailPage(
+                                      eventTitle:
+                                          appointment.appointment.subject,
+                                      startTime:
+                                          appointment.appointment.startTime,
+                                      endTime: appointment.appointment.endTime,
+                                      isNotified:
+                                          false, // 예시 값, 실제 모델에 따라 수정 필요
+                                      calendarColor:
+                                          appointment.appointment.color,
+                                      userProfileImageUrl:
+                                          "https://cdn.pixabay.com/photo/2020/05/17/20/21/cat-5183427_640.jpg",
+                                      groupEventId: appointment.groupeventId,
+                                    ),
+                                  ),
+                                );
                               },
                               child: Row(
                                 children: <Widget>[
@@ -159,13 +213,13 @@ class MeetingController extends GetxController {
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Text(
-                                        DateFormat('a h:mm', 'ko_KR')
-                                            .format(appointment.startTime),
+                                        DateFormat('a h:mm', 'ko_KR').format(
+                                            appointment.appointment.startTime),
                                         style: const TextStyle(fontSize: 14),
                                       ),
                                       Text(
-                                        DateFormat('a h:mm', 'ko_KR')
-                                            .format(appointment.endTime),
+                                        DateFormat('a h:mm', 'ko_KR').format(
+                                            appointment.appointment.endTime),
                                         style: const TextStyle(fontSize: 14),
                                       ),
                                     ],
@@ -175,14 +229,14 @@ class MeetingController extends GetxController {
                                     height: 30,
                                     width: 10,
                                     decoration: BoxDecoration(
-                                      color: appointment.color,
+                                      color: appointment.appointment.color,
                                       borderRadius: BorderRadius.circular(5),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      appointment.subject,
+                                      appointment.appointment.subject,
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
