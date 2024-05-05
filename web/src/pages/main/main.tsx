@@ -7,23 +7,40 @@ import RightMenuTap from '@components/Menu/RightMenuTap';
 import { useToggle } from '@hooks/useToggle';
 
 import * as KAKAO from '@services/KakaoAPI';
-import { useNowCalendarStore, useSocialEventStore } from '@store/index';
+import * as USER from '@services/userAPI';
+import { useNowCalendarStore, useSocialEventStore, useUserInfoStore } from '@store/index';
 import menuImg from '@assets/calendar_menu.webp';
 import syncImg from '@assets/sync.png';
 
 import '@styles/main.css';
 
 export default function MainPage() {
-  const { nowCalendar } = useNowCalendarStore();
-  const [calendarID, setCalendarID] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const { isOn, toggle } = useToggle(false);
 
+  const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
+  const setNowCalendarId = useNowCalendarStore((state) => state.setNowCalendar);
+
+  const getUserAndCalendar = useCallback(async () => {
+    try {
+      const userInfo = await USER.getInfo();
+      if (!userInfo) throw new Error('유저 정보 받아오기 실패');
+      console.log(`userInfo Store : `, userInfo);
+
+      setUserInfo(userInfo);
+      // 여기서 바로 nowCalendarId 설정
+      if (userInfo.userCalendarId) {
+        setNowCalendarId(userInfo.userCalendarId);
+        console.log(`현재 보고있는 캘린더`, userInfo.userCalendarId); //debug//
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [setUserInfo, setNowCalendarId]);
+
   useEffect(() => {
-    const id = nowCalendar || sessionStorage.getItem('MainCalendar');
-    console.log(`현재 보고있는 캘린더`, id);
-    setCalendarID(id);
-  }, [nowCalendar]);
+    getUserAndCalendar();
+  }, [getUserAndCalendar]);
 
   const prevCalendar = (): void => {
     setCurrentMonth(
@@ -42,7 +59,7 @@ export default function MainPage() {
       const kakaoEvents = await KAKAO.GetEvents();
       if (!kakaoEvents) throw new Error('카카오 일정 받아오기 실패');
     } catch (e) {
-      console.error('Failed to fetch social events:', e);
+      console.error('Failed to fetch social events:', e); //debug//
     }
   }, [KAKAO, useSocialEventStore]);
 
@@ -75,7 +92,7 @@ export default function MainPage() {
         >
           {isOn && <CalendarList isOpen={isOn} />}
         </aside>
-        <Calendar calendarId={calendarID} isPrevMonth isNextMonth currentMonth={currentMonth} />
+        <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
         <aside className="right-sideBar">
           <RightMenuTap />
         </aside>

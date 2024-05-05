@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'react-modal';
 import { format } from 'date-fns';
 
@@ -20,7 +20,7 @@ export default function EventModal({
   userCalendarId,
   position,
 }: EventModalProps) {
-  const [title, setTitle] = useState<string>('');
+  const titleRef = useRef<HTMLInputElement>(null);
   const [modalStyle, setModalStyle] = useState({});
   const groupCalendarId = useNowCalendarStore((state) => state.nowCalendar);
 
@@ -45,11 +45,14 @@ export default function EventModal({
     };
   }, [position, window.innerWidth]);
 
-  const handleSubmit = async () => {
-    if (!selectedDay || !groupCalendarId) {
-      console.error('날짜 혹은 캘린더 아이디가 없습니다.');
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    console.log(`일정 생성할 groupCalendarId`, groupCalendarId); //debug//
+    const title = titleRef.current?.value;
+    if (!title) return alert('등록할 일정 제목을 작성해주세요.');
+    if (!selectedDay) return console.log('선택된 날이 없습니다.'); //debug//
+    if (!groupCalendarId) return console.log('등록할 수 있는 그룹 캘린더 아이디가 없습니다.'); //debug//
 
     const eventData: reqGroupEvent = {
       groupCalendarId,
@@ -66,10 +69,11 @@ export default function EventModal({
       console.log(`일정 등록 response`, res.data);
       await CALENDAR.getCalEvents(groupCalendarId);
       onClose();
-      setTitle('');
       console.log('일정 등록 성공'); //debug//
     } catch (error) {
+      alert('일정을 등록하지 못했습니다.');
       console.error('일정 등록 실패', error); //debug//
+      onClose();
     }
   };
 
@@ -94,16 +98,17 @@ export default function EventModal({
         },
       }}
     >
-      <input
-        className="w-5/6 p-1 mr-3 border rounded"
-        type="text"
-        placeholder="일정 제목"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <button className="h-fit text-lg hover:text-custom-main" onClick={handleSubmit}>
-        등록
-      </button>
+      <form onSubmit={handleSubmit} className="w-full flex justify-between items-center p-3">
+        <input
+          className="w-5/6 p-1 mr-3 border rounded"
+          type="text"
+          placeholder="일정 제목"
+          ref={titleRef}
+        />
+        <button className="h-fit text-lg hover:text-custom-main" type="submit">
+          등록
+        </button>
+      </form>
     </Modal>
   );
 }

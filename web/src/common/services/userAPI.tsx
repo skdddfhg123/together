@@ -48,8 +48,7 @@ async function logIn(formData: SignInForm) {
 
 async function getInfo() {
   const res = await API.get(`/auth/token-test`);
-  sessionStorage.setItem(`nickname`, res.data.nickname);
-  sessionStorage.setItem('MainCalendar', res.data.userCalendarId);
+  return res.data;
 }
 
 export { signUp, logIn, getInfo };

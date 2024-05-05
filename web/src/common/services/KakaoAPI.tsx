@@ -169,7 +169,9 @@ async function GetEvents() {
     }
   } catch (error) {
     const err = error as AxiosError;
-    if (err.response) {
+    if (err.response?.status === 401) {
+      alert('카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
+    } else {
       console.error(`이벤트 받아오기 실패 :`, error); //debug//
     }
   }

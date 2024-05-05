@@ -8,16 +8,16 @@ import { useToggle } from '@hooks/useToggle';
 
 import * as USER from '@services/userAPI';
 import { SignUpForm, SignInForm, ErrorResponse } from '@type/index';
+import { useUserInfoStore } from '@store/index';
 
 export default function LogInPage() {
   const navigate = useNavigate();
   const { isOn, toggle } = useToggle(false);
+  const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
 
   const handleLogIn = async (formData: SignInForm) => {
     try {
       await USER.logIn(formData);
-      await USER.getInfo();
-
       alert('로그인 성공');
       navigate('/main');
     } catch (e) {

@@ -7,7 +7,7 @@ export default function CreateGroupPage() {
   const [groupType, setGroupType] = useState<'public' | 'private'>('private');
   const navigate = useNavigate();
 
-  const submitForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const groupTitle = titleRef.current?.value;
@@ -32,7 +32,7 @@ export default function CreateGroupPage() {
   return (
     <div className={`h-128 flex flex-col items-center`}>
       <h1 className={`m-10`}>캘린더 만들기 페이지</h1>
-      <form className="h-5/6 flex flex-col items-center justify-center">
+      <form className="h-5/6 flex flex-col items-center justify-center" onSubmit={submitForm}>
         <fieldset className={`flex flex-col items-center`}>
           <section className={`w-full mb-5 text-xl flex flex-row justify-center`}>
             <label className={`p-2 mx-4`}>
@@ -65,7 +65,7 @@ export default function CreateGroupPage() {
           <Link className={`p-4 mx-4`} to="/main">
             뒤로가기
           </Link>
-          <button className={`p-4 mx-4`} type="button" onClick={submitForm}>
+          <button className={`p-4 mx-4`} type="submit">
             캘린더 만들기
           </button>
         </div>

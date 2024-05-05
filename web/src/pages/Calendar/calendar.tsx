@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { format, isSameDay, startOfMonth, endOfMonth, addDays } from 'date-fns';
+import { isSameDay, startOfMonth, endOfMonth, addDays } from 'date-fns';
 import EventModal from '@components/Canlendar/EventModal';
 
 import * as CALENDAR from '@services/calendarAPI';
 import {
-  reqGroupEvent,
   useGroupEventStore,
+  useNowCalendarStore,
   useSetDayStore,
   useSocialEventStore,
   useUserInfoStore,
@@ -14,14 +14,12 @@ import {
 import '@styles/calendar.css';
 
 type CalendarProps = {
-  calendarId: string | null;
   isPrevMonth: boolean;
   isNextMonth: boolean;
   currentMonth: Date;
 };
 
 export default React.memo(function CalendarPage({
-  calendarId,
   isPrevMonth,
   isNextMonth,
   currentMonth,
@@ -35,6 +33,7 @@ export default React.memo(function CalendarPage({
   const groupEvents = useGroupEventStore((state) => state.groupEvents);
 
   const userCalendarId = useUserInfoStore((state) => state.userInfo?.userCalendarId || null);
+  const nowCalendarId = useNowCalendarStore((state) => state.nowCalendar);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
 
@@ -43,12 +42,12 @@ export default React.memo(function CalendarPage({
 
   useEffect(() => {
     getCalendarEvent();
-  }, [calendarId, currentMonth]);
+  }, [nowCalendarId, currentMonth]);
 
   const getCalendarEvent = async () => {
-    if (!calendarId) return;
+    if (!nowCalendarId) return '';
     try {
-      await CALENDAR.getCalEvents(calendarId);
+      await CALENDAR.getCalEvents(nowCalendarId);
     } catch (err) {
       console.error(err);
     }
