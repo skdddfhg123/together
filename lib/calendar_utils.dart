@@ -1,8 +1,10 @@
 // dialog_service.dart
 
 import 'package:calendar/api/event_creates_service.dart';
+import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -114,4 +116,80 @@ class DialogService {
       },
     );
   }
+}
+
+void showAddCalendarDialog(BuildContext context) {
+  final UserCalendarController calendarController =
+      Get.find<UserCalendarController>();
+  final calendarNameController =
+      TextEditingController(); // 캘린더 이름을 입력 받기 위한 컨트롤러
+  Color pickerColor = Colors.blue; // 기본 색상
+  Color currentColor = Colors.blue; // 현재 선택된 색상
+
+  // 색상 선택기 다이얼로그를 보여주는 함수
+  void changeColor(Color color) {
+    pickerColor = color;
+  }
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('캘린더 추가'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: calendarNameController,
+                decoration: const InputDecoration(hintText: "캘린더 이름"),
+              ),
+              ListTile(
+                title: const Text("색상 선택"),
+                leading: Icon(Icons.color_lens, color: currentColor),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("색상 선택"),
+                        content: SingleChildScrollView(
+                          child: ColorPicker(
+                            pickerColor: pickerColor,
+                            onColorChanged: changeColor,
+                            pickerAreaHeightPercent: 0.8,
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('저장'),
+                            onPressed: () {
+                              currentColor = pickerColor;
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('추가'),
+            onPressed: () async {
+              await calendarController.addCalendar(
+                calendarNameController.text,
+                currentColor, // 색상 정보 추가
+              );
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

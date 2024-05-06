@@ -23,7 +23,7 @@ class UserCalendarController extends GetxController {
       Calendar? newCalendar = await apiService.createCalendar(name, color);
       if (newCalendar != null) {
         calendars.add(newCalendar); // 캘린더 리스트에 추가
-        print(calendars.last);
+        print(calendars.last.title);
         update(); // GetX 업데이트 호출
       }
     } catch (e) {

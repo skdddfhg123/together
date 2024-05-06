@@ -1,3 +1,4 @@
+import 'package:calendar/api/calendar_create_service.dart';
 import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/api/kakao_auth_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
@@ -25,6 +26,7 @@ void main() async {
   Get.put(MeetingController());
   Get.put(KakaoAuthService());
   Get.put(EventSelectionController());
+  Get.put(CalendarCreateApiService());
 
   var calendarService = CalendarApiService();
   await calendarService.initializePrefs(); // 서비스 초기화 보장

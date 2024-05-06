@@ -59,6 +59,8 @@ class _MainPageState extends State<MainPage> {
           (cal) => cal.calendarId == calendarId,
         );
 
+        print(selectedCalendar.title);
+
         if (selectedCalendar != null) {
           DialogService.showAddAppointmentDialog(
             context,

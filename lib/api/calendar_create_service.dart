@@ -28,6 +28,7 @@ class CalendarCreateApiService {
   // 캘린더 생성 함수
   Future<Calendar?> createCalendar(String title, Color color) async {
     try {
+      print('_token : $_token');
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {

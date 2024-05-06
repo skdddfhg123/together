@@ -2,10 +2,10 @@ import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/meeting_data.dart';
+import 'package:calendar/widget/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-
 import '../models/calendar.dart';
 
 class CalendarDetailView extends StatelessWidget {
@@ -44,7 +44,7 @@ class CalendarDetailView extends StatelessWidget {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text("Confirm Delete"),
+                        title: const Text("캘린더 삭제"),
                         content: const Text(
                             "캘린더를 삭제 하면 캘린더의 일정이 모두 다 삭제 됩니다. 삭제 하시겠습니까?"),
                         actions: <Widget>[
@@ -72,47 +72,7 @@ class CalendarDetailView extends StatelessWidget {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                children: [
-                  const DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                    ),
-                    child: Text('캘린더 목록'),
-                  ),
-                  Obx(
-                    () => Column(
-                      children: List.generate(
-                          calendarController.calendars.length, (index) {
-                        final calendar = calendarController.calendars[index];
-                        return ListTile(
-                          title: Text(calendar.title),
-                          onTap: () {
-                            Navigator.pop(context);
-                            onCalendarChanged(calendar.calendarId);
-                          },
-                        );
-                      }),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              title: const Text('모든 캘린더 '), // AllCalendar 페이지로 이동하는 버튼
-              leading: const Icon(Icons.calendar_today), // 아이콘 추가
-              onTap: () {
-                Navigator.pop(context); // Drawer 닫기
-                onCalendarChanged('all_calendar');
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: CustomDrawer(onCalendarChanged: (id) => onCalendarChanged(id)),
       body: Obx(() {
         // MeetingController에서 변경 사항을 감지하여 UI를 갱신합니다.
         final dataSource = MeetingDataSource(
