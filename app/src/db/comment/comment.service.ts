@@ -39,8 +39,11 @@ export class FeedCommentService {
             feedComment.content = content;
 
             
-                const savedFeedComment = await this.feedCommentRepository.save(feedComment);
-                return savedFeedComment;
+            const savedFeedComment = await this.feedCommentRepository.save(feedComment);
+            delete feedComment.user;
+            delete feedComment.feedId;
+            
+            return savedFeedComment;
         } catch (e) {
             console.error('Error saving feed comment:', e);
             throw new InternalServerErrorException('Error saving feed comment');

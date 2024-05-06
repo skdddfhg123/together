@@ -11,6 +11,7 @@ import { ImageService } from 'src/image.upload/image.service';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
 import { UtilsService } from 'src/image.upload/aws.s3/utils/utils.service';
 import { AwsService } from 'src/image.upload/aws.s3/aws.service';
+import { FeedImageBinded } from './interface/feedAndImageBinding';
 
 
 @Injectable()
@@ -27,12 +28,56 @@ export class FeedService {
         private imageService: ImageService     
     ) {}
 
+    // async createFeed(  
+    //     body: CreateFeedDTO,
+    //     payload: PayloadResponse,
+    //     groupEventId: string,
+    //     images: Express.Multer.File[]
+    // ) {
+    //     try{
+    //         const groupEvent = await this.groupEventService.findOne({ groupEventId: groupEventId });  
+    //         if (!groupEvent) {
+    //             throw new NotFoundException('Group event not found');
+    //         }
+    //         const user = await this.userService.findOne({useremail : payload.useremail})
+    //         if (!user) {
+    //             throw new UnauthorizedException('User not found');
+    //         }
+    //         /*
+    //         해당 그룹의 소속이 아닐 때 exception
+    //         */ 
+    //         const feed = new Feed();
+    //         feed.user = user;
+    //         feed.groupEventId = groupEventId;
+    //         feed.feedType = body.feedType;
+    //         feed.title = body.title;
+    //         feed.content = body.content;
+    //         const savedFeed = await this.feedRepository.save(feed);
+
+    //         if (images && images.length) {
+    //         const imageUrls = await this.imageService.imageArrayUpload(images);
+
+    //         for (const imageUrl of imageUrls) {
+    //             const feedImage = new FeedImage();
+    //             feedImage.feed = savedFeed;
+    //             feedImage.imageSrc = imageUrl;
+    //             await this.feedImageRepository.save(feedImage);
+    //             }
+    //         }
+
+    //         console.log(feed);
+    //     } catch (e) {
+    //         console.error('Error saving feed:', e);
+    //         throw new InternalServerErrorException('Error saving feed');
+    //     }
+    // }
+
     async createFeed(  
         body: CreateFeedDTO,
         payload: PayloadResponse,
         groupEventId: string,
         images: Express.Multer.File[]
-    ) {
+    ):Promise<{ feed : Feed , feedImages : FeedImage[] }> {
         try{
             const groupEvent = await this.groupEventService.findOne({ groupEventId: groupEventId });  
             if (!groupEvent) {
@@ -53,16 +98,26 @@ export class FeedService {
             feed.content = body.content;
             const savedFeed = await this.feedRepository.save(feed);
 
+            let feedImages = [] 
             if (images && images.length) {
             const imageUrls = await this.imageService.imageArrayUpload(images);
+            
 
             for (const imageUrl of imageUrls) {
                 const feedImage = new FeedImage();
-                feedImage.feed = savedFeed;
+                feedImage.feed = feed;
                 feedImage.imageSrc = imageUrl;
-                await this.feedImageRepository.save(feedImage);
+                const savedFeedImage = await this.feedImageRepository.save(feedImage);
+                delete feedImage.feed;
+                feedImages.push(feedImage);
                 }
             }
+
+            delete feed.user;
+
+
+            return { feed : feed, feedImages : feedImages }
+
         } catch (e) {
             console.error('Error saving feed:', e);
             throw new InternalServerErrorException('Error saving feed');

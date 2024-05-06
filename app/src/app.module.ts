@@ -22,6 +22,7 @@ import { FeedCommentModule } from './db/comment/comment.module';
 import { AwsModule } from './image.upload/aws.s3/aws.module';
 import { ImageModule } from './image.upload/image.module';
 import { UtilsModule } from './image.upload/aws.s3/utils/utils.module';
+import { emojiModule } from './emoji/emoji.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { UtilsModule } from './image.upload/aws.s3/utils/utils.module';
     FeedModule,
     FeedCommentModule,
     ImageModule,
+    emojiModule
   ],
   controllers: [RedisController],
   providers: [RedisService, DiscordBotService],

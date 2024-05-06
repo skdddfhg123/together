@@ -14,6 +14,8 @@ import { UpdateFeedCommentDTO } from 'src/db/comment/dtos/comment.update.dto';
 import { ReadFeedDTO } from './dtos/feed.read.dto';
 import { ReadFeedCommentDTO } from 'src/db/comment/dtos/comment.read.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FeedImageBinded } from './interface/feedAndImageBinding';
+import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
 
 @ApiTags("feed")
 @Controller('feed')
@@ -25,6 +27,28 @@ export class FeedController {
     ) {}
 
     // 피드 작성
+    // @Post('create/:groupeventId')
+    // @UseInterceptors(FileFieldsInterceptor([
+    //     { name: 'images', maxCount: 5 }
+    //   ]))
+    // @ApiConsumes('multipart/form-data', 'application/json')
+    // @ApiOperation({ summary: 'group event 내에서 피드 생성' })
+    // @ApiResponse({ status: 201, description: 'Feed created successfully' })
+    // @ApiResponse({ status: 403, description: 'Forbidden' })
+    // @ApiBearerAuth('JWT-auth')
+    // @ApiBody({ type: CreateFeedDTO })
+    // @UseGuards(JwtAuthGuard)
+    // async createFeed(
+
+    //   @Body() createFeedDto: CreateFeedDTO,
+    //   @getPayload() payload: PayloadResponse,
+    //   @Param('groupeventId') groupEventId: string,
+    //   @UploadedFiles() files: { images?: Express.Multer.File[] }
+
+    // )   { 
+    //      await this.feedService.createFeed(createFeedDto, payload, groupEventId, files.images);
+    // }
+
     @Post('create/:groupeventId')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 5 }
@@ -43,8 +67,8 @@ export class FeedController {
       @Param('groupeventId') groupEventId: string,
       @UploadedFiles() files: { images?: Express.Multer.File[] }
 
-    )   { 
-         await this.feedService.createFeed(createFeedDto, payload, groupEventId, files.images);
+    ):Promise<{ feed : Feed , feedImages : FeedImage[] }>   { 
+         return await this.feedService.createFeed(createFeedDto, payload, groupEventId, files.images);
     }
 
 

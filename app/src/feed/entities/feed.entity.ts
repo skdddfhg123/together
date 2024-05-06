@@ -5,6 +5,8 @@ import { User } from 'src/db/user/entities/user.entity';
 import { Entity, Column, ManyToOne, JoinColumn, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeleteDateColumn, OneToMany } from 'typeorm';
 import { FeedImage } from '../../db/feedImage/entities/feedImage.entity';
 import { FeedComment } from 'src/db/comment/entities/comment.entity';
+import { EmojiInFeed } from 'src/db/emoji_feed/entities/emoji.feed.entity';
+
 
 @Entity('feed')
 export class Feed {
@@ -62,4 +64,9 @@ export class Feed {
 
     @OneToMany(() => FeedComment, FeedComment => FeedComment.feedId)
     feedComments: FeedComment[];
+
+
+    @OneToMany(() => EmojiInFeed, emojiInFeed => emojiInFeed.feed)
+    emojisInFeed: EmojiInFeed[];
+
 }
