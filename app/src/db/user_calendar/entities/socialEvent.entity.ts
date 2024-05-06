@@ -1,9 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { UserCalendar } from "../../../user_calendar/entities/userCalendar.entity";
+import { Calendar } from "src/calendar/entities/calendar.entity";
+import { User } from "src/db/user/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { UserCalendar } from "./userCalendar.entity";
 import { IsNotEmpty, IsOptional } from "class-validator";
 
 @Entity('social_event')
-@Unique(['social', 'startAt', 'endAt', 'userCalendar'] )
 export class SocialEvent {
 
     @PrimaryGeneratedColumn('uuid')

@@ -12,10 +12,8 @@ import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './db/user/user.module';
 import { DataSource } from 'typeorm';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
-import { GroupEventModule } from './db/event/group_event/groupEvent.module';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
-import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
 import { AwsModule } from './aws/aws.module';
 
 @Module({

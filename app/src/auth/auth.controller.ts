@@ -1,12 +1,14 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards, ValidationPipe } from '@nestjs/common'; import { AuthService } from './auth.service';
+import { Body, Controller, Get, Param, Post, Req, Request, UseGuards, ValidationPipe } from '@nestjs/common'; import { AuthService } from './auth.service';
 import { UserService } from 'src/db/user/user.service';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDTO } from 'src/db/user/dtos/create-user.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { PayloadResponse } from './dtos/payload-response';
-import { JwtAuthGuard } from './jwt.guard';
+import { JwtAuthGuard } from './strategy/jwt.guard';
 import { getPayload } from './getPayload.decorator';
+import { RefreshStrategy } from './strategy/refresh.strategy';
+import { RefreshAuthGuard } from './strategy/refresh.guard';
 
 @ApiTags("auth")
 @Controller('auth')
@@ -44,7 +46,7 @@ export class AuthController {
   })
   @Post('login')
   login(
-    @Body(ValidationPipe) loginDTO: LoginDTO): Promise<{ accessToken: string }> {
+    @Body(ValidationPipe) loginDTO: LoginDTO): Promise<{ accessToken: string, refreshToken: string }> {
     return this.authService.login(loginDTO);
   }
 
@@ -71,10 +73,13 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @Get('token-test')
   @UseGuards(JwtAuthGuard)
+  // @UseGuards(RefreshAuthGuard)
   tokenTest(
-    @getPayload() payload: PayloadResponse
+    @getPayload() payload: PayloadResponse,
   ): any {
+    console.log("1111111")
     // console.log(payload);
+    // console.log(req.cookie)
     return payload;
   }
 }

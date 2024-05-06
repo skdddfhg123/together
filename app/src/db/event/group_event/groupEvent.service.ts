@@ -6,6 +6,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Calendar } from "src/calendar/entities/calendar.entity";
 
+
 @Injectable()
 export class GroupEventService {
     constructor(
@@ -70,6 +71,7 @@ export class GroupEventService {
 
 
     async getGroupEvent(groupEventId: string): Promise<GroupEvent> {
+
         try {
 
             const groupEvent = await this.groupEventRepository.findOne({

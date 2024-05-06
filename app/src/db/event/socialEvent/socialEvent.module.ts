@@ -6,7 +6,7 @@ import { SocialEvent } from './entities/socialEvent.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ SocialEvent]),
+  TypeOrmModule.forFeature([ SocialEvent ]),
     UserCalendarModule,
   ],
   providers: [SocialEventService],

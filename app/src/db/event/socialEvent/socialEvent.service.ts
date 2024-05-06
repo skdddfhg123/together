@@ -14,11 +14,10 @@ export class SocialEventService {
         private userCalendarService: UserCalendarService,
     ) {}
 
+    /** API에서 불러온 캘린더 일정 저장 */
     async saveSocialCalendar(calendar: SocialEventDto, userCalenderId: string): Promise<SocialEvent> {
         try{
-            // const tempUID = '5fcb0643-5458-406e-bf42-cbcf4603a61d';
-            // const userInfo = await this.userService.findOne({userId: tempUID});
-            const calendarInfo = await this.userCalendarService.findCalendarByUserCalendarId(userCalenderId)
+            const calendarInfo = await this.userCalendarService.findUserCalendarById(userCalenderId)
             const socialCalendar = new SocialEvent();
             socialCalendar.startAt = calendar.startAt;
             socialCalendar.endAt = calendar.endAt;
@@ -45,13 +44,29 @@ export class SocialEventService {
         }
     }
     
-    async deleteAll(socialName: string): Promise<boolean> {
+    /** userCalendar를 통한 특정 소셜 이벤트 지우기 */
+    async deleteSocialEvents(socialName: string, userCalendarId: string): Promise<void> {
         try {
-            await this.socialEventRepository.delete({social: socialName})
-            return true;
+            const userCalendar = await this.userCalendarService.findUserCalendarById(userCalendarId)
+            if(userCalendar) {
+                await this.socialEventRepository.delete({social: socialName, userCalendar: userCalendar})
+            }
         }
         catch(err){
-            return false;
+            console.log(err)
+        }
+    }
+
+    /** userCalendar를 통한 특정 소셜 찾기 */
+    async findSocialEventsByUserCalendarId(provider: string, userCalendarId: string): Promise<SocialEvent[]> {
+        try {
+            const userCalendar = await this.userCalendarService.findUserCalendarById(userCalendarId)
+            if(userCalendar) {
+                return await this.socialEventRepository.findBy({social: provider, userCalendar: userCalendar})
+            }
+        }
+        catch(err) {
+            console.log(err)
         }
     }
 }

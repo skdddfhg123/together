@@ -4,13 +4,14 @@ import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { getPayload } from 'src/auth/getPayload.decorator';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
-import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { JwtAuthGuard } from 'src/auth/strategy/jwt.guard';
 import { Calendar } from './entities/calendar.entity';
 import { GroupEventService } from 'src/db/event/group_event/groupEvent.service';
 import { CreateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.create.dto';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
 import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 import { UpdateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.update.dto';
+import { RefreshAuthGuard } from 'src/auth/strategy/refresh.guard';
 
 @ApiTags("calendar")
 @Controller('calendar')
@@ -27,6 +28,7 @@ export class CalendarController {
     @ApiBearerAuth('JWT-auth')
     @ApiBody({ type: CalendarCreateDto })
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async createGroupCalendar(
       @Body() calendarCreateDto: CalendarCreateDto,
       @getPayload() payload: PayloadResponse
@@ -41,6 +43,7 @@ export class CalendarController {
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async getGroupCalendar(
         @getPayload() payload: PayloadResponse
     ): Promise<Calendar[]> {
@@ -54,6 +57,7 @@ export class CalendarController {
     @ApiResponse({ status: 403, description: 'Forbidden Permission Error' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async updateGroupCalendar(
         @Param('calendarId') calendarId: string,
         @Body() calendarUpdateDto: CalendarUpdateDto,
@@ -69,6 +73,7 @@ export class CalendarController {
     @ApiResponse({ status: 500, description: 'Failed to delete calendar' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async deleteCalendar(@Param('calendarId') calendarId: string): Promise<void> {
         await this.calendarService.deleteCalendar(calendarId);
     }
@@ -80,6 +85,7 @@ export class CalendarController {
     @ApiResponse({ status: 409, description: 'Attendee already exists.' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async addAttendee(
         @Param('calendarId') calendarId: string,
         @getPayload() payload: PayloadResponse
@@ -94,6 +100,7 @@ export class CalendarController {
     @ApiResponse({ status: 409, description: 'Attendee does not exist.' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async subAttendee(
         @Param('calendarId') calendarId: string,
         @getPayload() payload: PayloadResponse
@@ -109,6 +116,7 @@ export class CalendarController {
     @ApiResponse({ status: 500, description: 'Error saving group event' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async createGroupEvent(
          @Body() groupEventDTO: CreateGroupEventDTO,
          @getPayload() payload: PayloadResponse,
@@ -123,6 +131,7 @@ export class CalendarController {
     @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async getAllGroupEvent(
         @Param('calendarId') calendarId: string,
     ): Promise<GroupEvent[]>{
@@ -134,6 +143,7 @@ export class CalendarController {
     @ApiOperation({ summary: '특정 그룹 이벤트 가져오기' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async getGroupEventUpdateForm(
         @Param('groupeventId') groupEventId: string,
     ): Promise<GroupEvent>{
@@ -147,6 +157,7 @@ export class CalendarController {
     @ApiResponse({ status: 500, description: 'Error updating group event' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async updateGroupEvent(
         @Param('groupeventId') groupEventId: string, 
         @Body() groupEventDTO: UpdateGroupEventDTO
@@ -162,6 +173,7 @@ export class CalendarController {
     @ApiResponse({ status: 500, description: 'Error removing group event' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
     async removeGroupEvent(
         @Param('groupeventId') groupEventId: string
     ): Promise<GroupEvent> {

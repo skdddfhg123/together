@@ -2,6 +2,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
 import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { UserAccessToken } from "../../tokens/entities/userAccessToken.entity";
+import { UserRefreshToken } from "../../tokens/entities/userRefreshToken.entity";
 
 @Entity()
 @Unique(['useremail', 'nickname'])
@@ -48,4 +50,12 @@ export class User extends BaseEntity{
     @OneToOne(() => UserCalendar, userCalendar => userCalendar.user)
     @JoinColumn({ name: 'userCalendarId' })
     userCalendarId: UserCalendar
+
+    @OneToOne(() => UserAccessToken, accessToken => accessToken.user)
+    @JoinColumn({name: 'accessId'})
+    accessToken: UserAccessToken;
+
+    @OneToOne(() => UserRefreshToken, refreshToken => refreshToken.user)
+    @JoinColumn({name: 'refreshId'})
+    refreshToken: UserRefreshToken;
 }

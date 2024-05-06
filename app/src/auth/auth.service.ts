@@ -5,6 +5,7 @@ import { UserService } from 'src/db/user/user.service';
 import { LoginDTO } from './dtos/login.dto';
 import * as bcrypt from "bcryptjs";
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
+import { TokensService } from 'src/db/tokens/tokens.service';
 import { User } from 'src/db/user/entities/user.entity';
 import { Repository, createQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,6 +23,7 @@ export class AuthService {
         private jwtService: JwtService,
         private configService: ConfigService,
         private userCalendarService: UserCalendarService,
+        private tokensService: TokensService,
     ) { }
 
     getEnvVariables() {
@@ -30,7 +32,7 @@ export class AuthService {
         };
     }
 
-    async login(loginDTO: LoginDTO): Promise<{ accessToken: string }> {
+    async login(loginDTO: LoginDTO): Promise<{ accessToken: string, refreshToken: string }> {
         const user = await this.userService.findOne(loginDTO);
 
         if (!user) {
@@ -48,8 +50,16 @@ export class AuthService {
                 useremail: user.useremail,
                 userCalendarId: userCalendar?.userCalendarId
             };
-            console.log(payload);
-            return { accessToken: this.jwtService.sign(payload) };
+
+            const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+            const refreshToken = this.jwtService.sign(payload, { expiresIn: '60d' });
+
+            await this.tokensService.saveUserToken(user.useremail, 'jwt', accessToken, refreshToken);
+
+            return {
+                accessToken,
+                refreshToken
+            };
         } else {
             throw new UnauthorizedException("Password does not match");
         }
