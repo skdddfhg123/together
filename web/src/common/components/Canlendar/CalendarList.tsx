@@ -12,23 +12,11 @@ interface CalendarListProps {
 }
 
 export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
-  const { calendars, isLoadedCalenderList, setIsLoadedCalendarList } = useCalendarListStore(
-    (state) => ({
-      calendars: state.calendars,
-      isLoadedCalenderList: state.isLoaded,
-      setIsLoadedCalendarList: state.setIsLoaded,
-    }),
-  );
+  const { calendars } = useCalendarListStore();
   const { setNowCalendar } = useNowCalendarStore();
 
   useEffect(() => {
-    if (isLoadedCalenderList) return;
-    try {
-      CALENDAR.getAllCalendar();
-      setIsLoadedCalendarList(true);
-    } catch (err) {
-      console.error('전체 캘린더 받아오기 실패', err);
-    }
+    CALENDAR.getAllCalendar();
   }, []);
 
   const ChangeCalendar = (calendarId: string | null) => {
@@ -41,7 +29,7 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
     return calendars.length > 0 ? (
       calendars.map((calendar: Calendar, idx: number) => (
         <li
-          className={`py-2 text-l cursor-pointer flex items-center`}
+          className={`w-full py-2 text-l cursor-pointer flex items-center`}
           onClick={() => ChangeCalendar(calendar.calendarId)}
           key={idx}
         >
@@ -53,30 +41,26 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
         </li>
       ))
     ) : (
-      <></>
+      <h2 className="text-center py-10">소속된 그룹 캘린더가 없습니다.</h2>
     );
   };
 
   return (
     <section
-      className={`h-fit overflow-scroll ${isOpen ? 'w-128' : 'w-0'}`}
+      className={`h-fit flex flex-col items-center overflow-hidden ${isOpen ? 'w-full' : 'w-0'}`}
       id={isOpen ? 'slideIn-left' : 'slideOut-left'}
     >
-      <ul className={`h-fit flex flex-col`}>
-        <li
-          className={`py-2 text-l cursor-pointer flex items-center`}
-          onClick={() => ChangeCalendar(sessionStorage.getItem('MainCalendar'))}
+      <ul className={`h-fit w-full items-center flex flex-col`}>
+        <h2
+          className="p-4 hover:text-custom-main hover:cursor-pointer"
+          onClick={() => ChangeCalendar('All')}
         >
-          <img className="m-2 w-36" src={defaultCover} alt="no Img"></img>
-          메인
-        </li>
+          일정 모아보기
+        </h2>
         {renderCalendarList()}
       </ul>
-      <Link
-        className="p-4 text-xl w-fit flex items-center m-16 my-10 text-gray-400 hover:text-custom-main"
-        to={`/createGroup`}
-      >
-        새 캘린더 그룹 만들기
+      <Link className="p-4 text-xl text-gray-400 hover:text-custom-main" to={`/createGroup`}>
+        + 새 캘린더 그룹 만들기
       </Link>
     </section>
   );

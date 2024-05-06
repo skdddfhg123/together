@@ -1,35 +1,26 @@
 import React, { useState, useRef } from 'react';
 import * as CALENDAR from '@services/calendarAPI';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCalendarListStore } from '@store/index';
 
 export default function CreateGroupPage() {
   const titleRef = useRef<HTMLInputElement>(null);
-  const [groupType, setGroupType] = useState<'public' | 'private'>('private');
+  const [groupType, setGroupType] = useState<string>('#123456'); //TODO color로 변경?
   const navigate = useNavigate();
-  const setIsLoadedCalendarList = useCalendarListStore((state) => state.setIsLoaded);
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const groupTitle = titleRef.current?.value;
-    if (!groupTitle) {
-      alert('생성할 그룹명을 입력해주세요.');
-      return;
-    }
+    if (!groupTitle) return alert('생성할 그룹명을 입력해주세요.');
 
-    try {
-      const res = await CALENDAR.createGroupCalendar({
-        title: groupTitle,
-        type: groupType,
-      });
-      if (!res) throw new Error('그룹 캘린더 생성 실패');
-      alert('그룹 생성 성공');
-      setIsLoadedCalendarList(false);
-      navigate('/main');
-    } catch (err) {
-      console.error(err);
-    }
+    const res = await CALENDAR.createGroupCalendar({
+      title: groupTitle,
+      type: groupType, //TODO color로 변경?
+    });
+    if (!res) throw new Error('그룹 캘린더 생성 실패');
+
+    alert('그룹 생성 성공');
+    navigate('/main');
   };
 
   return (
@@ -37,7 +28,7 @@ export default function CreateGroupPage() {
       <h1 className={`m-10`}>캘린더 만들기 페이지</h1>
       <form className="h-5/6 flex flex-col items-center justify-center" onSubmit={submitForm}>
         <fieldset className={`flex flex-col items-center`}>
-          <section className={`w-full mb-5 text-xl flex flex-row justify-center`}>
+          {/* <section className={`w-full mb-5 text-xl flex flex-row justify-center`}>
             <label className={`p-2 mx-4`}>
               <input
                 className={`mr-2`}
@@ -59,9 +50,9 @@ export default function CreateGroupPage() {
               />
               Public
             </label>
-          </section>
+          </section> */}
           <label>
-            <input className={`formInput`} type="text" ref={titleRef} />
+            <input className={`signInput`} type="text" ref={titleRef} />
           </label>
         </fieldset>
         <div className="w-full m-5 flex justify-center">

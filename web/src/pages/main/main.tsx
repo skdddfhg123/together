@@ -4,43 +4,36 @@ import Calendar from '@pages/Calendar/calendar';
 import CalendarList from '@components/Canlendar/CalendarList';
 import UserModal from '@components/User/Profile/UserModal';
 import RightMenuTap from '@components/Menu/RightMenuTap';
-import { useToggle } from '@hooks/useToggle';
+import useToggle from '@hooks/useToggle';
 
 import * as KAKAO from '@services/KakaoAPI';
 import * as USER from '@services/userAPI';
-import { useNowCalendarStore, useSocialEventStore, useUserInfoStore } from '@store/index';
 import menuImg from '@assets/calendar_menu.webp';
 import syncImg from '@assets/sync.png';
 
 import '@styles/main.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const { isOn, toggle } = useToggle(false);
 
-  const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
-  const setNowCalendarId = useNowCalendarStore((state) => state.setNowCalendar);
-
   const getUserAndCalendar = useCallback(async () => {
-    try {
-      const userInfo = await USER.getInfo();
-      if (!userInfo) throw new Error('유저 정보 받아오기 실패');
-      console.log(`userInfo Store : `, userInfo);
+    const res = await USER.setUserInfo();
+    if (!res) navigate('/signin');
+  }, []);
 
-      setUserInfo(userInfo);
-      // 여기서 바로 nowCalendarId 설정
-      if (userInfo.userCalendarId) {
-        setNowCalendarId(userInfo.userCalendarId);
-        console.log(`현재 보고있는 캘린더`, userInfo.userCalendarId); //debug//
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, [setUserInfo, setNowCalendarId]);
+  const getSocialEvents = useCallback(async () => {
+    await KAKAO.GetEvents();
+    // ***************TODO 구글 및 outlook API 등록 필요
+
+    getUserAndCalendar();
+  }, []);
 
   useEffect(() => {
     getUserAndCalendar();
-  }, [getUserAndCalendar]);
+  }, []);
 
   const prevCalendar = (): void => {
     setCurrentMonth(
@@ -53,15 +46,6 @@ export default function MainPage() {
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, currentMonth.getDate()),
     );
   };
-
-  const getSocialEvents = useCallback(async () => {
-    try {
-      const kakaoEvents = await KAKAO.GetEvents();
-      if (!kakaoEvents) throw new Error('카카오 일정 받아오기 실패');
-    } catch (e) {
-      console.error('Failed to fetch social events:', e); //debug//
-    }
-  }, [KAKAO, useSocialEventStore]);
 
   return (
     <>

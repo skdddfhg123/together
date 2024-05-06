@@ -1,53 +1,33 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AxiosError } from 'axios';
 
 import SignUp from '@components/User/SignUp';
 import SignIn from '@components/User/SignIn';
-import { useToggle } from '@hooks/useToggle';
+import useToggle from '@hooks/useToggle';
 
 import * as USER from '@services/userAPI';
-import { SignUpForm, SignInForm, ErrorResponse } from '@type/index';
-import { useUserInfoStore } from '@store/index';
+import { SignUpForm, SignInForm } from '@type/index';
 
 export default function LogInPage() {
   const navigate = useNavigate();
   const { isOn, toggle } = useToggle(false);
-  const setUserInfo = useUserInfoStore((state) => state.setUserInfo);
 
   const handleLogIn = async (formData: SignInForm) => {
-    try {
-      await USER.logIn(formData);
-      alert('로그인 성공');
-      navigate('/main');
-    } catch (e) {
-      const err = e as AxiosError;
-      if (err.response) {
-        const data = err.response.data as ErrorResponse;
-        console.log(data); //debug//
-        alert(data.message);
-        return;
-      }
-    }
+    const res = await USER.logIn(formData);
+    if (!res) return;
+    alert('로그인 성공');
+    navigate('/main');
   };
 
   const handleSingUp = async (formData: SignUpForm) => {
-    try {
-      await USER.signUp(formData);
-    } catch (e) {
-      const err = e as AxiosError;
-      if (err.response) {
-        const data = err.response.data as ErrorResponse;
-        console.log(data); //debug//
-        alert(data.message);
-      }
-    }
+    const res = await USER.signUp(formData);
+    if (!res) return;
     alert('정상적으로 가입되었습니다! ');
     toggle();
   };
 
   return (
-    <div className="h-160 w-3/5 flex flex-col mx-auto items-center justify-center">
+    <div className="h-full w-3/5 mt-28 flex flex-col mx-auto items-center justify-center">
       <section>
         <button id="singin" onClick={toggle}>
           {isOn ? '로그인으로' : '회원가입으로'}

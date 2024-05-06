@@ -43,8 +43,18 @@ declare global {
     resultArray: KakaoEvent[];
     accessTokenCheck: string;
   }
+
+  interface KakaoResponse {
+    data?: object;
+  }
+
+  interface KakaoLogoutResponse extends KakaoResponse {
+    id?: string;
+  }
+
   interface KakaoErrorResponse {
     msg?: string;
+    code?: number;
   }
 
   interface Window {

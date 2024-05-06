@@ -1,10 +1,8 @@
 import * as API from '@utils/api';
 import axios, { AxiosError } from 'axios';
 
-import { transToKorDate } from '@utils/dateTranslate';
 import { setCookie, getCookie, deleteCookie } from '@utils/cookie';
-import { useSocialEventStore } from '@store/index';
-import { Cookie, SocialEvent } from '@type/index';
+import { Cookie } from '@type/index';
 
 const headrOptions = {
   headers: {
@@ -14,14 +12,19 @@ const headrOptions = {
 
 async function LogIn() {
   try {
-    const res = window.Kakao.Auth.authorize({
+    const { data: res } = window.Kakao.Auth.authorize({
       redirectUri: process.env.REACT_APP_REDIRECT_URI,
       // prompt: 'select_account',
     });
-    if (!res) throw new Error('로그인 실패');
+    if (!res) throw new Error('kakao API - 로그인 실패');
+
+    console.log(`KAKAO - LogIn 성공 :`, res); //debug//
     alert('카카오톡 로그인 성공');
+
+    return true;
   } catch (err) {
-    console.error(`로그인 에러 : `, err); //debug//
+    const e = err as AxiosError<KakaoErrorResponse>;
+    console.log(`KAKAO - LogIn 실패:`, e); //debug//
   }
 }
 
@@ -29,8 +32,8 @@ async function getToken() {
   try {
     const AUTHORIZATION_CODE = new URL(window.location.href).searchParams.get('code');
 
-    if (window.Kakao.Auth.getAccessToken()) return console.log('find kakako Token'); //debug//
-    if (!AUTHORIZATION_CODE) return console.log('Authorization code not found.'); //debug//
+    if (window.Kakao.Auth.getAccessToken()) return console.log('KAKAO - getToken : 토큰 존재'); //debug//
+    if (!AUTHORIZATION_CODE) return console.log('KAKAO getToken : 인가 코드가 없습니다.'); //debug//
 
     const getTokenURL = `https://kauth.kakao.com/oauth/token`;
     const reqTokenData: reqTokenData = {
@@ -46,18 +49,18 @@ async function getToken() {
       reqTokenData,
       headrOptions,
     );
+    if (!getToken) throw new Error(`kakao API - 토큰 받아오기 실패`);
+    console.log(`KAKAO - getToken :`, getToken); //debug//
 
-    console.log(`kakaoAPI - getToken =`, getToken); //debug//
-
-    const saveTokenRes = await API.post(`/kakao/save/token`, {
+    const res = await API.post(`/kakao/save/token`, {
       kakaoAccessToken: getToken.access_token,
       kakaoRefreshToken: getToken.refresh_token,
     });
 
-    if (!saveTokenRes) throw new Error('Refresh Token Registration Failed');
-    console.log(`kakaoAPI - saveToken`, saveTokenRes); //debug//
+    if (!res) throw new Error('KAKAO - getToken (토큰 DB 저장 실패)');
+    console.log(`KAKAO - getToken ( post ) : `, res.status); //debug//
 
-    window.Kakao.Auth.setAccessToken(getToken.access_token, false);
+    window.Kakao.Auth.setAccessToken(getToken.access_token, true);
     const kakaoToken: Cookie = {
       name: 'kakaoToken',
       value: getToken.access_token,
@@ -70,40 +73,53 @@ async function getToken() {
     };
 
     setCookie(kakaoToken);
+
+    return true;
   } catch (err) {
     console.error(err); //debug//
   }
 }
 
 async function LogOut() {
-  window.Kakao.Auth.logout()
-    .then((res: unknown) => {
-      deleteCookie(`kakaoToken`);
-      console.log(res); //debug//
-      alert(`로그아웃 완료`);
-    })
-    .catch(function () {
+  try {
+    const res = window.Kakao.Auth.logout();
+    if (!res) throw new Error('kakao API - 연동 해제 및 로그아웃 실패');
+    console.log(`KAKAO - Logout 성공 : `, res.id); //debug//
+
+    deleteCookie(`kakaoToken`);
+
+    return true;
+  } catch (err) {
+    const e = err as KakaoErrorResponse;
+    console.log(`KAKAO - Logout 실패 :`, e); //debug//
+
+    if (e?.code === -401) {
       alert('로그인 정보가 없습니다.');
-    });
+    }
+  }
 }
 
 async function GetInfo() {
   try {
-    const res = await axios.get('https://kapi.kakao.com/v2/user/me', {
+    const { data: res } = await axios.get('https://kapi.kakao.com/v2/user/me', {
       headers: {
         Authorization: `Bearer ${window.Kakao.Auth.getAccessToken()}`,
       },
     });
-    alert(`받아오기 성공`);
-    console.log(`Kakao User`, res.data); // debug//
-  } catch (error) {
-    const err = error as AxiosError<KakaoErrorResponse>;
-    if (err.response?.status === 401) {
-      console.error(`토큰 유효 정보 없음:`, err.response); //debug//
+    if (!res) throw new Error('kakao API - 유저 정보 받아오기 실패');
+    console.log(`KAKAO.getInfo - 성공 : `, res); // debug//
+
+    alert(`카카오 유저 정보를 받아왔습니다.`);
+
+    return true;
+  } catch (err) {
+    const e = err as AxiosError<KakaoErrorResponse>;
+    console.error('KAKAO.getInfo - 실패 :', e); //debug//
+
+    if (e.response?.status === 401) {
       alert(`로그인을 먼저 해주세요.`);
     } else {
-      console.error(`유저 정보 받아오기 실패 :`, err); //debug//
-      alert(`카카오톡 유저정보를 받아오지 못했습니다.`);
+      alert(`카카오톡 유저 정보를 받아오지 못했습니다.`);
     }
   }
 }
@@ -116,6 +132,9 @@ async function GetEvents() {
       const { data: res }: { data: KakaoEventsAndToken } = await API.post('/kakao/get/calendar', {
         kakaoAccessToken: null,
       });
+      if (!res) throw new Error('KAKAO - GetEvents (카카오 일정 DB 저장 실패)');
+
+      console.log(`Kakao API - 토큰을 생성합니다.`); //debug//
 
       const kakaoToken: Cookie = {
         name: 'kakaoToken',
@@ -129,51 +148,23 @@ async function GetEvents() {
       };
       setCookie(kakaoToken);
 
-      const eventLists = res.resultArray.map(
-        (event: KakaoEvent): SocialEvent => ({
-          title: event.title || '카카오 일정',
-          startAt: transToKorDate(event.startAt, 9),
-          endAt: transToKorDate(event.endAt, 9),
-          isPast: event.deactivatedAt,
-          userCalendarId: event.userCalendar?.userCalendarId,
-          social: event.social,
-          socialEventId: event.socialEventId,
-        }),
-      );
-      useSocialEventStore.getState().setSocialEvents(eventLists);
-      console.log(`eventLists`, eventLists);
-
-      return useSocialEventStore.getState();
+      return res;
     } else {
       const { data: res }: { data: KakaoEventsAndToken } = await API.post('/kakao/get/calendar', {
         kakaoAccessToken: getCookie('kakaoToken'),
       });
+      if (!res) throw new Error('KAKAO - GetEvents (카카오 일정 DB 저장 실패)');
 
-      console.log(`받아온 일정`, res.resultArray);
+      console.log(`Kakao API - 토큰이 이미 존재합니다.`); //debug//
 
-      const eventLists = res.resultArray.map(
-        (event: KakaoEvent): SocialEvent => ({
-          title: event.title || '카카오 일정',
-          startAt: transToKorDate(event.startAt, 9),
-          endAt: transToKorDate(event.endAt, 9),
-          isPast: event.deactivatedAt,
-          userCalendarId: event.userCalendar?.userCalendarId,
-          social: event.social,
-          socialEventId: event.socialEventId,
-        }),
-      );
-      useSocialEventStore.getState().setSocialEvents(eventLists);
-      console.log(`eventLists`, eventLists);
-
-      return useSocialEventStore.getState();
+      return res;
     }
   } catch (error) {
     const err = error as AxiosError;
-    if (err.response?.status === 401) {
+    console.error(`KAKAO - GetEvents 실패 :`, err); //debug//
+
+    if (err.response?.status === 401)
       alert('카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
-    } else {
-      console.error(`이벤트 받아오기 실패 :`, error); //debug//
-    }
   }
 }
 

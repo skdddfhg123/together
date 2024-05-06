@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Modal from 'react-modal';
 import { format } from 'date-fns';
 
+import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
 import * as CALENDAR from '@services/calendarAPI';
-import { reqGroupEvent, useNowCalendarStore } from '@store/index';
+import { reqGroupEventStore, useNowCalendarStore } from '@store/index';
 
 interface EventModalProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ interface EventModalProps {
   position: { x: number; y: number };
 }
 
-export default function EventModal({
+export default React.memo(function EventModal({
   isOpen,
   onClose,
   selectedDay,
@@ -21,60 +22,33 @@ export default function EventModal({
   position,
 }: EventModalProps) {
   const titleRef = useRef<HTMLInputElement>(null);
-  const [modalStyle, setModalStyle] = useState({});
+  const [modalStyle, setModalStyle] = useState<React.CSSProperties>({});
   const groupCalendarId = useNowCalendarStore((state) => state.nowCalendar);
 
-  useEffect(() => {
-    const updateModalStyle = () => {
-      const modalWidth = 384;
-      const modalHeight = 80;
-      const newX = Math.max(10, Math.min(position.x - 100, window.innerWidth - modalWidth - 10));
-      const newY = Math.max(10, Math.min(position.y + 50, window.innerHeight - modalHeight - 10));
-
-      setModalStyle({
-        top: `${newY}px`,
-        left: `${newX}px`,
-      });
-    };
-
-    window.addEventListener('resize', updateModalStyle);
-    updateModalStyle();
-
-    return () => {
-      window.removeEventListener('resize', updateModalStyle);
-    };
-  }, [position, window.innerWidth]);
+  useUpdateModalStyle({ position, setModalStyle });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    console.log(`일정 생성할 groupCalendarId`, groupCalendarId); //debug//
     const title = titleRef.current?.value;
-    if (!title) return alert('등록할 일정 제목을 작성해주세요.');
-    if (!selectedDay) return console.log('선택된 날이 없습니다.'); //debug//
-    if (!groupCalendarId) return console.log('등록할 수 있는 그룹 캘린더 아이디가 없습니다.'); //debug//
 
-    const eventData: reqGroupEvent = {
+    if (!title) return alert('등록할 일정 제목을 작성해주세요.');
+    if (!selectedDay) return alert('선택된 날이 없습니다.');
+    if (!groupCalendarId) return alert('그룹 리스트에서 일정을 등록할 그룹을 선택해주세요');
+    if (!userCalendarId) return alert('새로고침 후 다시 시도해주세요.');
+
+    const eventData: reqGroupEventStore = {
       groupCalendarId,
       title,
-      author: userCalendarId || 'defaultUserId',
+      author: userCalendarId,
       startAt: format(selectedDay, 'yyyy-MM-dd'),
       endAt: format(selectedDay, 'yyyy-MM-dd'),
-      emails: [] as string[],
-      color: 'blue',
     };
 
-    try {
-      const res = await CALENDAR.createGroupEvent(eventData);
-      console.log(`일정 등록 response`, res.data);
+    const res = await CALENDAR.createGroupEvent(eventData);
+    if (res) {
       await CALENDAR.getCalEvents(groupCalendarId);
-      onClose();
-      console.log('일정 등록 성공'); //debug//
-    } catch (error) {
-      alert('일정을 등록하지 못했습니다.');
-      console.error('일정 등록 실패', error); //debug//
-      onClose();
     }
+    onClose();
   };
 
   return (
@@ -98,7 +72,7 @@ export default function EventModal({
         },
       }}
     >
-      <form onSubmit={handleSubmit} className="w-full flex justify-between items-center p-3">
+      <form onSubmit={handleSubmit} className="w-full px-3 flex justify-between items-center">
         <input
           className="w-5/6 p-1 mr-3 border rounded"
           type="text"
@@ -111,4 +85,4 @@ export default function EventModal({
       </form>
     </Modal>
   );
-}
+});

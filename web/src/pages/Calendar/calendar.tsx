@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { isSameDay, startOfMonth, endOfMonth, addDays } from 'date-fns';
+import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
 
 import EventModal from '@components/Canlendar/EventModal';
 import EventDetails from '@components/Canlendar/EventDetails';
@@ -7,7 +7,7 @@ import * as CALENDAR from '@services/calendarAPI';
 import {
   useGroupEventStore,
   useNowCalendarStore,
-  useSetDayStore,
+  useSelectedDayStore,
   useSocialEventStore,
   useUserInfoStore,
 } from '@store/index';
@@ -25,47 +25,51 @@ export default React.memo(function CalendarPage({
   isNextMonth,
   currentMonth,
 }: CalendarProps) {
-  const { selectedDay, setSelectedDay } = useSetDayStore((state) => ({
+  const { selectedDay, setSelectedDay } = useSelectedDayStore((state) => ({
     selectedDay: state.selectedDay,
     setSelectedDay: state.setSelectedDay,
   }));
+
   const socialEvents = useSocialEventStore((state) => state.socialEvents);
   const groupEvents = useGroupEventStore((state) => state.groupEvents);
-
-  const userCalendarId = useUserInfoStore((state) => state.userInfo?.userCalendarId || null);
+  const userCalendarId = useUserInfoStore(
+    (state) => state.userInfo?.userCalendarId?.userCalendarId || null,
+  );
   const nowCalendarId = useNowCalendarStore((state) => state.nowCalendar);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
-
-  const [detailsOn, setDetailsOn] = useState<boolean>(false);
-  const [groupEventId, setGroupEventId] = useState<string | null>(null);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // *****************? 특정 일자 이벤트 등록 Modal
+  const [eventModalOn, setEventModalOn] = useState<boolean>(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
+
+  // *****************? 등록된 그룹 이벤트의 세부 slide-bar
+  const [detailsOn, setDetailsOn] = useState<boolean>(false);
+  const [groupEventId, setGroupEventId] = useState<string | null>(null);
+
+  // *****************? 최초 달력 일정 Rendering
   useEffect(() => {
-    if (nowCalendarId) {
-      CALENDAR.getCalEvents(nowCalendarId).catch(console.error);
-    }
+    if (!nowCalendarId) return;
+
+    if (nowCalendarId === 'All') return console.log('전체 일정 그리기');
+    CALENDAR.getCalEvents(nowCalendarId).catch(console.error);
   }, [nowCalendarId]);
 
+  // *****************? 더블 클릭으로 이벤트 등록 Modal 띄움
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
     const rect = e.currentTarget.getBoundingClientRect();
     setModalPosition({ x: rect.left, y: rect.top });
 
     if (selectedDay && isSameDay(day, selectedDay)) {
-      setModalIsOpen(!modalIsOpen);
+      setEventModalOn(!eventModalOn);
     } else {
       setSelectedDay(day);
-      setModalIsOpen(false);
+      setEventModalOn(false);
     }
   };
 
-  const detailsClose = useCallback(() => {
-    setDetailsOn(false);
-  }, []);
-
-  const handleDetails = (evnetId: string, e: React.MouseEvent<HTMLDivElement>) => {
+  const handleDetails = (evnetId: string, e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
 
     if (!groupEventId || evnetId !== groupEventId) {
@@ -77,6 +81,16 @@ export default React.memo(function CalendarPage({
     }
   };
 
+  // *****************? 자식컴포넌트 전달을 위한 callback 최적화
+  const eventModalClose = useCallback(() => {
+    setEventModalOn(false);
+  }, []);
+
+  const detailsClose = useCallback(() => {
+    setDetailsOn(false);
+  }, []);
+
+  // *****************? 달력 생성 Logic
   const buildCalendarDays = () => {
     const firstDayOfMonth = startOfMonth(currentMonth);
     const lastDayOfMonth = endOfMonth(currentMonth);
@@ -98,52 +112,50 @@ export default React.memo(function CalendarPage({
     return days;
   };
 
+  // *****************? 세부 일정 및 이벤트 생성 Logic
   const buildCalendarTag = (calendarDays: Date[]) => {
     const eventMap = new Map<string, JSX.Element[]>();
 
+    // ************* 소셜 이벤트 생성
     socialEvents.forEach((event) => {
-      const eventDate = event.startAt.split('T')[0];
+      const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
       const existingEvents = eventMap.get(eventDate) || [];
       existingEvents.push(
-        <div className="kakao-title" key={existingEvents.length}>
-          {event.title || 'No Title'}
-        </div>,
+        <li className="social-title" key={existingEvents.length}>
+          {event.title || 'NO-TITLE'}
+        </li>,
       );
       eventMap.set(eventDate, existingEvents);
     });
 
+    // ************* 그룹 이벤트 생성
     groupEvents.forEach((event) => {
-      const eventDate = event.startAt.split('T')[0];
+      const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
       const existingEvents = eventMap.get(eventDate) || [];
       existingEvents.push(
-        <div
+        <li
           onMouseEnter={(e) => e.stopPropagation()}
           onMouseLeave={(e) => e.stopPropagation()}
           onClick={(e) => handleDetails(event.groupEventId, e)}
-          className="group-event rounded transform transition duration-300 hover:shadow-lg hover:-translate-y-1"
+          className="group-event"
           style={{ backgroundColor: `${event.color === 'blue' ? '#0086FF' : '${event.color}'}` }}
           key={event.groupEventId}
         >
           {event.title || 'No Title'}
-        </div>,
+        </li>,
       );
       eventMap.set(eventDate, existingEvents);
     });
 
     return calendarDays.map((day: Date, i: number) => {
-      const localDayKey = [
-        day.getFullYear(),
-        ('0' + (day.getMonth() + 1)).slice(-2),
-        ('0' + day.getDate()).slice(-2),
-      ].join('-');
-
+      const localDayKey = format(day, 'yyyy-MM-dd');
       const eventElements = eventMap.get(localDayKey) || [];
 
       if (day.getMonth() < currentMonth.getMonth()) {
         return (
           <td key={i} className="prevMonthDay">
             <div>{isPrevMonth ? day.getDate() : ''}</div>
-            {eventElements}
+            <ul id="event-box">{eventElements}</ul>
           </td>
         );
       }
@@ -151,7 +163,7 @@ export default React.memo(function CalendarPage({
         return (
           <td key={i} className="nextMonthDay">
             <div>{isNextMonth ? day.getDate() : ''}</div>
-            {eventElements}
+            <ul id="event-box">{eventElements}</ul>
           </td>
         );
       }
@@ -165,7 +177,7 @@ export default React.memo(function CalendarPage({
       return (
         <td key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
           <div className="day">{day.getDate()}</div>
-          {eventElements}
+          <ul id="event-box">{eventElements}</ul>
         </td>
       );
     });
@@ -203,8 +215,8 @@ export default React.memo(function CalendarPage({
       </table>
       <EventDetails isOpen={detailsOn} eventId={groupEventId} onClose={detailsClose} />
       <EventModal
-        isOpen={modalIsOpen}
-        onClose={() => setModalIsOpen(false)}
+        isOpen={eventModalOn}
+        onClose={eventModalClose}
         selectedDay={selectedDay}
         userCalendarId={userCalendarId}
         position={modalPosition}
