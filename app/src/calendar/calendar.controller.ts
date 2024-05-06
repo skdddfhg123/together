@@ -129,12 +129,12 @@ export class CalendarController {
         return await this.groupEventService.getAllGroupEventsByCalendarId(calendarid);
     }
 
-    @Get('group/get/:groupeventid')
+    @Get('group/get/:groupeventId')
     @ApiOperation({ summary: '특정 그룹 이벤트 가져오기' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async getGroupEventUpdateForm(
-        @Param('groupeventid') groupEventId: string,
+        @Param('groupeventId') groupEventId: string,
     ): Promise<GroupEvent>{
         return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
     }

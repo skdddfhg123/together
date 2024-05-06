@@ -1,3 +1,4 @@
+process.env.TZ = 'UTC';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -20,7 +21,7 @@ async function bootstrap() {
     .addTag('test')
     .addBearerAuth(
       {
-        type: "http",
+        type: "http", 
         scheme: "bearer",
         bearerFormat: "JWT",
         name: "JWT",

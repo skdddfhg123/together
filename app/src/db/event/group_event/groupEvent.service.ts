@@ -25,9 +25,9 @@ export class GroupEventService {
         private readonly groupEventRepository: Repository<GroupEvent>,
         @ InjectRepository(Calendar)
         private readonly calendarRepository: Repository<Calendar>,
-        private userService: UserService,
-        private calendarService: CalendarService,
-        private userCalendarService: UserCalendarService,
+        // private userService: UserService,
+        // private calendarService: CalendarService,
+        // private userCalendarService: UserCalendarService,
     ) {}
 
     async createGroupEvent(

@@ -16,6 +16,12 @@ import { GroupEventModule } from './db/event/group_event/groupEvent.module';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
 import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
+import { FeedModule } from './feed/feed.module';
+import { UserCalendarModule } from './db/user_calendar/userCalendar.module';
+import { FeedCommentModule } from './db/comment/comment.module';
+import { AwsModule } from './image.upload/aws.s3/aws.module';
+import { ImageModule } from './image.upload/image.module';
+import { UtilsModule } from './image.upload/aws.s3/utils/utils.module';
 
 @Module({
   imports: [
@@ -31,6 +37,8 @@ import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
       port: parseInt(process.env.REDIS_PORT),
       password: process.env.REDIS_PASS,
     }),
+    AwsModule,
+    UtilsModule,
     UserModule,
     AuthModule,
     
@@ -39,6 +47,10 @@ import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
     CalendarModule,
     GroupEventModule,
     SocialEventModule,
+    UserCalendarModule,
+    FeedModule,
+    FeedCommentModule,
+    ImageModule,
   ],
   controllers: [RedisController],
   providers: [RedisService, DiscordBotService],

@@ -12,14 +12,18 @@ import { UserService } from 'src/db/user/user.service';
 import { CalendarService } from 'src/calendar/calendar.service';
 
 
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([GroupEvent, User, UserCalendar, Calendar]),
-    UserModule,
-    UserCalendarModule,
+    //UserModule,
+    //UserCalendarModule,
     //CalendarModule,
   ],
-  providers: [GroupEventService, UserService, CalendarService],
+  providers: [GroupEventService,
+      //UserService,
+      //CalendarService
+    ],
   exports: [GroupEventService]
 
 })

@@ -1,7 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
+import { FeedComment } from "src/db/comment/entities/comment.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { Feed } from "src/feed/entities/feed.entity";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity()
 @Unique(['useremail', 'nickname'])
@@ -52,7 +54,9 @@ export class User extends BaseEntity{
     @JoinColumn({ name: 'userCalendarId' })
     userCalendarId: UserCalendar
 
-    // Relation
-    //@OneToMany(type => Board, board => board.user, {eager : true})
-    //boards: Board[]
+    @OneToMany(()=> Feed, feed => feed.user)
+    feeds: Feed[];
+
+    @OneToMany(() => FeedComment, FeedComment => FeedComment.user)
+    feedComments: FeedComment[];
 }
