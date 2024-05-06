@@ -27,6 +27,15 @@ class CalendarCreateApiService {
 
   // 캘린더 생성 함수
   Future<Calendar?> createCalendar(String title, Color color) async {
+    // 토큰이 없다면 로드
+    if (_token == null) {
+      await _loadToken();
+      if (_token == null) {
+        print('Token is still not loaded.');
+        return null;
+      }
+    }
+
     try {
       print('_token : $_token');
       final response = await http.post(
