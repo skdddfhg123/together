@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Calendar } from './entities/calendar.entity';
 import { Repository } from 'typeorm';
@@ -81,9 +81,7 @@ export class CalendarService {
             const calendars = await this.calendarRepository
                 .createQueryBuilder("calendar")
                 .leftJoinAndSelect("calendar.author", "author")
-                .where("author.userCalendarId = :userCalendarId", { userCalendarId })
-                .andWhere("calendar.isDeleted = false")
-                .orWhere(":userCalendarId = ANY(calendar.attendees)", { userCalendarId })
+                .whereInIds([userCalendarId])
                 .andWhere("calendar.isDeleted = false")
                 .getMany();
 

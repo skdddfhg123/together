@@ -14,7 +14,9 @@ import { DataSource } from 'typeorm';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
-import { AwsModule } from './aws/aws.module';
+import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
+import { FeedModule } from './feed/feed.module';
+import { ImageModule } from './image.upload/image.module';
 
 @Module({
   imports: [
@@ -35,7 +37,10 @@ import { AwsModule } from './aws/aws.module';
     CalendarModule,
     GoogleModule,
     KakaoModule,
-    AwsModule,
+    CalendarModule,
+    SocialEventModule,
+    FeedModule,
+    ImageModule,
   ],
   controllers: [RedisController],
   providers: [RedisService, DiscordBotService],

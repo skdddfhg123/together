@@ -1,5 +1,6 @@
 import { Calendar } from 'src/calendar/entities/calendar.entity';
-import { Entity, Column, ManyToOne, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import { Feed } from 'src/feed/entities/feed.entity';
+import { Entity, Column, ManyToOne, JoinColumn, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeleteDateColumn, OneToMany } from 'typeorm';
 
 @Entity('group_event')
 export class GroupEvent {
@@ -47,4 +48,7 @@ export class GroupEvent {
 
     @Column({ default: false })
     isDeleted: boolean;
+
+    @OneToMany(() => Feed, (feed) => feed.groupEventId)
+    feeds: string[]
 }

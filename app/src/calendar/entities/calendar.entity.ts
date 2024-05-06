@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString } from "class-validator";
+import { Emoji } from "src/emoji/entities/emoji.entity";
 import { GroupEvent } from "src/db/event/group_event/entities/groupEvent.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -49,4 +50,8 @@ export class Calendar {
 
     @Column({ default: false })
     isDeleted: boolean;
+
+    @OneToMany(() => Emoji, emoji => emoji.calendar)
+    emojis: Emoji[];
+
 }

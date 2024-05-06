@@ -12,11 +12,11 @@ import { TokensService } from '../tokens/tokens.service';
 export class UserService {
 
     constructor(
-        @ InjectRepository(User)
+        @InjectRepository(User)
         private readonly userRepository: Repository<User>,
 
         private readonly tokensService: TokensService
-    ) {}
+    ) { }
 
     async signUp(userDTO: CreateUserDTO): Promise<User> {
         const existingEmail = await this.userRepository.findOne({ where: { useremail: userDTO.useremail } });
@@ -47,13 +47,13 @@ export class UserService {
             refreshTokenUser.user = savedUser;
 
             const tokens = await this.tokensService.saveTokenUser(accessTokenUser, refreshTokenUser)
-            await this.userRepository.update(savedUser.userId, {accessToken: tokens[0], refreshToken: tokens[1]})
-            
+            await this.userRepository.update(savedUser.userId, { accessToken: tokens[0], refreshToken: tokens[1] })
+
             return savedUser;
         } catch (e) {
             throw new InternalServerErrorException('Failed to create user');
         }
-    } 
+    }
 
     async findOne(data: Partial<User>): Promise<User> {
         const user = await this.userRepository.findOneBy({ useremail: data.useremail });
