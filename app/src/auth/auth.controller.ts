@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './strategy/jwt.guard';
 import { getPayload } from './getPayload.decorator';
 import { RefreshStrategy } from './strategy/refresh.strategy';
 import { RefreshAuthGuard } from './strategy/refresh.guard';
+import { ApiOperation } from '@nestjs/swagger';
 
 @ApiTags("auth")
 @Controller('auth')
@@ -39,19 +40,20 @@ export class AuthController {
     }
   }
 
-  @ApiResponse({
-    status: 201,
-    description: '성공 시 해당 response 반환',
-    type: LoginDTO
-  })
+  @ApiResponse({ status: 201, description: 'Successfully logged in', type: LoginDTO })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @Post('login')
-  login(
-    @Body(ValidationPipe) loginDTO: LoginDTO): Promise<{ accessToken: string, refreshToken: string }> {
+  async login(
+    @Body(ValidationPipe) loginDTO: LoginDTO,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     return this.authService.login(loginDTO);
   }
 
   @ApiBearerAuth('JWT-auth')
-  @ApiResponse({ status: 201, description: '성공 시 해당 response 반환' })
+  @ApiResponse({ status: 200, description: 'Successfully retrieved user data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @Get('all')
   @UseGuards(JwtAuthGuard)
   GetAllByToken(
@@ -61,7 +63,9 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
-  @ApiResponse({ status: 201, description: '성공 시 해당 response 반환' })
+  @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   @Get('all/:userCalendarId')
   @UseGuards(JwtAuthGuard)
   GetAllByUCId(
@@ -77,9 +81,6 @@ export class AuthController {
   tokenTest(
     @getPayload() payload: PayloadResponse,
   ): any {
-    console.log("1111111")
-    // console.log(payload);
-    // console.log(req.cookie)
     return payload;
   }
 }

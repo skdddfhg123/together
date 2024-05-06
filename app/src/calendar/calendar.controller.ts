@@ -18,8 +18,8 @@ import { RefreshAuthGuard } from 'src/auth/strategy/refresh.guard';
 export class CalendarController {
     constructor(
         private calendarService: CalendarService,
-        private groupEventService : GroupEventService,
-    ) {}
+        private groupEventService: GroupEventService,
+    ) { }
 
     @Post('create')
     @ApiOperation({ summary: '그룹 캘린더 생성' })
@@ -30,8 +30,8 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async createGroupCalendar(
-      @Body() calendarCreateDto: CalendarCreateDto,
-      @getPayload() payload: PayloadResponse
+        @Body() calendarCreateDto: CalendarCreateDto,
+        @getPayload() payload: PayloadResponse
     ): Promise<Calendar> {
         return await this.calendarService.createGroupCalendar(calendarCreateDto, payload);
     }
@@ -107,7 +107,7 @@ export class CalendarController {
     ): Promise<string> {
         return this.calendarService.removeAttendeeFromCalendar(calendarId, payload.userCalendarId);
     }
-    
+
     @Post('group/create/:calendarId')
     @ApiOperation({ summary: '그룹 이벤트 만들기' })
     @ApiResponse({ status: 201, description: 'GroupEvent added successfully' })
@@ -118,10 +118,10 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async createGroupEvent(
-         @Body() groupEventDTO: CreateGroupEventDTO,
-         @getPayload() payload: PayloadResponse,
-         @Param('calendarId') calendarId: string 
-    ): Promise<GroupEvent>{
+        @Body() groupEventDTO: CreateGroupEventDTO,
+        @getPayload() payload: PayloadResponse,
+        @Param('calendarId') calendarId: string
+    ): Promise<GroupEvent> {
         return await this.groupEventService.createGroupEvent(groupEventDTO, payload, calendarId);
     }
 
@@ -134,7 +134,7 @@ export class CalendarController {
     // @UseGuards(RefreshAuthGuard)
     async getAllGroupEvent(
         @Param('calendarId') calendarId: string,
-    ): Promise<GroupEvent[]>{
+    ): Promise<GroupEvent[]> {
         console.log(calendarId);
         return await this.groupEventService.getAllGroupEventsByCalendarId(calendarId);
     }
@@ -146,7 +146,7 @@ export class CalendarController {
     // @UseGuards(RefreshAuthGuard)
     async getGroupEventUpdateForm(
         @Param('groupeventId') groupEventId: string,
-    ): Promise<GroupEvent>{
+    ): Promise<GroupEvent> {
         return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
     }
 
@@ -159,10 +159,10 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async updateGroupEvent(
-        @Param('groupeventId') groupEventId: string, 
+        @Param('groupeventId') groupEventId: string,
         @Body() groupEventDTO: UpdateGroupEventDTO
     ): Promise<GroupEvent> {
-            return await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
+        return await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
     }
 
     @Patch('group/remove/:groupeventId')

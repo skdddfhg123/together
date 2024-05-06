@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/db/user/user.service';
@@ -33,22 +33,26 @@ export class AuthService {
     }
 
     async login(loginDTO: LoginDTO): Promise<{ accessToken: string, refreshToken: string }> {
-        const user = await this.userService.findOne(loginDTO);
+        try {
+            const user = await this.userService.findOne(loginDTO);
 
-        if (!user) {
-            throw new UnauthorizedException("User not found");
-        }
+            if (!user) {
+                throw new UnauthorizedException("User not found");
+            }
 
-        const passwordMatched = await bcrypt.compare(loginDTO.password, user.password);
+            const passwordMatched = await bcrypt.compare(loginDTO.password, user.password);
 
-        if (passwordMatched) {
+            if (!passwordMatched) {
+                throw new UnauthorizedException("Password does not match");
+            }
+
             // userCalendar 정보를 가져오는 로직 추가 (가정)
             const userCalendar = await this.userCalendarService.findCalendarByUserId(user.userId);
 
             const payload = {
                 nickname: user.nickname,
                 useremail: user.useremail,
-                userCalendarId: userCalendar?.userCalendarId
+                userCalendarId: userCalendar?.userCalendarId,
             };
 
             const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
@@ -58,68 +62,90 @@ export class AuthService {
 
             return {
                 accessToken,
-                refreshToken
+                refreshToken,
             };
-        } else {
-            throw new UnauthorizedException("Password does not match");
+
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            } else {
+                throw new InternalServerErrorException("An error occurred during login");
+            }
         }
     }
 
     async GetAllByToken(payload: PayloadResponse): Promise<any> {
+        try {
+            const result = await this.userRepository.createQueryBuilder("user")
+                .select([
+                    "user.useremail",
+                    "user.phone",
+                    "user.nickname",
+                    "user.thumbnail",
+                    "user.registeredAt",
+                    "user.updatedAt",
+                    "user.birthDay",
+                ])
+                .leftJoinAndSelect("user.userCalendarId", "userCalendar")
+                .leftJoin("userCalendar.groupCalendar", "calendar")
+                .addSelect([
+                    "calendar.calendarId",
+                    "calendar.title",
+                    "calendar.coverImage",
+                    "calendar.bannerImage",
+                    "calendar.type",
+                    "calendar.attendees",
+                    "calendar.author",
+                ])
+                .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
+                .leftJoinAndSelect("userCalendar.socialEvents", "socialEvent")
+                .where("user.useremail = :useremail", { useremail: payload.useremail })
+                .getMany();
 
-        const result = await this.userRepository.createQueryBuilder("user")
-            .select([
-                "user.useremail",
-                "user.phone",
-                "user.nickname",
-                "user.thumbnail",
-                "user.registeredAt",
-                "user.updatedAt",
-                "user.birthDay",
-            ])
-            .leftJoinAndSelect("user.userCalendarId", "userCalendar")
-            .leftJoin("userCalendar.groupCalendar", "calendar")
-            .addSelect([
-                "calendar.calendarId",
-                "calendar.title",
-                "calendar.coverImage",
-                "calendar.bannerImage",
-                "calendar.type",
-                "calendar.attendees",
-                "calendar.author",
-            ])
-            .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
-            .leftJoinAndSelect("userCalendar.socialEvents", "socialEvent")
-            .where("user.useremail = :useremail", { useremail: payload.useremail })
-            .getMany();
+            if (!result || result.length === 0) {
+                throw new UnauthorizedException("User not found");
+            }
 
-        if (!result || result.length === 0) {
-            throw new UnauthorizedException("User not found");
+            return result;
+
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            } else {
+                throw new InternalServerErrorException("An error occurred while fetching user data");
+            }
         }
-
-        return result;
     }
 
     async GetAllByUserCalendarId(userCalendarId: string): Promise<any> {
-        const result = await this.userCalendarRepository.createQueryBuilder("userCalendar")
-            .leftJoinAndSelect("userCalendar.user", "user")
-            .select([
-                "user.useremail",
-                "user.nickname",
-            ])
-            .addSelect([
-                "userCalendar.userCalendarId"
-            ])
-            .leftJoinAndSelect("userCalendar.groupCalendar", "calendar")
-            .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
-            .leftJoinAndSelect("userCalendar.socialEvents", "socialEvent")
-            .where("userCalendar.userCalendarId = :userCalendarId", { userCalendarId })
-            .getMany();
+        try {
+            const result = await this.userCalendarRepository.createQueryBuilder("userCalendar")
+                .leftJoinAndSelect("userCalendar.user", "user")
+                .select([
+                    "user.useremail",
+                    "user.nickname",
+                ])
+                .addSelect([
+                    "userCalendar.userCalendarId"
+                ])
+                .leftJoinAndSelect("userCalendar.groupCalendar", "calendar")
+                .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
+                .leftJoinAndSelect("userCalendar.socialEvents", "socialEvent")
+                .where("userCalendar.userCalendarId = :userCalendarId", { userCalendarId })
+                .getMany();
 
-        if (!result || result.length === 0) {
-            throw new UnauthorizedException("UserCalendar not found");
+            if (!result || result.length === 0) {
+                throw new UnauthorizedException("UserCalendar not found");
+            }
+
+            return result;
+
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            } else {
+                throw new InternalServerErrorException("An error occurred while fetching user calendar data");
+            }
         }
-
-        return result;
     }
 }
