@@ -22,11 +22,23 @@ class CustomDrawer extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                const DrawerHeader(
+                DrawerHeader(
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: Colors.blue[200],
                   ),
-                  child: Text('캘린더 목록'),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: const Text('연동 앱 관리'),
+                        trailing: const Icon(Icons.phone_android), // 아이콘 추가
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showSyncLoginPageModal(context);
+                        }, // 클릭 이벤트 핸들러
+                      ),
+                      syncButton(),
+                    ],
+                  ),
                 ),
                 Obx(() => Column(
                       children: List.generate(

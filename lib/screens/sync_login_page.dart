@@ -1,3 +1,4 @@
+import 'package:calendar/api/kakao_auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -63,10 +64,15 @@ class _SyncLoginPageState extends State<SyncLoginPage> {
   }
 
   Future<void> saveToken(SharedPreferences prefs, OAuthToken token) async {
+    final KakaoAuthService kakaoAuthService = Get.find<KakaoAuthService>();
     await prefs.setString('kakaoAccessToken', token.accessToken);
+    String? jwtToken = prefs.getString('token');
     if (token.refreshToken != null) {
       await prefs.setString('kakaoRefreshToken', token.refreshToken!);
     }
+
+    kakaoAuthService.saveTokenToServer(
+        jwtToken!, token.accessToken, token.refreshToken!);
   }
 
   @override

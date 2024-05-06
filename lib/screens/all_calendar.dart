@@ -21,26 +21,11 @@ class AllCalendar extends StatelessWidget {
 
   AllCalendar({super.key, this.onCalendarChanged});
 
-  final KakaoAuthService kakaoAuthService = Get.find<KakaoAuthService>();
   final MeetingController meetingController = Get.find<MeetingController>();
 
   @override
   Widget build(BuildContext context) {
     final eventSelectionController = Get.find<EventSelectionController>();
-
-    void _showSyncLoginPageModal(BuildContext context) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ), // 다이얼로그의 모서리를 둥글게
-            child: SyncLoginPage(), // SyncLoginPage를 다이얼로그 내용으로 사용
-          );
-        },
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -68,50 +53,6 @@ class AllCalendar extends StatelessWidget {
           },
         ),
       ),
-    );
-  }
-
-  Widget syncButton() {
-    return ListTile(
-      title: const Text('동기화 하기'),
-      trailing: const Icon(Icons.sync),
-      onTap: () async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        String? jwtToken = prefs.getString('token');
-        String? accessToken = prefs.getString('kakaoAccessToken');
-        String? refreshToken = prefs.getString('kakaoRefreshToken');
-
-        if (jwtToken != null && accessToken != null) {
-          kakaoAuthService.sendTokensToServer(
-              jwtToken, accessToken, refreshToken);
-        } else {
-          print('No token available for syncing');
-        }
-      },
-    );
-  }
-
-  void showCustomModal(BuildContext context, List<Appointment> appointments) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return ListView.builder(
-          itemCount: appointments.length,
-          itemBuilder: (context, index) {
-            final appointment = appointments[index];
-            return ListTile(
-              title: Text(appointment.subject),
-              subtitle:
-                  Text('${appointment.startTime} - ${appointment.endTime}'),
-              trailing: Container(
-                width: 10,
-                height: 30,
-                color: appointment.color,
-              ),
-            );
-          },
-        );
-      },
     );
   }
 

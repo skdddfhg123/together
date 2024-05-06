@@ -1,8 +1,10 @@
 // dialog_service.dart
 
 import 'package:calendar/api/event_creates_service.dart';
+import 'package:calendar/api/kakao_auth_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
+import 'package:calendar/screens/sync_login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
@@ -118,6 +120,20 @@ class DialogService {
   }
 }
 
+void showSyncLoginPageModal(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ), // 다이얼로그의 모서리를 둥글게
+        child: SyncLoginPage(), // SyncLoginPage를 다이얼로그 내용으로 사용
+      );
+    },
+  );
+}
+
 void showAddCalendarDialog(BuildContext context) {
   final UserCalendarController calendarController =
       Get.find<UserCalendarController>();
@@ -190,6 +206,27 @@ void showAddCalendarDialog(BuildContext context) {
           ),
         ],
       );
+    },
+  );
+}
+
+Widget syncButton() {
+  final KakaoAuthService kakaoAuthService = Get.find<KakaoAuthService>();
+  return ListTile(
+    title: const Text('동기화 하기'),
+    trailing: const Icon(Icons.sync),
+    onTap: () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? jwtToken = prefs.getString('token');
+      String? accessToken = prefs.getString('kakaoAccessToken');
+      String? refreshToken = prefs.getString('kakaoRefreshToken');
+
+      if (jwtToken != null && accessToken != null) {
+        kakaoAuthService.sendTokensToServer(
+            jwtToken, accessToken, refreshToken);
+      } else {
+        print('No token available for syncing');
+      }
     },
   );
 }

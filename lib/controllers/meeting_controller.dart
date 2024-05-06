@@ -41,13 +41,15 @@ class MeetingController extends GetxController {
     update();
   }
 
-  void syncSocialEvents(String jsonData) {
+  void syncSocialEvents(List<dynamic> jsonData) {
     tz.initializeTimeZones(); // 시간대 데이터 초기화
     var seoul = tz.getLocation('Asia/Seoul'); // 서울 시간대 객체 가져오기
 
-    List<dynamic> jsonResponse = json.decode(jsonData);
+    // List<dynamic> jsonResponse = json.decode(jsonData);
+    // List<SocialEvent> events =
+    //     jsonResponse.map((data) => SocialEvent.fromJson(data)).toList();
     List<SocialEvent> events =
-        jsonResponse.map((data) => SocialEvent.fromJson(data)).toList();
+        jsonData.map((data) => SocialEvent.fromJson(data)).toList();
 
     Set<String> newEventCalendarIds =
         events.map((event) => event.userCalendarId).toSet();
