@@ -39,7 +39,7 @@ export default function SignIn({ onSubmit }: SignInProps) {
           EMAIL
         </label>
         <input
-          className="formInput mb-10 transition duration-300 
+          className="signInput mb-10 transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none"
           id="email"
           type="email"
@@ -52,7 +52,7 @@ export default function SignIn({ onSubmit }: SignInProps) {
           PASSWORD
         </label>
         <input
-          className="formInput transition duration-300 
+          className="signInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none"
           id="password"
           type="password"

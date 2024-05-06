@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import DayPickerComp from '@components/Canlendar/DayPickerComp';
+// import DayPickerComp from '@components/Canlendar/DayPickerComp';
 import { format } from 'date-fns';
-import { useSetDayStore } from '@store/index';
+import { useSelectedDayStore } from '@store/index';
 interface ScheduleModalProps {
   isOpen: boolean;
   onSave: (title: string) => void;
@@ -10,7 +10,7 @@ interface ScheduleModalProps {
 export default function ScheduleModal({ isOpen, onSave }: ScheduleModalProps) {
   const [title, setTitle] = useState<string>('');
   const [isDayPickerOpen, setIsDayPickerOpen] = useState<boolean>(false);
-  const { selectedDay, setSelectedDay } = useSetDayStore((state) => ({
+  const { selectedDay, setSelectedDay } = useSelectedDayStore((state) => ({
     selectedDay: state.selectedDay,
     setSelectedDay: state.setSelectedDay,
   }));
@@ -43,7 +43,7 @@ export default function ScheduleModal({ isOpen, onSave }: ScheduleModalProps) {
           </button>
           {isDayPickerOpen && (
             <div className="daypicker-modal">
-              <DayPickerComp selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
+              {/* <DayPickerComp selectedDay={selectedDay} setSelectedDay={setSelectedDay} /> */}
             </div>
           )}
           <button

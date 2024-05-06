@@ -32,7 +32,7 @@ export type SocialEvent = {
   startAt: string;
   endAt: string;
   isPast: boolean;
-  userCalendarId: string;
+  userCalendarId?: string;
   social: string;
   socialEventId: string;
 };
@@ -49,11 +49,11 @@ export interface Calendar {
   isDeleted: boolean;
   registeredAt: string;
   title: string;
-  type: 'public' | 'private';
+  type: string; //TODO color로 변경?
   updatedAt: string;
 }
 
 export interface CreateGroupForm {
   title: string;
-  type: 'public' | 'private';
+  type: string; //TODO color로 변경?
 }

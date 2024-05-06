@@ -72,7 +72,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           EMAIL
         </label>
         <input
-          className={`formInput transition duration-300 
+          className={`signInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
             emailValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
@@ -86,14 +86,14 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           autoComplete="off"
           required
         />
-        <div className="h-10 flex items-center mb-4">
+        <div className="h-10 flex items-center">
           {emailValid ? '' : '유효하지 않은 이메일 형식입니다.'}
         </div>
         <label className="w-full mb-2" htmlFor="nickname">
           NICKNAME
         </label>
         <input
-          className={`formInput transition duration-300 
+          className={`signInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
             nicknameValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
@@ -107,14 +107,14 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           autoComplete="off"
           required
         />
-        <div className="h-10 flex items-center mb-4">
+        <div className="h-10 flex items-center">
           {nicknameValid ? '' : '4~10자 사이여야 합니다.'}
         </div>
         <label className="w-full mb-2" htmlFor="password">
           PASSWORD
         </label>
         <input
-          className={`formInput transition duration-300 
+          className={`signInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
             passwordValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
@@ -126,14 +126,14 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           placeholder="****"
           required
         />
-        <div className="h-10 flex items-center mb-4">
+        <div className="h-10 flex items-center">
           {passwordValid ? '' : '4글자 이상 입력해주세요.'}
         </div>
         <label className="w-full mb-2" htmlFor="confirmPassword">
           CONFIRM PASSWORD
         </label>
         <input
-          className={`formInput transition duration-300 
+          className={`signInput transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
             passwordsMatch ? '' : 'border-red-500 focus:border-red-500'
           }`}
@@ -145,7 +145,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           placeholder="****"
           required
         />
-        <div className="h-10 flex items-center mb-4">
+        <div className="h-10 flex items-center">
           {passwordsMatch ? '' : '비밀번호가 서로 일치하지 않습니다.'}
         </div>
       </fieldset>
