@@ -11,7 +11,7 @@ import { KakaoModule } from './auth/kakao/kakao.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './db/user/user.module';
 import { DataSource } from 'typeorm';
-import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
+import { AuthLoggerMiddleware, CalendarLoggerMiddleware, FeedLoggerMiddleware, GroupEventLoggerMiddleware, KakaoLoggerMiddleware, LoggerMiddleware, PlatformLoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
 import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
@@ -52,5 +52,11 @@ export class AppModule implements NestModule {
   }
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
+    consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
+    consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
+    consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');
+    consumer.apply(PlatformLoggerMiddleware).forRoutes('/google');
+    consumer.apply(KakaoLoggerMiddleware).forRoutes('/kakao');
+    consumer.apply(FeedLoggerMiddleware).forRoutes('/feed');
   }
 }
