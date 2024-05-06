@@ -7,17 +7,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CalendarCreateApiService {
   final String apiUrl = "http://15.164.174.224:3000/calendar/create";
-
-  String? _token;
+  SharedPreferences? prefs;
 
   CalendarCreateApiService() {
-    _loadToken();
+    initializePrefs();
   }
 
-  // 토큰 로드 함수
-  Future<void> _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    _token = prefs.getString('token');
+  Future<void> initializePrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    await _loadToken(); // 초기화 시 토큰도 로드
+  }
+
+  Future<String?> _loadToken() async {
+    return prefs?.getString('token')?.trim();
   }
 
   // 색상 객체를 16진수 문자열로 변환하는 함수
@@ -27,6 +29,7 @@ class CalendarCreateApiService {
 
   // 캘린더 생성 함수
   Future<Calendar?> createCalendar(String title, Color color) async {
+    String? _token = await _loadToken();
     // 토큰이 없다면 로드
     if (_token == null) {
       await _loadToken();

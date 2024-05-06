@@ -16,7 +16,12 @@ import 'screens/signup_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  var token = prefs.getString('token');
+  // 로그로 삭제 확인
+  print("Deleting token...");
+  await prefs.remove('token');
+  print("Token deleted.");
+  var token = prefs.getString('token'); // 이제 token은 null이어야 합니다.
+  print("Token after deletion: $token"); // 로그 출력
 
   KakaoSdk.init(
       nativeAppKey: 'e93a75bf0305cc39ffdd47eeb2815a7a',
@@ -44,8 +49,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Group Calendar App',
-      initialRoute: token != null ? '/home' : '/',
-      // initialRoute: '/',
+      // initialRoute: token != null ? '/home' : '/',
+      initialRoute: '/',
       getPages: [
         GetPage(name: '/', page: () => LoginPage()),
         GetPage(name: '/signup', page: () => SignupPage()),

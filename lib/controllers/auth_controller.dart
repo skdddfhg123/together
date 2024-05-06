@@ -22,7 +22,13 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    // 삭제 전 토큰 상태 확인
+    print('Deleting token, current token: ${prefs.getString('token')}');
+
     await prefs.remove('token');
+
+    // 삭제 후 토큰 상태 확인
+    print('Token after deletion: ${prefs.getString('token')}');
     isLoggedIn.value = false;
 
     Get.find<MeetingController>().clearAppointments();
