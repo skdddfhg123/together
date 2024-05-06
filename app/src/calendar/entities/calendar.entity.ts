@@ -6,7 +6,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTab
 
 
 @Entity()
-export class Calendar{
+export class Calendar {
     @PrimaryGeneratedColumn('uuid')
     calendarId: string;
 
@@ -28,7 +28,7 @@ export class Calendar{
     type: string;
 
     @ManyToOne(() => UserCalendar, (userCalendar) => userCalendar.groupCalendar)
-    @JoinColumn({ name: 'calendars'})
+    @JoinColumn({ name: 'calendars' })
     author: UserCalendar;
 
     @Column("uuid", { array: true })

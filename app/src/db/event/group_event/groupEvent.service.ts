@@ -8,12 +8,12 @@ import { Calendar } from "src/calendar/entities/calendar.entity";
 
 @Injectable()
 export class GroupEventService {
-    constructor (
-        @ InjectRepository(GroupEvent)
+    constructor(
+        @InjectRepository(GroupEvent)
         private readonly groupEventRepository: Repository<GroupEvent>,
-        @ InjectRepository(Calendar)
+        @InjectRepository(Calendar)
         private readonly calendarRepository: Repository<Calendar>,
-    ) {}
+    ) { }
 
     async createGroupEvent(
         userCreateGroupEventDTO: CreateGroupEventDTO,
@@ -31,8 +31,8 @@ export class GroupEventService {
         const groupEvent = new GroupEvent();
         groupEvent.author = payload.userCalendarId;
         groupEvent.calendarId = calendarId;
-        
-        const { title, color, startAt, endAt, emails} = userCreateGroupEventDTO;
+
+        const { title, color, startAt, endAt, emails } = userCreateGroupEventDTO;
         groupEvent.title = title;
         groupEvent.color = color;
         groupEvent.startAt = startAt;
@@ -46,7 +46,7 @@ export class GroupEventService {
             console.error('Error saving group calendar:', e);
             throw new InternalServerErrorException('Error saving group event');
         }
-    
+
     }
 
     async getAllGroupEventsByCalendarId(CalendarId: string): Promise<GroupEvent[]> {
@@ -62,20 +62,21 @@ export class GroupEventService {
                 }
             });
             return groupEvents;
-        } 
+        }
         catch (e) {
-          throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${CalendarId}`);
+            throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${CalendarId}`);
         }
     }
 
 
-     async getGroupEvent( groupEventId : string ): Promise<GroupEvent> {
-            try {
-            
+    async getGroupEvent(groupEventId: string): Promise<GroupEvent> {
+        try {
+
             const groupEvent = await this.groupEventRepository.findOne({
-                where: { groupEventId: groupEventId, isDeleted : false 
-                 },
-                
+                where: {
+                    groupEventId: groupEventId, isDeleted: false
+                },
+
             });
 
             if (!groupEvent) {
@@ -88,7 +89,7 @@ export class GroupEventService {
             console.error('Error occurred:', e);
             throw new InternalServerErrorException('Failed to deactivate group event');
         }
-     }
+    }
 
     async getGroupEventUpdateForm(groupEventId: string): Promise<GroupEvent> {
         try {
@@ -106,11 +107,11 @@ export class GroupEventService {
     async updateGroupEvent(groupEventId: string, updateData: Partial<GroupEvent>): Promise<GroupEvent> {
         try {
             const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId } });
-    
+
             if (!groupEventToUpdate) {
                 throw new NotFoundException('Group event not found');
             }
-    
+
             const updatedGroupEvent = this.groupEventRepository.merge(groupEventToUpdate, updateData);
             updatedGroupEvent.updatedAt = new Date();
             return await this.groupEventRepository.save(updatedGroupEvent);
@@ -119,24 +120,24 @@ export class GroupEventService {
             throw new InternalServerErrorException('Failed to modify group event');
         }
     }
-    
+
     async removeGroupEvent(groupEventId: string): Promise<GroupEvent> {
         try {
             const groupEvent = await this.groupEventRepository.findOne({
                 where: { groupEventId },
             });
-    
+
             if (!groupEvent) {
                 throw new NotFoundException('Group event not found');
             }
-    
+
             if (groupEvent.isDeleted) {
                 throw new Error('Group event is already marked as deleted');
             }
-    
+
             groupEvent.isDeleted = true;
             groupEvent.deletedAt = new Date();
-    
+
             const updatedGroupEvent = await this.groupEventRepository.save(groupEvent);
             return updatedGroupEvent;
         } catch (e) {
