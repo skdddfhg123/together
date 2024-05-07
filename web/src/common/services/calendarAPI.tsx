@@ -1,7 +1,13 @@
 import * as API from '@utils/api';
 import { AxiosError } from 'axios';
 
-import { useCalendarListStore, useGroupEventStore, reqGroupEventStore } from '@store/index';
+import {
+  useCalendarListStore,
+  useGroupEventStore,
+  reqGroupEventStore,
+  resGroupEventStore,
+  useNowCalendarStore,
+} from '@store/index';
 import { Calendar, CreateGroupForm, ErrorResponse } from '@type/index';
 
 export async function getCalEvents(calendarId: string) {
@@ -79,6 +85,29 @@ export async function createGroupCalendar({ title, type }: CreateGroupForm) {
   }
 }
 
+export async function deleteGroupCalendar(groupCalendarId: string) {
+  if (groupCalendarId === 'All') return alert('캘린더 목록에서 캘린더를 선택해주세요.');
+  try {
+    const res = await API.patch(`/calendar/delete/${groupCalendarId}`);
+    console.log(`CALENDAR - deleteGroupCalendar 성공 :`, res);
+
+    useCalendarListStore.getState().setIsLoaded(false);
+    useNowCalendarStore.getState().setNowCalendar('All');
+
+    alert('그룹 캘린더가 삭제되었습니다.');
+
+    return true;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as ErrorResponse;
+      console.error(`CALENDAR - deleteGroupCalendar 실패 :`, data); //debug//
+      alert('일정 삭제에 실패했습니다.');
+    }
+  }
+}
+
 export async function createGroupEvent({
   groupCalendarId,
   title,
@@ -95,8 +124,8 @@ export async function createGroupEvent({
       author,
       startAt,
       endAt,
-      // emails: emails || [],
-      // color: color || '#badfff',
+      emails: emails || [],
+      color: color || '#badfff',
     });
     if (!res) throw new Error('CALENDAR - createGroupEvent (DB 이벤트 생성 실패)');
     console.log(`CALENDAR - createGroupEvent 성공 :`, res);
@@ -110,6 +139,67 @@ export async function createGroupEvent({
       const data = err.response.data as ErrorResponse;
       console.error(`CALENDAR - createGroupEvent 실패 :`, data); //debug//
       alert('일정 등록에 실패했습니다.');
+    }
+  }
+}
+
+export async function updateGroupEvent({
+  title,
+  startAt,
+  endAt,
+  author,
+  member,
+  color,
+  pinned,
+  groupEventId,
+  alerts,
+  emails,
+}: resGroupEventStore) {
+  try {
+    const { data: res } = await API.patch(`/calendar/group/update/${groupEventId}`, {
+      title,
+      startAt,
+      endAt,
+      author,
+      member,
+      color,
+      pinned,
+      alerts,
+      emails,
+    });
+    if (!res) throw new Error(`CALENDAR - updateGroupEvent (DB 수정 반영 실패)`);
+    console.log(`CALENDAR - updateGroupEvent 성공 :`, res);
+    alert('일정이 수정되었습니다.');
+
+    return true;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as ErrorResponse;
+      console.error(`CALENDAR - updateGroupEvent 실패 :`, data); //debug//
+      alert('일정 수정에 실패했습니다.');
+    }
+  }
+}
+
+export async function deleteGroupEvent(groupEventId: string) {
+  if (!groupEventId) return alert('삭제할 일정을 선택해주세요.');
+
+  try {
+    const res = await API.patch(`/calendar/group/remove/${groupEventId}`);
+    console.log(`CALENDAR - deleteGroupEvent 성공 :`, res);
+
+    alert('일정이 삭제되었습니다.');
+
+    return true;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as ErrorResponse;
+      console.error(`CALENDAR - deleteGroupEvent 실패 :`, data); //debug//
+      alert('일정 삭제에 실패했습니다.');
     }
   }
 }

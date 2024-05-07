@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { format, parseISO } from 'date-fns';
 import { HexColorPicker } from 'react-colorful';
+import { format, parseISO } from 'date-fns';
 
-import { useGroupEventStore, resGroupEventStore } from '@store/index';
+import * as CALENDAR from '@services/calendarAPI';
+import * as USER from '@services/userAPI';
+import { useGroupEventStore, resGroupEventStore, useNowCalendarStore } from '@store/index';
 
 interface EventDetailsProps {
   isOpen: boolean;
@@ -28,6 +30,8 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
   const groupEvent = useMemo(() => {
     return groupEvents.find((event) => event.groupEventId === eventId);
   }, [eventId, groupEvents]);
+  const { nowCalendar } = useNowCalendarStore();
+  // *************TODO 전체 캘린더에서 일정을 삭제하면 현재 리렌더링이 발생하지 않고있어서 문제 해결 필요
 
   useMemo(() => {
     if (groupEvent) {
@@ -70,8 +74,16 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
     setEditMode(true);
   };
 
-  const handleSave = () => {
-    setEditMode(false);
+  const handleDelete = async () => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) return onClose();
+    const res = await CALENDAR.deleteGroupEvent(editedValues.groupEventId);
+    if (res && nowCalendar === 'All') await USER.firstRender();
+    onClose();
+  };
+
+  const handleSave = async () => {
+    await CALENDAR.updateGroupEvent(editedValues);
+    onClose();
   };
 
   const handleCancel = () => {
@@ -102,19 +114,28 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
           <nav className="flex m-4 justify-between">
             {editMode ? (
               <button className="p-2" onClick={handleCancel}>
-                Cancel
+                취소
               </button>
             ) : (
               <button className="p-2" onClick={onClose}>
-                Close
+                닫기
               </button>
             )}
-            <button className="p-2" onClick={editMode ? handleSave : handleEdit}>
-              {editMode ? 'Save' : 'Edit'}
-            </button>
+            <div>
+              {editMode ? (
+                <></>
+              ) : (
+                <button className="p-2" onClick={handleDelete}>
+                  삭제
+                </button>
+              )}
+              <button className="p-2" onClick={editMode ? handleSave : handleEdit}>
+                {editMode ? '수정 완료' : '수정'}
+              </button>
+            </div>
           </nav>
           <form key="event-form" id={`${isOpen ? 'slideIn-right' : 'slideOut-right'}`}>
-            <h2 className="text-center my-8 mx-2">
+            <h2 className="text-center my-8 mx-2" style={{ color: `${editedValues.color}` }}>
               {editMode ? (
                 <input
                   type="text"
@@ -159,7 +180,7 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                 )}
               </div>
             </section>
-            <div className="m-2">
+            <div className="m-4">
               {editMode ? <></> : <div>작성자 : {groupEvent?.author}</div>}
               멤버 :
               {editMode ? (
@@ -179,26 +200,7 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                 '없음'
               )}
             </div>
-            <div className="m-2">
-              {'Color : '}
-              {editMode ? (
-                <HexColorPicker
-                  color={editedValues.color || '#ffffff00'}
-                  onChange={(color) => handleChange('color', color)}
-                />
-              ) : (
-                <div
-                  style={{
-                    backgroundColor: editedValues.color || '#ffffff00',
-                    color: '#fff',
-                    padding: '0.5rem',
-                  }}
-                >
-                  {editedValues.color}
-                </div>
-              )}
-            </div>
-            <div className="m-2">
+            <div className="m-4">
               {'중요 : '}
               {editMode ? (
                 <input
@@ -210,6 +212,15 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                 'Yes'
               ) : (
                 'No'
+              )}
+            </div>
+            <div className="flex flex-row justify-center m-8">
+              {editMode && (
+                <HexColorPicker
+                  color={editedValues.color || '#ffffff00'}
+                  onChange={(color) => handleChange('color', color)}
+                  defaultValue={`${editedValues.color}`}
+                />
               )}
             </div>
           </form>

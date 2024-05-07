@@ -95,7 +95,7 @@ th.day-6, .day-6 .day { /* 토요일 */
 .today .day {
   border-radius: 5px;
 
-  background-color: #badfff;
+  background-color: #ffea29;
   font-weight: bold;
 }
 

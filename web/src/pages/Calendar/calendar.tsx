@@ -30,12 +30,13 @@ export default React.memo(function CalendarPage({
     setSelectedDay: state.setSelectedDay,
   }));
 
-  const socialEvents = useSocialEventStore((state) => state.socialEvents);
-  const groupEvents = useGroupEventStore((state) => state.groupEvents);
+  const { socialEvents } = useSocialEventStore();
+  const { groupEvents } = useGroupEventStore();
   const userCalendarId = useUserInfoStore(
     (state) => state.userInfo?.userCalendarId?.userCalendarId || null,
   );
-  const nowCalendarId = useNowCalendarStore((state) => state.nowCalendar);
+  const { nowCalendar } = useNowCalendarStore();
+  const { setGroupEvents } = useGroupEventStore();
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -50,11 +51,11 @@ export default React.memo(function CalendarPage({
 
   // *****************? 최초 달력 일정 Rendering
   useEffect(() => {
-    if (!nowCalendarId) return;
+    if (!nowCalendar) return;
 
-    if (nowCalendarId === 'All') return console.log('전체 일정 그리기');
-    CALENDAR.getCalEvents(nowCalendarId).catch(console.error);
-  }, [nowCalendarId]);
+    if (nowCalendar === 'All') return console.log('전체 일정 그리기');
+    CALENDAR.getCalEvents(nowCalendar);
+  }, [nowCalendar, detailsOn, setGroupEvents]);
 
   // *****************? 더블 클릭으로 이벤트 등록 Modal 띄움
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
@@ -122,7 +123,7 @@ export default React.memo(function CalendarPage({
       const existingEvents = eventMap.get(eventDate) || [];
       existingEvents.push(
         <li className="social-title" key={existingEvents.length}>
-          {event.title || 'NO-TITLE'}
+          {event.title || '카카오 일정'}
         </li>,
       );
       eventMap.set(eventDate, existingEvents);
@@ -138,7 +139,8 @@ export default React.memo(function CalendarPage({
           onMouseLeave={(e) => e.stopPropagation()}
           onClick={(e) => handleDetails(event.groupEventId, e)}
           className="group-event"
-          style={{ backgroundColor: `${event.color === 'blue' ? '#0086FF' : '${event.color}'}` }}
+          // style={{ backgroundColor: `${event.color === 'blue' ? '#0086FF' : '${event.color}'}` }}
+          style={{ backgroundColor: `${event.color}` }}
           key={event.groupEventId}
         >
           {event.title || 'No Title'}

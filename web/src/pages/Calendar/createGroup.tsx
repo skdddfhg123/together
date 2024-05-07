@@ -19,7 +19,7 @@ export default function CreateGroupPage() {
     });
     if (!res) throw new Error('그룹 캘린더 생성 실패');
 
-    alert('그룹 생성 성공');
+    alert('그룹 캘린더가 생성되었습니다.');
     navigate('/main');
   };
 

@@ -19,8 +19,8 @@ export default function MainPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const { isOn, toggle } = useToggle(false);
 
-  const getUserAndCalendar = useCallback(async () => {
-    const res = await USER.setUserInfo();
+  const RendarUserAndCalendar = useCallback(async () => {
+    const res = await USER.firstRender();
     if (!res) navigate('/signin');
   }, []);
 
@@ -28,11 +28,12 @@ export default function MainPage() {
     await KAKAO.GetEvents();
     // ***************TODO 구글 및 outlook API 등록 필요
 
-    getUserAndCalendar();
+    RendarUserAndCalendar();
   }, []);
 
+  // *****************? 최초 렌더링
   useEffect(() => {
-    getUserAndCalendar();
+    RendarUserAndCalendar();
   }, []);
 
   const prevCalendar = (): void => {

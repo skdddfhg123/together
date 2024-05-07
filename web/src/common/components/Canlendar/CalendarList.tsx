@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import * as CALENDAR from '@services/calendarAPI';
+import * as USER from '@services/userAPI';
 import { useCalendarListStore, useNowCalendarStore } from '@store/index';
 import { Calendar } from '@type/index';
 
@@ -53,7 +54,10 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
       <ul className={`h-fit w-full items-center flex flex-col`}>
         <h2
           className="p-4 hover:text-custom-main hover:cursor-pointer"
-          onClick={() => ChangeCalendar('All')}
+          onClick={() => {
+            ChangeCalendar('All');
+            USER.firstRender();
+          }}
         >
           일정 모아보기
         </h2>

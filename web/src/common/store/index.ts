@@ -61,17 +61,17 @@ export const useCalendarListStore = create<CalendarStore>((set) => ({
   calendars: [],
   isLoaded: false,
   setCalendars: (calendars) => set({ calendars }),
-  setIsLoaded: (isLoaded) => set((state) => ({ isLoaded })),
+  setIsLoaded: (isLoaded: boolean) => set({ isLoaded: isLoaded }),
 }));
 
 interface NowCalendarStore {
-  nowCalendar: string | null;
-  setNowCalendar: (calendarId: string | null) => void;
+  nowCalendar: string;
+  setNowCalendar: (calendarId: string) => void;
 }
 
 export const useNowCalendarStore = create<NowCalendarStore>((set) => ({
-  nowCalendar: null,
-  setNowCalendar: (calendarId: string | null) => set({ nowCalendar: calendarId }),
+  nowCalendar: 'All',
+  setNowCalendar: (calendarId: string) => set({ nowCalendar: calendarId }),
 }));
 
 export interface reqGroupEventStore {

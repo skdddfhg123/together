@@ -2,9 +2,15 @@ import { AxiosError } from 'axios';
 import * as API from '@utils/api';
 import { setCookie } from '@utils/cookie';
 import { Cookie, SignInForm, SignUpForm, ErrorResponse } from '@type/index';
-import { useNowCalendarStore, useSocialEventStore, useUserInfoStore } from '@store/index';
+import {
+  resGroupEventStore,
+  useGroupEventStore,
+  useNowCalendarStore,
+  useSocialEventStore,
+  useUserInfoStore,
+} from '@store/index';
 
-async function signUp(formData: SignUpForm) {
+export async function signUp(formData: SignUpForm) {
   try {
     const { useremail, nickname, password } = formData;
 
@@ -27,7 +33,7 @@ async function signUp(formData: SignUpForm) {
   }
 }
 
-async function logIn(formData: SignInForm) {
+export async function logIn(formData: SignInForm) {
   try {
     const { useremail, password } = formData;
 
@@ -74,16 +80,38 @@ async function logIn(formData: SignInForm) {
   }
 }
 
-async function setUserInfo() {
+export async function firstRender() {
   try {
     const {
       data: [db_user],
     } = await API.get(`/auth/all`);
-    if (!db_user) throw new Error('유저 정보 db 조회 실패');
+    if (!db_user) throw new Error('USER - firstRender (유저 정보 db 조회 실패)');
+    console.log(`USER - firstRender 성공`, db_user);
 
     useUserInfoStore.getState().setUserInfo(db_user);
     useNowCalendarStore.getState().setNowCalendar('All');
     useSocialEventStore.getState().setSocialEvents(db_user.userCalendarId.socialEvents);
+
+    const allGroupEvents = [];
+
+    for (const calendar of db_user.userCalendarId.groupCalendar) {
+      if (calendar.groupEvents) {
+        allGroupEvents.push(
+          ...calendar.groupEvents.map((event: resGroupEventStore) => ({
+            groupEventId: event.groupEventId,
+            title: event.title,
+            member: event.member || [],
+            pinned: event.pinned || false,
+            alerts: event.alerts || null,
+            attachment: event.attachment || null,
+            color: event.color,
+            startAt: event.startAt,
+            endAt: event.endAt,
+          })),
+        );
+      }
+    }
+    useGroupEventStore.getState().setGroupEvents(allGroupEvents);
 
     return true;
   } catch (e) {
@@ -91,7 +119,7 @@ async function setUserInfo() {
 
     if (err.response?.status === 400) {
       console.error(err.response);
-      alert('토큰 정보가 일치하지 않습니다');
+      alert('USER - firstRender 실패 : 토큰 정보가 일치하지 않습니다');
       return false;
     } else {
       const data = err.response?.data as ErrorResponse;
@@ -100,5 +128,3 @@ async function setUserInfo() {
     }
   }
 }
-
-export { signUp, logIn, setUserInfo };
