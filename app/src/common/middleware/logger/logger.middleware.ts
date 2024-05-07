@@ -84,6 +84,12 @@ export class AuthLoggerMiddleware implements NestMiddleware {
         prettyBody = `\`\`\`\n${body}\n\`\`\``;
       }
 
+      // Limit the length to 2000 characters, including "..."
+      const maxLength = 1000;
+      if (prettyBody.length > maxLength) {
+        prettyBody = prettyBody.slice(0, maxLength - 3) + '...' + `\`\`\``;
+      }
+
       const responseInfo = {
         statusCode: res.statusCode,
         headers: res.getHeaders(),
@@ -93,10 +99,9 @@ export class AuthLoggerMiddleware implements NestMiddleware {
       };
 
       const channel = this.discordBotService.getClient().channels.cache.get('1237047183753347174');
-
       if (channel && channel instanceof TextChannel) {
-        channel.send(`[Request Info]\n ${JSON.stringify(requestInfo, null, 2)}\n`);
-        channel.send(`[Response Info]\n ${JSON.stringify(responseInfo, null, 2)}`);
+        channel.send(`[Request Info]\njson\n${JSON.stringify(requestInfo, null, 2)}\n`);
+        channel.send(`[Response Info]\njson\n${JSON.stringify(responseInfo, null, 2)}\n`);
         channel.send(`[Response body]\n${prettyBody}`);
       }
 
@@ -129,7 +134,9 @@ export class CalendarLoggerMiddleware implements NestMiddleware {
     let chunks: any[] = [];
 
     res.send = function (chunk: any) {
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      if (chunk !== undefined) {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      }
       return originalSend.apply(res, arguments);
     };
 
@@ -143,6 +150,11 @@ export class CalendarLoggerMiddleware implements NestMiddleware {
         prettyBody = `\`\`\`json\n${prettyBody}\n\`\`\``;
       } catch (error) {
         prettyBody = `\`\`\`\n${body}\n\`\`\``;
+      }
+
+      const maxLength = 1000;
+      if (prettyBody.length > maxLength) {
+        prettyBody = prettyBody.slice(0, maxLength - 3) + '...' + `\`\`\``;
       }
 
       const responseInfo = {
@@ -203,7 +215,12 @@ export class GroupEventLoggerMiddleware implements NestMiddleware {
         prettyBody = JSON.stringify(JSON.parse(body), null, 2);
         prettyBody = `\`\`\`json\n${prettyBody}\n\`\`\``;
       } catch (error) {
-        prettyBody = `\`\`\`\n${body}\n\`\`\``; // Not JSON, keep original and format it
+        prettyBody = `\`\`\`\n${body}\n\`\`\``;
+      }
+
+      const maxLength = 1000;
+      if (prettyBody.length > maxLength) {
+        prettyBody = prettyBody.slice(0, maxLength - 3) + '...' + `\`\`\``;
       }
 
       const responseInfo = {
@@ -264,7 +281,12 @@ export class PlatformLoggerMiddleware implements NestMiddleware {
         prettyBody = JSON.stringify(JSON.parse(body), null, 2);
         prettyBody = `\`\`\`json\n${prettyBody}\n\`\`\``;
       } catch (error) {
-        prettyBody = `\`\`\`\n${body}\n\`\`\``; // Not JSON, keep original and format it
+        prettyBody = `\`\`\`\n${body}\n\`\`\``;
+      }
+
+      const maxLength = 1000;
+      if (prettyBody.length > maxLength) {
+        prettyBody = prettyBody.slice(0, maxLength - 3) + '...' + `\`\`\``;
       }
 
       const responseInfo = {
@@ -325,7 +347,12 @@ export class KakaoLoggerMiddleware implements NestMiddleware {
         prettyBody = JSON.stringify(JSON.parse(body), null, 2);
         prettyBody = `\`\`\`json\n${prettyBody}\n\`\`\``;
       } catch (error) {
-        prettyBody = `\`\`\`\n${body}\n\`\`\``; // Not JSON, keep original and format it
+        prettyBody = `\`\`\`\n${body}\n\`\`\``;
+      }
+
+      const maxLength = 1000;
+      if (prettyBody.length > maxLength) {
+        prettyBody = prettyBody.slice(0, maxLength - 3) + '...' + `\`\`\``;
       }
 
       const responseInfo = {
@@ -386,7 +413,12 @@ export class FeedLoggerMiddleware implements NestMiddleware {
         prettyBody = JSON.stringify(JSON.parse(body), null, 2);
         prettyBody = `\`\`\`json\n${prettyBody}\n\`\`\``;
       } catch (error) {
-        prettyBody = `\`\`\`\n${body}\n\`\`\``; // Not JSON, keep original and format it
+        prettyBody = `\`\`\`\n${body}\n\`\`\``;
+      }
+
+      const maxLength = 1000;
+      if (prettyBody.length > maxLength) {
+        prettyBody = prettyBody.slice(0, maxLength - 3) + '...' + `\`\`\``;
       }
 
       const responseInfo = {

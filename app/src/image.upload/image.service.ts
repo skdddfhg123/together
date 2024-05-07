@@ -62,7 +62,7 @@ export class ImageService {
       const ext = file.originalname.split('.').pop();
 
       const imageUrl = await this.awsService.imageUploadToS3(
-        `${imageName}.${ext}`,
+        `feeds/${imageName}.${ext}`,
         file,
         ext
       );

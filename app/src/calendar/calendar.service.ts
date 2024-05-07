@@ -81,13 +81,15 @@ export class CalendarService {
             const calendars = await this.calendarRepository
                 .createQueryBuilder("calendar")
                 .leftJoinAndSelect("calendar.author", "author")
-                .whereInIds([userCalendarId])
+                .where("author.userCalendarId = :userCalendarId", { userCalendarId })
+                .andWhere("calendar.isDeleted = false")
+                .orWhere(":userCalendarId = ANY(calendar.attendees)", { userCalendarId })
                 .andWhere("calendar.isDeleted = false")
                 .getMany();
 
-            if (calendars.length === 0) {
-                throw new NotFoundException(`No calendars found associated with userCalendarId ${userCalendarId}`);
-            }
+            // if (calendars.length === 0) {
+            //     throw new NotFoundException(`No calendars found associated with userCalendarId ${userCalendarId}`);
+            // }
             return calendars;
         } catch (e) {
             console.error('Error occurred while fetching calendars:', e);

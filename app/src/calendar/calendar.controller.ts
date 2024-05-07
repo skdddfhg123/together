@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { getPayload } from 'src/auth/getPayload.decorator';
@@ -68,14 +68,28 @@ export class CalendarController {
 
     @Patch('delete/:calendarId')
     @ApiOperation({ summary: 'Delete a calendar and its associated group events' })
-    @ApiResponse({ status: 200, description: 'Calendar and associated group events deleted successfully' })
+    @ApiResponse({ status: 204, description: 'Calendar and associated group events deleted successfully' })
     @ApiResponse({ status: 404, description: 'Calendar not found' })
     @ApiResponse({ status: 500, description: 'Failed to delete calendar' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
-    // @UseGuards(RefreshAuthGuard)
-    async deleteCalendar(@Param('calendarId') calendarId: string): Promise<void> {
-        await this.calendarService.deleteCalendar(calendarId);
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deleteCalendar(@Param('calendarId') calendarId: string): Promise<any> {
+        try {
+            await this.calendarService.deleteCalendar(calendarId);
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw new NotFoundException(`Calendar with ID ${calendarId} not found`);
+            } else {
+                throw new HttpException(
+                    {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        error: 'Failed to delete calendar',
+                    },
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                );
+            }
+        }
     }
 
     @Patch('participate/:calendarId')
