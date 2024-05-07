@@ -28,7 +28,7 @@ class DeleteCalendarService {
       'Authorization': 'Bearer $token', // 토큰을 헤더에 추가
     });
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 204) {
       print('Calendar deleted successfully');
       return true; // 성공적으로 삭제됨
     } else {

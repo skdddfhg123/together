@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:calendar/api/calendar_delete_service.dart';
 import 'package:calendar/api/delete_event_service.dart';
 import 'package:calendar/api/event_creates_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
+import 'package:calendar/models/post.dart';
 import 'package:calendar/models/social_event.dart';
 import 'package:calendar/screens/event_detail.dart';
 import 'package:flutter/material.dart';
@@ -24,13 +23,45 @@ class CalendarAppointment {
       required this.groupeventId});
 }
 
+class FeedWithId {
+  final Feed feed;
+  final String groupeventId;
+  final String feedId;
+
+  FeedWithId({
+    required this.feed,
+    required this.groupeventId,
+    required this.feedId,
+  });
+}
+
 class MeetingController extends GetxController {
   final RxList<CalendarAppointment> calendarAppointments =
       <CalendarAppointment>[].obs;
+
+  final RxList<FeedWithId> feeds = <FeedWithId>[].obs;
+
   final DeleteEventService deleteEventService = DeleteEventService();
   final CalendarEventService eventService = CalendarEventService();
   final DeleteCalendarService deleteCalendarService = DeleteCalendarService();
 
+///////////////////////////////////////피드 부분 /////////////////////////////////////////
+  void addFeed(Feed newFeed, String groupEventId, String feedId) {
+    var newFeeds = FeedWithId(
+      feed: newFeed,
+      groupeventId: groupEventId,
+      feedId: feedId,
+    );
+    feeds.add(newFeeds);
+    update(); // Trigger UI updates where MeetingController is being used
+  }
+
+  void deleteFeed(int index) {
+    feeds.removeAt(index);
+    update();
+  }
+
+//////////////////////////////////////// 캘린더, 일정 부분 //////////////////////////////////////
   void addCalendarAppointment(
       Appointment appointment, String calendarId, String groupeventId) {
     var newCalendarAppointment = CalendarAppointment(

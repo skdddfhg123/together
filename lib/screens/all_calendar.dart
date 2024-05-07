@@ -29,7 +29,7 @@ class AllCalendar extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Calendar'),
+        title: const Text('모든 캘린더'),
       ),
       drawer:
           CustomDrawer(onCalendarChanged: (id) => onCalendarChanged?.call(id)),

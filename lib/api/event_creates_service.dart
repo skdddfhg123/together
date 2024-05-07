@@ -36,7 +36,6 @@ class CalendarEventService {
     if (response.statusCode == 201) {
       var data = jsonDecode(response.body);
       print('Event created successfully');
-      // 서버에서 groupEventId 반환 예시, 실제 키는 응답 구조에 맞게 조정 필요
       return {'isCreated': true, 'groupEventId': data['groupEventId'] ?? ''};
     } else {
       print('Failed to create event, status code: ${response.statusCode}');

@@ -1,4 +1,5 @@
 import 'package:calendar/controllers/meeting_controller.dart';
+import 'package:calendar/screens/create_post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart'; // 날짜 형식을 위해 필요
@@ -28,6 +29,26 @@ class EventDetailPage extends StatefulWidget {
 }
 
 class _EventDetailPageState extends State<EventDetailPage> {
+  // 현재 시간으로부터 몇 시간 전인지를 계산하는 함수
+  String timeAgoSinceDate(DateTime date) {
+    final currentDate = DateTime.now();
+    final difference = currentDate.difference(date);
+
+    if (difference.inDays > 30) {
+      return '${difference.inDays ~/ 30}달 전';
+    } else if (difference.inDays > 7) {
+      return '${difference.inDays ~/ 7}주 전';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}일 전';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}시간 전';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}분 전';
+    } else {
+      return '방금 전';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final MeetingController meetingController = Get.find<MeetingController>();
@@ -186,21 +207,103 @@ class _EventDetailPageState extends State<EventDetailPage> {
             thickness: 1,
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: 20, // Example count for user posts
-              itemBuilder: (_, index) => ListTile(
-                title: Text(
-                  'Post $index',
-                ),
-                subtitle: Text('Detail of post $index'),
-              ),
+            child: Obx(
+              () {
+                print("현재 피드 수: ${meetingController.feeds.length}"); // 로그 추가
+                if (meetingController.feeds.isNotEmpty) {
+                  return ListView.builder(
+                    itemCount: meetingController.feeds.length,
+                    itemBuilder: (_, index) {
+                      final feed = meetingController.feeds[index].feed;
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 15),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      feed.thumbnail), // feed.thumbnail
+                                  radius: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      feed.nickname,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      timeAgoSinceDate(feed.createdAt),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: feed.imageSrcs.map((image) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 10),
+                                    child: Image.network(
+                                      image,
+                                      width: 100, // 이미지의 너비 조절
+                                      height: 100, // 이미지의 높이 조절
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              feed.content,
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  print("피드 리스트가 비어있습니다."); // 로그 추가
+                  return const Center(
+                    child: Text("아직 게시글이 없습니다."),
+                  );
+                }
+              },
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Implement your add post action
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) =>
+                CreateFeedPage(groupEventId: widget.groupEventId),
+          ));
         },
         backgroundColor: widget.calendarColor,
         child: const Icon(Icons.add, color: Colors.white),
