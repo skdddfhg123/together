@@ -2,10 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { SocketIoAdapter } from './calendar/chat/adapter/socketIoAdapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: {
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:3001',
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     preflightContinue: false,
@@ -32,7 +33,9 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
+  
+  app.useWebSocketAdapter(new SocketIoAdapter(app))
+  
   await app.listen(3000);
 }
 bootstrap();

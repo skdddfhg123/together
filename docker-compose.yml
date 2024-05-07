@@ -46,6 +46,7 @@ services:
       - .env
     ports:
       - "3000:3000"
+      - "5000:5000" # 웹소켓 포트
     depends_on:
       - postgresql
     volumes:

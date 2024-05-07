@@ -33,6 +33,7 @@ export class CalendarController {
       @Body() calendarCreateDto: CalendarCreateDto,
       @getPayload() payload: PayloadResponse
     ): Promise<Calendar> {
+        // 채팅방 생성
         return await this.calendarService.createGroupCalendar(calendarCreateDto, payload);
     }
 
@@ -90,6 +91,7 @@ export class CalendarController {
         @Param('calendarId') calendarId: string,
         @getPayload() payload: PayloadResponse
     ): Promise<string> {
+        // 채팅방 참여
         return this.calendarService.addAttendeeToCalendar(calendarId, payload);
     }
 
@@ -105,6 +107,7 @@ export class CalendarController {
         @Param('calendarId') calendarId: string,
         @getPayload() payload: PayloadResponse
     ): Promise<string> {
+        //채팅방 나가기
         return this.calendarService.removeAttendeeFromCalendar(calendarId, payload.userCalendarId);
     }
     

@@ -15,6 +15,8 @@ import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
 import { AwsModule } from './aws/aws.module';
+import { ChatGateway } from './calendar/chat/chat.gateway';
+import { ChatModule } from './calendar/chat/chat.module';
 
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { AwsModule } from './aws/aws.module';
     GoogleModule,
     KakaoModule,
     AwsModule,
+    ChatModule,
   ],
   controllers: [RedisController],
   providers: [RedisService, DiscordBotService],
