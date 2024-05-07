@@ -29,6 +29,26 @@ h2 {
   font-weight: 700;
 }
 
+@layer base {
+  .btn {
+    padding: 0.5rem;
+  }
+}
+
+@layer components {
+  .rMenuHeader {
+    height: 3rem;
+    padding: 0 0.5rem;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 1px solid #F2F2F2;
+  }
+}
+
 @layer components {
   .customInput {
     border: 1px solid lightgray;
@@ -36,9 +56,7 @@ h2 {
 
     font-size: larger;
   }
-}
 
-@layer components {
   .signInput {
     width: 40rem;
     height: 3rem;

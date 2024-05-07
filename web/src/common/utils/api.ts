@@ -60,15 +60,18 @@ async function post(endpoint: string, data: Data): Promise<AxiosResponse> {
   return axiosInstance.post(endpoint, JSON.stringify(data));
 }
 
-async function patch(endpoint: string, data: Data): Promise<AxiosResponse> {
+async function patch(endpoint: string, data?: Data): Promise<AxiosResponse> {
   // JSON.stringify 함수: Javascript 객체를 JSON 형태로 변환함.
   // 예시: {name: "Kim"} => {"name": "Kim"}
-  const bodyData = JSON.stringify(data);
+  console.log(`%cPUT 요청: ${serverUrl + endpoint}`, `color: #059c4b;`);
 
-  console.log(`%cPUT 요청: ${serverUrl + endpoint}`, 'color: #059c4b;');
-  console.log(`%cPUT 요청 데이터: ${bodyData}`, 'color: #059c4b;');
-
-  return axiosInstance.patch(endpoint, JSON.stringify(data));
+  let bodyData = null;
+  if (data) {
+    bodyData = JSON.stringify(data);
+    console.log(`%cPUT 요청 데이터: ${bodyData}`, 'color: #059c4b;');
+    return axiosInstance.patch(endpoint, JSON.stringify(data));
+  }
+  return axiosInstance.patch(endpoint);
 }
 
 async function del(endpoint: string, params?: Params): Promise<AxiosResponse> {

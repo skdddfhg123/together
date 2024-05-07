@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface BookmarpProps {
   onClose: () => void;
@@ -6,9 +6,13 @@ interface BookmarpProps {
 
 export default function BookMarkTap({ onClose }: BookmarpProps) {
   return (
-    <div className={`flex flex-row justify-between`}>
-      <div>bookmark</div>
-      <button onClick={onClose}>Close</button>
-    </div>
+    <>
+      <header className="rMenuHeader">
+        <h2>Bookmark</h2>
+        <button className="btn" onClick={onClose}>
+          Close
+        </button>
+      </header>
+    </>
   );
 }

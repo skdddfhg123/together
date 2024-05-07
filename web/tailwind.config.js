@@ -23,7 +23,7 @@ module.exports = {
         custom: {
           main: '#0086FF',
           light: '#badfff',
-          line: 'rgb(242, 242, 242)',
+          line: '#F2F2F2',
         },
       },
     },

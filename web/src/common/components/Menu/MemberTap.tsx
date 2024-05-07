@@ -6,9 +6,13 @@ interface memberTapProps {
 
 export default function memberTap({ onClose }: memberTapProps) {
   return (
-    <div className={`flex flex-row justify-between`}>
-      <div>Member</div>
-      <button onClick={onClose}>Close</button>
-    </div>
+    <>
+      <header className="rMenuHeader">
+        <h2>Member</h2>
+        <button className="btn" onClick={onClose}>
+          Close
+        </button>
+      </header>
+    </>
   );
 }

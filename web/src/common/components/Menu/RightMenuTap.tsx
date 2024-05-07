@@ -1,31 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import BookMarkTap from '@components/Menu/BookMarkTap';
 import ChatTap from '@components/Menu/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
 import CalendarSetTap from '@components/Menu/CalenderSetTap';
+import { useNowCalendarStore } from '@store/index';
 
 type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
 export default React.memo(function RightMenuTap() {
+  const { nowCalendar } = useNowCalendarStore();
   const [activeTap, setActiveTap] = useState<TapName | null>(null);
 
-  const toggleTap = (tap: TapName) => {
-    setActiveTap(activeTap === tap ? null : tap);
-  };
+  useEffect(() => {
+    setActiveTap(null);
+  }, [nowCalendar]);
+
+  const toggleTap = useCallback(
+    (tap: TapName) => {
+      setActiveTap(activeTap === tap ? null : tap);
+    },
+    [activeTap],
+  );
 
   return (
     <div className="h-full flex flex-row border-l">
       <div className="flex flex-col">
-        <button className={`py-4`} onClick={() => toggleTap('bookmark')}>
+        <button
+          className={`${activeTap === 'bookmark' ? 'bg-custom-line' : ''} py-4`}
+          onClick={() => toggleTap('bookmark')}
+        >
           Bookmark
         </button>
-        <button className={`py-4`} onClick={() => toggleTap('chat')}>
+        <button
+          className={`${activeTap === 'chat' ? 'bg-custom-line' : ''} py-4`}
+          onClick={() => toggleTap('chat')}
+        >
           Chat
         </button>
-        <button className={`py-4`} onClick={() => toggleTap('member')}>
+        <button
+          className={`${activeTap === 'member' ? 'bg-custom-line' : ''} py-4`}
+          onClick={() => toggleTap('member')}
+        >
           Member
         </button>
-        <button className={`py-4`} onClick={() => toggleTap('calendarSet')}>
+        <button
+          disabled={nowCalendar === 'All'}
+          className={`${
+            activeTap === 'calendarSet' ? 'bg-custom-line' : ''
+          } ${nowCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
+          onClick={() => {
+            if (nowCalendar !== 'All') {
+              toggleTap('calendarSet');
+            }
+          }}
+        >
           CalendarSet
         </button>
       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 import * as API from '@utils/api';
 import { useUserInfoStore } from '@store/index';
