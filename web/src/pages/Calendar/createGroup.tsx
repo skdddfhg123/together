@@ -24,10 +24,10 @@ export default function CreateGroupPage() {
   };
 
   return (
-    <div className={`h-128 flex flex-col items-center`}>
+    <div className={`FLEX-horizC h-128`}>
       <h1 className={`m-10`}>캘린더 만들기 페이지</h1>
-      <form className="h-5/6 flex flex-col items-center justify-center" onSubmit={submitForm}>
-        <fieldset className={`flex flex-col items-center`}>
+      <form className="FLEX-horizC h-5/6" onSubmit={submitForm}>
+        <fieldset className={`FLEX-horizC`}>
           {/* <section className={`w-full mb-5 text-xl flex justify-center`}>
             <label className={`p-2 mx-4`}>
               <input
@@ -52,10 +52,10 @@ export default function CreateGroupPage() {
             </label>
           </section> */}
           <label>
-            <input className={`sign-input`} type="text" ref={titleRef} />
+            <input className={`SIGN-input`} type="text" ref={titleRef} />
           </label>
         </fieldset>
-        <div className="w-full m-5 flex justify-center">
+        <div className="FLEX-verC w-full m-5">
           <Link className={`p-4 mx-4`} to="/main">
             뒤로가기
           </Link>

@@ -23,8 +23,8 @@ export default React.memo(function RightMenuTap() {
   );
 
   return (
-    <div className="h-full flex flex-row border-l">
-      <div className="flex flex-col">
+    <div className="FLEX-verC h-full border-l">
+      <div className="FLEX-horiz">
         <button
           className={`${activeTap === 'bookmark' ? 'bg-custom-line' : ''} py-4`}
           onClick={() => toggleTap('bookmark')}
@@ -58,18 +58,18 @@ export default React.memo(function RightMenuTap() {
         </button>
       </div>
       <section
-        className={`flex flex-col overflow-hidden transition-all duration-300 ${activeTap ? 'w-80' : 'w-0'}`}
+        className={`FLEX-horiz overflow-hidden transition-all duration-300 ${activeTap ? 'w-80' : 'w-0'}`}
       >
-        <div id={`${activeTap === 'bookmark' ? 'slideIn-right' : 'slideOut-right'}`}>
+        <div id={`${activeTap === 'bookmark' ? 'SLIDEin-right' : 'SLIDEout-right'}`}>
           {activeTap === 'bookmark' && <BookMarkTap onClose={() => setActiveTap(null)} />}
         </div>
-        <div id={activeTap === 'chat' ? 'slideIn-right' : 'slideOut-right'}>
+        <div id={activeTap === 'chat' ? 'SLIDEin-right' : 'SLIDEout-right'}>
           {activeTap === 'chat' && <ChatTap onClose={() => setActiveTap(null)} />}
         </div>
-        <div id={activeTap === 'member' ? 'slideIn-right' : 'slideOut-right'}>
+        <div id={activeTap === 'member' ? 'SLIDEin-right' : 'SLIDEout-right'}>
           {activeTap === 'member' && <MemberTap onClose={() => setActiveTap(null)} />}
         </div>
-        <div id={activeTap === 'calendarSet' ? 'slideIn-right' : 'slideOut-right'}>
+        <div id={activeTap === 'calendarSet' ? 'SLIDEin-right' : 'SLIDEout-right'}>
           {activeTap === 'calendarSet' && <CalendarSetTap onClose={() => setActiveTap(null)} />}
         </div>
       </section>

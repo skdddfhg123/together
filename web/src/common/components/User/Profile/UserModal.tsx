@@ -27,7 +27,7 @@ export default React.memo(function UserModal() {
       />
       <section className={`userModal${modalOpen ? ' open' : ''} w-36 h-fit -left-full`}>
         {modalOpen && (
-          <div className="flex flex-col items-center justify-center mx-auto">
+          <div className="FLEX-horizC mx-auto">
             <button
               className="w-full h-10 hover:bg-custom-light"
               onClick={() => handleRedirect('/connection')}

@@ -74,7 +74,7 @@ export default React.memo(function EventModal({
     >
       <form onSubmit={handleSubmit} className="w-full px-3 flex justify-between items-center">
         <input
-          className="w-5/6 p-1 mr-3 border rounded"
+          className="INPUT w-5/6 p-1 mr-3 border rounded"
           type="text"
           placeholder="일정 제목"
           ref={titleRef}

@@ -9,7 +9,7 @@ export default function BookMarkTap({ onClose }: BookmarpProps) {
     <>
       <header className="rMenu-header">
         <h2>Bookmark</h2>
-        <button className="btn" onClick={onClose}>
+        <button className="BTN" onClick={onClose}>
           Close
         </button>
       </header>

@@ -27,7 +27,7 @@ export default function LogInPage() {
   };
 
   return (
-    <div className="h-full w-3/5 mt-28 flex flex-col mx-auto items-center justify-center">
+    <div className="FLEX-horizC h-full w-3/5 mt-28 mx-auto">
       <section>
         <button id="singin" onClick={toggle}>
           {isOn ? '로그인으로' : '회원가입으로'}

@@ -20,12 +20,12 @@ export default function CalenderSetTap({ onClose }: CalenderTapProps) {
     <>
       <header className="rMenu-header">
         <h2>CalendarSet</h2>
-        <button className="btn" onClick={onClose}>
+        <button className="BTN" onClick={onClose}>
           Close
         </button>
       </header>
-      <section className="flex justify-center">
-        <button className="btn my-4 p-4 hover:bg-custom-light rounded" onClick={handleDelete}>
+      <section className="FLEX-verC">
+        <button className="BTN my-4 p-4 hover:bg-custom-light rounded" onClick={handleDelete}>
           캘린더 삭제
         </button>
       </section>

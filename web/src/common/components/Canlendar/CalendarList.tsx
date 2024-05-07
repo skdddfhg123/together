@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import * as CALENDAR from '@services/calendarAPI';
 import * as USER from '@services/userAPI';
-import { useCalendarListStore, useNowCalendarStore } from '@store/index';
+import { useCalendarListStore, useGroupEventStore, useNowCalendarStore } from '@store/index';
 import { Calendar } from '@type/index';
 
 import defaultCover from '@assets/default_cover.png';
@@ -19,6 +19,10 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   useEffect(() => {
     CALENDAR.getAllCalendar();
   }, []);
+
+  useEffect(() => {
+    onClose();
+  }, [useGroupEventStore.getState().groupEvents]);
 
   const ChangeCalendar = (calendarId: string | null) => {
     if (calendarId) setNowCalendar(calendarId);
@@ -48,10 +52,10 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
 
   return (
     <section
-      className={`scroll-hide h-fit flex flex-col items-center ${isOpen ? 'w-full' : 'w-0'}`}
-      id={isOpen ? 'slideIn-left' : 'slideOut-left'}
+      className={`SCROLL-hide FLEX-horizC h-fit ${isOpen ? 'w-full' : 'w-0'}`}
+      id={isOpen ? 'SLIDEin-left' : 'SLIDEout-left'}
     >
-      <ul className={`h-fit w-full items-center flex flex-col`}>
+      <ul className={`h-fit w-full`}>
         <h2
           className="p-4 hover:text-custom-main hover:cursor-pointer"
           onClick={() => {

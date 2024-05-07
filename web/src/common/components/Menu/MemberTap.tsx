@@ -9,7 +9,7 @@ export default function memberTap({ onClose }: memberTapProps) {
     <>
       <header className="rMenu-header">
         <h2>Member</h2>
-        <button className="btn" onClick={onClose}>
+        <button className="BTN" onClick={onClose}>
           Close
         </button>
       </header>

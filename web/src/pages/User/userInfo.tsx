@@ -21,7 +21,7 @@ export default function UserInfoPage() {
   }, [setUserInfo]);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="FLEX-horizC">
       <h1>유저 정보 페이지</h1>
       <NavLink to="/main">메인으로 가기</NavLink>
       <button onClick={getUserInfo}>유저 정보 받아오기</button>

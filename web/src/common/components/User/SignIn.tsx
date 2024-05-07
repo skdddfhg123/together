@@ -33,14 +33,13 @@ export default function SignIn({ onSubmit }: SignInProps) {
     // formRef.current.reset();
   };
   return (
-    <form className="h-5/6 flex flex-col items-center justify-center" ref={formRef}>
-      <fieldset className="h-5/6 flex flex-col items-center justify-center">
+    <form className="FLEX-horizC h-5/6" ref={formRef}>
+      <fieldset className="FLEX-horizC h-5/6">
         <label className="w-full mb-2" htmlFor="email">
           EMAIL
         </label>
         <input
-          className="sign-input mb-10 transition duration-300 
-          focus:border-blue-600 focus:border-2 focus:outline-none"
+          className="SIGN-input mb-10"
           id="email"
           type="email"
           ref={useremailRef}
@@ -52,8 +51,7 @@ export default function SignIn({ onSubmit }: SignInProps) {
           PASSWORD
         </label>
         <input
-          className="sign-input transition duration-300 
-          focus:border-blue-600 focus:border-2 focus:outline-none"
+          className="SIGN-input mb-10"
           id="password"
           type="password"
           ref={passwordRef}

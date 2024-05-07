@@ -157,7 +157,7 @@ export default React.memo(function CalendarPage({
         return (
           <td key={i} className="prevMonthDay">
             <div>{isPrevMonth ? day.getDate() : ''}</div>
-            <ul className="scroll-hide" id="event-box">
+            <ul className="SCROLL-hide" id="event-box">
               {eventElements}
             </ul>
           </td>
@@ -167,7 +167,7 @@ export default React.memo(function CalendarPage({
         return (
           <td key={i} className="nextMonthDay">
             <div>{isNextMonth ? day.getDate() : ''}</div>
-            <ul className="scroll-hide" id="event-box">
+            <ul className="SCROLL-hide" id="event-box">
               {eventElements}
             </ul>
           </td>
@@ -183,7 +183,7 @@ export default React.memo(function CalendarPage({
       return (
         <td key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
           <div className="day">{day.getDate()}</div>
-          <ul className="scroll-hide" id="event-box">
+          <ul className="SCROLL-hide" id="event-box">
             {eventElements}
           </ul>
         </td>

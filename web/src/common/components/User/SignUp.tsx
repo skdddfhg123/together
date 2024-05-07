@@ -66,16 +66,13 @@ export default function SignUp({ onSubmit }: SignUpProps) {
   };
 
   return (
-    <form className="h-5/6 flex flex-col items-center justify-center" ref={formRef}>
-      <fieldset className="h-5/6 flex flex-col items-center justify-center">
+    <form className="FLEX-horizC h-5/6" ref={formRef}>
+      <fieldset className="FLEX-horizC h-5/6">
         <label className="w-full mb-2" htmlFor="email">
           EMAIL
         </label>
         <input
-          className={`sign-input transition duration-300 
-          focus:border-blue-600 focus:border-2 focus:outline-none ${
-            emailValid ? '' : 'border-red-500 focus:border-red-500'
-          }`}
+          className={`SIGN-input ${emailValid ? '' : 'border-red-500 focus:border-red-500'}`}
           id="useremail"
           type="email"
           maxLength={50}
@@ -86,17 +83,12 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           autoComplete="off"
           required
         />
-        <div className="h-10 flex items-center">
-          {emailValid ? '' : '유효하지 않은 이메일 형식입니다.'}
-        </div>
+        <div className="FLEX-verC h-10">{emailValid ? '' : '유효하지 않은 이메일 형식입니다.'}</div>
         <label className="w-full mb-2" htmlFor="nickname">
           NICKNAME
         </label>
         <input
-          className={`sign-input transition duration-300 
-          focus:border-blue-600 focus:border-2 focus:outline-none ${
-            nicknameValid ? '' : 'border-red-500 focus:border-red-500'
-          }`}
+          className={`SIGN-input ${nicknameValid ? '' : 'border-red-500 focus:border-red-500'}`}
           id="nickname"
           type="nickname"
           maxLength={11}
@@ -107,17 +99,12 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           autoComplete="off"
           required
         />
-        <div className="h-10 flex items-center">
-          {nicknameValid ? '' : '4~10자 사이여야 합니다.'}
-        </div>
+        <div className="FLEX-verC h-10">{nicknameValid ? '' : '4~10자 사이여야 합니다.'}</div>
         <label className="w-full mb-2" htmlFor="password">
           PASSWORD
         </label>
         <input
-          className={`sign-input transition duration-300 
-          focus:border-blue-600 focus:border-2 focus:outline-none ${
-            passwordValid ? '' : 'border-red-500 focus:border-red-500'
-          }`}
+          className={`SIGN-input ${passwordValid ? '' : 'border-red-500 focus:border-red-500'}`}
           id="password"
           type="password"
           ref={passwordRef}
@@ -126,17 +113,12 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           placeholder="****"
           required
         />
-        <div className="h-10 flex items-center">
-          {passwordValid ? '' : '4글자 이상 입력해주세요.'}
-        </div>
+        <div className="FLEX-verC h-10">{passwordValid ? '' : '4글자 이상 입력해주세요.'}</div>
         <label className="w-full mb-2" htmlFor="confirmPassword">
           CONFIRM PASSWORD
         </label>
         <input
-          className={`sign-input transition duration-300 
-          focus:border-blue-600 focus:border-2 focus:outline-none ${
-            passwordsMatch ? '' : 'border-red-500 focus:border-red-500'
-          }`}
+          className={`SIGN-input ${passwordsMatch ? '' : 'border-red-500 focus:border-red-500'}`}
           id="confirmPassword"
           type="password"
           ref={confirmPasswordRef}
@@ -145,7 +127,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           placeholder="****"
           required
         />
-        <div className="h-10 flex items-center">
+        <div className="FLEX-verC h-10">
           {passwordsMatch ? '' : '비밀번호가 서로 일치하지 않습니다.'}
         </div>
       </fieldset>

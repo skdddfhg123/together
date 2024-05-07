@@ -29,15 +29,42 @@ h2 {
   font-weight: 700;
 }
 
-@layer components {
-  .scroll-hide {
-    @apply overflow-y-auto scrollbar-hide;
+@layer base {
+  .BTN {
+    padding: 0.5rem;
   }
 }
 
 @layer base {
-  .btn {
-    padding: 0.5rem;
+  .FLEX-horiz {
+    @apply flex flex-col
+  }
+
+  .FLEX-horizC {
+    @apply flex flex-col items-center justify-center
+  }
+}
+
+@layer base {
+  .FLEX-ver {
+    @apply flex flex-row
+  }
+  .FLEX-verA {
+    @apply flex flex-row justify-around
+  }
+
+  .FLEX-verB {
+    @apply flex flex-row justify-between
+  }
+
+  .FLEX-verC {
+    @apply flex flex-row justify-center
+  }
+}
+
+@layer components {
+  .SCROLL-hide {
+    @apply overflow-y-auto scrollbar-hide;
   }
 }
 
@@ -56,14 +83,15 @@ h2 {
 }
 
 @layer components {
-  .custom-input {
+  .INPUT {
     border: 1px solid lightgray;
     border-radius: 5px;
 
     font-size: larger;
+    @apply transition duration-300 focus:border-blue-600 focus:border-2 focus:outline-none
   }
 
-  .sign-input {
+  .SIGN-input {
     width: 40rem;
     height: 3rem;
 
@@ -72,10 +100,11 @@ h2 {
     border-radius: 5px;
 
     font-size: larger;
+    @apply transition duration-300 focus:border-blue-600 focus:border-2 focus:outline-none
   }
 }
 
-@keyframes slideInLeft {
+@keyframes SLIDEinLeft {
   from {
     opacity: 0;
     transform: translateX(-100%);
@@ -86,7 +115,7 @@ h2 {
   }
 }
 
-@keyframes slideOutLeft {
+@keyframes SLIDEoutLeft {
   from {
     opacity: 1;
     transform: translateX(0);
@@ -97,16 +126,16 @@ h2 {
   }
 }
 
-#slideIn-left {
+#SLIDEin-left {
   border-right: 1px solid rgb(242, 242, 242);
-  animation: slideInLeft 0.3s forwards;
+  animation: SLIDEinLeft 0.3s forwards;
 }
 
-#slideOut-left {
-  animation: slideOutLeft 0.3s forwards;
+#SLIDEout-left {
+  animation: SLIDEoutLeft 0.3s forwards;
 }
 
-@keyframes slideInRight {
+@keyframes SLIDEinRight {
   from {
     opacity: 0;
     transform: translateX(100%);
@@ -117,7 +146,7 @@ h2 {
   }
 }
 
-@keyframes slideOutRight {
+@keyframes SLIDEoutRight {
   from {
     opacity: 1;
     transform: translateX(0);
@@ -128,7 +157,7 @@ h2 {
   }
 }
 
-@keyframes slideInRightWidth {
+@keyframes SLIDEinRightWidth {
   from {
     opacity: 0;
     transform: translateX(100%);
@@ -141,7 +170,7 @@ h2 {
   }
 }
 
-@keyframes slideOutRightWidth {
+@keyframes SLIDEoutRightWidth {
   from {
     opacity: 1;
     transform: translateX(0);
@@ -155,19 +184,19 @@ h2 {
 }
 
 
-#slideIn-right, #slideDetailIn-right {
+#SLIDEin-right, #SLIDEdetailIn-right {
   border-left: 1px solid rgb(242, 242, 242);
-  animation: slideInRight 0.3s forwards;
+  animation: SLIDEinRight 0.3s forwards;
 }
 
-#slideOut-right, #slideDetailOut-right {
-  animation: slideOutRight 0.3s forwards;
+#SLIDEout-right, #SLIDEdetailOut-right {
+  animation: SLIDEoutRight 0.3s forwards;
 }
 
-#slideDetailIn-right {
-  animation: slideInRightWidth 0.3s forwards;
+#SLIDEdetailIn-right {
+  animation: SLIDEinRightWidth 0.3s forwards;
 }
 
-#slideDetailOut-right {
-  animation: slideOutRightWidth 0.3s forwards;
+#SLIDEdetailOut-right {
+  animation: SLIDEoutRightWidth 0.3s forwards;
 }
