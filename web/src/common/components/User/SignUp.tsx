@@ -72,7 +72,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           EMAIL
         </label>
         <input
-          className={`signInput transition duration-300 
+          className={`sign-input transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
             emailValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
@@ -93,7 +93,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           NICKNAME
         </label>
         <input
-          className={`signInput transition duration-300 
+          className={`sign-input transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
             nicknameValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
@@ -114,7 +114,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           PASSWORD
         </label>
         <input
-          className={`signInput transition duration-300 
+          className={`sign-input transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
             passwordValid ? '' : 'border-red-500 focus:border-red-500'
           }`}
@@ -133,7 +133,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           CONFIRM PASSWORD
         </label>
         <input
-          className={`signInput transition duration-300 
+          className={`sign-input transition duration-300 
           focus:border-blue-600 focus:border-2 focus:outline-none ${
             passwordsMatch ? '' : 'border-red-500 focus:border-red-500'
           }`}

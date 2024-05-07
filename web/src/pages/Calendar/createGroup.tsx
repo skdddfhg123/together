@@ -28,7 +28,7 @@ export default function CreateGroupPage() {
       <h1 className={`m-10`}>캘린더 만들기 페이지</h1>
       <form className="h-5/6 flex flex-col items-center justify-center" onSubmit={submitForm}>
         <fieldset className={`flex flex-col items-center`}>
-          {/* <section className={`w-full mb-5 text-xl flex flex-row justify-center`}>
+          {/* <section className={`w-full mb-5 text-xl flex justify-center`}>
             <label className={`p-2 mx-4`}>
               <input
                 className={`mr-2`}
@@ -52,7 +52,7 @@ export default function CreateGroupPage() {
             </label>
           </section> */}
           <label>
-            <input className={`signInput`} type="text" ref={titleRef} />
+            <input className={`sign-input`} type="text" ref={titleRef} />
           </label>
         </fieldset>
         <div className="w-full m-5 flex justify-center">

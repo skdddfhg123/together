@@ -43,6 +43,13 @@ export async function logIn(formData: SignInForm) {
     });
     if (!res) throw new Error('가입 실패');
 
+    /*
+    TODO 
+    access 토큰 유효시간을 백엔드에서 발급한 refresh 토큰과 동일하게 설정, 이후 만료된 access 토큰을 http header 담아서 보내면 refresh 시간 내에는 백엔드에서 자동 발급 
+    따라서, 로그아웃을 수동으로 할 경우 백엔드에 저장된 refresh 토큰을 삭제하는 요청을 보낼 필요가 있음
+    위의 경우, 백엔드에서 DB의 부하가 커질 수 있어 refresh 토큰을 프론트에서 쿠키에 저장해두고 access 토큰이 만료되면 http 헤더에 access 대신 refresh 토큰을 보내고, 
+    백엔드가 refresh 토큰을 받았을 떄는 토큰이 유효한지 확인한 뒤에 access 토큰을 새로 발급해서 보내주는 것이 좋지 않나? 
+    */
     const accessToken: Cookie = {
       name: 'accessToken',
       value: res.data.accessToken,
@@ -54,19 +61,19 @@ export async function logIn(formData: SignInForm) {
       },
     };
 
-    const refreshToken: Cookie = {
-      name: 'refreshToken',
-      value: res.data.refreshToken,
-      options: {
-        path: '/',
-        maxAge: 5184000,
-        secure: true,
-        sameSite: 'none',
-      },
-    };
+    // const refreshToken: Cookie = {
+    //   name: 'refreshToken',
+    //   value: res.data.refreshToken,
+    //   options: {
+    //     path: '/',
+    //     maxAge: 5184000,
+    //     secure: true,
+    //     sameSite: 'none',
+    //   },
+    // };
 
     setCookie(accessToken);
-    setCookie(refreshToken);
+    // setCookie(refreshToken);
 
     return true;
   } catch (e) {

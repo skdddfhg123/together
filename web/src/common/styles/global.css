@@ -29,6 +29,12 @@ h2 {
   font-weight: 700;
 }
 
+@layer components {
+  .scroll-hide {
+    @apply overflow-y-auto scrollbar-hide;
+  }
+}
+
 @layer base {
   .btn {
     padding: 0.5rem;
@@ -36,7 +42,7 @@ h2 {
 }
 
 @layer components {
-  .rMenuHeader {
+  .rMenu-header {
     height: 3rem;
     padding: 0 0.5rem;
 
@@ -50,14 +56,14 @@ h2 {
 }
 
 @layer components {
-  .customInput {
+  .custom-input {
     border: 1px solid lightgray;
     border-radius: 5px;
 
     font-size: larger;
   }
 
-  .signInput {
+  .sign-input {
     width: 40rem;
     height: 3rem;
 
@@ -100,7 +106,6 @@ h2 {
   animation: slideOutLeft 0.3s forwards;
 }
 
-
 @keyframes slideInRight {
   from {
     opacity: 0;
@@ -123,11 +128,46 @@ h2 {
   }
 }
 
-#slideIn-right {
+@keyframes slideInRightWidth {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+    width: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    width: 32rem;  
+  }
+}
+
+@keyframes slideOutRightWidth {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    width: 32rem;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+    width: 0;
+  }
+}
+
+
+#slideIn-right, #slideDetailIn-right {
   border-left: 1px solid rgb(242, 242, 242);
   animation: slideInRight 0.3s forwards;
 }
 
-#slideOut-right {
+#slideOut-right, #slideDetailOut-right {
   animation: slideOutRight 0.3s forwards;
+}
+
+#slideDetailIn-right {
+  animation: slideInRightWidth 0.3s forwards;
+}
+
+#slideDetailOut-right {
+  animation: slideOutRightWidth 0.3s forwards;
 }

@@ -18,13 +18,13 @@ export default function CalenderSetTap({ onClose }: CalenderTapProps) {
   };
   return (
     <>
-      <header className="rMenuHeader">
+      <header className="rMenu-header">
         <h2>CalendarSet</h2>
         <button className="btn" onClick={onClose}>
           Close
         </button>
       </header>
-      <section className="flex flex-row justify-center">
+      <section className="flex justify-center">
         <button className="btn my-4 p-4 hover:bg-custom-light rounded" onClick={handleDelete}>
           캘린더 삭제
         </button>

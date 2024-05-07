@@ -22,6 +22,7 @@ thead {
 
 tr {
   height: calc(100% / 5);
+
   display: flex;
   justify-content: space-around;
 }
@@ -55,13 +56,6 @@ td.today:hover {
 #event-box {
   height: 75%;
   padding: 0.25rem;
-  overflow-y: scroll;
-	-ms-overflow-style:none; /* IE and Edge */
-  scrollbar-width:none; /* Firefox */
-}
-
-#event-box::-webkit-scrollbar {
-	display:none; /* Chrome , Safari , Opera */
 }
 
 #event-box li {
@@ -95,7 +89,7 @@ th.day-6, .day-6 .day { /* 토요일 */
 .today .day {
   border-radius: 5px;
 
-  background-color: #ffea29;
+  background-color: #0086FF;
   font-weight: bold;
 }
 

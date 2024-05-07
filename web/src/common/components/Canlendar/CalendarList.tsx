@@ -48,7 +48,7 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
 
   return (
     <section
-      className={`h-fit flex flex-col items-center overflow-hidden ${isOpen ? 'w-full' : 'w-0'}`}
+      className={`scroll-hide h-fit flex flex-col items-center ${isOpen ? 'w-full' : 'w-0'}`}
       id={isOpen ? 'slideIn-left' : 'slideOut-left'}
     >
       <ul className={`h-fit w-full items-center flex flex-col`}>

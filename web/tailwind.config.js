@@ -3,6 +3,9 @@ module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
+      transitionDuration: {
+        2000: '2000ms',
+      },
       fontFamily: {},
       width: {
         100: '25rem',
@@ -28,5 +31,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar-hide')],
 };
