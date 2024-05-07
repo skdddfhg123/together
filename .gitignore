@@ -4,4 +4,4 @@
 config_local.py
 
 .env
-.postgres.env
+.db.env
