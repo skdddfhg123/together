@@ -6,7 +6,7 @@ import { RedisController } from './redis/redis.controller';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { KakaoModule } from './auth/kakao/kakao.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './db/user/user.module';
@@ -17,6 +17,7 @@ import { DiscordBotService } from './discordBot.service';
 import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
 import { FeedModule } from './feed/feed.module';
 import { ImageModule } from './image.upload/image.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ImageModule } from './image.upload/image.module';
       port: parseInt(process.env.REDIS_PORT),
       password: process.env.REDIS_PASS,
     }),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     UserModule,
     AuthModule,
     CalendarModule,
@@ -52,11 +54,11 @@ export class AppModule implements NestModule {
   }
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
-    consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
-    consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
-    consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');
-    consumer.apply(PlatformLoggerMiddleware).forRoutes('/google');
-    consumer.apply(KakaoLoggerMiddleware).forRoutes('/kakao');
-    consumer.apply(FeedLoggerMiddleware).forRoutes('/feed');
+    // consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
+    // consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
+    // consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');
+    // consumer.apply(PlatformLoggerMiddleware).forRoutes('/google');
+    // consumer.apply(KakaoLoggerMiddleware).forRoutes('/kakao');
+    // consumer.apply(FeedLoggerMiddleware).forRoutes('/feed');
   }
 }
