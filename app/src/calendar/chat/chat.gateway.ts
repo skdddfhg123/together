@@ -3,12 +3,11 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { SetInitDTO } from './dtos/createChat.dto';
 import * as jwt from 'jsonwebtoken';
-import { getPayload } from 'src/auth/getPayload.decorator';
-import { PayloadResponse } from 'src/auth/dtos/payload-response';
+import { SaveMessageDTO } from './dtos/saveMessage.dto';
 
 @WebSocketGateway(5000, {
     cors: {
-        origin: 'http://localhost:3001',
+        origin: 'http://localhost:3000',
         credentials: true,
     },
 })
@@ -28,11 +27,11 @@ export class ChatGateway
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
             client.data.nickname = decoded['nickname'];
+            client.data.email = decoded['useremail'];
             console.log(client.data)
-            // console.log('connected', client.id);
             client.leave(client.id);
-            client.data.roomId = `room:lobby`;
-            client.join('room:lobby');
+            client.data.roomId = `mainRoom` + client.data.email;
+            client.join((`mainRoom` + client.data.email));
         }
         catch(err) {
             client.disconnect(true);
@@ -43,11 +42,12 @@ export class ChatGateway
     //소켓 연결 해제시 유저목록에서 제거
     public handleDisconnect(client: Socket): void {
         const { roomId } = client.data;
+
         if (
-            roomId != 'room:lobby' &&
+            roomId != ('mainRoom' + client.data.email) &&
             !this.server.sockets.adapter.rooms.get(roomId)
         ) {
-            this.chatService.deleteChatRoom(roomId);
+            this.chatService.exitChatRoom(client, roomId);
             this.server.emit(
                 'getChatRoomList',
                 this.chatService.getChatRoomList(),
@@ -58,16 +58,32 @@ export class ChatGateway
 
     //메시지가 전송되면 모든 유저에게 메시지 전송
     @SubscribeMessage('sendMessage')
-    sendMessage(client: Socket, message: string): void {
+    async sendMessage(client: Socket, message: string): Promise<void> {
 
-        // console.log(message);
-        client.rooms.forEach((roomId) =>
+        client.rooms.forEach((roomId) =>  
             client.to(roomId).emit('getMessage', {
                 id: client.id,
+                email: client.data.email,
                 nickname: client.data.nickname,
                 message,
             }),
         );
+
+        try {
+            const newChatDto = new SaveMessageDTO();
+            newChatDto.email = client.data.email;
+            newChatDto.nickname = client.data.nickname;
+            newChatDto.message = message;
+            newChatDto.roomId = client.data.roomId;
+
+            await this.chatService.saveMessage(newChatDto);
+        }
+        catch(err) {
+            console.error(`message saved falied: ${err}`);
+        }
+
+        console.log(`Number of clients in room ${client.data.roomId}: ${this.server.sockets.adapter.rooms.get(client.data.roomId)?.size}`);
+        console.log(client.rooms)
     }
 
     //처음 접속시 닉네임 등 최초 설정
@@ -89,15 +105,15 @@ export class ChatGateway
         return {
             nickname: client.data.nickname,
             room: {
-                roomId: 'room:lobby',
-                roomName: '로비',
+                roomId: ('mainRoom' + client.data.email),
+                roomName: ('mainRoom' + client.data.email),
             },
         };
     }
 
     //채팅방 목록 가져오기
     @SubscribeMessage('getChatRoomList')
-    getChatRoomList(client: Socket, payload: any) {
+    getChatRoom(client: Socket, payload: any) {
         client.emit('getChatRoomList', this.chatService.getChatRoomList());
     }
 
@@ -106,7 +122,7 @@ export class ChatGateway
     createChatRoom(client: Socket, roomName: string) {
         //이전 방이 만약 나 혼자있던 방이면 제거
         if (
-            client.data.roomId != 'room:lobby' &&
+            client.data.roomId != ('mainRoom' + client.data.email) &&
             this.server.sockets.adapter.rooms.get(client.data.roomId).size == 1
         ) {
             this.chatService.deleteChatRoom(client.data.roomId);
@@ -123,22 +139,39 @@ export class ChatGateway
 
     //채팅방 들어가기
     @SubscribeMessage('enterChatRoom')
-    enterChatRoom(client: Socket, roomId: string) {
+    async enterChatRoom(client: Socket, roomId: string) {
         //이미 접속해있는 방 일 경우 재접속 차단
-        if (client.rooms.has(roomId)) {
+        let room = roomId;
+
+        if(room == null || room == 'All') {
+            room = 'mainRoom' + client.data.email;
+        }
+        
+        if (client.rooms.has(room)) {
             return;
         }
-        //이전 방이 만약 나 혼자있던 방이면 제거
-        if (
-            client.data.roomId != 'room:lobby' &&
-            this.server.sockets.adapter.rooms.get(client.data.roomId).size == 1
-        ) {
-            this.chatService.deleteChatRoom(client.data.roomId);
-        }
-        this.chatService.enterChatRoom(client, roomId);
+
+        this.chatService.enterChatRoom(client, room);
+
+        // MongoDB에서 이 채팅방의 메시지 조회
+        const messages = await this.chatService.findLimitCntMessageByCalendarId(room, 1);
+
+        console.log(messages);
+
+        // 클라이언트에게 이전 메시지 전송
+        messages.forEach((message) => {
+            client.emit('getMessage', {
+                id: message._id,
+                email: message.email,
+                nickname: message.nickname,
+                message: message.message,
+                registeredAt: message.registeredAt,
+            });
+        });
+
         return {
-            roomId: roomId,
-            roomName: this.chatService.getChatRoom(roomId).roomName,
+            roomId: room,
+            roomName: this.chatService.getChatRoom(room).roomName,
         };
     }
 }

@@ -15,8 +15,8 @@ import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GoogleModule } from './auth/google/google.module';
 import { DiscordBotService } from './discordBot.service';
 import { AwsModule } from './aws/aws.module';
-import { ChatGateway } from './calendar/chat/chat.gateway';
 import { ChatModule } from './calendar/chat/chat.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -25,6 +25,7 @@ import { ChatModule } from './calendar/chat/chat.module';
       envFilePath: '.env'
     }),
     TypeOrmModule.forRoot(typeORMConfig),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     CacheModule.register({
       isGlobal: true,
       store: redisStore,

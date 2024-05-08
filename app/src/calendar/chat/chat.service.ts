@@ -1,51 +1,59 @@
 import { Injectable } from "@nestjs/common";
 import { ChatRoomListDTO } from "./dtos/createChat.dto";
 import { Socket } from 'socket.io';
-import { v4 as uuidv4 } from 'uuid';
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Chat, ChatSchema } from "./entities/chat.schema";
+import { Connection, Model } from "mongoose";
+import { SaveMessageDTO } from "./dtos/saveMessage.dto";
 
 @Injectable()
 export class ChatService {
     private chatRoomList: Record<string, ChatRoomListDTO>;
-    constructor() {
+    constructor(
+        @InjectConnection()
+        private chatConnection: Connection,
+    ) {
         this.chatRoomList = {
-            'room:lobby': {
-                roomId: 'room:lobby',
-                roomName: '로비',
+            'roomMain': {
+                roomId: 'roomMain',
+                roomName: 'roomMain',
                 cheifId: null,
             },
         };
     }
+
+    private getModelForCalendar(calendarId: string): Model<Chat> {
+        const collectionName = calendarId;
+        return this.chatConnection.model<Chat>(
+            collectionName,
+            ChatSchema,
+            collectionName
+        );
+    }
+
     createChatRoom(client: Socket, roomName: string): void {
-        const roomId = `room:${uuidv4()}`;
+        const roomId = roomName;
         const nickname: string = client.data.nickname;
-        client.emit('getMessage', {
-            id: null,
-            nickname: '안내',
-            message:
-                `" ${nickname} "님이 " ${roomName} "일정을 생성하였습니다.`,
-        });
+        
         // return this.chatRoomList[roomId];
         this.chatRoomList[roomId] = {
             roomId,
             cheifId: client.id,
             roomName,
         };
+
         client.data.roomId = roomId;
-        client.rooms.clear();
-        client.join(roomId);
     }
 
     enterChatRoom(client: Socket, roomId: string) {
         client.data.roomId = roomId;
+        const { nickname } = client.data.nickname;
+        const roomName = this.chatRoomList[roomId];
+        if(!roomName) {
+            this.createChatRoom(client, roomId);
+        }
         client.rooms.clear();
         client.join(roomId);
-        const { nickname } = client.data;
-        const { roomName } = this.getChatRoom(roomId);
-        client.to(roomId).emit('getMessage', {
-            id: null,
-            nickname: '안내',
-            message: `"${nickname}"님이 "${roomName}"일정에 참가하셨습니다.`,
-        });
     }
 
     exitChatRoom(client: Socket, roomId: string) {
@@ -60,9 +68,44 @@ export class ChatService {
         });
     }
 
-    getChatRoom(roomId: string): ChatRoomListDTO {
+    getChatRoom(roomId: string): ChatRoomListDTO | null {
         return this.chatRoomList[roomId];
     }
+
+    async saveMessage(saveMessageDto: SaveMessageDTO): Promise<Chat> {
+        const { roomId } = saveMessageDto;
+        const chatModel = this.getModelForCalendar(roomId);
+        const saveMessage = new chatModel(saveMessageDto);
+        return await saveMessage.save();
+    }
+
+    async findAllMessageByCalendarId(calendarId: string): Promise<Chat[]> {
+        const chatModel = this.getModelForCalendar(calendarId);
+
+        return await chatModel.find();
+    }
+
+    async findLimitCntMessageByCalendarId(calendarId: string, skipPage: number): Promise<Chat[]> {
+        const chatModel = this.getModelForCalendar(calendarId);
+
+        const limit = 10;
+        const skipNum = (skipPage - 1) * limit;
+
+        return await chatModel.find().skip(skipNum).limit(limit);
+    }
+
+    async findThreeDaysAgoMessageByCalendarId(calendarId: string): Promise<Chat[]> {
+        const threeDays = 3 * 24 * 60 * 60 * 1000;
+        const threeDaysAgo = new Date(Date.now() - threeDays);
+
+        const chatModel = this.getModelForCalendar(calendarId);
+
+        return await chatModel.find({
+            registeredAt: {$gte: threeDaysAgo},
+        });
+    }
+
+
 
     getChatRoomList(): Record<string, ChatRoomListDTO> {
         return this.chatRoomList;
