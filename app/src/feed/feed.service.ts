@@ -96,12 +96,11 @@ export class FeedService {
             feed.feedType = body.feedType;
             feed.title = body.title;
             feed.content = body.content;
-            const savedFeed = await this.feedRepository.save(feed);
+            await this.feedRepository.save(feed);
 
             let feedImages = []
             if (images && images.length) {
                 const imageUrls = await this.imageService.imageArrayUpload(images);
-
 
                 for (const imageUrl of imageUrls) {
                     const feedImage = new FeedImage();
@@ -109,13 +108,23 @@ export class FeedService {
                     feedImage.imageSrc = imageUrl;
                     const savedFeedImage = await this.feedImageRepository.save(feedImage);
                     delete feedImage.feed;
-                    feedImages.push(feedImage);
+                    const { imageSrc, feedImageId } = feedImage
+                    const resImage = { imageSrc, feedImageId }
+                    feedImages.push(resImage);
                 }
             }
 
-            delete feed.user;
+            delete feed.user.useremail
+            delete feed.user.password
+            delete feed.user.prePwd
+            delete feed.user.phone
+            delete feed.user.registeredAt
+            delete feed.user.updatedAt
+            delete feed.user.deletedAt
+            delete feed.user.birthDay
+            delete feed.user.birthDayFlag
 
-
+            console.log(feed);
             return { feed: feed, feedImages: feedImages }
 
         } catch (e) {
