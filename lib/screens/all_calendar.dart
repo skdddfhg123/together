@@ -1,19 +1,14 @@
-import 'package:calendar/api/kakao_auth_service.dart';
-import 'package:calendar/calendar_utils.dart';
-import 'package:calendar/controllers/auth_controller.dart';
-import 'package:calendar/controllers/calendar_controller.dart'; // CalendarController를 가져옵니다.
 import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/meeting_data.dart';
 import 'package:calendar/screens/event_detail.dart';
-import 'package:calendar/screens/login_page.dart';
-import 'package:calendar/screens/sync_login_page.dart';
+
 import 'package:calendar/widget/custom_drawer.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class AllCalendar extends StatelessWidget {

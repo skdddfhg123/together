@@ -20,8 +20,8 @@ void main() async {
   print("Deleting token...");
   await prefs.remove('token');
   print("Token deleted.");
-  var token = prefs.getString('token'); // 이제 token은 null이어야 합니다.
-  print("Token after deletion: $token"); // 로그 출력
+  var token = prefs.getString('token');
+  print("Token after deletion: $token");
 
   KakaoSdk.init(
       nativeAppKey: 'e93a75bf0305cc39ffdd47eeb2815a7a',

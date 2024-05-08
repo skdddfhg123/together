@@ -29,6 +29,7 @@ class EventDetailPage extends StatefulWidget {
 }
 
 class _EventDetailPageState extends State<EventDetailPage> {
+  int currentPage = 0;
   // 현재 시간으로부터 몇 시간 전인지를 계산하는 함수
   String timeAgoSinceDate(DateTime date) {
     final currentDate = DateTime.now();
@@ -209,71 +210,107 @@ class _EventDetailPageState extends State<EventDetailPage> {
           Expanded(
             child: Obx(
               () {
-                print("현재 피드 수: ${meetingController.feeds.length}"); // 로그 추가
                 if (meetingController.feeds.isNotEmpty) {
                   return ListView.builder(
                     itemCount: meetingController.feeds.length,
                     itemBuilder: (_, index) {
                       final feed = meetingController.feeds[index].feed;
                       return Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 15),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
+                          color: Colors.white,
                           border: Border(
-                            bottom: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
+                            bottom:
+                                BorderSide(color: Colors.grey[300]!, width: 1),
                           ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      feed.thumbnail), // feed.thumbnail
-                                  radius: 20,
-                                ),
-                                const SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                Row(
                                   children: [
-                                    Text(
-                                      feed.nickname,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          NetworkImage(feed.thumbnail),
+                                      radius: 20,
                                     ),
-                                    Text(
-                                      timeAgoSinceDate(feed.createdAt),
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                      ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          feed.nickname,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Text(
+                                          timeAgoSinceDate(feed.createdAt),
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
+                                Icon(Icons.more_vert,
+                                    color: widget.calendarColor),
                               ],
                             ),
                             const SizedBox(height: 10),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: feed.imageSrcs.map((image) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: Image.network(
-                                      image,
-                                      width: 100, // 이미지의 너비 조절
-                                      height: 100, // 이미지의 높이 조절
-                                      fit: BoxFit.cover,
-                                    ),
-                                  );
-                                }).toList(),
+                            if (feed.imageSrcs.isNotEmpty)
+                              Container(
+                                height: 200, // 이미지 높이 설정
+                                child: PageView.builder(
+                                  itemCount: feed.imageSrcs.length,
+                                  onPageChanged: (int page) {
+                                    setState(() {
+                                      currentPage = page;
+                                    });
+                                  },
+                                  itemBuilder: (_, imageIndex) {
+                                    return ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        feed.imageSrcs[imageIndex],
+                                        fit: BoxFit.cover,
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
+                            Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: Text(
+                                '${currentPage + 1}/${feed.imageSrcs.length}',
+                                style: TextStyle(color: Colors.grey[700]),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.comment, color: Colors.grey),
+                                  onPressed: () {
+                                    // 댓글 기능 구현
+                                  },
+                                ),
+                                IconButton(
+                                  icon:
+                                      Icon(Icons.bookmark, color: Colors.grey),
+                                  onPressed: () {
+                                    // 북마크 기능 구현
+                                  },
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 10),
                             Text(
@@ -288,7 +325,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     },
                   );
                 } else {
-                  print("피드 리스트가 비어있습니다."); // 로그 추가
                   return const Center(
                     child: Text("아직 게시글이 없습니다."),
                   );
