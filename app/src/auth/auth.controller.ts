@@ -50,6 +50,16 @@ export class AuthController {
     return this.authService.login(loginDTO);
   }
 
+  @ApiResponse({ status: 201, description: 'Successfully logged in', type: LoginDTO })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Post('login/v2')
+  async login2(
+    @Body(ValidationPipe) loginDTO: LoginDTO,
+  ): Promise<any> {
+    return this.authService.login2(loginDTO);
+  }
+
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Successfully retrieved user data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

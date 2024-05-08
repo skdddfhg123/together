@@ -27,7 +27,9 @@ export class CustomLoggerService {
         let chunks: any[] = [];
 
         res.send = function (chunk: any) {
-            chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+            if (chunk !== undefined) {
+                chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+            }
             return originalSend.apply(res, arguments);
         };
 

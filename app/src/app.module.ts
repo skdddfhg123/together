@@ -54,12 +54,12 @@ export class AppModule implements NestModule {
     console.log(dataSource.driver.database);
   }
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
-    // consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
-    // consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
-    // consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');
-    // consumer.apply(PlatformLoggerMiddleware).forRoutes('/google');
-    // consumer.apply(KakaoLoggerMiddleware).forRoutes('/kakao');
-    // consumer.apply(FeedLoggerMiddleware).forRoutes('/feed');
+    // consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
+    consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
+    consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
+    consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');
+    consumer.apply(PlatformLoggerMiddleware).forRoutes('/google');
+    consumer.apply(KakaoLoggerMiddleware).forRoutes('/kakao');
+    consumer.apply(FeedLoggerMiddleware).forRoutes('/feed');
   }
 }

@@ -74,6 +74,51 @@ export class AuthService {
         }
     }
 
+    async login2(loginDTO: LoginDTO): Promise<any> {
+        try {
+            const user = await this.userService.findOne(loginDTO);
+
+            if (!user) {
+                throw new UnauthorizedException("User not found");
+            }
+
+            const passwordMatched = await bcrypt.compare(loginDTO.password, user.password);
+
+            if (!passwordMatched) {
+                throw new UnauthorizedException("Password does not match");
+            }
+
+            // userCalendar 정보를 가져오는 로직 추가 (가정)
+            const userCalendar = await this.userCalendarService.findCalendarByUserId(user.userId);
+
+            const payload = {
+                nickname: user.nickname,
+                useremail: user.useremail,
+                userCalendarId: userCalendar?.userCalendarId,
+            };
+
+            const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+            const refreshToken = this.jwtService.sign(payload, { expiresIn: '60d' });
+
+            await this.tokensService.saveUserToken(user.useremail, 'jwt', accessToken, refreshToken);
+
+            return {
+                accessToken,
+                refreshToken,
+                "nickname": user.nickname,
+                "useremail": user.useremail,
+                "userCalendarId": userCalendar.userCalendarId,
+            };
+
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            } else {
+                throw new InternalServerErrorException("An error occurred during login");
+            }
+        }
+    }
+
     async GetAllByToken(payload: PayloadResponse): Promise<any> {
         try {
             const result = await this.userRepository.createQueryBuilder("user")
