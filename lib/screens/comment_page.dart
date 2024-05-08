@@ -32,6 +32,7 @@ class _CommentsPageState extends State<CommentsPage> {
   void _loadComments() {
     // MeetingController 인스턴스를 가져오고 댓글을 로드
     final MeetingController meetingController = Get.find<MeetingController>();
+    final AuthController authController = Get.find<AuthController>();
     meetingController.loadCommentsForFeed(widget.feedId);
   }
 
@@ -138,9 +139,17 @@ class _CommentsPageState extends State<CommentsPage> {
                   icon: const Icon(Icons.send),
                   onPressed: () {
                     if (_controller.text.isNotEmpty) {
-                      meetingController.addComment(widget.feedId,
-                          _controller.text, widget.nickname, widget.thumbnail);
-                      _controller.clear();
+                      // 현재 로그인한 사용자의 정보를 사용
+                      var currentUser = Get.find<AuthController>().user;
+                      if (currentUser != null) {
+                        meetingController.addComment(
+                            widget.feedId,
+                            _controller.text,
+                            currentUser.nickname, // 로그인한 사용자의 닉네임 사용
+                            currentUser.thumbnail // 로그인한 사용자의 썸네일 사용
+                            );
+                        _controller.clear();
+                      }
                     }
                   },
                 ),

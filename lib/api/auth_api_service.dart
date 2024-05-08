@@ -20,8 +20,11 @@ class AuthAPIService {
     if (response.statusCode == 201) {
       var data = json.decode(response.body);
       var token = data['accessToken'];
-      var userInfo =
-          UserInfo(useremail: data['useremail'], nickname: data['nickname']);
+      var userInfo = UserInfo(
+          useremail: data['useremail'],
+          nickname: data['nickname'],
+          thumbnail: data['thumbnail'] ??
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s");
       Get.find<AuthController>().setAccessToken(token);
       Get.find<AuthController>().setUser(userInfo);
       return true;

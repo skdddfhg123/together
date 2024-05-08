@@ -280,56 +280,55 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                     ),
                                   ],
                                 ),
-                                PopupMenuButton<String>(
-                                  icon: Icon(Icons.more_vert,
-                                      color: widget.calendarColor),
-                                  onSelected: (String value) {
-                                    switch (value) {
-                                      case 'edit':
-                                        // 편집 로직
-                                        break;
-                                      case 'delete':
-                                        showDialog(
-                                          context: context,
-                                          builder:
-                                              (BuildContext dialogContext) {
-                                            return AlertDialog(
-                                              title: const Text("삭제 확인"),
-                                              content: const Text(
-                                                  "이 게시물을 삭제하시겠습니까?"),
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  child: const Text("취소"),
-                                                  onPressed: () => Navigator.of(
-                                                          dialogContext)
-                                                      .pop(),
-                                                ),
-                                                TextButton(
-                                                  child: const Text("삭제"),
-                                                  onPressed: () {
-                                                    // 삭제 로직 구현
-                                                    meetingController
-                                                        .deleteFeed(feedId)
-                                                        .then((_) {
-                                                      Navigator.of(
-                                                              dialogContext)
-                                                          .pop();
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                        break;
-                                    }
-                                  },
-                                  itemBuilder: (BuildContext context) {
-                                    final bool isUserPost =
-                                        authController.user?.nickname ==
-                                            feed.nickname;
-                                    return isUserPost
-                                        ? <PopupMenuEntry<String>>[
+                                authController.user?.nickname == feed.nickname
+                                    ? PopupMenuButton<String>(
+                                        icon: Icon(Icons.more_vert,
+                                            color: widget.calendarColor),
+                                        onSelected: (String value) {
+                                          switch (value) {
+                                            case 'edit':
+                                              // 편집 로직
+                                              break;
+                                            case 'delete':
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext
+                                                    dialogContext) {
+                                                  return AlertDialog(
+                                                    title: const Text("삭제 확인"),
+                                                    content: const Text(
+                                                        "이 게시물을 삭제하시겠습니까?"),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        child: const Text("취소"),
+                                                        onPressed: () =>
+                                                            Navigator.of(
+                                                                    dialogContext)
+                                                                .pop(),
+                                                      ),
+                                                      TextButton(
+                                                        child: const Text("삭제"),
+                                                        onPressed: () {
+                                                          // 삭제 로직 구현
+                                                          meetingController
+                                                              .deleteFeed(
+                                                                  feedId)
+                                                              .then((_) {
+                                                            Navigator.of(
+                                                                    dialogContext)
+                                                                .pop();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                              break;
+                                          }
+                                        },
+                                        itemBuilder: (BuildContext context) {
+                                          return <PopupMenuEntry<String>>[
                                             const PopupMenuItem<String>(
                                               value: 'edit',
                                               child: Text('편집'),
@@ -338,11 +337,10 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                               value: 'delete',
                                               child: Text('삭제'),
                                             ),
-                                          ]
-                                        : <PopupMenuEntry<
-                                            String>>[]; // 사용자가 작성자가 아니면 메뉴를 비웁니다.
-                                  },
-                                ),
+                                          ];
+                                        },
+                                      )
+                                    : const SizedBox.shrink(),
                               ],
                             ),
                             const SizedBox(height: 10),
