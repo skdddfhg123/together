@@ -5,6 +5,8 @@ import { GroupEvent } from "./entities/groupEvent.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Calendar } from "src/calendar/entities/calendar.entity";
+import { GetGroupDTO, MemberInfo } from "./dtos/groupEvent.get.dto";
+import { User } from "src/db/user/entities/user.entity";
 
 
 @Injectable()
@@ -14,6 +16,8 @@ export class GroupEventService {
         private readonly groupEventRepository: Repository<GroupEvent>,
         @InjectRepository(Calendar)
         private readonly calendarRepository: Repository<Calendar>,
+        @InjectRepository(User)
+        private userRepository: Repository<User>
     ) { }
 
     async createGroupEvent(
@@ -66,6 +70,55 @@ export class GroupEventService {
         }
         catch (e) {
             throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${CalendarId}`);
+        }
+    }
+
+    async getAllGroupEventsByCalendarId2(calendarId: string): Promise<GetGroupDTO[]> {
+        try {
+            const groupEvents = await this.groupEventRepository.find({
+                where: {
+                    calendarId,
+                    isDeleted: false
+                },
+                order: {
+                    startAt: 'ASC'
+                }
+            });
+
+            const groupEventDtos: GetGroupDTO[] = await Promise.all(groupEvents.map(async (event) => {
+                const memberInfos: MemberInfo[] = await Promise.all(event.member.map(async (memberEmail) => {
+                    const user = await this.userRepository.findOne({
+                        where: { useremail: memberEmail }
+                    });
+
+                    return {
+                        useremail: user?.useremail,
+                        thumbnail: user?.thumbnail,
+                        nickname: user?.nickname
+                    };
+                }));
+
+                return {
+                    groupEventId: event.groupEventId,
+                    author: event.author,
+                    member: memberInfos,
+                    title: event.title,
+                    color: event.color,
+                    pinned: event.pinned,
+                    alerts: event.alerts,
+                    attachment: event.attachment,
+                    createdAt: event.createdAt,
+                    updatedAt: event.updatedAt,
+                    startAt: event.startAt,
+                    endAt: event.endAt,
+                    deletedAt: event.deletedAt,
+                    isDeleted: event.isDeleted
+                };
+            }));
+
+            return groupEventDtos;
+        } catch (e) {
+            throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}: ${e.message}`);
         }
     }
 

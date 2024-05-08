@@ -12,6 +12,7 @@ import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity'
 import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 import { UpdateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.update.dto';
 import { RefreshAuthGuard } from 'src/auth/strategy/refresh.guard';
+import { GetGroupDTO } from 'src/db/event/group_event/dtos/groupEvent.get.dto';
 
 @ApiTags("calendar")
 @Controller('calendar')
@@ -153,7 +154,21 @@ export class CalendarController {
         return await this.groupEventService.getAllGroupEventsByCalendarId(calendarId);
     }
 
-    @Get('group/get/:groupeventId')
+    @Get('group/get/v2/:calendarId')
+    @ApiOperation({ summary: '캘린더 그룹 이벤트 가져오기' })
+    @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
+    async getAllGroupEvent2(
+        @Param('calendarId') calendarId: string,
+    ): Promise<GetGroupDTO[]> {
+        console.log(calendarId);
+        return await this.groupEventService.getAllGroupEventsByCalendarId2(calendarId);
+    }
+
+    @Get('group/get/detail/:groupeventId')
     @ApiOperation({ summary: '특정 그룹 이벤트 가져오기' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
