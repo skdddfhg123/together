@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { UUID } from 'crypto';
 import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
+
+import {
+  useSelectedDayStore,
+  useSelectedCalendarStore,
+  useGroupEventListStore,
+  useSocialEventListStore,
+} from '@store/index';
+import * as CALENDAR from '@services/calendarAPI';
 
 import EventModal from '@components/Canlendar/EventModal';
 import EventDetails from '@components/Canlendar/EventDetails';
-import * as CALENDAR from '@services/calendarAPI';
-import {
-  useGroupEventStore,
-  useNowCalendarStore,
-  useSelectedDayStore,
-  useSocialEventStore,
-  useUserInfoStore,
-} from '@store/index';
-
 import '@styles/calendar.css';
 
 type CalendarProps = {
@@ -25,18 +25,11 @@ export default React.memo(function CalendarPage({
   isNextMonth,
   currentMonth,
 }: CalendarProps) {
-  const { selectedDay, setSelectedDay } = useSelectedDayStore((state) => ({
-    selectedDay: state.selectedDay,
-    setSelectedDay: state.setSelectedDay,
-  }));
-
-  const { socialEvents } = useSocialEventStore();
-  const { groupEvents } = useGroupEventStore();
-  const userCalendarId = useUserInfoStore(
-    (state) => state.userInfo?.userCalendarId?.userCalendarId || null,
-  );
-  const { nowCalendar } = useNowCalendarStore();
-  const { setGroupEvents } = useGroupEventStore();
+  const { selectedDay, setSelectedDay } = useSelectedDayStore();
+  const { socialEvents } = useSocialEventListStore();
+  const { groupEvents } = useGroupEventListStore();
+  const { SelectedCalendar } = useSelectedCalendarStore();
+  const { setGroupEvents } = useGroupEventListStore();
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -47,15 +40,15 @@ export default React.memo(function CalendarPage({
 
   // *****************? 등록된 그룹 이벤트의 세부 slide-bar
   const [detailsOn, setDetailsOn] = useState<boolean>(false);
-  const [groupEventId, setGroupEventId] = useState<string | null>(null);
+  const [groupEventId, setGroupEventId] = useState<UUID | null>(null);
 
   // *****************? 최초 달력 일정 Rendering
   useEffect(() => {
-    if (!nowCalendar) return;
+    if (!SelectedCalendar) return;
 
-    if (nowCalendar === 'All') return console.log('전체 일정 그리기');
-    CALENDAR.getCalEvents(nowCalendar);
-  }, [nowCalendar, detailsOn, setGroupEvents]);
+    if (SelectedCalendar === 'All') return console.log('전체 일정 그리기');
+    CALENDAR.getGroupAllEvents(SelectedCalendar);
+  }, [SelectedCalendar, detailsOn, setGroupEvents]);
 
   // *****************? 더블 클릭으로 이벤트 등록 Modal 띄움
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
@@ -70,11 +63,11 @@ export default React.memo(function CalendarPage({
     }
   };
 
-  const handleDetails = (evnetId: string, e: React.MouseEvent<HTMLElement>) => {
+  const handleDetails = (eventId: UUID, e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
 
-    if (!groupEventId || evnetId !== groupEventId) {
-      setGroupEventId(evnetId);
+    if (!groupEventId || eventId !== groupEventId) {
+      setGroupEventId(eventId);
       setDetailsOn(true);
     } else {
       detailsClose();
@@ -137,7 +130,7 @@ export default React.memo(function CalendarPage({
         <li
           onMouseEnter={(e) => e.stopPropagation()}
           onMouseLeave={(e) => e.stopPropagation()}
-          onClick={(e) => handleDetails(event.groupEventId, e)}
+          onClick={(e) => event.groupEventId && handleDetails(event.groupEventId, e)}
           className="group-event"
           // style={{ backgroundColor: `${event.color === 'blue' ? '#0086FF' : '${event.color}'}` }}
           style={{ backgroundColor: `${event.color}` }}
@@ -226,7 +219,6 @@ export default React.memo(function CalendarPage({
         isOpen={eventModalOn}
         onClose={eventModalClose}
         selectedDay={selectedDay}
-        userCalendarId={userCalendarId}
         position={modalPosition}
       />
     </div>

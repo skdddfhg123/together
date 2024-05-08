@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import * as CALENDAR from '@services/calendarAPI';
 import { Link, useNavigate } from 'react-router-dom';
+
+import * as CALENDAR from '@services/calendarAPI';
 
 export default function CreateGroupPage() {
   const titleRef = useRef<HTMLInputElement>(null);

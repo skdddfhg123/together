@@ -1,7 +1,7 @@
-import * as API from '@utils/api';
 import axios, { AxiosError } from 'axios';
-
+import * as API from '@utils/api';
 import { setCookie, getCookie, deleteCookie } from '@utils/cookie';
+
 import { Cookie } from '@type/index';
 
 const headrOptions = {

@@ -1,10 +1,14 @@
+import { UUID } from 'crypto';
+
+// ************************** 쿠키
+
 export type Cookie = {
   name: string;
   value: string;
   options: CookieOptions;
 };
 
-interface CookieOptions {
+type CookieOptions = {
   expires?: Date;
   maxAge?: number;
   domain?: string;
@@ -12,8 +16,9 @@ interface CookieOptions {
   secure?: boolean;
   httpOnly?: boolean;
   sameSite?: 'lax' | 'strict' | 'none';
-}
+};
 
+// ************************** 회원가입 / 로그인
 export interface SignInForm {
   useremail: string;
   password: string;
@@ -23,37 +28,88 @@ export interface SignUpForm extends SignInForm {
   nickname: string;
 }
 
-export interface ErrorResponse {
-  message: string;
+export type UserInfo = {
+  nickname: string;
+  useremail: string;
+  birthDay?: string | null;
+  phone?: string | null;
+  userProfile?: Image;
+  userCalendarId: UserCalendarListInfo;
+  // kakaoId?: number;    //TODO setting 객체로 받을 듯?
+  // kakaoRefresh?: number;
+};
+
+// ************************** 캘린더
+
+type Image = string;
+export type CalendarId = UUID | 'All';
+
+export type UserCalendarListInfo = {
+  userCalendarId: UUID;
+  groupCalendar: GroupEvent[] | null;
+  socialEvents: SocialEvent[] | null;
+};
+
+export type CreateCalendarForm = {
+  title: string;
+  type: string; //TODO color로 변경?
+};
+
+export type Calendar = {
+  calendarId: UUID;
+  title: string;
+  attendees: string[];
+  author: {
+    userCalendarId: UUID;
+  };
+  bannerImage: Image;
+  coverImage: Image;
+  type: string; //TODO color로 변경?
+};
+
+// ************************** 이벤트 (일정)
+
+export interface reqGroupEvent {
+  groupCalendarId?: CalendarId;
+  emails?: string[] | null;
+  color?: string | null;
+  title: string;
+  startAt: string;
+  endAt: string;
+}
+
+export interface GroupEvent extends reqGroupEvent {
+  groupEventId?: UUID | null;
+  author?: UUID;
+  member: string[]; //TODO email(string), userProfile(Image) 추가
+  alerts?: number | null;
+  attachment?: string | null;
+  pinned: boolean;
 }
 
 export type SocialEvent = {
+  userCalendarId?: string;
+  socialEventId: UUID;
   title?: string;
   startAt: string;
   endAt: string;
   isPast: boolean;
-  userCalendarId?: string;
-  social: string;
-  socialEventId: string;
+  social: string; //TODO 'kakao' | 'google' | 'outlook'
 };
 
-export interface Calendar {
-  attendees: string[];
-  author: {
-    userCalendarId: string;
-  };
-  bannerImage: string | null;
-  calendarId: string;
-  coverImage: string | null;
-  deletedAt: string | null;
-  isDeleted: boolean;
-  registeredAt: string;
+// ************************** 피드
+
+export interface reqEventFeed {
+  groupEventId?: UUID;
+  feedId?: UUID;
+  feedType?: number;
   title: string;
-  type: string; //TODO color로 변경?
-  updatedAt: string;
+  content: string;
+  images: string[]; // image Type - string?
 }
 
-export interface CreateGroupForm {
-  title: string;
-  type: string; //TODO color로 변경?
+export interface EventFeed extends reqEventFeed {
+  userProfile: Image;
+  nickname: string;
+  createAt: Date;
 }

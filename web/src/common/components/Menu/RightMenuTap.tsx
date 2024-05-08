@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
+
+import { useSelectedCalendarStore } from '@store/index';
 import BookMarkTap from '@components/Menu/BookMarkTap';
 import ChatTap from '@components/Menu/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
 import CalendarSetTap from '@components/Menu/CalenderSetTap';
-import { useNowCalendarStore } from '@store/index';
 
 type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
 export default React.memo(function RightMenuTap() {
-  const { nowCalendar } = useNowCalendarStore();
+  const { SelectedCalendar } = useSelectedCalendarStore();
   const [activeTap, setActiveTap] = useState<TapName | null>(null);
 
   useEffect(() => {
     setActiveTap(null);
-  }, [nowCalendar]);
+  }, [SelectedCalendar]);
 
   const toggleTap = useCallback(
     (tap: TapName) => {
@@ -44,12 +45,12 @@ export default React.memo(function RightMenuTap() {
           Member
         </button>
         <button
-          disabled={nowCalendar === 'All'}
+          disabled={SelectedCalendar === 'All'}
           className={`${
             activeTap === 'calendarSet' ? 'bg-custom-line' : ''
-          } ${nowCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
+          } ${SelectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
           onClick={() => {
-            if (nowCalendar !== 'All') {
+            if (SelectedCalendar !== 'All') {
               toggleTap('calendarSet');
             }
           }}

@@ -1,18 +1,19 @@
 import React from 'react';
 import * as CALENDAR from '@services/calendarAPI';
 import * as USER from '@services/userAPI';
-import { useNowCalendarStore } from '@store/index';
+
+import { useSelectedCalendarStore } from '@store/index';
 
 interface CalenderTapProps {
   onClose: () => void;
 }
 
 export default function CalenderSetTap({ onClose }: CalenderTapProps) {
-  const { nowCalendar } = useNowCalendarStore();
+  const { SelectedCalendar } = useSelectedCalendarStore();
 
   const handleDelete = async () => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
-    await CALENDAR.deleteGroupCalendar(nowCalendar);
+    await CALENDAR.removeGroupCalendar(SelectedCalendar);
     await USER.firstRender();
     onClose();
   };

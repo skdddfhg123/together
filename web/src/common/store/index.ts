@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { Calendar, SocialEvent } from '@type/index';
+import { UUID } from 'crypto';
+
+import { GroupEvent, UserInfo, Calendar, CalendarId, SocialEvent } from '@type/index';
 
 interface SelectedDayState {
   selectedDay: Date | null;
@@ -11,93 +13,56 @@ export const useSelectedDayStore = create<SelectedDayState>((set) => ({
   setSelectedDay: (day: Date | null) => set({ selectedDay: day }),
 }));
 
-interface SocialEventState {
-  socialEvents: SocialEvent[];
-  setSocialEvents: (events: SocialEvent[]) => void;
+interface UserInfoState {
+  userInfo: UserInfo | null;
+  setUserInfo: (user: UserInfo | null) => void;
 }
 
-export const useSocialEventStore = create<SocialEventState>((set) => ({
-  socialEvents: [],
-  setSocialEvents: (events) => set({ socialEvents: events }),
-}));
-
-interface UserStore {
-  userInfo: UserInfoStore | null;
-  setUserInfo: (user: UserInfoStore | null) => void;
-}
-
-interface UserInfoStore {
-  nickname: string;
-  useremail: string;
-  birthDay?: string | null;
-  phone?: string | null;
-  registeredAt?: string;
-  thumbnail?: string | null;
-  updatedAt?: string;
-  userCalendarId?: UserCalendarInfo;
-  kakaoId?: number;
-  kakaoRefresh?: number;
-}
-
-interface UserCalendarInfo {
-  userCalendarId: string;
-  groupCalendar?: resGroupEventStore[];
-  socialEvents?: SocialEvent[];
-}
-
-export const useUserInfoStore = create<UserStore>((set) => ({
+export const useUserInfoStore = create<UserInfoState>((set) => ({
   userInfo: null,
-  setUserInfo: (user: UserInfoStore | null) => set({ userInfo: user }),
+  setUserInfo: (user: UserInfo | null) => set({ userInfo: user }),
 }));
 
-interface CalendarStore {
+interface CalendarListState {
   calendars: Calendar[];
   isLoaded: boolean;
   setCalendars: (calendars: Calendar[]) => void;
   setIsLoaded: (isLoaded: boolean) => void;
 }
 
-export const useCalendarListStore = create<CalendarStore>((set) => ({
+export const useCalendarListStore = create<CalendarListState>((set) => ({
   calendars: [],
   isLoaded: false,
   setCalendars: (calendars) => set({ calendars }),
   setIsLoaded: (isLoaded: boolean) => set({ isLoaded: isLoaded }),
 }));
 
-interface NowCalendarStore {
-  nowCalendar: string;
-  setNowCalendar: (calendarId: string) => void;
+interface SelectedCalendarState {
+  SelectedCalendar: UUID | 'All';
+  setSelectedCalendar: (calendarId: CalendarId) => void;
 }
 
-export const useNowCalendarStore = create<NowCalendarStore>((set) => ({
-  nowCalendar: 'All',
-  setNowCalendar: (calendarId: string) => set({ nowCalendar: calendarId }),
+export const useSelectedCalendarStore = create<SelectedCalendarState>((set) => ({
+  SelectedCalendar: 'All',
+  setSelectedCalendar: (calendarId: CalendarId) => set({ SelectedCalendar: calendarId }),
 }));
 
-export interface reqGroupEventStore {
-  groupCalendarId?: string;
-  emails?: string[] | null;
-  color?: string | null;
-  title: string;
-  author: string;
-  startAt: string;
-  endAt: string;
-}
-
-export interface resGroupEventStore extends reqGroupEventStore {
-  alerts?: number | null;
-  attachment?: string | null;
-  groupEventId: string;
-  member: string[];
-  pinned: boolean;
-}
-
 interface GroupEventsState {
-  groupEvents: resGroupEventStore[];
-  setGroupEvents: (events: resGroupEventStore[]) => void;
+  groupEvents: GroupEvent[];
+  setGroupEvents: (events: GroupEvent[]) => void;
 }
 
-export const useGroupEventStore = create<GroupEventsState>((set) => ({
+export const useGroupEventListStore = create<GroupEventsState>((set) => ({
   groupEvents: [],
-  setGroupEvents: (events: resGroupEventStore[]) => set({ groupEvents: events }),
+  setGroupEvents: (events: GroupEvent[]) => set({ groupEvents: events }),
+}));
+
+interface SocialEventListState {
+  socialEvents: SocialEvent[];
+  setSocialEvents: (events: SocialEvent[]) => void;
+}
+
+export const useSocialEventListStore = create<SocialEventListState>((set) => ({
+  socialEvents: [],
+  setSocialEvents: (events) => set({ socialEvents: events }),
 }));

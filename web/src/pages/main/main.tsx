@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
+import * as KAKAO from '@services/KakaoAPI';
+import * as USER from '@services/userAPI';
+import useToggle from '@hooks/useToggle';
+
 import Calendar from '@pages/Calendar/calendar';
 import CalendarList from '@components/Canlendar/CalendarList';
 import UserModal from '@components/User/Profile/UserModal';
 import RightMenuTap from '@components/Menu/RightMenuTap';
-import useToggle from '@hooks/useToggle';
 
-import * as KAKAO from '@services/KakaoAPI';
-import * as USER from '@services/userAPI';
 import menuImg from '@assets/calendar_menu.webp';
 import syncImg from '@assets/sync.png';
 
@@ -25,9 +26,17 @@ export default function MainPage() {
   }, []);
 
   const getSocialEvents = useCallback(async () => {
-    await KAKAO.GetEvents();
     // ***************TODO 구글 및 outlook API 등록 필요
+    // const kakaoRes = await KAKAO.GetEvents();
+    // if (!kakaoRes) return;
+    // const googleRes = await GOOGLE.GetEvents();
+    // if (!googleRes) return;
+    // const outlookRes = await OUTLOOK.GetEvents();
+    // if (!outlookRes) return;
 
+    await KAKAO.GetEvents();
+
+    console.log(`Main 동기화 종료`); //debug//
     RendarUserAndCalendar();
   }, []);
 
@@ -71,8 +80,7 @@ export default function MainPage() {
       </header>
       <main id="mainSection">
         <aside
-          className={`FLEX-horiz h-full
-            transition-all duration-300 ${isOn ? 'w-128' : 'w-0'}`}
+          className={`FLEX-horiz h-full transition-all duration-300 ${isOn ? 'w-128' : 'w-0'}`}
           id={`${isOn ? 'SLIDEin-left' : 'SLIDEout-left'}`}
         >
           {isOn && <CalendarList isOpen={isOn} onClose={toggle} />}

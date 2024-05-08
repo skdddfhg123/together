@@ -30,6 +30,9 @@ axiosInstance.interceptors.request.use(
   },
 );
 
+export type ErrorResponse = {
+  message: string;
+};
 interface Params {
   [key: string]: unknown;
 }

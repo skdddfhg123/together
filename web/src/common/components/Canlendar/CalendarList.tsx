@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom';
 
 import * as CALENDAR from '@services/calendarAPI';
 import * as USER from '@services/userAPI';
-import { useCalendarListStore, useGroupEventStore, useNowCalendarStore } from '@store/index';
-import { Calendar } from '@type/index';
+
+import { Calendar, CalendarId } from '@type/index';
+import {
+  useCalendarListStore,
+  useGroupEventListStore,
+  useSelectedCalendarStore,
+} from '@store/index';
 
 import defaultCover from '@assets/default_cover.png';
 interface CalendarListProps {
@@ -14,7 +19,7 @@ interface CalendarListProps {
 
 export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   const { calendars } = useCalendarListStore();
-  const { setNowCalendar } = useNowCalendarStore();
+  const { setSelectedCalendar } = useSelectedCalendarStore();
 
   useEffect(() => {
     CALENDAR.getAllCalendar();
@@ -22,10 +27,10 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
 
   useEffect(() => {
     onClose();
-  }, [useGroupEventStore.getState().groupEvents]);
+  }, [useGroupEventListStore.getState().groupEvents]);
 
-  const ChangeCalendar = (calendarId: string | null) => {
-    if (calendarId) setNowCalendar(calendarId);
+  const ChangeCalendar = (calendarId: CalendarId) => {
+    if (calendarId) setSelectedCalendar(calendarId);
     else console.error('캘린더 아이디를 찾을 수 없습니다.');
     onClose();
   };

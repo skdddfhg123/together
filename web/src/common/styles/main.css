@@ -1,6 +1,14 @@
+/* ************************* main ************************* */
+#mainSection {
+  height:100lvh;
+
+  display: flex;
+  flex-direction: row;
+}
+
 /* ************************* header ************************* */
 #calHeader {
-  width: 100%;
+  width: 100vmax;
   height: 5rem;
 
   display: flex;
@@ -86,12 +94,4 @@
 #sync-button:hover {
   border-radius: 33%;
   background-color: #badfff;
-}
-
-/* ************************* main ************************* */
-#mainSection {
-  height:89vh;
-
-  display: flex;
-  flex-direction: row;
 }
