@@ -105,8 +105,6 @@ export class ChatService {
         });
     }
 
-
-
     getChatRoomList(): Record<string, ChatRoomListDTO> {
         return this.chatRoomList;
     }

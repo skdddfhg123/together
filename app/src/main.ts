@@ -6,7 +6,7 @@ import { SocketIoAdapter } from './calendar/chat/adapter/socketIoAdapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: {
-    origin: 'http://localhost:3001',
+    origin: 'http://localhost:3000',
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     preflightContinue: false,
