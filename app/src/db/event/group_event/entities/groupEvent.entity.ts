@@ -7,7 +7,7 @@ export class GroupEvent {
     @PrimaryGeneratedColumn('uuid')
     groupEventId: string;
 
-    @ManyToOne(() => Calendar, (calendar) => calendar.calendarId)
+    @ManyToOne(() => Calendar, (calendar) => calendar.groupEvents)
     calendarId: string;
 
     @Column()
@@ -22,10 +22,10 @@ export class GroupEvent {
     @Column()
     color: string;
 
-    @Column({default : false})
+    @Column({ default: false })
     pinned: boolean;
 
-    @Column({nullable : true})
+    @Column({ nullable: true })
     alerts: number;
 
     @Column({ type: 'jsonb', nullable: true })
@@ -46,7 +46,7 @@ export class GroupEvent {
     @DeleteDateColumn()
     deletedAt: Date;
 
-    @Column({default : false})
+    @Column({ default: false })
     isDeleted: boolean;
 
     @OneToMany(() => Feed, (feed) => feed.groupEventId)

@@ -24,5 +24,5 @@ import { UtilsModule } from "src/image.upload/aws.s3/utils/utils.module";
       
     
   })
-  export class emojiModule {}
+  export class EmojiModule {}
   

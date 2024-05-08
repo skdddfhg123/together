@@ -3,13 +3,13 @@ import { FileFieldsInterceptor, FileInterceptor } from "@nestjs/platform-express
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
 import { getPayload } from "src/auth/getPayload.decorator";
-import { JwtAuthGuard } from "src/auth/jwt.guard";
 import { CreateEmojiDTO } from "./dtos/emoji.create.dto";
 import { Emoji } from "./entities/emoji.entity";
 import { EmojiService } from "./emoji.service";
 import { ReadEmojiDTO } from "./dtos/emoji.detail.dto";
 import { ReadFeedDTO } from "src/feed/dtos/feed.read.dto";
 import { EmojiInFeed } from "src/db/emoji_feed/entities/emoji.feed.entity";
+import { JwtAuthGuard } from "src/auth/strategy/jwt.guard";
 
 
 
@@ -170,13 +170,13 @@ export class EmojiController {
 
 
 
-/* ============================================ */
+  /* ============================================ */
 
-    // 그룹 이모지 댓글에 올리기
+  // 그룹 이모지 댓글에 올리기
 
-    // 그룹 이모지 댓글에서 삭제하기
+  // 그룹 이모지 댓글에서 삭제하기
 
-    // 특정 댓글에 있는 그룹 이모지 보기
+  // 특정 댓글에 있는 그룹 이모지 보기
 
 
 

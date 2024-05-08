@@ -101,13 +101,11 @@ export class EmojiService {
     async getEmojiDetail( emojiId : string ): Promise<ReadEmojiDTO> {
         try {
             const emoji = await this.emojiRepository.createQueryBuilder('emoji')
-                .leftJoinAndSelect('emoji.user', 'user')
                 .select([
                     'emoji.emojiId',
                     'emoji.emojiUrl',
                     'emoji.emojiName',
                     'emoji.createdAt',
-                    'user.nickname',
                 ])
                 .where('emoji.emojiId = :emojiId', { emojiId })
                 .andWhere('emoji.deletedAt IS NULL')
@@ -135,13 +133,13 @@ export class EmojiService {
      async getAllEmojisInGroupCalendar(calendarId: string): Promise<ReadEmojiDTO[]> {
         try {
             const emojis = await this.emojiRepository.createQueryBuilder('emoji')
-                .leftJoinAndSelect('emoji.user', 'user')
+                //.leftJoinAndSelect('emoji.user', 'user')
                 .select([
                     'emoji.emojiId',
                     'emoji.emojiUrl',
                     'emoji.emojiName',
                     'emoji.createdAt',
-                    'user.nickname',
+                    //'user.nickname',
                 ])
                 .where('emoji.calendarId = :calendarId', { calendarId })
                 .andWhere('emoji.deletedAt IS NULL')

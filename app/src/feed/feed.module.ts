@@ -11,6 +11,7 @@ import { ImageModule } from 'src/image.upload/image.module';
 import { AwsModule } from 'src/image.upload/aws.s3/aws.module';
 import { UtilsModule } from 'src/image.upload/aws.s3/utils/utils.module';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
+import { FeedCommentModule } from 'src/db/comment/comment.module';
 
 
 @Module({
@@ -20,12 +21,12 @@ import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
     UserModule,
     AwsModule,
     UtilsModule,
-    ImageModule
-
+    ImageModule,
+    // FeedCommentModule,
   ],
   controllers: [FeedController],
   providers: [FeedService, FeedCommentService],
-    
-  exports:[FeedService]
+
+  exports: [FeedService]
 })
-export class FeedModule {}
+export class FeedModule { }

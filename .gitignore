@@ -1,6 +1,7 @@
 /data
 /oauth2-test
 
+config_local.py
 
 .env
-.postgres.env
+.db.env

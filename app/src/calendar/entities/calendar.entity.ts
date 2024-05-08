@@ -2,13 +2,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString } from "class-validator";
 import { Emoji } from "src/emoji/entities/emoji.entity";
 import { GroupEvent } from "src/db/event/group_event/entities/groupEvent.entity";
-import { User } from "src/db/user/entities/user.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
 @Entity()
-export class Calendar{
+export class Calendar {
     @PrimaryGeneratedColumn('uuid')
     calendarId: string;
 
@@ -30,7 +29,7 @@ export class Calendar{
     type: string;
 
     @ManyToOne(() => UserCalendar, (userCalendar) => userCalendar.groupCalendar)
-    @JoinColumn({ name: 'calendars'})
+    @JoinColumn({ name: 'calendars' })
     author: UserCalendar;
 
     @Column("uuid", { array: true })

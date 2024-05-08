@@ -11,18 +11,14 @@ import { KakaoModule } from './auth/kakao/kakao.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './db/user/user.module';
 import { DataSource } from 'typeorm';
-import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
-import { GroupEventModule } from './db/event/group_event/groupEvent.module';
+import { AuthLoggerMiddleware, CalendarLoggerMiddleware, FeedLoggerMiddleware, GroupEventLoggerMiddleware, KakaoLoggerMiddleware, LoggerMiddleware, PlatformLoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GoogleModule } from './auth/google/google.module';
-import { DiscordBotService } from './discordBot.service';
 import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
 import { FeedModule } from './feed/feed.module';
-import { UserCalendarModule } from './db/user_calendar/userCalendar.module';
-import { FeedCommentModule } from './db/comment/comment.module';
-import { AwsModule } from './image.upload/aws.s3/aws.module';
 import { ImageModule } from './image.upload/image.module';
-import { UtilsModule } from './image.upload/aws.s3/utils/utils.module';
-import { emojiModule } from './emoji/emoji.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UtilModule } from './util/util.module';
+import { EmojiModule } from './emoji/emoji.module';
 
 @Module({
   imports: [
@@ -38,24 +34,21 @@ import { emojiModule } from './emoji/emoji.module';
       port: parseInt(process.env.REDIS_PORT),
       password: process.env.REDIS_PASS,
     }),
-    AwsModule,
-    UtilsModule,
+    MongooseModule.forRoot(process.env.MONGO_URI),
+    UtilModule,
     UserModule,
     AuthModule,
-    
+    CalendarModule,
     GoogleModule,
     KakaoModule,
     CalendarModule,
-    GroupEventModule,
     SocialEventModule,
-    UserCalendarModule,
     FeedModule,
-    FeedCommentModule,
     ImageModule,
-    emojiModule
+    EmojiModule,
   ],
   controllers: [RedisController],
-  providers: [RedisService, DiscordBotService],
+  providers: [RedisService],
   exports: [RedisService],
 })
 export class AppModule implements NestModule {
@@ -63,6 +56,12 @@ export class AppModule implements NestModule {
     console.log(dataSource.driver.database);
   }
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
+    // consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
+    consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
+    consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
+    consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');
+    consumer.apply(PlatformLoggerMiddleware).forRoutes('/google');
+    consumer.apply(KakaoLoggerMiddleware).forRoutes('/kakao');
+    consumer.apply(FeedLoggerMiddleware).forRoutes('/feed');
   }
 }

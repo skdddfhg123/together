@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UploadedFiles,
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { getPayload } from 'src/auth/getPayload.decorator';
-import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { Feed } from './entities/feed.entity';
 import { FeedService } from './feed.service';
 import { CreateFeedDTO } from './dtos/feed.create.dto';
@@ -16,15 +15,16 @@ import { ReadFeedCommentDTO } from 'src/db/comment/dtos/comment.read.dto';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { FeedImageBinded } from './interface/feedAndImageBinding';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
+import { JwtAuthGuard } from 'src/auth/strategy/jwt.guard';
 
 @ApiTags("feed")
 @Controller('feed')
 export class FeedController {
-    
+
     constructor(
         private feedService: FeedService,
         private feedCommentService: FeedCommentService
-    ) {}
+    ) { }
 
     // 피드 작성
     // @Post('create/:groupeventId')
@@ -52,7 +52,7 @@ export class FeedController {
     @Post('create/:groupeventId')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 5 }
-      ]))
+    ]))
     @ApiConsumes('multipart/form-data', 'application/json')
     @ApiOperation({ summary: 'group event 내에서 피드 생성' })
     @ApiResponse({ status: 201, description: 'Feed created successfully' })
@@ -62,13 +62,13 @@ export class FeedController {
     @UseGuards(JwtAuthGuard)
     async createFeed(
 
-      @Body() createFeedDto: CreateFeedDTO,
-      @getPayload() payload: PayloadResponse,
-      @Param('groupeventId') groupEventId: string,
-      @UploadedFiles() files: { images?: Express.Multer.File[] }
+        @Body() createFeedDto: CreateFeedDTO,
+        @getPayload() payload: PayloadResponse,
+        @Param('groupeventId') groupEventId: string,
+        @UploadedFiles() files: { images?: Express.Multer.File[] }
 
-    ):Promise<{ feed : Feed , feedImages : FeedImage[] }>   { 
-         return await this.feedService.createFeed(createFeedDto, payload, groupEventId, files.images);
+    ): Promise<{ feed: Feed, feedImages: FeedImage[] }> {
+        return await this.feedService.createFeed(createFeedDto, payload, groupEventId, files.images);
     }
 
 
@@ -85,10 +85,10 @@ export class FeedController {
 
         @Param('groupeventId') groupEventId: string,
 
-    ): Promise<ReadFeedDTO[]>{
+    ): Promise<ReadFeedDTO[]> {
         return await this.feedService.getAllFeedInGroupEvent(groupEventId);
     }
-    
+
 
     // 특정 피드 보기, 피드 수정 form 
     @Get('get/detail/:feedId')
@@ -100,7 +100,7 @@ export class FeedController {
 
         @Param('feedId') feedId: string,
 
-    ): Promise<ReadFeedDTO>{
+    ): Promise<ReadFeedDTO> {
         return await this.feedService.getFeedDetail(feedId);
     }
 
@@ -164,7 +164,7 @@ export class FeedController {
 
         @getPayload() payload: PayloadResponse,
         @Param('feedId') feedId: string
-    
+
     ): Promise<Feed> {
         return await this.feedService.removeFeed(payload, feedId);
     }
@@ -180,14 +180,14 @@ export class FeedController {
     @UseGuards(JwtAuthGuard)
     async createFeedComment(
 
-      @Body() createFeedDto: CreateFeedCommentDTO,
-      @getPayload() payload: PayloadResponse,
-      @Param('feedId') feedId: string
+        @Body() createFeedDto: CreateFeedCommentDTO,
+        @getPayload() payload: PayloadResponse,
+        @Param('feedId') feedId: string
 
     ): Promise<FeedComment> {
         return await this.feedCommentService.createFeedComment(createFeedDto, payload, feedId);
     }
-    
+
 
     // 특정 피드에서 댓글들 출력
     @Get('comment/:feedId')
@@ -200,11 +200,11 @@ export class FeedController {
 
         @Param('feedId') feedId: string,
 
-    ): Promise<ReadFeedCommentDTO[]>{
+    ): Promise<ReadFeedCommentDTO[]> {
         return await this.feedCommentService.getAllCommentsInFeed(feedId);
     }
 
-    
+
     // 특정 댓글 정보 가져오기
     @Get('comment/updateform/:feedcommentId')
     @ApiOperation({ summary: '특정 댓글 불러오기' })
@@ -214,10 +214,10 @@ export class FeedController {
 
         @Param('feedcommentId') feedCommentId: string,
 
-    ): Promise<ReadFeedCommentDTO>{
+    ): Promise<ReadFeedCommentDTO> {
         return await this.feedCommentService.getFeedCommentForm(feedCommentId);
     }
-    
+
 
     // 특정 댓글 수정하기
     @Patch('comment/update/:feedcommentId')
@@ -230,11 +230,11 @@ export class FeedController {
     async updateFeedComment(
 
         @getPayload() payload: PayloadResponse,
-        @Param('feedcommentId') feedCommentId: string, 
+        @Param('feedcommentId') feedCommentId: string,
         @Body() updateFeedCommentDTO: UpdateFeedCommentDTO
 
     ): Promise<FeedComment> {
-            return await this.feedCommentService.updateFeedComment(payload, feedCommentId, updateFeedCommentDTO);
+        return await this.feedCommentService.updateFeedComment(payload, feedCommentId, updateFeedCommentDTO);
     }
 
     // 특정 댓글 삭제하기기
@@ -250,10 +250,10 @@ export class FeedController {
 
         @getPayload() payload: PayloadResponse,
         @Param('feedcommentId') feedCommentId: string
-    
+
     ): Promise<FeedComment> {
         return await this.feedCommentService.removeFeedComment(payload, feedCommentId);
     }
-    
+
 
 }
