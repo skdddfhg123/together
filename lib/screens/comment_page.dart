@@ -32,7 +32,6 @@ class _CommentsPageState extends State<CommentsPage> {
   void _loadComments() {
     // MeetingController 인스턴스를 가져오고 댓글을 로드
     final MeetingController meetingController = Get.find<MeetingController>();
-    final AuthController authController = Get.find<AuthController>();
     meetingController.loadCommentsForFeed(widget.feedId);
   }
 

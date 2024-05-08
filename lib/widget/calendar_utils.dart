@@ -54,24 +54,24 @@ class DialogService {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add Appointment'),
+          title: const Text('일정 추가하기'),
           content: SingleChildScrollView(
             child: Column(
               children: <Widget>[
                 TextField(
                   controller: _subjectController,
-                  decoration: const InputDecoration(labelText: "Subject"),
+                  decoration: const InputDecoration(labelText: "타이틀"),
                 ),
                 ListTile(
                   leading: const Icon(Icons.timer),
-                  title: const Text("Start Time"),
+                  title: const Text("시작 시간"),
                   subtitle: Text(DateFormat('yyyy-MM-dd HH:mm')
                       .format(_selectedStartTime)),
                   onTap: () => _pickDateTime(context, true),
                 ),
                 ListTile(
                   leading: const Icon(Icons.timer_off),
-                  title: const Text("End Time"),
+                  title: const Text("종료 시간"),
                   subtitle: Text(
                       DateFormat('yyyy-MM-dd HH:mm').format(_selectedEndTime)),
                   onTap: () => _pickDateTime(context, false),

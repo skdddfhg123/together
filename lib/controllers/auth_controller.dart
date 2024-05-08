@@ -2,7 +2,6 @@ import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/userinfo.dart';
 import 'package:get/get.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {

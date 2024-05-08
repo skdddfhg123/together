@@ -1,4 +1,4 @@
-import 'package:calendar/calendar_utils.dart';
+import 'package:calendar/widget/calendar_utils.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/screens/alarm.dart';
