@@ -19,7 +19,7 @@ axiosInstance.interceptors.request.use(
 
     const token = getCookie('accessToken');
     if (!token) {
-      alert('로그인 세션이 만료되었습니다.');
+      alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
       window.location.href = 'http://localhost:3000/signin';
     }
     config.headers.Authorization = `Bearer ${token}`;
@@ -27,6 +27,16 @@ axiosInstance.interceptors.request.use(
   },
   (error: AxiosError) => {
     return Promise.reject(error);
+  },
+);
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      window.alert('인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
+      window.location.href = 'http://localhost:3000/signin';
+    }
   },
 );
 
@@ -52,29 +62,44 @@ async function get(endpoint: string, params?: Params): Promise<AxiosResponse> {
   return axiosInstance.get(endpoint, { params });
 }
 
-async function post(endpoint: string, data: Data): Promise<AxiosResponse> {
-  // JSON.stringify 함수: Javascript 객체를 JSON 형태로 변환함.
-  // 예시: {name: "Kim"} => {"name": "Kim"}
-  const bodyData = JSON.stringify(data);
+async function post(endpoint: string, data: Data | FormData): Promise<AxiosResponse> {
+  let config = {};
+  if (data instanceof FormData) {
+    config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
+    console.log(`%cPOST 요청 데이터: FormData`, 'color: #296aba;');
+  } else {
+    const bodydata = JSON.stringify(data);
 
-  console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
-  console.log(`%cPOST 요청 데이터: ${bodyData}`, 'color: #296aba;');
+    console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
+    console.log(`%cPOST 요청 데이터: ${bodydata}`, 'color: #296aba;');
+  }
 
-  return axiosInstance.post(endpoint, JSON.stringify(data));
+  return axiosInstance.post(endpoint, data, config);
 }
 
-async function patch(endpoint: string, data?: Data): Promise<AxiosResponse> {
-  // JSON.stringify 함수: Javascript 객체를 JSON 형태로 변환함.
-  // 예시: {name: "Kim"} => {"name": "Kim"}
-  console.log(`%cPUT 요청: ${serverUrl + endpoint}`, `color: #059c4b;`);
+async function patch(endpoint: string, data?: Data | FormData): Promise<AxiosResponse> {
+  let config = {};
+  if (data instanceof FormData) {
+    config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    console.log(`%cPATCH 요청: ${serverUrl + endpoint}`, 'color: #059c4b;');
+    console.log(`%cPATCH 요청 데이터: FormData`, 'color: #059c4b;');
+  } else if (data) {
+    const bodydata = JSON.stringify(data);
 
-  let bodyData = null;
-  if (data) {
-    bodyData = JSON.stringify(data);
-    console.log(`%cPUT 요청 데이터: ${bodyData}`, 'color: #059c4b;');
-    return axiosInstance.patch(endpoint, JSON.stringify(data));
+    console.log(`%cPATCH 요청: ${serverUrl + endpoint}`, 'color: #059c4b;');
+    console.log(`%cPATCH 요청 데이터: ${bodydata}`, 'color: #059c4b;');
   }
-  return axiosInstance.patch(endpoint);
+
+  return axiosInstance.patch(endpoint, data, config);
 }
 
 async function del(endpoint: string, params?: Params): Promise<AxiosResponse> {

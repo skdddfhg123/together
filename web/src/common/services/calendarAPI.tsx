@@ -92,8 +92,8 @@ export async function getGroupAllEvents(calendarId: string) {
   try {
     // TODO ************ get/calendarId 에서 get/all/calendarId로 변경 예정
 
-    const { data: res } = await API.get(`/calendar/group/get/${calendarId}`);
-    // const { data: res } = await API.get(`/calendar/group/get/all/${calendarId}`);
+    const { data: res } = await API.get(`/calendar/group/get/v2/${calendarId}`);
+    // const { data: res } = await API.get(`/calendar/group/get/${calendarId}`);
     if (!res) throw new Error('CALENDAR - getGroupAllEvents (db 조회 실패)');
     console.log(`CALENDAR - getGroupAllEvents 성공 :`, res);
 
@@ -113,7 +113,7 @@ export async function getGroupAllEvents(calendarId: string) {
 
 export default async function getGroupOneEvent(groupEventId: string) {
   try {
-    const { data: res } = await API.get(`/calendar/group/get/${groupEventId}`);
+    const { data: res } = await API.get(`/calendar/group/get/detail/${groupEventId}`);
     if (!res) throw new Error('CALENDAR - getGroupOneEvent (db 조회 실패)');
     console.log(`CALENDAR - getGroupOneEvent 성공 :`, res);
     console.log(`CALENDAR - getGroupOneEvent ( 데이터 가공 로직 추가 필요 )`);

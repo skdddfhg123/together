@@ -19,6 +19,7 @@ interface CalendarListProps {
 
 export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   const { calendars } = useCalendarListStore();
+  const { groupEvents } = useGroupEventListStore();
   const { setSelectedCalendar } = useSelectedCalendarStore();
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
 
   useEffect(() => {
     onClose();
-  }, [useGroupEventListStore.getState().groupEvents]);
+  }, [groupEvents]);
 
   const ChangeCalendar = (calendarId: CalendarId) => {
     if (calendarId) setSelectedCalendar(calendarId);
@@ -43,7 +44,11 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
           onClick={() => ChangeCalendar(calendar.calendarId)}
           key={idx}
         >
-          <img className="m-2 w-36" src={calendar.coverImage || defaultCover} alt="no Img"></img>
+          <img
+            className="m-2 w-36"
+            src={calendar.coverImage?.src || defaultCover}
+            alt="no Img"
+          ></img>
           <div>
             <div className="text-lg">{`${calendar.title}\n`}</div>
             <div className="text-gray-400">{`[ ${calendar.attendees.length} 명 ]`}</div>

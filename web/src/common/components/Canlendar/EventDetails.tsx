@@ -6,10 +6,15 @@ import debounce from 'lodash.debounce';
 
 import * as USER from '@services/userAPI';
 import * as CALENDAR from '@services/calendarAPI';
+import * as FEED from '@services/eventFeedAPI';
 
-import { useGroupEventListStore, useSelectedCalendarStore } from '@store/index';
+import {
+  useEventFeedListStore,
+  useGroupEventListStore,
+  useSelectedCalendarStore,
+} from '@store/index';
 import { GroupEvent } from '@type/index';
-import CreateFeed from '@components/Feed/CreateFeed';
+import CreateFeedModal from '@components/Feed/CreateFeed/CreateFeedModal';
 
 interface EventDetailsProps {
   isOpen: boolean;
@@ -18,12 +23,16 @@ interface EventDetailsProps {
 }
 
 export default React.memo(function EventDetails({ isOpen, eventId, onClose }: EventDetailsProps) {
-  const [editMode, setEditMode] = useState(false);
+  const { SelectedCalendar } = useSelectedCalendarStore();
+  const { groupEvents } = useGroupEventListStore();
+  const { eventFeedList } = useEventFeedListStore();
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [feedModalOn, setFeedModalOn] = useState<boolean>(false);
   const [editedValues, setEditedValues] = useState<GroupEvent>({
     title: '',
     startAt: '',
     endAt: '',
-    member: [],
+    member: null,
     color: '',
     pinned: false,
     alerts: null,
@@ -31,13 +40,19 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
   });
 
   // **************? 렌더링 시 보여줄 데이터 설정 및 최초 render useEffect
-  const groupEvent = useMemo(() => {
-    return useGroupEventListStore
-      .getState()
-      .groupEvents.find((event) => event.groupEventId === eventId);
+
+  // TODO 전체 일정 보기 상태일 땐, 각 일정들을 그룹별로 설정된 디폴트 색을 보여줘야할 듯. + 수정도 막아야할듯 ?
+  // TODO 그룹 안에서만 일정 수정 가능하게 SeletedCalendar가 "All" 일땐 수정 버튼 막아야할듯 ?
+  // TODO 지금 컬러 바꾸기 디바운싱 때문에 제목도 느리게 입력됨
+
+  const groupEvent: GroupEvent | undefined = useMemo(() => {
+    return groupEvents.find((event) => event.groupEventId === eventId);
   }, [eventId]);
 
   useEffect(() => {
+    if (eventId) {
+      getEventFeed(eventId);
+    }
     if (groupEvent && JSON.stringify(groupEvent) !== JSON.stringify(editedValues)) {
       setEditedValues({
         title: groupEvent.title,
@@ -52,13 +67,13 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
         alerts: groupEvent.alerts,
       });
     }
-  }, [groupEvent]);
+  }, [eventId]);
 
   useEffect(() => {
-    if (!isOpen) {
-      setEditMode(false);
-    }
+    if (!isOpen) setEditMode(false);
   }, [isOpen]);
+
+  useEffect(() => onClose(), [SelectedCalendar, groupEvents]);
 
   const displayDate = (dateString?: string) => {
     if (!dateString) return { year: '', monthDay: '' };
@@ -69,6 +84,14 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
     return { year, monthDay };
   };
 
+  // **************?  handle Function
+  const closeModal = useCallback(() => setFeedModalOn(false), []);
+  const handleEdit = useCallback(() => setEditMode(true), []);
+
+  const getEventFeed = async (groupEventId: UUID) => {
+    await FEED.getAllFeedInEvent(groupEventId);
+  };
+
   const setDebouncedEditedValues = useCallback(
     debounce((newValues: Partial<GroupEvent>) => {
       setEditedValues((prev) => ({ ...prev, ...newValues }));
@@ -76,15 +99,12 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
     [],
   );
 
-  // **************?  handle Function
   const handleChange = useCallback(
     (field: keyof GroupEvent, value: UUID | string | string[] | boolean) => {
-      setDebouncedEditedValues({ [field]: value });
+      setDebouncedEditedValues({ [field]: value }); // Color값 디바운싱
     },
     [setDebouncedEditedValues],
   );
-
-  const handleEdit = () => setEditMode(true);
 
   const handleCancel = () => {
     if (groupEvent) {
@@ -108,16 +128,16 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
     if (!window.confirm('정말 삭제하시겠습니까?')) return onClose();
 
     const res = await CALENDAR.removeGroupEvent(eventId);
-    if (res && useSelectedCalendarStore.getState().SelectedCalendar === 'All')
-      await USER.firstRender();
+    if (res && SelectedCalendar === 'All') await USER.firstRender();
+    await CALENDAR.getGroupAllEvents(SelectedCalendar);
 
     onClose();
   };
 
   const handleSave = async () => {
     const res = await CALENDAR.updateGroupEvent(editedValues);
-    if (res && useSelectedCalendarStore.getState().SelectedCalendar === 'All')
-      await USER.firstRender();
+    if (res && SelectedCalendar === 'All') return await USER.firstRender();
+    await CALENDAR.getGroupAllEvents(SelectedCalendar);
 
     onClose();
   };
@@ -130,7 +150,7 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
       >
         {isOpen && (
           <>
-            <nav className="m-4 FLEX-verB">
+            <nav className="FLEX-verB mx-4 mt-4 mb-16">
               <button className="p-2 hover:bg-custom-light rounded" onClick={onClose}>
                 닫기
               </button>
@@ -143,15 +163,28 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                 </button>
               </div>
             </nav>
-            <form key="event-form">
-              <div className="m-4">작성자 : {groupEvent?.author}</div>
+            <header className="FLEX-horizC h-28 mb-12 justify-end">
+              {SelectedCalendar !== 'All' && groupEvent?.author ? (
+                <span className="mb-6">
+                  {groupEvent?.author.userProfile ? (
+                    <img width="300px" src={`${groupEvent?.author.userProfile}`}></img>
+                  ) : (
+                    <>
+                      <p className="text-gray-400 text-center"> {'등록인'}</p>
+                      {groupEvent?.author.nickname}
+                    </>
+                  )}
+                </span>
+              ) : null}
               <h2
-                className="w-80 p-3 my-8 mx-auto text-3xl text-center rounded"
+                className="w-80 p-3 mx-auto text-3xl text-center rounded"
                 style={{ backgroundColor: `${editedValues.color}` }}
               >
                 {groupEvent?.title}
               </h2>
-              <section key="date-section" className="FLEX-verA my-8 mx-2">
+            </header>
+            <main>
+              <section key="date-section" className="FLEX-verA h-20 items-center mx-2 mb-12">
                 <div className="FLEX-horizC">
                   <div>{displayDate(groupEvent?.startAt).year}</div>
                   <h2>{displayDate(groupEvent?.startAt).monthDay}</h2>
@@ -162,18 +195,49 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                   <h2>{displayDate(groupEvent?.endAt).monthDay}</h2>
                 </div>
               </section>
-              <div className="m-4">
-                {'멤버 : '}
-                {groupEvent?.member && groupEvent.member.length > 0
-                  ? groupEvent.member.map((mem, idx) => <div key={idx}>{mem}</div>)
-                  : '없음'}
+              <section key="member-section">
+                <span className="m-4">
+                  {'멤버 : '}
+                  {groupEvent?.member && groupEvent.member.length > 0
+                    ? groupEvent.member.map((mem) => (
+                        <span key={mem.useremail}>{`${mem.nickname}`}</span>
+                      ))
+                    : '없음'}
+                </span>
+                <span className="m-4">
+                  {'중요 : '}
+                  {groupEvent?.pinned ? 'Yes' : 'No'}
+                </span>
+              </section>
+            </main>
+
+            <section key="Feed-section" className="FLEX-horiz items-center">
+              <button
+                className="BTN m-4 hover:text-custom-main"
+                onClick={() => setFeedModalOn(!feedModalOn)}
+              >
+                피드 생성하기
+                <CreateFeedModal
+                  groupEventId={groupEvent?.groupEventId || null}
+                  isOpen={feedModalOn}
+                  onClose={closeModal}
+                />
+              </button>
+              <div className="FLEX-horizC border rounded">
+                {eventFeedList.length === 0 ? (
+                  <p>피드를 등록해주세요</p>
+                ) : (
+                  eventFeedList.map((event, index) => (
+                    <img
+                      className="w-24"
+                      src={event.images[0].imageSrc}
+                      alt="피드"
+                      key={`event-image-${index}`}
+                    />
+                  ))
+                )}
               </div>
-              <div className="m-4">
-                {'중요 : '}
-                {groupEvent?.pinned ? 'Yes' : 'No'}
-              </div>
-            </form>
-            <CreateFeed />
+            </section>
           </>
         )}
       </div>
@@ -186,7 +250,7 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
       >
         {isOpen && (
           <div>
-            <nav className="FLEX-verB m-4 ">
+            <nav className="FLEX-verB mx-4 mt-4 mb-16">
               <button className="p-2 hover:bg-custom-light rounded" onClick={handleCancel}>
                 취소
               </button>
@@ -197,57 +261,55 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                 </button>
               </div>
             </nav>
-            <form key="event-form">
-              <h2 className="my-8 mx-auto text-center">
+            <header key="event-form">
+              <h2 className="FLEX-horizC h-28 mb-12 mx-auto justify-end">
                 <input
                   type="text"
-                  className="p-3 w-80 rounded text-center"
+                  className="w-80 p-3 rounded text-center"
                   style={{ backgroundColor: `${editedValues.color}` }}
                   value={editedValues.title}
                   onChange={(e) => handleChange('title', e.target.value)}
                 />
               </h2>
-              <section key="date-section" className="FLEX-verA my-8 mx-auto">
-                <div className="FLEX-horiz text-center">
-                  <label className="py-2 border-b">Start</label>
+            </header>
+            <main>
+              <section key="date-section" className="FLEX-verA h-20 items-center mx-auto mb-12">
+                <p className="FLEX-horiz py-2 border-b text-center">
+                  Start
                   <input
                     type="date"
                     // value={editedValues.startAt}
                     onChange={(e) => handleChange('startAt', e.target.value)}
                   />
-                </div>
-                <div className="FLEX-horiz text-center">
-                  <label className="py-2 border-b">End</label>
+                </p>
+                <p className="FLEX-horiz py-2 border-b text-center">
+                  End
                   <input
                     type="date"
                     // value={editedValues.endAt}
                     onChange={(e) => handleChange('endAt', e.target.value)}
                   />
-                </div>
+                </p>
               </section>
               <section key="member-section" className="m-4">
-                {'멤버 : '}
+                {/* {'멤버 : '}
                 <input
                   type="text"
-                  value={editedValues.member.join(', ')}
-                  onChange={(e) =>
-                    handleChange(
-                      'member',
-                      e.target.value.split(',').map((item) => item.trim()),
-                    )
-                  }
-                />
+                  value="미구현"
+                  onChange={(e) => }   // TODO : 멤버 객체들 중에 선택해서 고를 수 있게 변경 */}
+                {/* /> */}
               </section>
-              <div className="m-4">
+              <p className="m-4">
                 {'중요 : '}
                 <input
                   type="checkbox"
                   checked={editedValues.pinned}
                   onChange={(e) => handleChange('pinned', e.target.checked)}
                 />
-              </div>
-              <div className="FLEX-horizC m-8">
+              </p>
+              <section key="color-section" className="FLEX-horizC m-8">
                 <HexColorPicker
+                  style={{ width: '350px', height: '180px' }}
                   color={editedValues.color || '#ffffff00'}
                   onChange={(color) => handleChange('color', color)}
                   defaultValue={`${editedValues.color}`}
@@ -259,8 +321,8 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                   defaultValue={`${editedValues.color || ''}`}
                   onChange={(e) => handleChange('color', e.target.value)}
                 ></input>
-              </div>
-            </form>
+              </section>
+            </main>
           </div>
         )}
       </div>

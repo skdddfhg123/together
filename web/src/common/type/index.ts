@@ -41,7 +41,13 @@ export type UserInfo = {
 
 // ************************** 캘린더
 
-type Image = string;
+export type Image = {
+  name?: string | UUID;
+  file: File;
+  imageSrc?: string;
+  src: string;
+};
+
 export type CalendarId = UUID | 'All';
 
 export type UserCalendarListInfo = {
@@ -69,6 +75,14 @@ export type Calendar = {
 
 // ************************** 이벤트 (일정)
 
+export interface Author {
+  useremail: string;
+  userProfile: Image | null; // Assuming it's a URL or `null`
+  nickname: string;
+}
+
+export type Member = Author;
+
 export interface reqGroupEvent {
   groupCalendarId?: CalendarId;
   emails?: string[] | null;
@@ -80,8 +94,8 @@ export interface reqGroupEvent {
 
 export interface GroupEvent extends reqGroupEvent {
   groupEventId?: UUID | null;
-  author?: UUID;
-  member: string[]; //TODO email(string), userProfile(Image) 추가
+  author?: Member | null;
+  member: Member[] | null;
   alerts?: number | null;
   attachment?: string | null;
   pinned: boolean;
@@ -100,16 +114,17 @@ export type SocialEvent = {
 // ************************** 피드
 
 export interface reqEventFeed {
-  groupEventId?: UUID;
+  groupEventId?: UUID | null;
   feedId?: UUID;
   feedType?: number;
-  title: string;
+  title?: string; // TODO 필요없음 - 'title'로 저장
   content: string;
-  images: string[]; // image Type - string?
+  images: Image[]; // image Type - string?
 }
 
 export interface EventFeed extends reqEventFeed {
-  userProfile: Image;
+  thumbnail?: Image | null;
+  userProfile?: Image | null;
   nickname: string;
-  createAt: Date;
+  createdAt: string;
 }

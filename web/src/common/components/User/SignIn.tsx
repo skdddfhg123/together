@@ -14,7 +14,7 @@ export default function SignIn({ onSubmit }: SignInProps) {
   const useremailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  const submitForm = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const submitSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     const useremail = useremailRef.current?.value;
@@ -59,7 +59,7 @@ export default function SignIn({ onSubmit }: SignInProps) {
           required
         />
       </fieldset>
-      <button onClick={submitForm}>로그인</button>
+      <button onClick={submitSignIn}>로그인</button>
     </form>
   );
 }

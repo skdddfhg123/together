@@ -4,6 +4,7 @@ interface ChatTapProps {
   onClose: () => void;
 }
 
+//TODO 채팅 로그 페이지네이션
 export default function ChatTap({ onClose }: ChatTapProps) {
   return (
     <>

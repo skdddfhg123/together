@@ -27,7 +27,7 @@ export default React.memo(function EventModal({
 
   useUpdateModalStyle({ position, setModalStyle });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submitNewEvent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const title = titleRef.current?.value;
 
@@ -69,7 +69,7 @@ export default React.memo(function EventModal({
         },
       }}
     >
-      <form onSubmit={handleSubmit} className="w-full px-3 flex justify-between items-center">
+      <form onSubmit={submitNewEvent} className="w-full px-3 flex justify-between items-center">
         <input
           className="INPUT w-5/6 p-1 mr-3 border rounded"
           type="text"

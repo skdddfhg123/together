@@ -48,7 +48,7 @@ export default React.memo(function CalendarPage({
 
     if (SelectedCalendar === 'All') return console.log('전체 일정 그리기');
     CALENDAR.getGroupAllEvents(SelectedCalendar);
-  }, [SelectedCalendar, detailsOn, setGroupEvents]);
+  }, [SelectedCalendar, setGroupEvents]);
 
   // *****************? 더블 클릭으로 이벤트 등록 Modal 띄움
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
@@ -63,7 +63,7 @@ export default React.memo(function CalendarPage({
     }
   };
 
-  const handleDetails = (eventId: UUID, e: React.MouseEvent<HTMLElement>) => {
+  const handleDetails = useCallback((eventId: UUID, e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
 
     if (!groupEventId || eventId !== groupEventId) {
@@ -73,7 +73,7 @@ export default React.memo(function CalendarPage({
       detailsClose();
       setGroupEventId(null);
     }
-  };
+  }, []);
 
   // *****************? 자식컴포넌트 전달을 위한 callback 최적화
   const eventModalClose = useCallback(() => {

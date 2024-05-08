@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { UUID } from 'crypto';
 
-import { GroupEvent, UserInfo, Calendar, CalendarId, SocialEvent } from '@type/index';
+import { GroupEvent, UserInfo, Calendar, CalendarId, SocialEvent, EventFeed } from '@type/index';
 
 interface SelectedDayState {
   selectedDay: Date | null;
@@ -65,4 +65,14 @@ interface SocialEventListState {
 export const useSocialEventListStore = create<SocialEventListState>((set) => ({
   socialEvents: [],
   setSocialEvents: (events) => set({ socialEvents: events }),
+}));
+
+interface EventFeedListState {
+  eventFeedList: EventFeed[];
+  setEventFeedList: (eventFeeds: EventFeed[]) => void;
+}
+
+export const useEventFeedListStore = create<EventFeedListState>((set) => ({
+  eventFeedList: [],
+  setEventFeedList: (eventFeeds) => set({ eventFeedList: eventFeeds }),
 }));
