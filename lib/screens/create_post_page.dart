@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:calendar/api/create_post_service.dart';
+import 'package:calendar/api/post_service.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/post.dart';
 import 'package:flutter/material.dart';

@@ -3,6 +3,7 @@ import 'package:calendar/screens/create_post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart'; // 날짜 형식을 위해 필요
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EventDetailPage extends StatefulWidget {
   final String eventTitle;
@@ -48,6 +49,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
     } else {
       return '방금 전';
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final MeetingController meetingController = Get.find<MeetingController>();
+    meetingController.loadFeedsForEvent(widget.groupEventId);
   }
 
   @override
@@ -210,11 +218,19 @@ class _EventDetailPageState extends State<EventDetailPage> {
           Expanded(
             child: Obx(
               () {
-                if (meetingController.feeds.isNotEmpty) {
+                // groupEventId가 현재 페이지의 groupEventId와 일치하는 피드만 필터링
+                List<FeedWithId> filteredFeeds = meetingController.feeds
+                    .where((feedWithId) =>
+                        feedWithId.groupeventId == widget.groupEventId)
+                    .toList();
+
+                if (filteredFeeds.isNotEmpty) {
                   return ListView.builder(
-                    itemCount: meetingController.feeds.length,
+                    itemCount: filteredFeeds.length,
                     itemBuilder: (_, index) {
-                      final feed = meetingController.feeds[index].feed;
+                      final feedWithId = filteredFeeds[index];
+                      final feed = feedWithId.feed;
+                      final feedId = feedWithId.feedId; // 피드의 ID를 추출
                       return Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -260,14 +276,76 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                     ),
                                   ],
                                 ),
-                                Icon(Icons.more_vert,
-                                    color: widget.calendarColor),
+                                PopupMenuButton<String>(
+                                  icon: Icon(Icons.more_vert,
+                                      color: widget.calendarColor),
+                                  onSelected: (String value) {
+                                    switch (value) {
+                                      case 'edit':
+                                        // 편집 기능을 여기에 구현
+                                        break;
+                                      case 'delete':
+                                        showDialog(
+                                          context: context,
+                                          builder:
+                                              (BuildContext dialogContext) {
+                                            return AlertDialog(
+                                              title: const Text("삭제 확인"),
+                                              content: const Text(
+                                                  "이 게시물을 삭제하시겠습니까?"),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  child: const Text("취소"),
+                                                  onPressed: () => Navigator.of(
+                                                          dialogContext)
+                                                      .pop(),
+                                                ),
+                                                TextButton(
+                                                  child: const Text("삭제"),
+                                                  onPressed: () {
+                                                    // 삭제 로직 구현
+                                                    meetingController
+                                                        .deleteFeed(feedId)
+                                                        .then((_) {
+                                                      Navigator.of(
+                                                              dialogContext)
+                                                          .pop();
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                        break;
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) =>
+                                      <PopupMenuEntry<String>>[
+                                    const PopupMenuItem<String>(
+                                      value: 'edit',
+                                      child: Text('편집'),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'delete',
+                                      child: Text('삭제'),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                             const SizedBox(height: 10),
+                            // Container(
+                            //   alignment: Alignment.bottomRight,
+                            //   padding: const EdgeInsets.symmetric(vertical: 8),
+                            //   child: Text(
+                            //     '${currentPage + 1}/${feed.imageSrcs.length}',
+                            //     style: TextStyle(color: Colors.grey[700]),
+                            //   ),
+                            // ),
                             if (feed.imageSrcs.isNotEmpty)
                               Container(
-                                height: 200, // 이미지 높이 설정
+                                height: 200,
                                 child: PageView.builder(
                                   itemCount: feed.imageSrcs.length,
                                   onPageChanged: (int page) {
@@ -281,43 +359,66 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                       child: Image.network(
                                         feed.imageSrcs[imageIndex],
                                         fit: BoxFit.cover,
+                                        loadingBuilder: (BuildContext context,
+                                            Widget child,
+                                            ImageChunkEvent? loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              value: loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                          .cumulativeBytesLoaded /
+                                                      loadingProgress
+                                                          .expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          );
+                                        },
                                       ),
                                     );
                                   },
                                 ),
                               ),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(vertical: 8),
-                              child: Text(
-                                '${currentPage + 1}/${feed.imageSrcs.length}',
-                                style: TextStyle(color: Colors.grey[700]),
-                              ),
-                            ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.comment, color: Colors.grey),
+                                  icon: const Icon(Icons.mode_comment_outlined,
+                                      color: Colors.black),
                                   onPressed: () {
                                     // 댓글 기능 구현
                                   },
                                 ),
                                 IconButton(
-                                  icon:
-                                      Icon(Icons.bookmark, color: Colors.grey),
+                                  icon: const Icon(Icons.bookmark_add_outlined,
+                                      color: Colors.black),
                                   onPressed: () {
                                     // 북마크 기능 구현
                                   },
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              feed.content,
-                              style: const TextStyle(
-                                fontSize: 14,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  feed.nickname,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  feed.content,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

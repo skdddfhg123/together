@@ -1,6 +1,7 @@
 import 'package:calendar/api/calendar_delete_service.dart';
 import 'package:calendar/api/delete_event_service.dart';
 import 'package:calendar/api/event_creates_service.dart';
+import 'package:calendar/api/post_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/models/post.dart';
 import 'package:calendar/models/social_event.dart';
@@ -33,19 +34,28 @@ class FeedWithId {
     required this.groupeventId,
     required this.feedId,
   });
+
+  factory FeedWithId.fromJson(Map<String, dynamic> json) {
+    return FeedWithId(
+      feed: Feed.fromJson(json['feed']),
+      groupeventId: json['groupEventId'] as String,
+      feedId: json['feedId'] as String,
+    );
+  }
 }
 
 class MeetingController extends GetxController {
   final RxList<CalendarAppointment> calendarAppointments =
       <CalendarAppointment>[].obs;
 
-  final RxList<FeedWithId> feeds = <FeedWithId>[].obs;
-
   final DeleteEventService deleteEventService = DeleteEventService();
   final CalendarEventService eventService = CalendarEventService();
   final DeleteCalendarService deleteCalendarService = DeleteCalendarService();
 
 ///////////////////////////////////////피드 부분 /////////////////////////////////////////
+  final FeedService feedService = FeedService(); // FeedService 인스턴스 생성
+  final RxList<FeedWithId> feeds = <FeedWithId>[].obs;
+
   void addFeed(Feed newFeed, String groupEventId, String feedId) {
     var newFeeds = FeedWithId(
       feed: newFeed,
@@ -56,9 +66,22 @@ class MeetingController extends GetxController {
     update(); // Trigger UI updates where MeetingController is being used
   }
 
-  void deleteFeed(int index) {
-    feeds.removeAt(index);
-    update();
+  // 피드를 삭제하는 메소드
+  Future<void> deleteFeed(String feedId) async {
+    bool isDeleted = await feedService.deleteFeed(feedId);
+    if (isDeleted) {
+      feeds.removeWhere((feed) => feed.feedId == feedId); // 로컬 리스트에서 피드 삭제
+      update(); // GetX의 상태를 업데이트하여 UI를 갱신
+      Get.snackbar('삭제 성공', '피드가 성공적으로 삭제 되었습니다.');
+    } else {
+      Get.snackbar('삭제 실패', '피드 삭제에 실패 하였습니다.');
+    }
+  }
+
+  // 이벤트 ID에 따른 피드 로드
+  void loadFeedsForEvent(String groupEventId) async {
+    var eventFeeds = await feedService.loadFeedsForGroup(groupEventId);
+    feeds.assignAll(eventFeeds);
   }
 
 //////////////////////////////////////// 캘린더, 일정 부분 //////////////////////////////////////

@@ -69,4 +69,55 @@ class FeedService {
       return null;
     }
   }
+
+  // 피드 삭제 메서드
+  Future<bool> deleteFeed(String feedId) async {
+    String? token = await _loadToken();
+    var url = Uri.parse('http://15.164.174.224:3000/feed/remove/$feedId');
+
+    try {
+      // PATCH 요청 보내기
+      var response = await http.patch(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // 인증 토큰을 헤더에 추가
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Feed deleted successfully');
+        return true; // 피드 삭제 성공
+      } else {
+        print('Failed to delete feed, status code: ${response.statusCode}');
+        return false; // 피드 삭제 실패
+      }
+    } catch (e) {
+      print('Error deleting feed: $e');
+      return false;
+    }
+  }
+
+  Future<List<FeedWithId>> loadFeedsForGroup(String groupeventId) async {
+    String? token = await _loadToken();
+    var url = Uri.parse('http://15.164.174.224:3000/feed/get/$groupeventId');
+
+    try {
+      var response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      });
+      if (response.statusCode == 200) {
+        List<dynamic> feedsJson = json.decode(response.body);
+        return feedsJson.map((json) => FeedWithId.fromJson(json)).toList();
+      } else {
+        print(
+            'Failed to load feeds for group $groupeventId, status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error loading feeds for group $groupeventId: $e');
+      return [];
+    }
+  }
 }
