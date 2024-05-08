@@ -7,6 +7,7 @@ import { Repository } from "typeorm";
 import { Calendar } from "src/calendar/entities/calendar.entity";
 import { GetGroupDTO, MemberInfo } from "./dtos/groupEvent.get.dto";
 import { User } from "src/db/user/entities/user.entity";
+import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
 
 
 @Injectable()
@@ -14,6 +15,8 @@ export class GroupEventService {
     constructor(
         @InjectRepository(GroupEvent)
         private readonly groupEventRepository: Repository<GroupEvent>,
+        @InjectRepository(UserCalendar)
+        private readonly userCalendarRepository: Repository<UserCalendar>,
         @InjectRepository(Calendar)
         private readonly calendarRepository: Repository<Calendar>,
         @InjectRepository(User)
@@ -86,6 +89,23 @@ export class GroupEventService {
             });
 
             const groupEventDtos: GetGroupDTO[] = await Promise.all(groupEvents.map(async (event) => {
+                // Fetch author details
+                const userCalendar = await this.userCalendarRepository.findOne({
+                    where: { userCalendarId: event.author },
+                    relations: ['user']
+                });
+
+                if (!userCalendar) {
+                    throw new Error(`Author with email ${event.author} not found.`);
+                }
+
+                const authorInfo: MemberInfo = {
+                    useremail: userCalendar?.user.useremail,
+                    thumbnail: userCalendar?.user.thumbnail,
+                    nickname: userCalendar?.user.nickname
+                };
+
+                // Fetch member details
                 const memberInfos: MemberInfo[] = await Promise.all(event.member.map(async (memberEmail) => {
                     const user = await this.userRepository.findOne({
                         where: { useremail: memberEmail }
@@ -100,7 +120,7 @@ export class GroupEventService {
 
                 return {
                     groupEventId: event.groupEventId,
-                    author: event.author,
+                    author: authorInfo,
                     member: memberInfos,
                     title: event.title,
                     color: event.color,
@@ -121,6 +141,7 @@ export class GroupEventService {
             throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}: ${e.message}`);
         }
     }
+
 
 
     async getGroupEvent(groupEventId: string): Promise<GroupEvent> {

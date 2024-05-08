@@ -16,8 +16,9 @@ export class GetGroupDTO {
     @IsUUID()
     groupEventId: string;
 
-    @IsUUID()
-    author: string;
+    @ValidateNested()
+    @Type(() => MemberInfo)
+    author: MemberInfo;
 
     @ValidateNested({ each: true })
     @Type(() => MemberInfo)
