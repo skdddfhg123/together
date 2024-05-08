@@ -23,8 +23,16 @@ export class SaveMessageDTO {
         example: 'test message',
     })
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     message: string;
+
+    @ApiProperty({
+        description: 'user input image',
+        example: 'http://jungle-toogether.s3.amazon.com/',
+    })
+    @IsString()
+    @IsOptional()
+    imgUrl: string;
 
     @ApiProperty({
         description: '현재 채팅중인 캘린더 ID',

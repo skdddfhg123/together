@@ -18,7 +18,6 @@ export class ChatGateway
     @WebSocketServer()
     server: Server;
 
-    // 소켓 연결시 유저목록에 추가
     public handleConnection(client: Socket): void {
 
         const token = client.handshake.headers.authorization.split(' ')[1];
@@ -39,7 +38,6 @@ export class ChatGateway
         }
     }
 
-    //소켓 연결 해제시 유저목록에서 제거
     public handleDisconnect(client: Socket): void {
         const { roomId } = client.data;
 
@@ -82,7 +80,40 @@ export class ChatGateway
             console.error(`message saved falied: ${err}`);
         }
 
-        console.log(`Number of clients in room ${client.data.roomId}: ${this.server.sockets.adapter.rooms.get(client.data.roomId)?.size}`);
+        console.log(client.rooms)
+    }
+
+    @SubscribeMessage('sendCombinedMessage')
+    async sendCombinedMessage(client: Socket, payload: { text: string, imageUrl: string }) {
+        // this.server.to(payload.calendarId).emit('receiveCombinedMessage', payload);
+
+        console.log(payload.text);
+        console.log(payload.imageUrl);
+
+        client.rooms.forEach((roomId) =>  
+            client.to(roomId).emit('getMessage', {
+                id: client.id,
+                email: client.data.email,
+                nickname: client.data.nickname,
+                message: payload?.text,
+                image: payload?.imageUrl,
+            }),
+        );
+
+        try {
+            const newChatDto = new SaveMessageDTO();
+            newChatDto.email = client.data.email;
+            newChatDto.nickname = client.data.nickname;
+            newChatDto.message = payload.text;
+            newChatDto.imgUrl = payload.imageUrl;
+            newChatDto.roomId = client.data.roomId;
+
+            await this.chatService.saveMessage(newChatDto);
+        }
+        catch(err) {
+            console.error(`message saved falied: ${err}`);
+        }
+
         console.log(client.rooms)
     }
 
@@ -111,36 +142,8 @@ export class ChatGateway
         };
     }
 
-    //채팅방 목록 가져오기
-    @SubscribeMessage('getChatRoomList')
-    getChatRoom(client: Socket, payload: any) {
-        client.emit('getChatRoomList', this.chatService.getChatRoomList());
-    }
-
-    //채팅방 생성하기
-    @SubscribeMessage('createChatRoom')
-    createChatRoom(client: Socket, roomName: string) {
-        //이전 방이 만약 나 혼자있던 방이면 제거
-        if (
-            client.data.roomId != ('mainRoom' + client.data.email) &&
-            this.server.sockets.adapter.rooms.get(client.data.roomId).size == 1
-        ) {
-            this.chatService.deleteChatRoom(client.data.roomId);
-        }
-
-        this.chatService.createChatRoom(client, roomName);
-        console.log(`${roomName} Created.`)
-        return {
-            roomId: client.data.roomId,
-            roomName: this.chatService.getChatRoom(client.data.roomId)
-                .roomName,
-        };
-    }
-
-    //채팅방 들어가기
     @SubscribeMessage('enterChatRoom')
     async enterChatRoom(client: Socket, roomId: string) {
-        //이미 접속해있는 방 일 경우 재접속 차단
         let room = roomId;
 
         if(room == null || room == 'All') {
@@ -153,12 +156,10 @@ export class ChatGateway
 
         this.chatService.enterChatRoom(client, room);
 
-        // MongoDB에서 이 채팅방의 메시지 조회
         const messages = await this.chatService.findLimitCntMessageByCalendarId(room, 1);
 
         console.log(messages);
 
-        // 클라이언트에게 이전 메시지 전송
         messages.forEach((message) => {
             client.emit('getMessage', {
                 id: message._id,
@@ -173,5 +174,10 @@ export class ChatGateway
             roomId: room,
             roomName: this.chatService.getChatRoom(room).roomName,
         };
+    }
+
+    @SubscribeMessage('sendImage')
+    handleImage(client: Socket, payload: { imageUrl: string, calendarId: string }) {
+        client.to(payload.calendarId).emit('receiveImage', payload.imageUrl);
     }
 }

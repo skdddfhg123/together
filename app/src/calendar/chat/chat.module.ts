@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
-import { Chat, ChatSchema } from './entities/chat.schema';
-import { MongooseModule } from '@nestjs/mongoose';
+import { EmojiController } from './emoji.controller';
+import { EmojiService } from './emoji.service';
 @Module({
-    imports: [
-        // MongooseModule.forFeature([{name: Chat.name, schema: ChatSchema}])
+    controllers: [
+        EmojiController,
     ],
     providers: [
         ChatGateway,
         ChatService,
+        EmojiService,
     ],
 })
 export class ChatModule {}

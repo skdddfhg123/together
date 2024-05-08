@@ -21,12 +21,20 @@ export class Chat extends Document{
     nickname: string;
     
     @Prop({
-        required: true,
+        required: false,
         unique: false,
     })
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     message: string;
+
+    @Prop({
+        required: false,
+        unique: false,
+    })
+    @IsString()
+    @IsOptional()
+    imgUrl: string;
 
     @Prop(raw({
         type: Date,
