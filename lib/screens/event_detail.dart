@@ -1,4 +1,6 @@
+import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
+import 'package:calendar/screens/comment_page.dart';
 import 'package:calendar/screens/create_post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,6 +32,7 @@ class EventDetailPage extends StatefulWidget {
 }
 
 class _EventDetailPageState extends State<EventDetailPage> {
+  final authController = Get.find<AuthController>();
   int currentPage = 0;
   // 현재 시간으로부터 몇 시간 전인지를 계산하는 함수
   String timeAgoSinceDate(DateTime date) {
@@ -56,6 +59,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     super.initState();
     final MeetingController meetingController = Get.find<MeetingController>();
     meetingController.loadFeedsForEvent(widget.groupEventId);
+    print("???????????");
   }
 
   @override
@@ -282,7 +286,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                   onSelected: (String value) {
                                     switch (value) {
                                       case 'edit':
-                                        // 편집 기능을 여기에 구현
+                                        // 편집 로직
                                         break;
                                       case 'delete':
                                         showDialog(
@@ -320,29 +324,28 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                         break;
                                     }
                                   },
-                                  itemBuilder: (BuildContext context) =>
-                                      <PopupMenuEntry<String>>[
-                                    const PopupMenuItem<String>(
-                                      value: 'edit',
-                                      child: Text('편집'),
-                                    ),
-                                    const PopupMenuItem<String>(
-                                      value: 'delete',
-                                      child: Text('삭제'),
-                                    ),
-                                  ],
+                                  itemBuilder: (BuildContext context) {
+                                    final bool isUserPost =
+                                        authController.user?.nickname ==
+                                            feed.nickname;
+                                    return isUserPost
+                                        ? <PopupMenuEntry<String>>[
+                                            const PopupMenuItem<String>(
+                                              value: 'edit',
+                                              child: Text('편집'),
+                                            ),
+                                            const PopupMenuItem<String>(
+                                              value: 'delete',
+                                              child: Text('삭제'),
+                                            ),
+                                          ]
+                                        : <PopupMenuEntry<
+                                            String>>[]; // 사용자가 작성자가 아니면 메뉴를 비웁니다.
+                                  },
                                 ),
                               ],
                             ),
                             const SizedBox(height: 10),
-                            // Container(
-                            //   alignment: Alignment.bottomRight,
-                            //   padding: const EdgeInsets.symmetric(vertical: 8),
-                            //   child: Text(
-                            //     '${currentPage + 1}/${feed.imageSrcs.length}',
-                            //     style: TextStyle(color: Colors.grey[700]),
-                            //   ),
-                            // ),
                             if (feed.imageSrcs.isNotEmpty)
                               Container(
                                 height: 200,
@@ -390,7 +393,24 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                   icon: const Icon(Icons.mode_comment_outlined,
                                       color: Colors.black),
                                   onPressed: () {
-                                    // 댓글 기능 구현
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      useSafeArea: true,
+                                      isDismissible: true,
+                                      backgroundColor: Colors
+                                          .transparent, // 배경을 투명하게 설정하여 둥근 효과를 극대화
+                                      builder: (context) => ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(20.0),
+                                          topRight: Radius.circular(20.0),
+                                        ),
+                                        child: CommentsPage(
+                                            feedId: feedId,
+                                            nickname: feed.nickname,
+                                            thumbnail: feed.thumbnail),
+                                      ),
+                                    );
                                   },
                                 ),
                                 IconButton(

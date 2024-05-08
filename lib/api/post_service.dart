@@ -108,8 +108,11 @@ class FeedService {
         'Content-Type': 'application/json',
       });
       if (response.statusCode == 200) {
+        print('피드로드하기 성공');
         List<dynamic> feedsJson = json.decode(response.body);
-        return feedsJson.map((json) => FeedWithId.fromJson(json)).toList();
+        return feedsJson
+            .map((json) => FeedWithId.fromJson(json, groupeventId))
+            .toList();
       } else {
         print(
             'Failed to load feeds for group $groupeventId, status code: ${response.statusCode}');

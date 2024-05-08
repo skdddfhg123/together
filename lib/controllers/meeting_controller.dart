@@ -1,8 +1,10 @@
 import 'package:calendar/api/calendar_delete_service.dart';
+import 'package:calendar/api/comment_service.dart';
 import 'package:calendar/api/delete_event_service.dart';
 import 'package:calendar/api/event_creates_service.dart';
 import 'package:calendar/api/post_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
+import 'package:calendar/models/comment.dart';
 import 'package:calendar/models/post.dart';
 import 'package:calendar/models/social_event.dart';
 import 'package:calendar/screens/event_detail.dart';
@@ -17,11 +19,13 @@ class CalendarAppointment {
   final Appointment appointment;
   final String calendarId;
   final String groupeventId;
+  final bool isSocial;
 
   CalendarAppointment(
       {required this.appointment,
       required this.calendarId,
-      required this.groupeventId});
+      required this.groupeventId,
+      required this.isSocial});
 }
 
 class FeedWithId {
@@ -35,13 +39,23 @@ class FeedWithId {
     required this.feedId,
   });
 
-  factory FeedWithId.fromJson(Map<String, dynamic> json) {
+  factory FeedWithId.fromJson(Map<String, dynamic> json, String groupeventId) {
     return FeedWithId(
-      feed: Feed.fromJson(json['feed']),
-      groupeventId: json['groupEventId'] as String,
+      feed: Feed.fromJsonLoad(json), // json 객체 자체를 Feed.fromJson에 전달
+      groupeventId: groupeventId,
       feedId: json['feedId'] as String,
     );
   }
+}
+
+class CommentWithFeedId {
+  final Comment comment;
+  final String feedId;
+
+  CommentWithFeedId({
+    required this.comment,
+    required this.feedId,
+  });
 }
 
 class MeetingController extends GetxController {
@@ -53,7 +67,7 @@ class MeetingController extends GetxController {
   final DeleteCalendarService deleteCalendarService = DeleteCalendarService();
 
 ///////////////////////////////////////피드 부분 /////////////////////////////////////////
-  final FeedService feedService = FeedService(); // FeedService 인스턴스 생성
+  final FeedService feedService = FeedService();
   final RxList<FeedWithId> feeds = <FeedWithId>[].obs;
 
   void addFeed(Feed newFeed, String groupEventId, String feedId) {
@@ -64,6 +78,15 @@ class MeetingController extends GetxController {
     );
     feeds.add(newFeeds);
     update(); // Trigger UI updates where MeetingController is being used
+  }
+
+  // 특정 이벤트와 관련된 모든 피드를 삭제하는 메소드
+  Future<void> deleteFeedsForEvent(String groupEventId) async {
+    List<FeedWithId> feedsToDelete =
+        feeds.where((feed) => feed.groupeventId == groupEventId).toList();
+    for (FeedWithId feed in feedsToDelete) {
+      await deleteFeed(feed.feedId);
+    }
   }
 
   // 피드를 삭제하는 메소드
@@ -78,19 +101,69 @@ class MeetingController extends GetxController {
     }
   }
 
-  // 이벤트 ID에 따른 피드 로드
   void loadFeedsForEvent(String groupEventId) async {
-    var eventFeeds = await feedService.loadFeedsForGroup(groupEventId);
-    feeds.assignAll(eventFeeds);
+    try {
+      var eventFeeds = await feedService.loadFeedsForGroup(groupEventId);
+      if (eventFeeds.isNotEmpty) {
+        feeds.assignAll(eventFeeds);
+        update(); // 상태 업데이트 강제 실행
+        print("success");
+      } else {
+        print("No feeds found for this groupEventId: $groupEventId");
+      }
+    } catch (e) {
+      print("Failed to load feeds: $e");
+    }
+  }
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////// 댓 글 ///////////////////////////////////////////////
+  final CommentService commentService = CommentService();
+  final RxList<CommentWithFeedId> comments = <CommentWithFeedId>[].obs;
+
+  // 특정 피드에 대한 댓글 로드 메서드
+  Future<void> loadCommentsForFeed(String feedId) async {
+    try {
+      comments.clear(); // 기존 댓글 목록을 초기화
+      var feedComments = await commentService.fetchComments(feedId);
+      var mappedComments = feedComments
+          .map((comment) => CommentWithFeedId(comment: comment, feedId: feedId))
+          .toList();
+      comments.assignAll(mappedComments);
+      update(); // 리스너에게 업데이트 알림
+    } catch (e) {
+      print('댓글 로딩 에러: $e');
+      Get.snackbar('오류', '댓글을 로드하는데 실패했습니다.');
+    }
   }
 
+  // 특정 피드에 댓글을 게시하는 메서드
+  Future<void> addComment(
+      String feedId, String content, String nickname, String thumbnail) async {
+    try {
+      Comment? newComment = await commentService.postComment(
+          feedId, content, nickname, thumbnail);
+      if (newComment != null) {
+        comments.add(CommentWithFeedId(comment: newComment, feedId: feedId));
+        update(); // 새 댓글 추가 후 UI 업데이트
+        Get.snackbar('성공', '댓글이 성공적으로 추가되었습니다.');
+      }
+    } catch (e) {
+      print('댓글 게시 에러: $e');
+      Get.snackbar('오류', '댓글 게시에 실패했습니다.');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
 //////////////////////////////////////// 캘린더, 일정 부분 //////////////////////////////////////
-  void addCalendarAppointment(
-      Appointment appointment, String calendarId, String groupeventId) {
+  void addCalendarAppointment(Appointment appointment, String calendarId,
+      String groupeventId, bool isSocial) {
     var newCalendarAppointment = CalendarAppointment(
         appointment: appointment,
         calendarId: calendarId,
-        groupeventId: groupeventId);
+        groupeventId: groupeventId,
+        isSocial: isSocial);
     calendarAppointments.add(newCalendarAppointment);
     update();
   }
@@ -98,10 +171,9 @@ class MeetingController extends GetxController {
   void syncSocialEvents(List<dynamic> jsonData) {
     tz.initializeTimeZones(); // 시간대 데이터 초기화
     var seoul = tz.getLocation('Asia/Seoul'); // 서울 시간대 객체 가져오기
+    // calendarAppointments에서 isSocial이 true인 항목 제거
+    calendarAppointments.removeWhere((appointment) => appointment.isSocial);
 
-    // List<dynamic> jsonResponse = json.decode(jsonData);
-    // List<SocialEvent> events =
-    //     jsonResponse.map((data) => SocialEvent.fromJson(data)).toList();
     List<SocialEvent> events =
         jsonData.map((data) => SocialEvent.fromJson(data)).toList();
 
@@ -110,6 +182,8 @@ class MeetingController extends GetxController {
 
     calendarAppointments.removeWhere(
         (appointment) => newEventCalendarIds.contains(appointment.calendarId));
+
+    update();
 
     for (var event in events) {
       // UTC 시간을 서울 시간대로 변환
@@ -125,6 +199,7 @@ class MeetingController extends GetxController {
         ),
         event.userCalendarId,
         event.socialEventId,
+        true,
       );
     }
   }
@@ -161,6 +236,7 @@ class MeetingController extends GetxController {
     }).toList();
   }
 
+  // 일정과 연관된 피드들을 모두 삭제하는 기능이 포함된 일정 삭제 메소드
   Future<void> deleteCalendarAppointment(String groupEventId) async {
     bool isDeleted = await deleteEventService.deleteEvent(groupEventId);
     if (isDeleted) {
@@ -168,10 +244,12 @@ class MeetingController extends GetxController {
           .indexWhere((item) => item.groupeventId == groupEventId);
       if (index != -1) {
         calendarAppointments.removeAt(index);
-        update(); // GetX의 update 메서드를 호출하여 UI 갱신
+        await deleteFeedsForEvent(groupEventId); // 연관된 피드들도 삭제
+        update(); // UI 갱신
+        Get.back(); // 현재 페이지 닫기
+        Get.snackbar(
+            'Success', 'Event and related feeds deleted successfully.');
       }
-      Get.back(); // 현재 페이지 닫기
-      Get.snackbar('Success', 'Event deleted successfully.');
     } else {
       Get.snackbar('Error', 'Failed to delete event from server.',
           snackPosition: SnackPosition.BOTTOM);

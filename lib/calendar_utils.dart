@@ -106,7 +106,7 @@ class DialogService {
                     id: calendarId.toString(),
                   );
                   meetingController.addCalendarAppointment(
-                      newAppointment, calendarId, groupEventId);
+                      newAppointment, calendarId, groupEventId, false);
                   Navigator.pop(context);
                 } else {
                   Get.snackbar("Error", "Failed to create event");

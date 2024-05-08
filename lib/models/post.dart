@@ -13,6 +13,7 @@ class Feed {
     required this.imageSrcs, // List<String> 타입으로 수정
   });
 
+  //create 할때 쓰는 용
   factory Feed.fromJson(Map<String, dynamic> json) {
     List<String> imageUrls = [];
     if (json['feedImages'] != null && json['feedImages'].isNotEmpty) {
@@ -30,6 +31,25 @@ class Feed {
           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s",
       content: feedData['content'],
       createdAt: DateTime.parse(feedData['createdAt']),
+      imageSrcs: imageUrls,
+    );
+  }
+
+  //load 할때 쓰는 용
+  factory Feed.fromJsonLoad(Map<String, dynamic> json) {
+    List<String> imageUrls = [];
+    if (json['images'] != null && json['images'].isNotEmpty) {
+      imageUrls = json['images']
+          .map<String>((img) => img['imageSrc'] as String)
+          .toList();
+    }
+
+    return Feed(
+      nickname: json['nickname'],
+      thumbnail: json['thumbnail'] ??
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s",
+      content: json['content'],
+      createdAt: DateTime.parse(json['createdAt']),
       imageSrcs: imageUrls,
     );
   }

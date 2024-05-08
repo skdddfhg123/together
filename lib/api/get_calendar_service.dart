@@ -74,7 +74,6 @@ class CalendarApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> appointmentData = json.decode(response.body);
-      List<Appointment> appointments = [];
 
       for (var data in appointmentData) {
         Appointment newAppointment = Appointment(
@@ -88,7 +87,7 @@ class CalendarApiService {
 
         // 일정과 groupeventId를 meetingController에 추가
         meetingController.addCalendarAppointment(
-            newAppointment, calendar.calendarId, groupEventId);
+            newAppointment, calendar.calendarId, groupEventId, false);
       }
       meetingController.update(); // 일정 추가 후 UI 업데이트
     } else {
