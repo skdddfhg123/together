@@ -25,6 +25,32 @@ export class ImageService {
     return imageUrl;
   }
 
+  // 이미지 파일 S3에 저장 후 url return 모듈화
+  async feedImageUpload(file: Express.Multer.File, imageName: string): Promise<string>{
+    // const imageName = this.utilsService.getUUID();
+    const ext = file.originalname.split('.').pop();
+  
+    const imageUrl = await this.awsService.imageUploadToS3(
+      `feeds/${imageName}.${ext}`,
+      file,
+      ext,
+    );
+    return imageUrl;
+  }
+
+  // 이미지 파일 S3에 저장 후 url return 모듈화
+  async emojiImageUpload(file: Express.Multer.File, imageName: string): Promise<string>{
+    // const imageName = this.utilsService.getUUID();
+    const ext = file.originalname.split('.').pop();
+  
+    const imageUrl = await this.awsService.imageUploadToS3(
+      `emoji/${imageName}.${ext}`,
+      file,
+      ext,
+    );
+    return imageUrl;
+  }
+
   //다수 이미지 파일 대해 S3에 비동기 업로드 후 각각의 url을 반환하는 Promise 배열을 생성
   async multipleImageUpload(files: Express.Multer.File[]): Promise<string[]> {
     const uploadPromises = files.map(async file => {
@@ -42,17 +68,17 @@ export class ImageService {
   }
 
 
-  async multipleImageAndTextFormUpload(
-    files: Express.Multer.File[], 
-    body :ImageMultyTextUploadDto
-  ): Promise<string[]> {
+  // async multipleImageAndTextFormUpload(
+  //   files: Express.Multer.File[], 
+  //   body :ImageMultyTextUploadDto
+  // ): Promise<string[]> {
     
-    const title = body.title
-    const content = body.description
-    const imgUrls = this.imageArrayUpload(files)
-    return imgUrls;
+  //   const title = body.title
+  //   const content = body.description
+  //   const imgUrls = this.imageArrayUpload(files, "test")
+  //   return imgUrls;
 
-  }
+  // }
 
 
 
@@ -62,7 +88,7 @@ export class ImageService {
       const ext = file.originalname.split('.').pop();
 
       const imageUrl = await this.awsService.imageUploadToS3(
-          `${imageName}.${ext}`,
+          `feeds/${imageName}.${ext}`,
           file, 
           ext 
       );

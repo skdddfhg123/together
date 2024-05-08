@@ -117,7 +117,7 @@ export class CalendarController {
         return await this.groupEventService.createGroupEvent(groupEventDTO, payload, calendarId);
     }
 
-    @Get('group/get/:calendarId')
+    @Get('group/get/all/:calendarId')
     @ApiOperation({ summary: '캘린더 그룹 이벤트 가져오기' })
     @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
     @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })

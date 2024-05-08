@@ -62,8 +62,8 @@ export class User extends BaseEntity{
     @OneToMany(() => FeedComment, FeedComment => FeedComment.user)
     feedComments: FeedComment[];
 
-    @OneToMany(() => Emoji, emoji => emoji.user)
-    emojis: Emoji[];
+    // @OneToMany(() => Emoji, emoji => emoji.user)
+    // emojis: Emoji[];
 
     @OneToMany(() => EmojiInFeed, emojiInFeed => emojiInFeed.user)
     emojisInFeed: EmojiInFeed[];

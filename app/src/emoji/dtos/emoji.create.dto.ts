@@ -2,6 +2,10 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 
+class ImageDto {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: Express.Multer.File;
+}
 
 export class CreateEmojiDTO { 
     
@@ -14,13 +18,15 @@ export class CreateEmojiDTO {
     emojiName: string;
 
 
-  
     // 1개 업로드
-    @ApiProperty({ type: 'string', format: 'binary' })
-    @IsNotEmpty()
-    emojiFile: any;
+    // @ApiProperty({ 
+    //   type: 'string', 
+    //   format: 'binary' 
+    // })
+    // @IsNotEmpty()
+    // emojiFile: any;
     
-
+}
 
 
     // 2개 이상 업로드
@@ -40,5 +46,3 @@ export class CreateEmojiDTO {
       @IsNotEmpty()
       images: ImageDto[];
       */ 
-    
-}

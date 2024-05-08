@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { getPayload } from 'src/auth/getPayload.decorator';
@@ -13,7 +13,7 @@ import { FeedCommentService } from 'src/db/comment/comment.service';
 import { UpdateFeedCommentDTO } from 'src/db/comment/dtos/comment.update.dto';
 import { ReadFeedDTO } from './dtos/feed.read.dto';
 import { ReadFeedCommentDTO } from 'src/db/comment/dtos/comment.read.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { FeedImageBinded } from './interface/feedAndImageBinding';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
 
@@ -72,6 +72,7 @@ export class FeedController {
     }
 
 
+
     //그룹 이벤트에서 피드 일괄 출력
     @Get('get/:groupeventId')
     @ApiConsumes('multipart/form-data', 'application/json')
@@ -104,23 +105,51 @@ export class FeedController {
     }
 
     // 피드 수정하기
+    // @Patch('update/:feedId')
+    // @ApiOperation({ summary: '피드 업데이트' })
+    // @ApiResponse({ status: 200, description: 'Feed updated successfully' })
+    // @ApiResponse({ status: 403, description: 'You do not have permission to update this feed' })
+    // @ApiResponse({ status: 404, description: 'Feed not found' })
+    // @ApiResponse({ status: 500, description: 'Error updating feed' })
+    // @ApiBearerAuth('JWT-auth')
+    // @UseGuards(JwtAuthGuard)
+    // async updateFeed(
+
+    //     @getPayload() payload: PayloadResponse,
+    //     @Param('feedId') feedId: string, 
+    //     @Body() feedDTO: UpdateFeedDTO
+
+    // ): Promise<Feed> {
+    //         return await this.feedService.updateFeed(payload, feedId, feedDTO);
+    // }
+
+    // 피드 수정하기
     @Patch('update/:feedId')
     @ApiOperation({ summary: '피드 업데이트' })
+    @ApiConsumes('multipart/form-data')
     @ApiResponse({ status: 200, description: 'Feed updated successfully' })
     @ApiResponse({ status: 403, description: 'You do not have permission to update this feed' })
     @ApiResponse({ status: 404, description: 'Feed not found' })
     @ApiResponse({ status: 500, description: 'Error updating feed' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileFieldsInterceptor
+        ([
+            { name: 'images', maxCount: 5 }
+          ]
+    ))
     async updateFeed(
 
         @getPayload() payload: PayloadResponse,
         @Param('feedId') feedId: string, 
-        @Body() feedDTO: UpdateFeedDTO
-
-    ): Promise<Feed> {
-            return await this.feedService.updateFeed(payload, feedId, feedDTO);
+        @Body() feedDTO: UpdateFeedDTO,
+        @UploadedFiles() images: Express.Multer.File[]
+    ): Promise<{ feed: Feed, updatedFeedImages?: FeedImage[] }> {
+            return await this.feedService.updateFeed(payload, feedId, feedDTO, images);
     }
+
+
+
 
     // 피드 삭제하기 
     @Patch('remove/:feedId')

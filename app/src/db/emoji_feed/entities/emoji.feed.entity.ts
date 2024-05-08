@@ -1,7 +1,7 @@
 import { User } from "src/db/user/entities/user.entity";
 import { Emoji } from "src/emoji/entities/emoji.entity";
 import { Feed } from "src/feed/entities/feed.entity";
-import { CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
 
@@ -10,7 +10,7 @@ import { CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, Prim
 export class EmojiInFeed {
 
     //Auto
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn('uuid')
     emojiInFeedId: string;
 
     // Auto (Auth)

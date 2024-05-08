@@ -40,7 +40,16 @@ export class FeedCommentService {
 
             
             const savedFeedComment = await this.feedCommentRepository.save(feedComment);
-            delete feedComment.user;
+            //delete feedComment.user;
+            delete feedComment.user.useremail
+            delete feedComment.user.password
+            delete feedComment.user.prePwd
+            delete feedComment.user.phone
+            delete feedComment.user.registeredAt
+            delete feedComment.user.updatedAt
+            delete feedComment.user.deletedAt
+            delete feedComment.user.birthDay
+            delete feedComment.user.birthDayFlag
             delete feedComment.feedId;
             
             return savedFeedComment;
@@ -59,7 +68,7 @@ export class FeedCommentService {
             const feedComments = await this.feedCommentRepository.createQueryBuilder('feedComment')
                 .leftJoinAndSelect('feedComment.user', 'user')
                 .select([
-                    'feedComment.feedId',
+                    'feedComment.feedCommentId',
                     'feedComment.content',
                     'feedComment.createdAt',
                     'feedComment.updatedAt',
@@ -122,7 +131,11 @@ export class FeedCommentService {
             }
         }
  
-    async updateFeedComment(payload: PayloadResponse, feedCommentId: string, updateData: Partial<FeedComment>): Promise<FeedComment> {
+    async updateFeedComment(
+        payload: PayloadResponse, 
+        feedCommentId: string, 
+        updateData: Partial<FeedComment>
+    ): Promise<FeedComment> {
         try {
             const feedCommentToUpdate = await this.feedCommentRepository.createQueryBuilder('feedComment')
                 .innerJoinAndSelect('feedComment.user', 'user')
@@ -141,7 +154,14 @@ export class FeedCommentService {
 
             const updatedFeedComment = this.feedCommentRepository.merge(feedCommentToUpdate, updateData);
             updatedFeedComment.updatedAt = new Date(); 
-            return await this.feedCommentRepository.save(updatedFeedComment);
+            const updateResult = await this.feedCommentRepository.save(updatedFeedComment);
+            delete updateResult.user
+            delete updateResult.feedId
+            delete updateResult.isDeleted
+            delete updateResult.deletedAt
+            delete updateResult.createdAt
+
+            return updateResult
 
         } catch (e) {
             console.error('Error occurred while updating the feedComment:', e);
@@ -149,7 +169,10 @@ export class FeedCommentService {
         }
     }
     
-    async removeFeedComment(payload: PayloadResponse, feedCommentId: string): Promise<FeedComment> {
+    async removeFeedComment(
+        payload: PayloadResponse, 
+        feedCommentId: string
+    ): Promise<FeedComment> {
         try {
             const feedComment = await this.feedCommentRepository.findOne({
                 where: { feedCommentId : feedCommentId },
@@ -170,6 +193,13 @@ export class FeedCommentService {
 
             feedComment.deletedAt = new Date();
             const removedFeedComment = await this.feedCommentRepository.save(feedComment);
+            
+            delete removedFeedComment.user
+            delete removedFeedComment.isDeleted
+            delete removedFeedComment.updatedAt
+            delete removedFeedComment.createdAt
+            delete removedFeedComment.content
+            
             return removedFeedComment;
 
         } catch (e) {

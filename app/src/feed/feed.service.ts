@@ -87,9 +87,7 @@ export class FeedService {
             if (!user) {
                 throw new UnauthorizedException('User not found');
             }
-            /*
-            해당 그룹의 소속이 아닐 때 exception
-            */ 
+
             const feed = new Feed();
             feed.user = user;
             feed.groupEventId = groupEventId;
@@ -100,20 +98,31 @@ export class FeedService {
 
             let feedImages = [] 
             if (images && images.length) {
-            const imageUrls = await this.imageService.imageArrayUpload(images);
-            
+                const imageUrls = await this.imageService.imageArrayUpload(images);
 
-            for (const imageUrl of imageUrls) {
-                const feedImage = new FeedImage();
-                feedImage.feed = feed;
-                feedImage.imageSrc = imageUrl;
-                const savedFeedImage = await this.feedImageRepository.save(feedImage);
-                delete feedImage.feed;
-                feedImages.push(feedImage);
+                for (const imageUrl of imageUrls) {
+                    const feedImage = new FeedImage();
+                    const id = this.utilsService.extractFilename(imageUrl);
+                    feedImage.feedImageId = id
+                    feedImage.feed = feed;
+                    feedImage.imageSrc = imageUrl;
+                    const savedFeedImage = await this.feedImageRepository.save(feedImage);
+                    delete feedImage.feed;
+                    const { imageSrc, feedImageId } = feedImage
+                    const resImage = { imageSrc, feedImageId }
+                    feedImages.push(resImage);
+                    }
                 }
-            }
 
-            delete feed.user;
+            delete feed.user.useremail
+            delete feed.user.password
+            delete feed.user.prePwd
+            delete feed.user.phone
+            delete feed.user.registeredAt
+            delete feed.user.updatedAt
+            delete feed.user.deletedAt
+            delete feed.user.birthDay
+            delete feed.user.birthDayFlag
 
 
             return { feed : feed, feedImages : feedImages }
@@ -139,7 +148,7 @@ export class FeedService {
                     'feed.updatedAt',
                     'user.nickname', 
                     'user.thumbnail',
-                    'feedImage.imageSrc'
+                    'feedImage.feedImageId'
                 ])
                 .where('feed.groupEventId = :groupEventId', { groupEventId })
                 .andWhere('feed.deletedAt IS NULL')
@@ -177,7 +186,8 @@ export class FeedService {
                     'feed.updatedAt',
                     'user.nickname', 
                     'user.thumbnail',
-                    'feedImage.imageSrc'
+                    'feedImage.imageSrc',
+                    'feedImage.feedImageId'
                 ])
                 .where('feed.feedId = :feedId', { feedId })
                 .andWhere('feed.deletedAt IS NULL')
@@ -206,10 +216,16 @@ export class FeedService {
         }
      }
 
-    async updateFeed(payload: PayloadResponse, feedId: string, updateData: Partial<Feed>): Promise<Feed> {
+    async updateFeed(
+        payload: PayloadResponse, 
+        feedId: string, 
+        updateData: Partial<Feed>,
+        newImages?: Express.Multer.File[]
+    ): Promise<{ feed: Feed, updatedFeedImages?: FeedImage[] }> {
         try {
             const feedToUpdate = await this.feedRepository.createQueryBuilder('feed')
                 .innerJoinAndSelect('feed.user', 'user')
+                .leftJoinAndSelect('feed.feedImages', 'feedImage')
                 .where('feed.feedId = :feedId', { feedId }) 
                 .andWhere('feed.deletedAt IS NULL') 
                 .getOne();
@@ -224,13 +240,135 @@ export class FeedService {
 
             const updatedFeed = this.feedRepository.merge(feedToUpdate, updateData);
             updatedFeed.updatedAt = new Date();  
-            return await this.feedRepository.save(updatedFeed);
+
+            let updatedFeedImages = [];
+            if (newImages && newImages.length) {
+                // 기존 이미지 삭제 또는 비활성화 처리
+                feedToUpdate.feedImages.forEach(async image => {
+                    image.deletedAt = new Date();
+                    await this.feedImageRepository.save(image);
+                });
+
+                // 새 이미지를 S3에 업로드 및 저장
+            const imageUrls = await this.imageService.imageArrayUpload(newImages);
+            for (const imageUrl of imageUrls) {
+                const feedImage = new FeedImage();
+                feedImage.feed = updatedFeed;
+                feedImage.imageSrc = imageUrl;
+                const savedFeedImage = await this.feedImageRepository.save(feedImage);
+                updatedFeedImages.push({
+                    imageSrc: savedFeedImage.imageSrc,
+                    feedImageId: savedFeedImage.feedImageId
+                });
+            }
+        }
+
+            await this.feedRepository.save(updatedFeed);
+            return { feed: updatedFeed, updatedFeedImages };
 
         } catch (e) {
             console.error('Error occurred while updating the feed:', e);
             throw new InternalServerErrorException('Failed to modify feed');
         }
     }
+
+
+
+    // async updateFeed(
+    //     payload: PayloadResponse, 
+    //     feedId: string, 
+    //     updateData: Partial<Feed>,
+    //     newImages?: Express.Multer.File[]
+    // ): Promise<{ feed: Feed, updatedFeedImages?: FeedImage[] }> {
+    //     try {
+    //         const feedToUpdate = await this.feedRepository.createQueryBuilder('feed')
+    //             .innerJoinAndSelect('feed.user', 'user')
+    //             .leftJoinAndSelect('feed.feedImages', 'feedImage')
+    //             .where('feed.feedId = :feedId', { feedId }) 
+    //             .andWhere('feed.deletedAt IS NULL') 
+    //             .getOne();
+    
+    //         if (!feedToUpdate) {
+    //             throw new NotFoundException('Feed not found');
+    //         }
+    
+    //         if (feedToUpdate.user?.useremail !== payload.useremail) {
+    //             throw new ForbiddenException('Access denied'); 
+    //         }
+
+    //         const updatedFeed = this.feedRepository.merge(feedToUpdate, updateData);
+    //         updatedFeed.updatedAt = new Date();  
+
+    //         let updatedFeedImages = [];
+    //         if (newImages && newImages.length) {
+    //             // 기존 이미지 삭제 또는 비활성화 처리
+    //             feedToUpdate.feedImages.forEach(async image => {
+    //                 image.deletedAt = new Date();
+    //                 await this.feedImageRepository.save(image);
+    //             });
+
+    //             // 새 이미지를 S3에 업로드 및 저장
+    //         const imageUrls = await this.imageService.imageArrayUpload(newImages);
+    //         for (const imageUrl of imageUrls) {
+    //             const feedImage = new FeedImage();
+    //             feedImage.feed = updatedFeed;
+    //             feedImage.imageSrc = imageUrl;
+    //             const savedFeedImage = await this.feedImageRepository.save(feedImage);
+    //             updatedFeedImages.push({
+    //                 imageSrc: savedFeedImage.imageSrc,
+    //                 feedImageId: savedFeedImage.feedImageId
+    //             });
+    //         }
+    //     }
+
+    //         await this.feedRepository.save(updatedFeed);
+    //         return { feed: updatedFeed, updatedFeedImages };
+
+    //     } catch (e) {
+    //         console.error('Error occurred while updating the feed:', e);
+    //         throw new InternalServerErrorException('Failed to modify feed');
+    //     }
+    // }
+
+
+
+
+
+    
+    // async updateFeed(
+    //     payload: PayloadResponse, 
+    //     feedId: string, 
+    //     updateData: Partial<Feed>
+    // ): Promise<Feed> {
+    //     try {
+    //         const feedToUpdate = await this.feedRepository.createQueryBuilder('feed')
+    //             .innerJoinAndSelect('feed.user', 'user')
+    //             .where('feed.feedId = :feedId', { feedId }) 
+    //             .andWhere('feed.deletedAt IS NULL') 
+    //             .getOne();
+    
+    //         if (!feedToUpdate) {
+    //             throw new NotFoundException('Feed not found');
+    //         }
+    
+    //         if (feedToUpdate.user?.useremail !== payload.useremail) {
+    //             throw new ForbiddenException('Access denied'); 
+    //         }
+
+    //         const updatedFeed = this.feedRepository.merge(feedToUpdate, updateData);
+    //         updatedFeed.updatedAt = new Date();  
+    //         return await this.feedRepository.save(updatedFeed);
+
+    //     } catch (e) {
+    //         console.error('Error occurred while updating the feed:', e);
+    //         throw new InternalServerErrorException('Failed to modify feed');
+    //     }
+    // }
+
+
+
+
+
     
     async removeFeed(payload: PayloadResponse, feedId: string): Promise<Feed>{
         try {

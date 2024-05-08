@@ -17,8 +17,6 @@ export class FeedImage {
     @Column()
     imageSrc: string;
 
-
-
     @CreateDateColumn()
     createdAt: Date;
 

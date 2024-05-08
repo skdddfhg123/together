@@ -44,27 +44,27 @@ export class ImageController {
     };
   }
 
-  @Post('image/multy/text')
-  @ApiOperation({ summary: 'Upload multiple images with text for Test' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: ImageMultyTextUploadDto })
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'images', maxCount: 5 }
-  ]))
-  async uploadThings(
-    @UploadedFiles() files: { images?: Express.Multer.File[]},
-    @Body() body: ImageMultyTextUploadDto
-     ) {
-    if (!files.images || files.images.length === 0) {
-      return { message: 'No images uploaded' };
-    }
-    const urls = await this.imageService.multipleImageAndTextFormUpload(files.images, body);
-    return {
-      message: 'Images uploaded successfully',
-      urls: urls,
-      title: body.title,
-      description: body.description
-    };
-  }
+  // @Post('image/multy/text')
+  // @ApiOperation({ summary: 'Upload multiple images with text for Test' })
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({ type: ImageMultyTextUploadDto })
+  // @UseInterceptors(FileFieldsInterceptor([
+  //   { name: 'images', maxCount: 5 }
+  // ]))
+  // async uploadThings(
+  //   @UploadedFiles() files: { images?: Express.Multer.File[]},
+  //   @Body() body: ImageMultyTextUploadDto
+  //    ) {
+  //   if (!files.images || files.images.length === 0) {
+  //     return { message: 'No images uploaded' };
+  //   }
+  //   const urls = await this.imageService.multipleImageAndTextFormUpload(files.images, body);
+  //   return {
+  //     message: 'Images uploaded successfully',
+  //     urls: urls,
+  //     title: body.title,
+  //     description: body.description
+  //   };
+  // }
 
 }

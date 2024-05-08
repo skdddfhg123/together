@@ -1,20 +1,20 @@
 import { Calendar } from "src/calendar/entities/calendar.entity";
 import { EmojiInFeed } from "src/db/emoji_feed/entities/emoji.feed.entity";
 import { User } from "src/db/user/entities/user.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
 @Entity('emoji')
 export class Emoji {
 
     //Auto
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn('uuid')
     emojiId: string;
 
-    // Auto (Auth)
-    @ManyToOne(() => User, user => user.emojis)
-    @JoinColumn({ name: 'userId' })
-    user: User;
+    // // Auto (Auth)
+    // @ManyToOne(() => User, user => user.emojis)
+    // @JoinColumn({ name: 'userId' })
+    // user: User;
 
     // Auto (Param)
     @ManyToOne(() => Calendar, calendar => calendar.emojis)

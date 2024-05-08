@@ -9,7 +9,6 @@ class ImageDto {
   }
 
 
-
 export class UpdateFeedDTO {
     @IsOptional()
     @IsString()
@@ -53,4 +52,11 @@ export class UpdateFeedDTO {
     // @ApiPropertyOptional({ description: 'Feed images of the feed to be updated' })
     // feedImages?: FeedImage[];
 
+}
+
+
+export class ImageAction {
+    action: 'add' | 'delete' | 'keep';
+    imageId?: string;  // 'delete' 또는 'keep' 액션에 사용
+    file?: Express.Multer.File;  // 'add' 액션에 사용
 }
