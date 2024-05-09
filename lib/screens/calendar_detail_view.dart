@@ -2,6 +2,7 @@ import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/meeting_data.dart';
+import 'package:calendar/screens/chat_page.dart';
 import 'package:calendar/widget/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -69,6 +70,19 @@ class CalendarDetailView extends StatelessWidget {
               }
             },
             icon: const Icon(Icons.delete_forever_rounded),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatPage(
+                      calendarId: selectedCalendar.calendarId,
+                      calendartitle: selectedCalendar.title),
+                ),
+              );
+            },
+            icon: const Icon(Icons.chat),
           ),
         ],
       ),

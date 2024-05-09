@@ -69,7 +69,7 @@ class CalendarApiService {
   Future<void> loadAppointmentsForCalendar(
       Calendar calendar, String token) async {
     var response = await http.get(
-        Uri.parse("$apiUrl/group/get/${calendar.calendarId}"),
+        Uri.parse("$apiUrl/group/get/v2/${calendar.calendarId}"),
         headers: {'Authorization': 'Bearer $token'});
 
     if (response.statusCode == 200) {
