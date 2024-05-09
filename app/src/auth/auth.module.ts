@@ -8,6 +8,9 @@ import { UserModule } from 'src/db/user/user.module';
 import { UserCalendarModule } from 'src/db/user_calendar/userCalendar.module';
 import { TokensModule } from 'src/db/tokens/tokens.module';
 import { RefreshStrategy } from './strategy/refresh.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/db/user/entities/user.entity';
+import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
 
 @Module({
   imports: [
@@ -18,17 +21,18 @@ import { RefreshStrategy } from './strategy/refresh.strategy';
       }),
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([User, UserCalendar]),
     UserModule,
     UserCalendarModule,
     TokensModule,
   ],
   controllers: [AuthController],
   providers: [
-    AuthService, 
+    AuthService,
     ConfigService,
     JWTStrategy,
     RefreshStrategy,
   ],
   exports: [AuthService]
 })
-export class AuthModule {}
+export class AuthModule { }

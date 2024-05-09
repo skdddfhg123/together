@@ -7,13 +7,13 @@ import { SocialEvent } from "../../event/socialEvent/entities/socialEvent.entity
 export class UserCalendar {
     @PrimaryGeneratedColumn('uuid')
     userCalendarId: string;
-    
+
     @OneToOne(() => User, user => user.userCalendarId)
-    @JoinColumn({ name: 'userId'})
+    @JoinColumn({ name: 'userId' })
     user: User
 
-    @OneToMany(() => Calendar, calendar => calendar.author )
-    @JoinColumn({ name: 'userCalendars'})
+    @OneToMany(() => Calendar, calendar => calendar.author)
+    @JoinColumn({ name: 'userCalendars' })
     groupCalendar: Calendar[];
 
     @OneToMany(() => SocialEvent, socialEvents => socialEvents.userCalendar)

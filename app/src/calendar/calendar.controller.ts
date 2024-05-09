@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { getPayload } from 'src/auth/getPayload.decorator';
@@ -12,14 +12,15 @@ import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity'
 import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 import { UpdateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.update.dto';
 import { RefreshAuthGuard } from 'src/auth/strategy/refresh.guard';
+import { GetGroupDTO } from 'src/db/event/group_event/dtos/groupEvent.get.dto';
 
 @ApiTags("calendar")
 @Controller('calendar')
 export class CalendarController {
     constructor(
         private calendarService: CalendarService,
-        private groupEventService : GroupEventService,
-    ) {}
+        private groupEventService: GroupEventService,
+    ) { }
 
     @Post('create')
     @ApiOperation({ summary: '그룹 캘린더 생성' })
@@ -30,8 +31,8 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async createGroupCalendar(
-      @Body() calendarCreateDto: CalendarCreateDto,
-      @getPayload() payload: PayloadResponse
+        @Body() calendarCreateDto: CalendarCreateDto,
+        @getPayload() payload: PayloadResponse
     ): Promise<Calendar> {
         // 채팅방 생성
         return await this.calendarService.createGroupCalendar(calendarCreateDto, payload);
@@ -69,14 +70,28 @@ export class CalendarController {
 
     @Patch('delete/:calendarId')
     @ApiOperation({ summary: 'Delete a calendar and its associated group events' })
-    @ApiResponse({ status: 200, description: 'Calendar and associated group events deleted successfully' })
+    @ApiResponse({ status: 204, description: 'Calendar and associated group events deleted successfully' })
     @ApiResponse({ status: 404, description: 'Calendar not found' })
     @ApiResponse({ status: 500, description: 'Failed to delete calendar' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
-    // @UseGuards(RefreshAuthGuard)
-    async deleteCalendar(@Param('calendarId') calendarId: string): Promise<void> {
-        await this.calendarService.deleteCalendar(calendarId);
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deleteCalendar(@Param('calendarId') calendarId: string): Promise<any> {
+        try {
+            await this.calendarService.deleteCalendar(calendarId);
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw new NotFoundException(`Calendar with ID ${calendarId} not found`);
+            } else {
+                throw new HttpException(
+                    {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        error: 'Failed to delete calendar',
+                    },
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                );
+            }
+        }
     }
 
     @Patch('participate/:calendarId')
@@ -110,7 +125,7 @@ export class CalendarController {
         //채팅방 나가기
         return this.calendarService.removeAttendeeFromCalendar(calendarId, payload.userCalendarId);
     }
-    
+
     @Post('group/create/:calendarId')
     @ApiOperation({ summary: '그룹 이벤트 만들기' })
     @ApiResponse({ status: 201, description: 'GroupEvent added successfully' })
@@ -121,14 +136,14 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async createGroupEvent(
-         @Body() groupEventDTO: CreateGroupEventDTO,
-         @getPayload() payload: PayloadResponse,
-         @Param('calendarId') calendarId: string 
-    ): Promise<GroupEvent>{
+        @Body() groupEventDTO: CreateGroupEventDTO,
+        @getPayload() payload: PayloadResponse,
+        @Param('calendarId') calendarId: string
+    ): Promise<GroupEvent> {
         return await this.groupEventService.createGroupEvent(groupEventDTO, payload, calendarId);
     }
 
-    @Get('group/get/:calendarId')
+    @Get('group/get/all/:calendarId')
     @ApiOperation({ summary: '캘린더 그룹 이벤트 가져오기' })
     @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
     @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
@@ -137,19 +152,33 @@ export class CalendarController {
     // @UseGuards(RefreshAuthGuard)
     async getAllGroupEvent(
         @Param('calendarId') calendarId: string,
-    ): Promise<GroupEvent[]>{
+    ): Promise<GroupEvent[]> {
         console.log(calendarId);
         return await this.groupEventService.getAllGroupEventsByCalendarId(calendarId);
     }
 
-    @Get('group/get/:groupeventId')
+    @Get('group/get/v2/:calendarId')
+    @ApiOperation({ summary: '캘린더 그룹 이벤트 가져오기' })
+    @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
+    async getAllGroupEvent2(
+        @Param('calendarId') calendarId: string,
+    ): Promise<GetGroupDTO[]> {
+        console.log(calendarId);
+        return await this.groupEventService.getAllGroupEventsByCalendarId2(calendarId);
+    }
+
+    @Get('group/get/detail/:groupeventId')
     @ApiOperation({ summary: '특정 그룹 이벤트 가져오기' })
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async getGroupEventUpdateForm(
-        @Param('groupeventId') groupEventId: string,
-    ): Promise<GroupEvent>{
+        @Param('groupeventid') groupEventId: string,
+    ): Promise<GroupEvent> {
         return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
     }
 
@@ -162,10 +191,10 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async updateGroupEvent(
-        @Param('groupeventId') groupEventId: string, 
+        @Param('groupeventId') groupEventId: string,
         @Body() groupEventDTO: UpdateGroupEventDTO
     ): Promise<GroupEvent> {
-            return await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
+        return await this.groupEventService.updateGroupEvent(groupEventId, groupEventDTO);
     }
 
     @Patch('group/remove/:groupeventId')

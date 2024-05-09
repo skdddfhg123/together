@@ -50,25 +50,3 @@ services:
     volumes:
       - ./data/redis:/data
 
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    restart: always
-    ports:
-      - "27017:27017"
-    env_file:
-      - .db.env
-    command: [ "mongod", "--auth" ]
-    volumes:
-      - ./data/mongo:/data/db
-
-  mongo-express:
-    image: mongo-express
-    container_name: mongo-express
-    restart: always
-    ports:
-      - "8081:8081"
-    depends_on:
-      - mongodb
-    env_file:
-      - .db.env
