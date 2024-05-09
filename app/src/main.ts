@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 // import * as compression from 'compression';
-import { ChatModule } from './chat/chat.module';
 import { SwaggerDocument } from './swagger';
 import { SocketIoAdapter } from './calendar/chat/adapter/socketIoAdapter';
 
@@ -37,7 +36,7 @@ async function bootstrap() {
     profilesSampleRate: 1.0,
   });
 
-  const swaggerDocument = SwaggerDocument(app, [ChatModule]);
+  const swaggerDocument = SwaggerDocument(app, []);
   SwaggerModule.setup('api', app, swaggerDocument);
   
   app.useWebSocketAdapter(new SocketIoAdapter(app))

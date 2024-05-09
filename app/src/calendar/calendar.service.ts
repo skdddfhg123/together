@@ -34,7 +34,6 @@ export class CalendarService {
 
         try {
             const savedGroupCalendar = await this.calendarRepository.save(newGroupCalendar);
-            // console.log('Saved Group Calendar:', savedGroupCalendar);
             return savedGroupCalendar;
         } catch (e) {
             console.error('Error saving group calendar:', e);
