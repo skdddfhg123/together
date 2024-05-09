@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import * as API from '@utils/api';
 import { setCookie } from '@utils/cookie';
 
-import { Cookie, SignInForm, SignUpForm } from '@type/index';
+import { CalendarId, Cookie, SignInForm, SignUpForm } from '@type/index';
 import {
   useGroupEventListStore,
   useSelectedCalendarStore,
@@ -111,6 +111,28 @@ export async function firstRender() {
       }
     }
     useGroupEventListStore.getState().setGroupEvents(allGroupEvents);
+
+    return true;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response?.status === 400) {
+      console.error(err.response);
+      alert('USER - firstRender 실패 : 토큰 정보가 일치하지 않습니다');
+    } else {
+      const data = err.response?.data as API.ErrorResponse;
+      console.error(data); //debug//
+      alert(data.message);
+    }
+  }
+}
+
+export async function joinCalendar(calendarId: string) {
+  try {
+    const { data: res } = await API.patch(`/calendar/participate/${calendarId}`);
+    if (!res) throw new Error('USER - joinCalendar (DB에서 그룹 캘린터 가입 실패)');
+    console.log(`USER - joinCalendar 성공`, res); //debug//
+    alert(`캘린더 가입에 성공했습니다.`);
 
     return true;
   } catch (e) {
