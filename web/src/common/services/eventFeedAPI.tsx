@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 
 import * as API from '@utils/api';
-import { reqEventFeed, EventFeed } from '@type/index';
+import { ImageFile, reqEventFeed, EventFeed } from '@type/index';
 import { useEventFeedListStore } from '@store/index';
 
 interface FeedImage {
@@ -57,8 +57,8 @@ export async function createEventFeed({ groupEventId, content, images }: reqEven
     feedData.append('content', content);
 
     // images는 File 배열이어야 합니다.
-    images.forEach((image) => {
-      feedData.append('images', image.file);
+    images.forEach((img: ImageFile) => {
+      if (img.file) feedData.append('images', img.file);
     });
 
     const { data: res } = await API.post(`/feed/create/${groupEventId}`, feedData);

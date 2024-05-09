@@ -41,9 +41,9 @@ export default function MainPage() {
   }, []);
 
   // *****************? 최초 렌더링
-  useEffect(() => {
-    RendarUserAndCalendar();
-  }, []);
+  // useEffect(() => {
+  //   RendarUserAndCalendar();
+  // }, []);
 
   const prevCalendar = (): void => {
     setCurrentMonth(

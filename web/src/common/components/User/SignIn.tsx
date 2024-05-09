@@ -30,7 +30,7 @@ export default function SignIn({ onSubmit }: SignInProps) {
     };
 
     onSubmit(formData);
-    // formRef.current.reset();
+    formRef.current?.reset();
   };
   return (
     <form className="FLEX-horizC h-5/6" ref={formRef}>

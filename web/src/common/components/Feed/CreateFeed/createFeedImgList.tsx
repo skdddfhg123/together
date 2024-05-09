@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { Image } from '@type/index';
+import { ImageFile } from '@type/index';
 
 interface ImageProps {
-  image: Image;
+  image: ImageFile;
   onRemove: (id: string) => void;
 }
 
@@ -21,7 +21,7 @@ function ImageItem({ image, onRemove }: ImageProps) {
 }
 
 interface ImageListProps {
-  images: Image[];
+  images: ImageFile[];
   onRemoveImage: (id: string) => void;
 }
 

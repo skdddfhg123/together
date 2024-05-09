@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import { UUID } from 'crypto';
 
 import * as FEED from '@services/eventFeedAPI';
-import { Image, reqEventFeed } from '@type/index';
+import { ImageFile, reqEventFeed } from '@type/index';
 import CreateFeedImageList from '@components/Feed/CreateFeed/createFeedImgList';
 
 interface CreatedFeedProps {
@@ -13,7 +13,7 @@ interface CreatedFeedProps {
 }
 
 export default function CreateFeedModal({ groupEventId, isOpen, onClose }: CreatedFeedProps) {
-  const [images, setImages] = useState<Image[]>([]);
+  const [images, setImages] = useState<ImageFile[]>([]);
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
     const feedData: reqEventFeed = {
       groupEventId: groupEventId,
       content,
-      images,
+      images: images,
     };
 
     FEED.createEventFeed(feedData);

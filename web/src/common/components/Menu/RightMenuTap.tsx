@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Socket, io } from 'socket.io-client';
 
 import { useSelectedCalendarStore } from '@store/index';
 import BookMarkTap from '@components/Menu/BookMarkTap';
-import ChatTap from '@components/Menu/ChatTap';
+import ChatTap from '@components/Menu/Chat/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
 import CalendarSetTap from '@components/Menu/CalenderSetTap';
 
@@ -10,18 +11,56 @@ type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
 export default React.memo(function RightMenuTap() {
   const { SelectedCalendar } = useSelectedCalendarStore();
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [activeTap, setActiveTap] = useState<TapName | null>(null);
+
+  const getCookie = (name: string) => {
+    let cookieValue = null;
+    if (document.cookie) {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + '=') {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  };
+
+  const token = getCookie('accessToken');
+
+  useEffect(() => {
+    console.log(`cookie in RightMenuTap`, token);
+    if (activeTap === 'chat' && !socket) {
+      const newSocket = io('http://15.164.174.224:5000', {
+        extraHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setSocket(newSocket);
+
+      newSocket.on('connect', () => {
+        console.log('Connected to chat server');
+        newSocket.emit('enterChatRoom', SelectedCalendar);
+      });
+
+      return () => {
+        newSocket.close();
+        setSocket(null);
+      };
+    }
+  }, [activeTap, token, SelectedCalendar]);
 
   useEffect(() => {
     setActiveTap(null);
   }, [SelectedCalendar]);
 
-  const toggleTap = useCallback(
-    (tap: TapName) => {
-      setActiveTap(activeTap === tap ? null : tap);
-    },
-    [activeTap],
-  );
+  const toggleTap = useCallback((tap: TapName) => {
+    setActiveTap(activeTap === tap ? null : tap);
+  }, []);
 
   return (
     <div className="FLEX-verC h-full border-l">
@@ -59,13 +98,15 @@ export default React.memo(function RightMenuTap() {
         </button>
       </div>
       <section
-        className={`FLEX-horiz overflow-hidden transition-all duration-300 ${activeTap ? 'w-80' : 'w-0'}`}
+        className={`FLEX-horiz overflow-hidden transition-all duration-300 ${activeTap ? 'w-96' : 'w-0'}`}
       >
         <div id={`${activeTap === 'bookmark' ? 'SLIDEin-right' : 'SLIDEout-right'}`}>
           {activeTap === 'bookmark' && <BookMarkTap onClose={() => setActiveTap(null)} />}
         </div>
         <div id={activeTap === 'chat' ? 'SLIDEin-right' : 'SLIDEout-right'}>
-          {activeTap === 'chat' && <ChatTap onClose={() => setActiveTap(null)} />}
+          {activeTap === 'chat' && socket ? (
+            <ChatTap socket={socket} onClose={() => setActiveTap(null)} />
+          ) : null}
         </div>
         <div id={activeTap === 'member' ? 'SLIDEin-right' : 'SLIDEout-right'}>
           {activeTap === 'member' && <MemberTap onClose={() => setActiveTap(null)} />}

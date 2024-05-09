@@ -41,12 +41,14 @@ export type UserInfo = {
 
 // ************************** 캘린더
 
-export type Image = {
+export type Image = string;
+
+export interface ImageFile {
   name?: string | UUID;
-  file: File;
-  imageSrc?: string;
-  src: string;
-};
+  file?: File;
+  imageSrc?: Image;
+  src: Image;
+}
 
 export type CalendarId = UUID | 'All';
 
@@ -68,8 +70,8 @@ export type Calendar = {
   author: {
     userCalendarId: UUID;
   };
-  bannerImage: Image;
-  coverImage: Image;
+  bannerImage: ImageFile;
+  coverImage: ImageFile;
   type: string; //TODO color로 변경?
 };
 
@@ -119,7 +121,7 @@ export interface reqEventFeed {
   feedType?: number;
   title?: string; // TODO 필요없음 - 'title'로 저장
   content: string;
-  images: Image[]; // image Type - string?
+  images: ImageFile[]; // image Type - string?
 }
 
 export interface EventFeed extends reqEventFeed {
@@ -128,3 +130,12 @@ export interface EventFeed extends reqEventFeed {
   nickname: string;
   createdAt: string;
 }
+
+// ************************** 채팅
+
+export type Message = {
+  id: UUID; // 소켓 ID -> 나갔다 들어왔다 할 때 마다 바뀜
+  nickname: string;
+  message: string;
+  image?: Image;
+};
