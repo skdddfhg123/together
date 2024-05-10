@@ -257,10 +257,10 @@ export class AuthService {
                 throw new NotFoundException("No attendees found for this calendar");
             }
 
-            const twoMonthsAgo = new Date(currentDate);
-            twoMonthsAgo.setMonth(currentDate.getMonth() - 2);
-            const twoMonthsLater = new Date(currentDate);
-            twoMonthsLater.setMonth(currentDate.getMonth() + 2);
+            const fortyFiveDaysAgo = new Date(currentDate);
+            fortyFiveDaysAgo.setDate(currentDate.getDate() - 45);
+            const fortyFiveDaysLater = new Date(currentDate);
+            fortyFiveDaysLater.setDate(currentDate.getDate() + 45);
 
             const userCalendars = await this.userCalendarRepository.createQueryBuilder("userCalendar")
                 .leftJoinAndSelect("userCalendar.socialEvents", "socialEvent")
@@ -291,7 +291,7 @@ export class AuthService {
                     ])
                     .where("calendar.calendarId IN (:...calendarIds)", { calendarIds: userCalendar.groupCalendars })
                     .andWhere("calendar.calendarId != :originalCalendarId", { originalCalendarId: calendarId })
-                    .andWhere("groupEvent.startAt BETWEEN :twoMonthsAgo AND :twoMonthsLater", { twoMonthsAgo, twoMonthsLater })
+                    .andWhere("groupEvent.startAt BETWEEN :fortyFiveDaysAgo AND :fortyFiveDaysLater", { fortyFiveDaysAgo, fortyFiveDaysLater })
                     .andWhere(":userEmail = ANY(string_to_array(groupEvent.member, ','))", { userEmail: userCalendar.user.useremail })
                     .getMany();
 
@@ -310,6 +310,87 @@ export class AuthService {
             }));
 
             return calendarsData;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            throw new InternalServerErrorException("An error occurred while fetching user calendar data");
+        }
+    }
+
+    async GetAllEventByCalendarIdV2(calendarId: string, currentDate: Date): Promise<any> {
+        try {
+            const calendar = await this.calendarRepository.findOne({
+                where: { calendarId },
+                select: ['attendees']
+            });
+
+            if (!calendar) {
+                throw new NotFoundException("Calendar not found");
+            }
+
+            if (!calendar.attendees.length) {
+                throw new NotFoundException("No attendees found for this calendar");
+            }
+
+            const fortyFiveDaysAgo = new Date(currentDate);
+            fortyFiveDaysAgo.setDate(currentDate.getDate() - 45);
+            const fortyFiveDaysLater = new Date(currentDate);
+            fortyFiveDaysLater.setDate(currentDate.getDate() + 45);
+
+            const userCalendars = await this.userCalendarRepository.createQueryBuilder("userCalendar")
+                .leftJoinAndSelect("userCalendar.socialEvents", "socialEvent")
+                .leftJoinAndSelect("userCalendar.user", "user")
+                .select([
+                    "userCalendar.userCalendarId",
+                    "user.useremail",
+                    "user.nickname",
+                    "user.thumbnail",
+                    "userCalendar.groupCalendars"
+                ])
+                .where("userCalendar.userCalendarId IN (:...ids)", { ids: calendar.attendees })
+                .getMany();
+
+            if (!userCalendars.length) {
+                throw new NotFoundException("UserCalendar details not found for attendees");
+            }
+
+            const results = await Promise.all(userCalendars.map(async userCalendar => {
+                const calendars = await this.calendarRepository.createQueryBuilder("calendar")
+                    .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
+                    .select([
+                        "calendar.title",
+                        "calendar.type",
+                        "groupEvent.title",
+                        "groupEvent.startAt",
+                        "groupEvent.endAt",
+                    ])
+                    .where("calendar.calendarId IN (:...calendarIds)", { calendarIds: userCalendar.groupCalendars })
+                    .andWhere("calendar.calendarId != :originalCalendarId", { originalCalendarId: calendarId })
+                    .andWhere("groupEvent.startAt BETWEEN :fortyFiveDaysAgo AND :fortyFiveDaysLater", { fortyFiveDaysAgo, fortyFiveDaysLater })
+                    .getMany();
+
+                const socialEvents = Array.isArray(userCalendar.socialEvents) ? userCalendar.socialEvents.map(se => ({
+                    title: se.title,
+                    social: se.social,
+                    startAt: se.startAt,
+                    endAt: se.endAt
+                })) : [];
+
+                const allGroupEvents = calendars.flatMap(calendar =>
+                    calendar.groupEvents.map(ge => ({
+                        title: ge.title,
+                        startAt: ge.startAt,
+                        endAt: ge.endAt
+                    }))
+                );
+
+                return {
+                    useremail: userCalendar.user.useremail,
+                    nickname: userCalendar.user.nickname,
+                    allevents: [...allGroupEvents, ...socialEvents]
+                };
+            }));
+
+            return results;
         } catch (error) {
             console.error('Error fetching data:', error);
             throw new InternalServerErrorException("An error occurred while fetching user calendar data");

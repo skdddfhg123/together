@@ -97,7 +97,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: '캘린더 멤버 일정 불러오기' })
+  @ApiOperation({ summary: '캘린더 멤버 일정 불러오기 (필터:앞뒤2달/멤버가 포함된 일정' })
   @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Calendar not found or no attendees' })
@@ -108,6 +108,27 @@ export class AuthController {
   ): Promise<any> {
     try {
       return await this.authService.GetAllEventByCalendarId(calendarId, new Date());
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new InternalServerErrorException('An unexpected error occurred while fetching the calendar data');
+      }
+    }
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '캘린더 멤버 일정 불러오기 (필터:앞뒤2달/멤버가 포함된 일정' })
+  @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Calendar not found or no attendees' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Get('all/getcalendar/V2/:calendarId')
+  async GetAllEvenByCalendarIdV2(
+    @Param('calendarId', ParseUUIDPipe) calendarId: string
+  ): Promise<any> {
+    try {
+      return await this.authService.GetAllEventByCalendarIdV2(calendarId, new Date());
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error.message);
