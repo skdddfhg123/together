@@ -33,8 +33,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.join(`mainRoom${client.data.email}`);
         }
         catch (err) {
-            client.disconnect(true);
             console.log(err);
+            client.emit('exception', { message: `invalid token`} )
+            client.disconnect();
         }
     }
 
