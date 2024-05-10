@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { UUID } from 'crypto';
 
-import * as FEED from '@services/eventFeedAPI';
+import { EventFeed } from '@type/index';
 import { useEventFeedListStore } from '@store/index';
 
 import FeedModal from '@components/Feed/FeedModal';
@@ -9,23 +9,23 @@ import FeedModal from '@components/Feed/FeedModal';
 export default React.memo(function EventFeedList() {
   const { eventFeedList } = useEventFeedListStore();
   const [feedModalOn, setFeedModalOn] = useState<boolean>(false);
-  const [selectedFeedId, setSelectedFeedId] = useState<UUID | null>(null);
+  const [selectedFeedInfo, setSelectedFeedInfo] = useState<EventFeed | null>(null);
 
-  const openFeedModal = useCallback((feedId: UUID | null) => {
-    setSelectedFeedId(feedId);
+  const openFeedModal = useCallback((feedInfo: EventFeed | null) => {
+    setSelectedFeedInfo(feedInfo);
     setFeedModalOn(true);
   }, []);
 
   const closeFeedModal = useCallback(() => {
     setFeedModalOn(false);
-    setSelectedFeedId(null);
+    setSelectedFeedInfo(null);
   }, []);
 
   // TODO 피드 눌렀을 때, 각 피드 이벤트 모달 띄우기
   // TODO 피드 모달에선 댓글 및 상세 정보 보여줘야함
   return (
-    <div className="relative h-1/2">
-      <h3 className="sticky top-0 w-5/6 h-12 mx-auto rounded border-y-2 text-3xl text-center">
+    <div className="relative h-3/5">
+      <h3 className="sticky top-0 w-5/6 py-1 mx-auto rounded border-y-2 text-3xl text-center">
         Feed
       </h3>
       <main className="FLEX-horiz items-center w-full h-full overflow-y-auto rounded">
@@ -37,6 +37,7 @@ export default React.memo(function EventFeedList() {
               <div
                 className="my-2 py-1 px-2 outline-none hover:outline-2 hover:outline-custom-light rounded"
                 key={`no-Img-${idx}`}
+                onClick={() => openFeedModal(event)}
               >
                 사진 없음
               </div>
@@ -48,13 +49,13 @@ export default React.memo(function EventFeedList() {
                 src={event.images[0]?.imageSrc}
                 alt="피드 사진"
                 key={event.feedId}
-                onClick={() => openFeedModal(event.feedId)}
+                onClick={() => openFeedModal(event)}
               />
             ),
           )
         )}
       </main>
-      <FeedModal feedId={selectedFeedId} isOpen={feedModalOn} onClose={closeFeedModal} />
+      <FeedModal feedInfo={selectedFeedInfo} isOpen={feedModalOn} onClose={closeFeedModal} />
     </div>
   );
 });

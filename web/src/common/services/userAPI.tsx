@@ -115,14 +115,15 @@ export async function firstRender() {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
     if (err.response?.status === 400) {
-      console.error(err.response);
-      alert('USER - firstRender 실패 : 토큰 정보가 일치하지 않습니다');
-    } else {
-      const data = err.response?.data as API.ErrorResponse;
-      console.error(data); //debug//
+      console.error('USER - firstRender 실패 : ', err.response);
+      alert('USER - firstRender 실패 1 : 토큰 정보가 일치하지 않습니다');
+    } else if (err.response?.data) {
+      const data = err.response.data as API.ErrorResponse;
+      console.error('USER - firstRender 실패 2 : ', data); //debug//
       alert(data.message);
+    } else {
+      console.error('USER - firstRender 실패 3 : ', err);
     }
   }
 }

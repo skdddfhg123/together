@@ -30,15 +30,15 @@ axiosInstance.interceptors.request.use(
   },
 );
 
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      window.alert('인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
-      window.location.href = 'http://localhost:3000/signin';
-    }
-  },
-);
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   (error: AxiosError) => {
+//     if (error.response?.status === 401) {
+//       window.alert('인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
+//       window.location.href = 'http://localhost:3000/signin';
+//     }
+//   },
+// );
 
 export type ErrorResponse = {
   message: string;

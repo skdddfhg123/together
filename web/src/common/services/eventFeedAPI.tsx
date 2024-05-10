@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 
 import * as API from '@utils/api';
-import { ImageFile, reqEventFeed, EventFeed } from '@type/index';
+import { ImageFile, reqEventFeed, EventFeed, reqComment } from '@type/index';
 import { useEventFeedListStore } from '@store/index';
 
 interface FeedImage {
@@ -12,8 +12,8 @@ interface FeedImage {
 export async function getAllFeedInEvent(groupEventId: UUID) {
   try {
     const { data: res } = await API.get(`/feed/get/${groupEventId}`);
-    if (!res) throw new Error(`FEED - getAllFeedInEvent 실패 (DB 피드 받아오기 실패)`);
-    console.log(`FEED - getAllFeedInEvent 성공 :`, res);
+    if (!res) throw new Error(`FEED - getAllFeedInEvent 실패 (DB 피드 불러오기 실패)`);
+    console.log(`FEED - getAllFeedInEvent 성공 :`, res); //debug//
 
     useEventFeedListStore.getState().setEventFeedList(res);
 
@@ -32,12 +32,11 @@ export async function getAllFeedInEvent(groupEventId: UUID) {
 export async function getOneFeed(feedId: UUID) {
   try {
     const { data: res } = await API.get(`/feed/get/detail/${feedId}`);
-    if (!res) throw new Error(`FEED - getOneFeed 실패 (DB 피드 받아오기 실패)`);
+    if (!res) throw new Error(`FEED - getOneFeed 실패 (DB 피드 불러오기 실패)`);
 
-    console.log(`FEED - getOneFeed 성공 :`, res);
-    alert('피드를 가져왔습니다.');
+    console.log(`FEED - getOneFeed 성공 :`, res); //debug//
 
-    return true;
+    return res;
   } catch (e) {
     const err = e as AxiosError;
 
@@ -62,7 +61,7 @@ export async function createEventFeed({ groupEventId, content, images }: reqEven
 
     const { data: res } = await API.post(`/feed/create/${groupEventId}`, feedData);
     if (!res) throw new Error(`FEED - createEventFeed 실패 (DB 피드 생성 실패)`);
-    console.log(`FEED - createEventFeed 성공 :`, res.feedImages);
+    console.log(`FEED - createEventFeed 성공 :`, res.feedImages); //debug//
 
     const EventFeeds = useEventFeedListStore.getState().eventFeedList;
     useEventFeedListStore.getState().setEventFeedList([
@@ -73,7 +72,7 @@ export async function createEventFeed({ groupEventId, content, images }: reqEven
         content: res.feed.content,
         images: res.feedImages.map((img: FeedImage) => ({ imageSrc: img.imageSrc })),
         createdAt: res.feed.createdAt,
-        userProfile: res.feed.user.thumnail,
+        thumbnail: res.feed.user.thumnail,
         nickname: res.feed.user.nickname,
       },
     ]);
@@ -106,8 +105,8 @@ export async function updateEventFeed({
       content,
       // images
     });
-    if (!res) throw new Error(`FEED - updateEventFeed 실패 (DB 피드 생성 실패)`);
-    console.log(`FEED - updateEventFeed 성공 :`, res);
+    if (!res) throw new Error(`FEED - updateEventFeed 실패 (DB 피드 수정 실패)`);
+    console.log(`FEED - updateEventFeed 성공 :`, res); //debug//
     alert('피드를 수정했습니다.');
 
     return true;
@@ -125,8 +124,8 @@ export async function updateEventFeed({
 export async function removeEventFeed({ feedId }: EventFeed) {
   try {
     const { data: res } = await API.patch(`/feed/create/${feedId}`);
-    if (!res) throw new Error(`FEED - updateGroupEvent 실패 (DB 피드 생성 실패)`);
-    console.log(`FEED - updateGroupEvent 성공 :`, res);
+    if (!res) throw new Error(`FEED - removeEventFeed 실패 (DB 피드 삭제 실패)`);
+    console.log(`FEED - removeEventFeed 성공 :`, res); //debug//
     alert('피드를 삭제했습니다.');
 
     return true;
@@ -135,8 +134,47 @@ export async function removeEventFeed({ feedId }: EventFeed) {
 
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
-      console.error(`FEED - updateGroupEvent 실패 :`, data); //debug//
-      alert('피드 생성에 실패했습니다.');
+      console.error(`FEED - removeEventFeed 실패 :`, data); //debug//
+      alert('피드 삭제에 실패했습니다.');
+    }
+  }
+}
+
+// ************************************ 댓글
+
+export async function createFeedComment({ feedId, content }: reqComment) {
+  try {
+    const res = await API.post(`/feed/comment/create/${feedId}`, { content });
+    if (!res) throw new Error('FEEd - createFeedComment 실패 : (DB 댓글 등록 실패)');
+    console.log(`COMMENT - createFeedComment 성공 :`, res); //debug//
+    alert('댓글이 등록되었습니다.');
+
+    return true;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as API.ErrorResponse;
+      console.error(`COMMENT - createFeedComment 실패 :`, data); //debug//
+      alert('댓글 등록에 실패했습니다.');
+    }
+  }
+}
+
+export async function getFeedComment(feedId: UUID) {
+  try {
+    const { data: res } = await API.get(`/feed/comment/${feedId}`);
+    if (!res) throw new Error('FEEd - getFeedComment 실패 : (DB 댓글 불러오기 실패)');
+    console.log(`COMMENT - getFeedComment 성공 :`, res); //debug//
+
+    return res;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as API.ErrorResponse;
+      console.error(`COMMENT - getFeedComment 실패 :`, data); //debug//
+      alert('댓글 불러오기에 실패했습니다.');
     }
   }
 }

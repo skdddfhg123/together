@@ -33,7 +33,7 @@ export type UserInfo = {
   useremail: string;
   birthDay?: string | null;
   phone?: string | null;
-  userProfile?: Image;
+  thumbnail?: Image;
   userCalendarId: UserCalendarListInfo;
   // kakaoId?: number;    //TODO setting 객체로 받을 듯?
   // kakaoRefresh?: number;
@@ -79,7 +79,7 @@ export type Calendar = {
 
 export interface Author {
   useremail: string;
-  userProfile: Image | null; // Assuming it's a URL or `null`
+  thumbnail: Image | null;
   nickname: string;
 }
 
@@ -125,10 +125,23 @@ export interface reqEventFeed {
 
 export interface EventFeed extends reqEventFeed {
   thumbnail?: Image | null;
-  userProfile?: Image | null;
   feedId: UUID;
   nickname: string;
   createdAt: string;
+}
+
+// ************************** 댓글
+
+export interface reqComment {
+  feedId?: UUID;
+  content: string;
+}
+
+export interface Comment extends reqComment {
+  nickname: string;
+  thumbnail: Image;
+  feedCommentId: UUID;
+  createdAt: Date;
 }
 
 // ************************** 채팅

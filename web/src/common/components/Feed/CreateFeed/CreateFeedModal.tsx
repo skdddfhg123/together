@@ -6,6 +6,8 @@ import * as FEED from '@services/eventFeedAPI';
 import { ImageFile, reqEventFeed } from '@type/index';
 import CreateFeedImageList from '@components/Feed/CreateFeed/CreateFeedImgList';
 
+import '@styles/modalStyle.css';
+
 interface CreatedFeedProps {
   groupEventId: UUID | null;
   isOpen: boolean;
@@ -72,23 +74,10 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
   //TODO 이미지 케로셀로 하면 좋을듯 (Component Carousel)
   return (
     <Modal
+      className="feedModal"
+      overlayClassName="feedOverlay"
       isOpen={isOpen}
       onRequestClose={handleClose}
-      style={{
-        content: {
-          height: '80vh',
-          width: '150vh',
-          padding: 0,
-
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          overflow: 'hidden',
-        },
-        overlay: {
-          backgroundColor: 'rgba(0, 0, 0, 0.35)',
-        },
-      }}
     >
       <form
         className="FLEX-horizC w-full h-full"

@@ -148,15 +148,15 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
       >
         {isOpen && (
           <>
-            <nav className="FLEX-verB h-fit mx-2 my-2">
+            <nav className="FLEX-verB h-fit mx-2 my-1">
               <button className="p-2 hover:bg-custom-light rounded" onClick={onClose}>
                 닫기
               </button>
-              <div>
-                <button className="p-2 mr-1 hover:bg-custom-light rounded" onClick={handleDelete}>
+              <div className="space-x-1">
+                <button className="p-2  hover:bg-custom-light rounded" onClick={handleDelete}>
                   삭제
                 </button>
-                <button className="p-2 mr-1 hover:bg-custom-light rounded" onClick={handleEditMode}>
+                <button className="p-2 hover:bg-custom-light rounded" onClick={handleEditMode}>
                   수정
                 </button>
                 <button
@@ -175,8 +175,8 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
             <header className="FLEX-horizC h-auto p-4 justify-end">
               {SelectedCalendar !== 'All' && groupEvent?.author ? (
                 <span className="mb-6">
-                  {groupEvent?.author.userProfile ? (
-                    <img width="300px" src={`${groupEvent?.author.userProfile}`}></img>
+                  {groupEvent?.author.thumbnail ? (
+                    <img width="300px" src={`${groupEvent?.author.thumbnail}`}></img>
                   ) : (
                     <>{groupEvent?.author.nickname}</>
                   )}
@@ -201,8 +201,8 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                   <h2>{displayDate(groupEvent?.endAt).monthDay}</h2>
                 </div>
               </section>
-              <section key="detail-section" className="FLEX-verC p-2">
-                <span className="m-4">
+              <section key="detail-section" className="FLEX-verC space-x-4 py-4">
+                <span>
                   {'멤버 : '}
                   {groupEvent?.member && groupEvent.member.length > 0
                     ? groupEvent.member.map((mem) => (
@@ -210,7 +210,7 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                       ))
                     : '없음'}
                 </span>
-                <span className="m-4">
+                <span>
                   {'중요 : '}
                   {groupEvent?.pinned ? 'Yes' : 'No'}
                 </span>
