@@ -10,13 +10,14 @@ import { FeedComment } from 'src/db/comment/entities/comment.entity';
 import { ImageModule } from 'src/image.upload/image.module';
 import { AwsModule } from 'src/image.upload/aws.s3/aws.module';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
-import { FeedCommentModule } from 'src/db/comment/comment.module';
+import { Calendar } from 'src/calendar/entities/calendar.entity';
+import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
 import { UtilsModule } from 'src/utils/utils.module';
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Feed, FeedComment, FeedImage]),
+    TypeOrmModule.forFeature([Feed, FeedComment, FeedImage, Calendar, GroupEvent]),
     GroupEventModule,
     UserModule,
     AwsModule,

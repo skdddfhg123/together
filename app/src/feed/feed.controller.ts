@@ -49,6 +49,7 @@ export class FeedController {
     //      await this.feedService.createFeed(createFeedDto, payload, groupEventId, files.images);
     // }
 
+
     @Post('create/:groupeventId')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 5 }
@@ -72,9 +73,25 @@ export class FeedController {
     }
 
 
+    
+    @Get('get/calendar/:calendarId')
+    @ApiConsumes('multipart/form-data', 'application/json')
+    @ApiOperation({ summary: 'group calendar의 전체 피드 가져오기' })
+    @ApiResponse({ status: 200, description: 'Get Feeds successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch feeds for group event ID' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async getAllFeedInCalendar(
+
+        @Param('calendarId') calendarId: string,
+
+    ): Promise<ReadFeedDTO[]> {
+        return await this.feedService.getAllFeedInCalendar(calendarId);
+    }
+
 
     //그룹 이벤트에서 피드 일괄 출력
-    @Get('get/:groupeventId')
+    @Get('get/groupevent/:groupeventId')
     @ApiConsumes('multipart/form-data', 'application/json')
     @ApiOperation({ summary: 'group event의 전체 피드 가져오기' })
     @ApiResponse({ status: 200, description: 'Get Feeds successfully' })

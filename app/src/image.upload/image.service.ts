@@ -38,6 +38,19 @@ export class ImageService {
   }
 
   // 이미지 파일 S3에 저장 후 url return 모듈화
+  async thumbnailImageUpload(file: Express.Multer.File, imageName: string): Promise<string> {
+    // const imageName = this.utilsService.getUUID();
+    const ext = file.originalname.split('.').pop();
+
+    const imageUrl = await this.awsService.imageUploadToS3(
+      `profiles/${imageName}.${ext}`,
+      file,
+      ext,
+    );
+    return imageUrl;
+  }
+
+  // 이미지 파일 S3에 저장 후 url return 모듈화
   async emojiImageUpload(file: Express.Multer.File, imageName: string): Promise<string> {
     // const imageName = this.utilsService.getUUID();
     const ext = file.originalname.split('.').pop();

@@ -1,15 +1,15 @@
-import { Body, Controller, Get, InternalServerErrorException, NotFoundException, Param, ParseUUIDPipe, Post, Req, Request, UseGuards, ValidationPipe } from '@nestjs/common'; import { AuthService } from './auth.service';
+import { Body, Controller, Get, InternalServerErrorException, NotFoundException, Param, ParseUUIDPipe, Post, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common'; import { AuthService } from './auth.service';
 import { UserService } from 'src/db/user/user.service';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDTO } from 'src/db/user/dtos/create-user.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { PayloadResponse } from './dtos/payload-response';
 import { JwtAuthGuard } from './strategy/jwt.guard';
 import { getPayload } from './getPayload.decorator';
-import { RefreshStrategy } from './strategy/refresh.strategy';
-import { RefreshAuthGuard } from './strategy/refresh.guard';
-import { ApiOperation } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadDto } from 'src/feed/dtos/file.upload.dto';
+import { UserUpdateDto } from 'src/db/user/dtos/user.update.dto';
 
 @ApiTags("auth")
 @Controller('auth')
@@ -125,5 +125,21 @@ export class AuthController {
     @getPayload() payload: PayloadResponse,
   ): any {
     return payload;
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBody({
+    description: 'Update profile thumbnail',
+    type: FileUploadDto,
+  })
+  @Post('update/thumbnail')
+  async updateProfile(
+    @getPayload() payload: PayloadResponse,
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<UserUpdateDto> {
+    return await this.userService.updateThumbnail(payload, file);
   }
 }
