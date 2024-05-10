@@ -55,7 +55,7 @@ export class AuthService {
                 userCalendarId: userCalendar?.userCalendarId,
             };
 
-            const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+            const accessToken = this.jwtService.sign(payload, { expiresIn: '3d' });
             const refreshToken = this.jwtService.sign(payload, { expiresIn: '60d' });
 
             await this.tokensService.saveUserToken(user.useremail, 'jwt', accessToken, refreshToken);
@@ -97,7 +97,7 @@ export class AuthService {
                 userCalendarId: userCalendar?.userCalendarId,
             };
 
-            const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+            const accessToken = this.jwtService.sign(payload, { expiresIn: '3d' });
             const refreshToken = this.jwtService.sign(payload, { expiresIn: '60d' });
 
             await this.tokensService.saveUserToken(user.useremail, 'jwt', accessToken, refreshToken);
