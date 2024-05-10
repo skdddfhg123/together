@@ -4,6 +4,8 @@ import { ChatService } from './chat.service';
 import { SetInitDTO } from './dtos/createChat.dto';
 import * as jwt from 'jsonwebtoken';
 import { SaveMessageDTO } from './dtos/saveMessage.dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/strategy/jwt.guard';
 
 @WebSocketGateway(5000, {
     cors: {
@@ -33,8 +35,9 @@ export class ChatGateway
             client.join((`mainRoom` + client.data.email));
         }
         catch(err) {
-            client.disconnect(true);
-            throw new WsException(`invalid token: ${token}`);
+            // console.log(`invalid token: ${token}`)
+            client.emit('exception', { message: 'invalid token' })
+            client.disconnect();
         }
     }
 
@@ -55,6 +58,7 @@ export class ChatGateway
     }
 
     //메시지가 전송되면 모든 유저에게 메시지 전송
+    @UseGuards(JwtAuthGuard)
     @SubscribeMessage('sendMessage')
     async sendMessage(client: Socket, message: string): Promise<void> {
 
@@ -83,6 +87,7 @@ export class ChatGateway
         console.log(client.rooms)
     }
 
+    @UseGuards(JwtAuthGuard)
     @SubscribeMessage('sendCombinedMessage')
     async sendCombinedMessage(client: Socket, payload: { text: string, imageUrl: string }) {
         // this.server.to(payload.calendarId).emit('receiveCombinedMessage', payload);
@@ -142,6 +147,7 @@ export class ChatGateway
         };
     }
 
+    @UseGuards(JwtAuthGuard)
     @SubscribeMessage('enterChatRoom')
     async enterChatRoom(client: Socket, roomId: string) {
         let room = roomId;

@@ -15,7 +15,6 @@ export class EmojiController {
     @Get()
     async getImages() {
         const images = await this.imagesService.getImages();
-        console.log(images);
         return images;
     }
 }
