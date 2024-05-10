@@ -23,8 +23,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            if (!decoded)
-                throw new WsException(`invalid token: ${token}`);
             client.data.nickname = decoded['nickname'];
             client.data.email = decoded['useremail'];
             console.log(client.data)
