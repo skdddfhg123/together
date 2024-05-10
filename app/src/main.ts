@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 // import * as compression from 'compression';
 import { SwaggerDocument } from './swagger';
 import { SocketIoAdapter } from './calendar/chat/adapter/socketIoAdapter';
+import { ChatModule } from './calendar/chat/chat.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -24,23 +25,23 @@ async function bootstrap() {
 
   // app.use(compression()); // HTTP 응답 압축으로 네트워크 대역폭 절약
 
-  const Sentry = require('@sentry/node');
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    integrations: [
-      new Sentry.Integrations.Http({ tracing: true }),
-      new Sentry.Integrations.OnUncaughtException(),
-      new Sentry.Integrations.OnUnhandledRejection(),
-    ],
-    tracesSampleRate: 1.0,
-    profilesSampleRate: 1.0,
-  });
+  // const Sentry = require('@sentry/node');
+  // Sentry.init({
+  //   dsn: process.env.SENTRY_DSN,
+  //   integrations: [
+  //     new Sentry.Integrations.Http({ tracing: true }),
+  //     new Sentry.Integrations.OnUncaughtException(),
+  //     new Sentry.Integrations.OnUnhandledRejection(),
+  //   ],
+  //   tracesSampleRate: 1.0,
+  //   profilesSampleRate: 1.0,
+  // });
 
-  const swaggerDocument = SwaggerDocument(app, []);
+  const swaggerDocument = SwaggerDocument(app, [ChatModule]);
   SwaggerModule.setup('api', app, swaggerDocument);
-  
+
   app.useWebSocketAdapter(new SocketIoAdapter(app))
-  
+
   await app.listen(3000);
 }
 bootstrap();

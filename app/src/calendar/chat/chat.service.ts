@@ -12,6 +12,7 @@ export class ChatService {
     constructor(
         @InjectConnection()
         private chatConnection: Connection,
+        @InjectModel(Chat.name) private chatModel: Model<Chat>,
     ) {
         this.chatRoomList = {
             'roomMain': {
@@ -34,7 +35,7 @@ export class ChatService {
     createChatRoom(client: Socket, roomName: string): void {
         const roomId = roomName;
         const nickname: string = client.data.nickname;
-        
+
         // return this.chatRoomList[roomId];
         this.chatRoomList[roomId] = {
             roomId,
@@ -49,7 +50,7 @@ export class ChatService {
         client.data.roomId = roomId;
         const { nickname } = client.data.nickname;
         const roomName = this.chatRoomList[roomId];
-        if(!roomName) {
+        if (!roomName) {
             this.createChatRoom(client, roomId);
         }
         client.rooms.clear();
@@ -72,11 +73,15 @@ export class ChatService {
         return this.chatRoomList[roomId];
     }
 
-    async saveMessage(saveMessageDto: SaveMessageDTO): Promise<Chat> {
-        const { roomId } = saveMessageDto;
-        const chatModel = this.getModelForCalendar(roomId);
-        const saveMessage = new chatModel(saveMessageDto);
-        return await saveMessage.save();
+    // async saveMessage(saveMessageDto: SaveMessageDTO): Promise<Chat> {
+    //     const { roomId } = saveMessageDto;
+    //     const chatModel = this.getModelForCalendar(roomId);
+    //     const saveMessage = new chatModel(saveMessageDto);
+    //     return await saveMessage.save();
+    // }
+    async saveMessage(data: any): Promise<Chat> {
+        const newMessage = new this.chatModel(data);
+        return await newMessage.save();
     }
 
     async findAllMessageByCalendarId(calendarId: string): Promise<Chat[]> {
@@ -101,7 +106,7 @@ export class ChatService {
         const chatModel = this.getModelForCalendar(calendarId);
 
         return await chatModel.find({
-            registeredAt: {$gte: threeDaysAgo},
+            registeredAt: { $gte: threeDaysAgo },
         });
     }
 

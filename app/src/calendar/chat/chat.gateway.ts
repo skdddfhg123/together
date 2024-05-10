@@ -11,54 +11,46 @@ import { SaveMessageDTO } from './dtos/saveMessage.dto';
         credentials: true,
     },
 })
-export class ChatGateway
-    implements OnGatewayConnection, OnGatewayDisconnect
-{
-    constructor(private readonly chatService: ChatService) {}
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+    constructor(private readonly chatService: ChatService) { }
+
     @WebSocketServer()
     server: Server;
 
     public handleConnection(client: Socket): void {
-
         const token = client.handshake.headers.authorization.split(' ')[1];
 
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+
+            if (!decoded)
+                throw new WsException(`invalid token: ${token}`);
             client.data.nickname = decoded['nickname'];
             client.data.email = decoded['useremail'];
             console.log(client.data)
             client.leave(client.id);
-            client.data.roomId = `mainRoom` + client.data.email;
-            client.join((`mainRoom` + client.data.email));
+            client.data.roomId = `mainRoom${client.data.email}`;
+            client.join(`mainRoom${client.data.email}`);
         }
-        catch(err) {
+        catch (err) {
             client.disconnect(true);
-            throw new WsException(`invalid token: ${token}`);
+            console.log(err);
         }
     }
 
     public handleDisconnect(client: Socket): void {
         const { roomId } = client.data;
 
-        if (
-            roomId != ('mainRoom' + client.data.email) &&
-            !this.server.sockets.adapter.rooms.get(roomId)
-        ) {
+        if (roomId !== `mainRoom${client.data.email}` && !this.server.sockets.adapter.rooms.get(roomId)) {
             this.chatService.exitChatRoom(client, roomId);
-            this.server.emit(
-                'getChatRoomList',
-                this.chatService.getChatRoomList(),
-            );
+            this.server.emit('getChatRoomList', this.chatService.getChatRoomList());
         }
-        console.log('disonnected', client.id);
+        console.log('disconnected', client.id);
     }
 
-    //메시지가 전송되면 모든 유저에게 메시지 전송
     @SubscribeMessage('sendMessage')
     async sendMessage(client: Socket, message: string): Promise<void> {
-
-        client.rooms.forEach((roomId) =>  
+        client.rooms.forEach(roomId =>
             client.to(roomId).emit('getMessage', {
                 id: client.id,
                 email: client.data.email,
@@ -75,12 +67,11 @@ export class ChatGateway
             newChatDto.roomId = client.data.roomId;
 
             await this.chatService.saveMessage(newChatDto);
-        }
-        catch(err) {
-            console.error(`message saved falied: ${err}`);
+        } catch (err) {
+            console.error(`message saved failed: ${err}`);
         }
 
-        console.log(client.rooms)
+        console.log(client.rooms);
     }
 
     @SubscribeMessage('sendCombinedMessage')
@@ -90,7 +81,7 @@ export class ChatGateway
         console.log(payload.text);
         console.log(payload.imageUrl);
 
-        client.rooms.forEach((roomId) =>  
+        client.rooms.forEach((roomId) =>
             client.to(roomId).emit('getMessage', {
                 id: client.id,
                 email: client.data.email,
@@ -110,7 +101,7 @@ export class ChatGateway
 
             await this.chatService.saveMessage(newChatDto);
         }
-        catch(err) {
+        catch (err) {
             console.error(`message saved falied: ${err}`);
         }
 
@@ -126,11 +117,11 @@ export class ChatGateway
         }
 
         console.log(client.data)
-        
+
         client.data.nickname = client.data.nickname
-        ? client.data.nickname
-        : '낯선사람' + client.id;
-        
+            ? client.data.nickname
+            : '낯선사람' + client.id;
+
         client.data.isInit = true;
 
         return {
@@ -146,10 +137,10 @@ export class ChatGateway
     async enterChatRoom(client: Socket, roomId: string) {
         let room = roomId;
 
-        if(room == null || room == 'All') {
+        if (room == null || room == 'All') {
             room = 'mainRoom' + client.data.email;
         }
-        
+
         if (client.rooms.has(room)) {
             return;
         }

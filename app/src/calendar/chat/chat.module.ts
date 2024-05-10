@@ -3,7 +3,12 @@ import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
 import { EmojiController } from './emoji.controller';
 import { EmojiService } from './emoji.service';
+import { Chat, ChatSchema } from './entities/chat.schema';
+import { MongooseModule } from '@nestjs/mongoose';
 @Module({
+    imports: [
+        MongooseModule.forFeature([{ name: Chat.name, schema: ChatSchema }])
+    ],
     controllers: [
         EmojiController,
     ],
@@ -13,4 +18,4 @@ import { EmojiService } from './emoji.service';
         EmojiService,
     ],
 })
-export class ChatModule {}
+export class ChatModule { }
