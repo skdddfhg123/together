@@ -8,14 +8,14 @@ export default function InviteLinkGenerator() {
   // TODO CALENDAR ID를 직접 입력하지 않고 해쉬화 등 암호화 필요
   const handleGenerateLink = () => {
     // const inviteCode = Math.random().toString(36).substring(2, 15); // 간단한 랜덤 코드 생성
-    const link = `${window.location.origin}/register?invite=${SelectedCalendar}`;
+    const link = `${window.location.origin}/invite?invite=${SelectedCalendar}`;
     setInviteLink(link);
   };
 
   return (
     <div className="FLEX-horizC">
-      <button className="m-12 p-4 hover:bg-custom-light rounded" onClick={handleGenerateLink}>
-        Generate Invite Link
+      <button className="mx-auto p-2 hover:bg-custom-light rounded" onClick={handleGenerateLink}>
+        초대코드 만들기
       </button>
       {inviteLink && (
         <div className="FLEX-horizC">

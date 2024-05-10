@@ -7,14 +7,19 @@ module.exports = {
         2000: '2000ms',
       },
       fontFamily: {},
+      textShadow: {
+        blue: '-2px 0 darkblue, 0 2px darkblue, 2px 0 darkblue, 0 -2px darkblue',
+      },
       width: {
         100: '25rem',
         128: '32rem',
+        144: '36rem',
         160: '40rem',
         200: '48rem',
       },
       height: {
         128: '32rem',
+        144: '36rem',
         160: '40rem',
         200: '48rem',
       },
@@ -31,5 +36,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwind-scrollbar-hide')],
+  plugins: [require('tailwind-scrollbar-hide'), require('tailwindcss-textshadow')],
 };

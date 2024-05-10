@@ -8,13 +8,10 @@ import * as USER from '@services/userAPI';
 import * as CALENDAR from '@services/calendarAPI';
 import * as FEED from '@services/eventFeedAPI';
 
-import {
-  useEventFeedListStore,
-  useGroupEventListStore,
-  useSelectedCalendarStore,
-} from '@store/index';
+import { useGroupEventListStore, useSelectedCalendarStore } from '@store/index';
 import { GroupEvent } from '@type/index';
 import CreateFeedModal from '@components/Feed/CreateFeed/CreateFeedModal';
+import EventFeedList from '@components/Canlendar/EventFeedList';
 
 interface EventDetailsProps {
   isOpen: boolean;
@@ -25,9 +22,8 @@ interface EventDetailsProps {
 export default React.memo(function EventDetails({ isOpen, eventId, onClose }: EventDetailsProps) {
   const { SelectedCalendar } = useSelectedCalendarStore();
   const { groupEvents } = useGroupEventListStore();
-  const { eventFeedList } = useEventFeedListStore();
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [feedModalOn, setFeedModalOn] = useState<boolean>(false);
+  const [feedCreate, setFeedCreate] = useState<boolean>(false);
   const [editedValues, setEditedValues] = useState<GroupEvent>({
     title: '',
     startAt: '',
@@ -49,32 +45,6 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
     return groupEvents.find((event) => event.groupEventId === eventId);
   }, [eventId]);
 
-  useEffect(() => {
-    if (eventId) {
-      getEventFeed(eventId);
-    }
-    if (groupEvent && JSON.stringify(groupEvent) !== JSON.stringify(editedValues)) {
-      setEditedValues({
-        title: groupEvent.title,
-        startAt: groupEvent.startAt,
-        endAt: groupEvent.endAt,
-        author: groupEvent.author,
-        member: groupEvent.member,
-        color: groupEvent.color,
-        pinned: groupEvent.pinned,
-        groupEventId: groupEvent.groupEventId,
-        emails: groupEvent.emails,
-        alerts: groupEvent.alerts,
-      });
-    }
-  }, [eventId]);
-
-  useEffect(() => {
-    if (!isOpen) setEditMode(false);
-  }, [isOpen]);
-
-  useEffect(() => onClose(), [SelectedCalendar, groupEvents]);
-
   const displayDate = (dateString?: string) => {
     if (!dateString) return { year: '', monthDay: '' };
 
@@ -85,10 +55,10 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
   };
 
   // **************?  handle Function
-  const closeModal = useCallback(() => setFeedModalOn(false), []);
-  const handleEdit = useCallback(() => setEditMode(true), []);
+  const closeFeedCreateModal = useCallback(() => setFeedCreate(false), []);
+  const handleEditMode = useCallback(() => setEditMode(true), []);
 
-  const getEventFeed = async (groupEventId: UUID) => {
+  const getEventFeedList = async (groupEventId: UUID) => {
     await FEED.getAllFeedInEvent(groupEventId);
   };
 
@@ -142,6 +112,34 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
     onClose();
   };
 
+  // *****************? 최초 렌더링, action에 따른 동작 handling
+
+  useEffect(() => {
+    if (eventId) {
+      getEventFeedList(eventId);
+    }
+    if (groupEvent && JSON.stringify(groupEvent) !== JSON.stringify(editedValues)) {
+      setEditedValues({
+        title: groupEvent.title,
+        startAt: groupEvent.startAt,
+        endAt: groupEvent.endAt,
+        author: groupEvent.author,
+        member: groupEvent.member,
+        color: groupEvent.color,
+        pinned: groupEvent.pinned,
+        groupEventId: groupEvent.groupEventId,
+        emails: groupEvent.emails,
+        alerts: groupEvent.alerts,
+      });
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    if (!isOpen) setEditMode(false);
+  }, [isOpen]);
+
+  useEffect(() => onClose(), [SelectedCalendar, groupEvents]);
+
   if (!editMode) {
     return (
       <div
@@ -150,29 +148,37 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
       >
         {isOpen && (
           <>
-            <nav className="FLEX-verB mx-4 mt-4 mb-16">
+            <nav className="FLEX-verB h-fit mx-2 my-2">
               <button className="p-2 hover:bg-custom-light rounded" onClick={onClose}>
                 닫기
               </button>
               <div>
-                <button className="p-2 mr-3 hover:bg-custom-light rounded" onClick={handleDelete}>
+                <button className="p-2 mr-1 hover:bg-custom-light rounded" onClick={handleDelete}>
                   삭제
                 </button>
-                <button className="p-2 hover:bg-custom-light rounded" onClick={handleEdit}>
+                <button className="p-2 mr-1 hover:bg-custom-light rounded" onClick={handleEditMode}>
                   수정
+                </button>
+                <button
+                  className="BTN hover:bg-custom-light rounded"
+                  onClick={() => setFeedCreate(!feedCreate)}
+                >
+                  피드 등록
+                  <CreateFeedModal
+                    groupEventId={groupEvent?.groupEventId || null}
+                    isOpen={feedCreate}
+                    onClose={closeFeedCreateModal}
+                  />
                 </button>
               </div>
             </nav>
-            <header className="FLEX-horizC h-28 mb-12 justify-end">
+            <header className="FLEX-horizC h-auto p-4 justify-end">
               {SelectedCalendar !== 'All' && groupEvent?.author ? (
                 <span className="mb-6">
                   {groupEvent?.author.userProfile ? (
                     <img width="300px" src={`${groupEvent?.author.userProfile}`}></img>
                   ) : (
-                    <>
-                      <p className="text-gray-400 text-center"> {'등록인'}</p>
-                      {groupEvent?.author.nickname}
-                    </>
+                    <>{groupEvent?.author.nickname}</>
                   )}
                 </span>
               ) : null}
@@ -184,7 +190,7 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
               </h2>
             </header>
             <main>
-              <section key="date-section" className="FLEX-verA h-20 items-center mx-2 mb-12">
+              <section key="date-section" className="FLEX-verA items-center p-4">
                 <div className="FLEX-horizC">
                   <div>{displayDate(groupEvent?.startAt).year}</div>
                   <h2>{displayDate(groupEvent?.startAt).monthDay}</h2>
@@ -195,7 +201,7 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                   <h2>{displayDate(groupEvent?.endAt).monthDay}</h2>
                 </div>
               </section>
-              <section key="member-section">
+              <section key="detail-section" className="FLEX-verC p-2">
                 <span className="m-4">
                   {'멤버 : '}
                   {groupEvent?.member && groupEvent.member.length > 0
@@ -210,34 +216,7 @@ export default React.memo(function EventDetails({ isOpen, eventId, onClose }: Ev
                 </span>
               </section>
             </main>
-
-            <section key="Feed-section" className="FLEX-horiz items-center">
-              <button
-                className="BTN m-4 hover:text-custom-main"
-                onClick={() => setFeedModalOn(!feedModalOn)}
-              >
-                피드 생성하기
-                <CreateFeedModal
-                  groupEventId={groupEvent?.groupEventId || null}
-                  isOpen={feedModalOn}
-                  onClose={closeModal}
-                />
-              </button>
-              <div className="FLEX-horizC border rounded">
-                {eventFeedList.length === 0 ? (
-                  <p>피드를 등록해주세요</p>
-                ) : (
-                  eventFeedList.map((event, index) => (
-                    <img
-                      className="w-24"
-                      src={event.images[0].imageSrc}
-                      alt="피드"
-                      key={`event-image-${index}`}
-                    />
-                  ))
-                )}
-              </div>
-            </section>
+            <EventFeedList />
           </>
         )}
       </div>

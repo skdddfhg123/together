@@ -144,7 +144,7 @@ export async function joinCalendar(calendarId: string) {
     } else {
       const data = err.response?.data as API.ErrorResponse;
       console.error(data); //debug//
-      alert(data.message);
+      alert(data?.message);
     }
   }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Socket, io } from 'socket.io-client';
+import { useNavigate } from 'react-router-dom';
 
 import { useSelectedCalendarStore } from '@store/index';
 import BookMarkTap from '@components/Menu/BookMarkTap';
@@ -10,6 +11,7 @@ import CalendarSetTap from '@components/Menu/CalenderSetTap';
 type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
 export default React.memo(function RightMenuTap() {
+  const navigate = useNavigate();
   const { SelectedCalendar } = useSelectedCalendarStore();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [activeTap, setActiveTap] = useState<TapName | null>(null);
@@ -47,6 +49,12 @@ export default React.memo(function RightMenuTap() {
         newSocket.emit('enterChatRoom', SelectedCalendar);
       });
 
+      newSocket.on('exception', (error) => {
+        console.log(`채팅 Error`, error);
+        alert('로그인 세션이 만료되었습니다.');
+        navigate('/signin');
+      });
+
       return () => {
         newSocket.close();
         setSocket(null);
@@ -78,8 +86,15 @@ export default React.memo(function RightMenuTap() {
           Chat
         </button>
         <button
-          className={`${activeTap === 'member' ? 'bg-custom-line' : ''} py-4`}
-          onClick={() => toggleTap('member')}
+          disabled={SelectedCalendar === 'All'}
+          className={`${
+            activeTap === 'member' ? 'bg-custom-line' : ''
+          } ${SelectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
+          onClick={() => {
+            if (SelectedCalendar !== 'All') {
+              toggleTap('member');
+            }
+          }}
         >
           Member
         </button>
@@ -98,12 +113,12 @@ export default React.memo(function RightMenuTap() {
         </button>
       </div>
       <section
-        className={`FLEX-horiz overflow-hidden transition-all duration-300 ${activeTap ? 'w-96' : 'w-0'}`}
+        className={`FLEX-horiz overflow-hidden transition-all duration-300 ${activeTap ? 'w-96 border-l' : 'w-0'}`}
       >
         <div id={`${activeTap === 'bookmark' ? 'SLIDEin-right' : 'SLIDEout-right'}`}>
           {activeTap === 'bookmark' && <BookMarkTap onClose={() => setActiveTap(null)} />}
         </div>
-        <div id={activeTap === 'chat' ? 'SLIDEin-right' : 'SLIDEout-right'}>
+        <div id={activeTap === 'chat' ? 'SLIDEchatIn-right' : 'SLIDEchatOut-right'}>
           {activeTap === 'chat' && socket ? (
             <ChatTap socket={socket} onClose={() => setActiveTap(null)} />
           ) : null}

@@ -117,7 +117,6 @@ export type SocialEvent = {
 
 export interface reqEventFeed {
   groupEventId?: UUID | null;
-  feedId?: UUID;
   feedType?: number;
   title?: string; // TODO 필요없음 - 'title'로 저장
   content: string;
@@ -127,6 +126,7 @@ export interface reqEventFeed {
 export interface EventFeed extends reqEventFeed {
   thumbnail?: Image | null;
   userProfile?: Image | null;
+  feedId: UUID;
   nickname: string;
   createdAt: string;
 }

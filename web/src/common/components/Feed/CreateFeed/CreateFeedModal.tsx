@@ -4,7 +4,7 @@ import { UUID } from 'crypto';
 
 import * as FEED from '@services/eventFeedAPI';
 import { ImageFile, reqEventFeed } from '@type/index';
-import CreateFeedImageList from '@components/Feed/CreateFeed/createFeedImgList';
+import CreateFeedImageList from '@components/Feed/CreateFeed/CreateFeedImgList';
 
 interface CreatedFeedProps {
   groupEventId: UUID | null;
@@ -16,10 +16,10 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
   const [images, setImages] = useState<ImageFile[]>([]);
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
+  const handleClose = useCallback(() => {
     setImages([]);
     onClose();
-  }, [groupEventId]);
+  }, [onClose]);
 
   const submitNewFeed = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +39,7 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
     };
 
     FEED.createEventFeed(feedData);
-    setImages([]);
-    onClose();
+    handleClose();
   };
 
   const handleImageChange = useCallback(
@@ -64,11 +63,17 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
     setImages((images) => images.filter((image) => image.src !== id));
   }, []);
 
+  useEffect(() => {
+    if (groupEventId) {
+      setImages([]);
+    }
+  }, [groupEventId]);
+
   //TODO 이미지 케로셀로 하면 좋을듯 (Component Carousel)
   return (
     <Modal
       isOpen={isOpen}
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       style={{
         content: {
           height: '80vh',

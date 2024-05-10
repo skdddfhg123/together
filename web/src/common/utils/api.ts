@@ -71,7 +71,7 @@ async function post(endpoint: string, data: Data | FormData): Promise<AxiosRespo
       },
     };
     console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
-    console.log(`%cPOST 요청 데이터: FormData`, 'color: #296aba;');
+    console.log(`%cPOST 요청 데이터: `, FormData, 'color: #296aba;');
   } else {
     const bodydata = JSON.stringify(data);
 
@@ -91,7 +91,7 @@ async function patch(endpoint: string, data?: Data | FormData): Promise<AxiosRes
       },
     };
     console.log(`%cPATCH 요청: ${serverUrl + endpoint}`, 'color: #059c4b;');
-    console.log(`%cPATCH 요청 데이터: FormData`, 'color: #059c4b;');
+    console.log(`%cPATCH 요청 데이터: `, FormData, 'color: #059c4b;');
   } else if (data) {
     const bodydata = JSON.stringify(data);
 

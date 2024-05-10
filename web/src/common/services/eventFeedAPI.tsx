@@ -12,8 +12,8 @@ interface FeedImage {
 export async function getAllFeedInEvent(groupEventId: UUID) {
   try {
     const { data: res } = await API.get(`/feed/get/${groupEventId}`);
-    if (!res) throw new Error(`FEED - getAllFeedInGroup 실패 (DB 피드 받아오기 실패)`);
-    console.log(`FEED - getAllFeedInGroup 성공 :`, res);
+    if (!res) throw new Error(`FEED - getAllFeedInEvent 실패 (DB 피드 받아오기 실패)`);
+    console.log(`FEED - getAllFeedInEvent 성공 :`, res);
 
     useEventFeedListStore.getState().setEventFeedList(res);
 
@@ -23,7 +23,7 @@ export async function getAllFeedInEvent(groupEventId: UUID) {
 
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
-      console.error(`FEED - getAllFeedInGroup 실패 :`, data); //debug//
+      console.error(`FEED - getAllFeedInEvent 실패 :`, data); //debug//
       alert('전체 피드를 가져오지 못했습니다.');
     }
   }
@@ -56,7 +56,6 @@ export async function createEventFeed({ groupEventId, content, images }: reqEven
     feedData.append('title', 'Title');
     feedData.append('content', content);
 
-    // images는 File 배열이어야 합니다.
     images.forEach((img: ImageFile) => {
       if (img.file) feedData.append('images', img.file);
     });
@@ -99,7 +98,7 @@ export async function updateEventFeed({
   title,
   content,
   // images,    //TODO 업데이트할 이미지 URI 전송하기
-}: reqEventFeed) {
+}: EventFeed) {
   try {
     const { data: res } = await API.patch(`/feed/update/${feedId}`, {
       feedType: feedType || 1,

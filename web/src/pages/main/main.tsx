@@ -41,9 +41,9 @@ export default function MainPage() {
   }, []);
 
   // *****************? 최초 렌더링
-  // useEffect(() => {
-  //   RendarUserAndCalendar();
-  // }, []);
+  useEffect(() => {
+    RendarUserAndCalendar();
+  }, []);
 
   const prevCalendar = (): void => {
     setCurrentMonth(
@@ -80,13 +80,13 @@ export default function MainPage() {
       </header>
       <main id="mainSection">
         <aside
-          className={`FLEX-horiz h-full transition-all duration-300 ${isOn ? 'w-128' : 'w-0'}`}
           id={`${isOn ? 'SLIDEin-left' : 'SLIDEout-left'}`}
+          className={`FLEX-horiz h-full transition-all duration-300 ${isOn ? 'w-128' : 'w-0'}`}
         >
           {isOn && <CalendarList isOpen={isOn} onClose={toggle} />}
         </aside>
         <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
-        <aside className="right-sideBar">
+        <aside id="right-sideBar">
           <RightMenuTap />
         </aside>
       </main>

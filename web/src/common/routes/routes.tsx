@@ -7,7 +7,7 @@ import Test from '@pages/main/test';
 import UserInfo from '@pages/User/userInfo';
 import ConnectionPage from '@pages/User/connection';
 import CreateGroupPage from '@pages/Calendar/createGroup';
-import RegisterCodePage from '@pages/User/registerCode';
+import InvitePage from '@pages/User/invite';
 
 const routes: Routes = [
   {
@@ -39,8 +39,8 @@ const routes: Routes = [
     element: <CreateGroupPage />,
   },
   {
-    path: 'register',
-    element: <RegisterCodePage />,
+    path: '/invite',
+    element: <InvitePage />,
   },
 ];
 

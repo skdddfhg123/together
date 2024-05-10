@@ -20,6 +20,7 @@ type CalendarProps = {
   currentMonth: Date;
 };
 
+// TODO 일정 그릴 때, 그룹 캘린더 별로 구분할 수 있도록 색 지정해서 그릴 필요 있음.
 export default React.memo(function CalendarPage({
   isPrevMonth,
   isNextMonth,
@@ -41,14 +42,6 @@ export default React.memo(function CalendarPage({
   // *****************? 등록된 그룹 이벤트의 세부 slide-bar
   const [detailsOn, setDetailsOn] = useState<boolean>(false);
   const [groupEventId, setGroupEventId] = useState<UUID | null>(null);
-
-  // *****************? 최초 달력 일정 Rendering
-  useEffect(() => {
-    if (!SelectedCalendar) return;
-
-    if (SelectedCalendar === 'All') return console.log('전체 일정 그리기');
-    CALENDAR.getGroupAllEvents(SelectedCalendar);
-  }, [SelectedCalendar, setGroupEvents]);
 
   // *****************? 더블 클릭으로 이벤트 등록 Modal 띄움
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
@@ -195,6 +188,14 @@ export default React.memo(function CalendarPage({
   const calendarDays = buildCalendarDays();
   const calendarTags = buildCalendarTag(calendarDays);
   const calendarRows = divideWeek(calendarTags);
+
+  // *****************? 최초 달력 일정 Rendering
+  useEffect(() => {
+    if (!SelectedCalendar) return;
+
+    if (SelectedCalendar === 'All') return console.log('전체 일정 그리기');
+    CALENDAR.getGroupAllEvents(SelectedCalendar);
+  }, [SelectedCalendar, setGroupEvents]);
 
   return (
     <div className="calendar">

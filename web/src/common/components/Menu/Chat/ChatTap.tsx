@@ -83,53 +83,49 @@ export default React.memo(function ChatTap({ socket, onClose }: ChatTapProps) {
   };
 
   return (
-    <>
-      <div className="FLEX-horizC chat-tap w-full h-full">
-        <button onClick={onClose}>채팅 닫기</button>
-        <ul className="h-160 m-4">
-          {messages.map((msg, index) => (
-            <li className="flex" key={index}>
-              <strong>{msg.nickname} : </strong>
-              {msg.message}
-              {msg.image && <img src={msg.image} style={{ width: '100px', height: '100px' }} />}
-            </li>
+    <div className="FLEX-horizC chat-tap w-96 h-full">
+      <button onClick={onClose}>채팅 닫기</button>
+      <ul className="h-160 m-4">
+        {messages.map((msg, index) => (
+          <li className="flex" key={index}>
+            <strong>{msg.nickname} : </strong>
+            {msg.message}
+            {msg.image && <img className="w-40 h-40 object-cover" src={msg.image} />}
+          </li>
+        ))}
+      </ul>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="이모지 선택"
+        className="emojiModal"
+        overlayClassName="Overlay"
+      >
+        <button onClick={closeModal}>닫기</button>
+        <div className="SCROLL-hide flex flex-wrap w-full">
+          {images.map((img, index) => (
+            <img
+              className="w-20 h-20 m-0.5 object-cover"
+              key={index}
+              src={img}
+              alt={`Image ${index}`}
+              onClick={() => handleSelectImage(img)}
+              style={{ cursor: 'pointer' }}
+            />
           ))}
-        </ul>
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={closeModal}
-          contentLabel="이모지 선택"
-          className="emojiModal"
-          overlayClassName="Overlay"
-        >
-          <button onClick={closeModal}>닫기</button>
-          <div className="SCROLL-hide flex flex-wrap w-full">
-            {images.map((img, index) => (
-              <img
-                className="w-20 h-20 object-cover"
-                key={index}
-                src={img}
-                alt={`Image ${index}`}
-                onClick={() => handleSelectImage(img)}
-                style={{ cursor: 'pointer' }}
-              />
-            ))}
-          </div>
-        </Modal>
-        {imagePreview && (
-          <img className="w-20 h-20 object-cover" src={imagePreview} alt="Preview" />
-        )}
-        <section className="FLEX-verC w-full">
-          <button onClick={openModal}>이모지</button>
-          <input
-            className="INPUT m-4 h-12 text-center"
-            type="text"
-            ref={msgRef}
-            placeholder="메세지를 입력해주세요"
-          />
-          <button onClick={sendMessage}>전송</button>
-        </section>
-      </div>
-    </>
+        </div>
+      </Modal>
+      {imagePreview && <img className="w-20 h-20 object-cover" src={imagePreview} alt="Preview" />}
+      <section className="FLEX-verC w-full">
+        <button onClick={openModal}>이모지</button>
+        <input
+          className="INPUT m-4 h-12 text-center"
+          type="text"
+          ref={msgRef}
+          placeholder="메세지를 입력해주세요"
+        />
+        <button onClick={sendMessage}>전송</button>
+      </section>
+    </div>
   );
 });

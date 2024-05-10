@@ -14,7 +14,7 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-export default function RegisterCodePage() {
+export default function InvitePage() {
   const query = useQuery();
   const inviteCode = query.get('invite');
   const navigate = useNavigate();
@@ -39,10 +39,10 @@ export default function RegisterCodePage() {
     <div className="FLEX-horizC h-full w-3/5 mt-28 mx-auto">
       <section>
         <button id="singin" onClick={toggle}>
-          {isOn ? '회원가입으로' : '로그인으로'}
+          {isOn ? '로그인으로' : '회원가입으로'}
         </button>
       </section>
-      {isOn ? <SignIn onSubmit={handleLogIn} /> : <SignUp onSubmit={handleSingUp} />}
+      {isOn ? <SignUp onSubmit={handleSingUp} /> : <SignIn onSubmit={handleLogIn} />}
     </div>
   );
 }
