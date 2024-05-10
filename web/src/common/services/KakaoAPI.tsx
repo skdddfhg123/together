@@ -36,7 +36,7 @@ async function getToken() {
     if (!AUTHORIZATION_CODE) return console.log('KAKAO getToken : 인가 코드가 없습니다.'); //debug//
 
     const getTokenURL = `https://kauth.kakao.com/oauth/token`;
-    const reqTokenData: reqTokenData = {
+    const reqTokenData: KaKaoTokenRequest = {
       grant_type: 'authorization_code',
       client_id: process.env.REACT_APP_KAKAO_CLIENT_REST,
       redirect_uri: process.env.REACT_APP_REDIRECT_URI,
@@ -163,8 +163,8 @@ async function GetEvents() {
     const err = error as AxiosError;
     console.error(`KAKAO - GetEvents 실패 :`, err); //debug//
 
-    if (err.response?.status === 401)
-      alert('카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
+    if (err.response?.status === 401) console.log(`카카오톡 `, err);
+    return alert('카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
   }
 }
 
