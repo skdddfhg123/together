@@ -5,6 +5,8 @@ import * as FEED from '@services/eventFeedAPI';
 import { Comment, EventFeed } from '@type/index';
 import FeedImgCarousel from './FeedImgCarousel';
 
+import '@styles/modalStyle.css';
+
 interface FeedModalProps {
   feedInfo: EventFeed | null;
   isOpen: boolean;
@@ -12,12 +14,14 @@ interface FeedModalProps {
 }
 
 export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps) {
+  if (!feedInfo) return null;
+
   const [commentList, setCommentList] = useState<Comment[]>([]);
   const commentRef = useRef<HTMLInputElement>(null);
 
   console.log(`modal`, feedInfo);
+
   const handleClose = useCallback(() => {
-    // setImages([]);
     onClose();
   }, [onClose]);
 
@@ -29,24 +33,26 @@ export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: Feed
   }, [feedInfo]);
 
   const submitNewComment = useCallback(
-    async (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter' && commentRef.current) {
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      if (commentRef.current && feedInfo?.feedId) {
         const content = commentRef.current.value;
         if (!content.trim()) return;
 
-        const feedId = feedInfo?.feedId;
-        if (!feedId) return alert('피드 정보를 가져오지 못했습니다.');
-        await FEED.createFeedComment({ feedId, content });
+        await FEED.createFeedComment({ feedId: feedInfo.feedId, content });
         commentRef.current.value = '';
         fetchCommntList();
       }
     },
-    [feedInfo, fetchCommntList],
+    [feedInfo],
   );
 
   useEffect(() => {
-    fetchCommntList();
-  }, []);
+    if (isOpen) {
+      fetchCommntList();
+    }
+  }, [isOpen, fetchCommntList]);
 
   return (
     <Modal
@@ -86,8 +92,8 @@ export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: Feed
                   <div>댓글이 없습니다.</div>
                 )}
               </div>
-              <form>
-                <input ref={commentRef} className="INPUT" onSubmit={submitNewComment} />
+              <form onSubmit={submitNewComment}>
+                <input ref={commentRef} className="INPUT" />
                 <button type="submit">전송</button>
               </form>
             </section>

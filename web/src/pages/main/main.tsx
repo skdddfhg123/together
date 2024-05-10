@@ -27,21 +27,14 @@ export default function MainPage() {
 
   const getSocialEvents = useCallback(async () => {
     // ***************TODO 구글 및 outlook API 등록 필요
-    // const kakaoRes = await KAKAO.GetEvents();
-    // if (!kakaoRes) return;
+    const kakaoRes = await KAKAO.GetEvents();
+    if (!kakaoRes) return;
     // const googleRes = await GOOGLE.GetEvents();
     // if (!googleRes) return;
     // const outlookRes = await OUTLOOK.GetEvents();
     // if (!outlookRes) return;
 
-    await KAKAO.GetEvents();
-
     console.log(`Main 동기화 종료`); //debug//
-    RendarUserAndCalendar();
-  }, []);
-
-  // *****************? 최초 렌더링
-  useEffect(() => {
     RendarUserAndCalendar();
   }, []);
 
@@ -56,6 +49,11 @@ export default function MainPage() {
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, currentMonth.getDate()),
     );
   };
+
+  // *****************? 최초 렌더링
+  useEffect(() => {
+    RendarUserAndCalendar();
+  }, []);
 
   return (
     <>

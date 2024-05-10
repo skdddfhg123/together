@@ -168,10 +168,12 @@ export default React.memo(function CalendarPage({
 
       return (
         <td key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
-          <div className="day">{day.getDate()}</div>
-          <ul className="SCROLL-hide" id="event-box">
-            {eventElements}
-          </ul>
+          <div className="dayBox">
+            <div className="day">{day.getDate()}</div>
+            <ul className="SCROLL-hide" id="event-box">
+              {eventElements}
+            </ul>
+          </div>
         </td>
       );
     });

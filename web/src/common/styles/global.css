@@ -29,6 +29,10 @@ h2 {
   font-weight: 700;
 }
 
+:focus {
+  outline: none;
+}
+
 @layer base {
   .BTN {
     padding: 0.5rem;

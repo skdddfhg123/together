@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import * as API from '@utils/api';
 import { setCookie } from '@utils/cookie';
 
-import { CalendarId, Cookie, SignInForm, SignUpForm } from '@type/index';
+import { Cookie, SignInForm, SignUpForm } from '@type/index';
 import {
   useGroupEventListStore,
   useSelectedCalendarStore,
@@ -29,7 +29,7 @@ export async function signUp(formData: SignUpForm) {
 
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
-      console.error(data); //debug//
+      console.error('회원가입 에러', data); //debug//
       alert(data.message);
     }
   }
@@ -43,8 +43,7 @@ export async function logIn(formData: SignInForm) {
       useremail,
       password,
     });
-    if (!res) throw new Error('가입 실패');
-
+    if (!res) throw new Error('로그인 실패');
     /*
     TODO accessToken 어떻게 할까
     access 토큰 유효시간을 백엔드에서 발급한 refresh 토큰과 동일하게 설정, 이후 만료된 access 토큰을 http header 담아서 보내면 refresh 시간 내에는 백엔드에서 자동 발급 
@@ -85,10 +84,15 @@ export async function logIn(formData: SignInForm) {
 
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
-      console.error(data); //debug//
+      console.error('로그인 에러', data); //debug//
       alert(data.message);
     }
   }
+}
+
+export async function logOut() {
+  sessionStorage.removeItem('accessToken');
+  alert('로그아웃 되었습니다.');
 }
 
 export async function firstRender() {
@@ -117,7 +121,7 @@ export async function firstRender() {
     const err = e as AxiosError;
     if (err.response?.status === 400) {
       console.error('USER - firstRender 실패 : ', err.response);
-      alert('USER - firstRender 실패 1 : 토큰 정보가 일치하지 않습니다');
+      alert('토큰 정보가 일치하지 않습니다');
     } else if (err.response?.data) {
       const data = err.response.data as API.ErrorResponse;
       console.error('USER - firstRender 실패 2 : ', data); //debug//
@@ -141,10 +145,10 @@ export async function joinCalendar(calendarId: string) {
 
     if (err.response?.status === 400) {
       console.error(err.response);
-      alert('USER - firstRender 실패 : 토큰 정보가 일치하지 않습니다');
+      alert('토큰 정보가 일치하지 않습니다. 다시 로그인해주세요.');
     } else {
       const data = err.response?.data as API.ErrorResponse;
-      console.error(data); //debug//
+      console.error('그룹 캘린더 가입 에러', data); //debug//
       alert(data?.message);
     }
   }

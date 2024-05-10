@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 
 import * as API from '@utils/api';
 

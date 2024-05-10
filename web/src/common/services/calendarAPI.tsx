@@ -192,7 +192,7 @@ export async function updateGroupEvent({
     console.log(`CALENDAR - updateGroupEvent 성공 :`, res);
     alert('일정이 수정되었습니다.');
 
-    return true;
+    return res;
   } catch (e) {
     const err = e as AxiosError;
 

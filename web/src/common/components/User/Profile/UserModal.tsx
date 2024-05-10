@@ -30,6 +30,12 @@ export default React.memo(function UserModal() {
           <div className="FLEX-horizC mx-auto">
             <button
               className="w-full h-10 hover:bg-custom-light"
+              onClick={() => handleRedirect('/userinfo')}
+            >
+              프로필 사진 수정
+            </button>
+            <button
+              className="w-full h-10 hover:bg-custom-light"
               onClick={() => handleRedirect('/connection')}
             >
               동기화 계정 관리

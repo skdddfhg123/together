@@ -1,8 +1,5 @@
 import React from 'react';
-
-interface Image {
-  url: string;
-}
+import { Image } from '@type/index';
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -29,9 +26,9 @@ export default React.memo(function ImageModal({
           {images.map((image, index) => (
             <img
               key={index}
-              src={image.url}
+              src={image}
               alt={`emoji-${index}`}
-              onClick={() => onSelectImage(image.url)}
+              onClick={() => onSelectImage(image)}
             />
           ))}
         </div>

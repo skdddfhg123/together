@@ -34,7 +34,6 @@ export default React.memo(function RightMenuTap() {
   const token = getCookie('accessToken');
 
   useEffect(() => {
-    console.log(`cookie in RightMenuTap`, token);
     if (activeTap === 'chat' && !socket) {
       const newSocket = io('http://15.164.174.224:5000', {
         extraHeaders: {
@@ -45,12 +44,12 @@ export default React.memo(function RightMenuTap() {
       setSocket(newSocket);
 
       newSocket.on('connect', () => {
-        console.log('Connected to chat server');
+        console.log('Connected to chat server'); //debug//
         newSocket.emit('enterChatRoom', SelectedCalendar);
       });
 
       newSocket.on('exception', (error) => {
-        console.log(`채팅 Error`, error);
+        console.log(`채팅 Error`, error); //debug//
         alert('로그인 세션이 만료되었습니다.');
         navigate('/signin');
       });

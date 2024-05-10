@@ -11,7 +11,7 @@ interface FeedImage {
 
 export async function getAllFeedInEvent(groupEventId: UUID) {
   try {
-    const { data: res } = await API.get(`/feed/get/${groupEventId}`);
+    const { data: res } = await API.get(`/feed/get/groupevent/${groupEventId}`);
     if (!res) throw new Error(`FEED - getAllFeedInEvent 실패 (DB 피드 불러오기 실패)`);
     console.log(`FEED - getAllFeedInEvent 성공 :`, res); //debug//
 

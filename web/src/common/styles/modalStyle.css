@@ -13,6 +13,7 @@
 
 .userModal.open {
   opacity: 1; 
+  z-index: 1000;
   transform: translateX(-50%) translateY(-10px); 
   pointer-events: auto;
 }
@@ -46,6 +47,25 @@
   z-index: 999;
 }
 
+.eventModal {
+  width: 24rem;
+  height: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+
+  background-color: white;
+  border: 1px solid #f2f2f2;
+  border-radius: 5px;
+  box-shadow: 5px -5px 12px rgba(0,0,0,0.5); 
+}
+
+.evevntOverlay {
+  background-color: rgba(255, 255, 255, 0);
+}
+
+
 .feedModal {
   height: 80vh;
   width: 150vh;
@@ -67,3 +87,4 @@
   height: 100%;
   z-index: 1050;
 }
+

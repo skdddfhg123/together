@@ -8,6 +8,8 @@ import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
 import { reqGroupEvent } from '@type/index';
 import { useSelectedCalendarStore } from '@store/index';
 
+import '@styles/modalStyle.css';
+
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -29,9 +31,9 @@ export default React.memo(function EventModal({
 
   const submitNewEvent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const title = titleRef.current?.value;
+    const title = titleRef.current?.value.trim();
 
-    if (!title) return alert('등록할 일정 제목을 작성해주세요.');
+    if (!title) return alert('일정 제목이 비어있습니다.');
     if (!selectedDay) return alert('선택된 날이 없습니다.');
 
     const eventData: reqGroupEvent = {
@@ -50,24 +52,11 @@ export default React.memo(function EventModal({
 
   return (
     <Modal
+      className="eventModal"
+      overlayClassName="evevntOverlay"
       isOpen={isOpen}
       onRequestClose={onClose}
-      style={{
-        content: {
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '24rem',
-          height: '5rem',
-          position: 'fixed',
-          right: 'auto',
-          bottom: 'auto',
-          ...modalStyle,
-        },
-        overlay: {
-          backgroundColor: 'rgba(255, 255, 255, 0)',
-        },
-      }}
+      style={{ content: { ...modalStyle } }}
     >
       <form onSubmit={submitNewEvent} className="w-full px-3 flex justify-between items-center">
         <input
