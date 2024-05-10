@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, Request, UseGuards, ValidationPipe } from '@nestjs/common'; import { AuthService } from './auth.service';
+import { Body, Controller, Get, InternalServerErrorException, NotFoundException, Param, ParseUUIDPipe, Post, Req, Request, UseGuards, ValidationPipe } from '@nestjs/common'; import { AuthService } from './auth.service';
 import { UserService } from 'src/db/user/user.service';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDTO } from 'src/db/user/dtos/create-user.dto';
@@ -73,6 +73,18 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 200, description: 'Successfully retrieved user data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Get('all/v2')
+  @UseGuards(JwtAuthGuard)
+  GetAllByToken2(
+    @getPayload() payload: PayloadResponse
+  ): Promise<any> {
+    return this.authService.GetAllByToken2(payload);
+  }
+
+  @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
@@ -82,6 +94,27 @@ export class AuthController {
     @Param('userCalendarId') userCalendarId: string
   ): Promise<any> {
     return this.authService.GetAllByUserCalendarId(userCalendarId);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '캘린더 멤버 일정 불러오기' })
+  @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Calendar not found or no attendees' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Get('all/getcalendar/:calendarId')
+  async GetAllEvenByCalendarId(
+    @Param('calendarId', ParseUUIDPipe) calendarId: string
+  ): Promise<any> {
+    try {
+      return await this.authService.GetAllEventByCalendarId(calendarId, new Date());
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new InternalServerErrorException('An unexpected error occurred while fetching the calendar data');
+      }
+    }
   }
 
   @ApiBearerAuth('JWT-auth')

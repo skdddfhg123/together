@@ -1,12 +1,14 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Calendar } from './entities/calendar.entity';
-import { Repository } from 'typeorm';
+import { Repository, getManager } from 'typeorm';
 import { CalendarCreateDto } from './dtos/calendar.create.dto';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
+import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
+import { UtilsService } from 'src/utils/utils.service';
 
 @Injectable()
 export class CalendarService {
@@ -15,25 +17,34 @@ export class CalendarService {
         private calendarRepository: Repository<Calendar>,
         @InjectRepository(GroupEvent)
         private groupEventRepository: Repository<GroupEvent>,
+        @InjectRepository(UserCalendar)
+        private userCalendarRepository: Repository<UserCalendar>,
         private userCalendarService: UserCalendarService,
+        private readonly utilsService: UtilsService,
     ) { }
 
     async createGroupCalendar(body: CalendarCreateDto, payload: PayloadResponse): Promise<Calendar> {
         const { title, type } = body;
 
-        const author = await this.userCalendarService.findOne({ userCalendarId: payload.userCalendarId });
+        const author = await this.userCalendarRepository.findOne({ where: { userCalendarId: payload.userCalendarId } });
         if (!author) {
             throw new NotFoundException("UserCalendar not found");
         }
 
         const newGroupCalendar = new Calendar();
+        newGroupCalendar.calendarId = this.utilsService.getUUID();
         newGroupCalendar.title = title;
         newGroupCalendar.type = type;
         newGroupCalendar.attendees = [payload.userCalendarId];
         newGroupCalendar.author = author;
+        console.log(newGroupCalendar);
+        console.log(author);
+        // Group calendar is created by the author
+        author.groupCalendars.push(newGroupCalendar.calendarId);
 
         try {
             const savedGroupCalendar = await this.calendarRepository.save(newGroupCalendar);
+            await this.userCalendarRepository.save(author);
             return savedGroupCalendar;
         } catch (e) {
             console.error('Error saving group calendar:', e);
@@ -121,18 +132,28 @@ export class CalendarService {
     }
 
     async addAttendeeToCalendar(calendarId: string, payload: PayloadResponse): Promise<string> {
-        const calendar = await this.calendarRepository.findOne({
-            where: { calendarId },
-        });
+        const [userCalendar, calendar] = await Promise.all([
+            this.userCalendarRepository.findOne({
+                where: { userCalendarId: payload.userCalendarId },
+            }),
+            this.calendarRepository.findOne({
+                where: { calendarId },
+            })
+        ]);
 
         if (!calendar) {
             throw new NotFoundException(`Calendar with ID ${calendarId} not found`);
         }
-        const userCalendarId = payload.userCalendarId;
+        if (!userCalendar) {
+            throw new NotFoundException(`UserCalendar with ID ${payload.userCalendarId} not found`);
+        }
 
-        if (!calendar.attendees.includes(userCalendarId)) {
-            calendar.attendees.push(userCalendarId);
+        if (!calendar.attendees.includes(userCalendar.userCalendarId)) {
+            calendar.attendees.push(userCalendar.userCalendarId);
             await this.calendarRepository.save(calendar);
+            userCalendar.groupCalendars.push(calendar.calendarId);
+            await this.userCalendarRepository.save(userCalendar);
+
             return "Attendee added successfully!";
         } else {
             throw new HttpException('Attendee already exists.', HttpStatus.CONFLICT);
@@ -144,11 +165,16 @@ export class CalendarService {
             .leftJoinAndSelect("calendar.author", "author")
             .where("calendar.calendarId = :calendarId", { calendarId })
             .getOne();
-
         if (!calendar) {
             throw new NotFoundException(`Calendar with ID ${calendarId} not found`);
         }
 
+        const userCalendar = await this.userCalendarRepository.findOne({ where: { userCalendarId } });
+        if (!userCalendar) {
+            throw new NotFoundException(`UserCalendar with ID ${userCalendarId} not found`);
+        }
+
+        userCalendar.groupCalendars = userCalendar.groupCalendars.filter((id) => id !== calendarId);
         const index = calendar.attendees.indexOf(userCalendarId);
         if (index !== -1) {
             calendar.attendees.splice(index, 1);
@@ -156,13 +182,14 @@ export class CalendarService {
                 if (calendar.attendees.length > 0) {
                     const newAuthorId = calendar.attendees[0];
                     const newAuthor = await this.userCalendarService.findOne({ userCalendarId: newAuthorId });
-                    console.log(newAuthor);
+                    console.log(`New Author = ${newAuthor}`);
                     calendar.author = newAuthor;
                 } else {
                     calendar.isDeleted = true;
                     calendar.deletedAt = new Date();
                 }
             }
+            await this.userCalendarRepository.save(userCalendar);
             await this.calendarRepository.save(calendar);
             return "Attendee removed successfully";
         } else {

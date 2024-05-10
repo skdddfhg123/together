@@ -61,15 +61,19 @@ services:
     command: [ "mongod", "--auth" ]
     volumes:
       - ./data/mongo:/data/db
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   mongo-express:
     image: mongo-express
     container_name: mongo-express
-    restart: always
+    restart: on-failure
     ports:
       - "8081:8081"
     depends_on:
       - mongodb
     env_file:
       - .db.env
-

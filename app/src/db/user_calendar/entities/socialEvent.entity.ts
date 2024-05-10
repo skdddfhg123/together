@@ -10,15 +10,17 @@ export class SocialEvent {
     @PrimaryGeneratedColumn('uuid')
     socialEventId: string;
 
-    @ManyToOne(() => UserCalendar, calendar => calendar.socialEvents, {nullable: true})
+    @ManyToOne(() => UserCalendar, calendar => calendar.socialEvents, { nullable: true })
     @JoinColumn({ name: 'userCalendarId' })
     userCalendar: UserCalendar;
+
+    // @Column()
 
     @Column()
     @IsNotEmpty()
     social: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     @IsOptional()
     title: string;
 

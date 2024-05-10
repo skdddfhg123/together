@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { AwsService } from "./aws.s3/aws.service";
-import { UtilsService } from "./aws.s3/utils/utils.service";
-import { ImageMultyTextUploadDto } from "./dtos/image.text.dto";
+import { UtilsService } from "../utils/utils.service";
 
 
 //image.service.ts
@@ -26,10 +25,10 @@ export class ImageService {
   }
 
   // 이미지 파일 S3에 저장 후 url return 모듈화
-  async feedImageUpload(file: Express.Multer.File, imageName: string): Promise<string>{
+  async feedImageUpload(file: Express.Multer.File, imageName: string): Promise<string> {
     // const imageName = this.utilsService.getUUID();
     const ext = file.originalname.split('.').pop();
-  
+
     const imageUrl = await this.awsService.imageUploadToS3(
       `feeds/${imageName}.${ext}`,
       file,
@@ -39,10 +38,10 @@ export class ImageService {
   }
 
   // 이미지 파일 S3에 저장 후 url return 모듈화
-  async emojiImageUpload(file: Express.Multer.File, imageName: string): Promise<string>{
+  async emojiImageUpload(file: Express.Multer.File, imageName: string): Promise<string> {
     // const imageName = this.utilsService.getUUID();
     const ext = file.originalname.split('.').pop();
-  
+
     const imageUrl = await this.awsService.imageUploadToS3(
       `emoji/${imageName}.${ext}`,
       file,
@@ -72,7 +71,7 @@ export class ImageService {
   //   files: Express.Multer.File[], 
   //   body :ImageMultyTextUploadDto
   // ): Promise<string[]> {
-    
+
   //   const title = body.title
   //   const content = body.description
   //   const imgUrls = this.imageArrayUpload(files, "test")
@@ -88,9 +87,9 @@ export class ImageService {
       const ext = file.originalname.split('.').pop();
 
       const imageUrl = await this.awsService.imageUploadToS3(
-          `feeds/${imageName}.${ext}`,
-          file, 
-          ext 
+        `feeds/${imageName}.${ext}`,
+        file,
+        ext
       );
 
       console.log(imageUrl);

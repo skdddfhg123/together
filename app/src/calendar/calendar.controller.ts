@@ -22,6 +22,7 @@ export class CalendarController {
         private groupEventService: GroupEventService,
     ) { }
 
+    // 최신화 완료
     @Post('create')
     @ApiOperation({ summary: '그룹 캘린더 생성' })
     @ApiResponse({ status: 201, description: 'Calendar created successfully' })
@@ -34,7 +35,6 @@ export class CalendarController {
         @Body() calendarCreateDto: CalendarCreateDto,
         @getPayload() payload: PayloadResponse
     ): Promise<Calendar> {
-        // 채팅방 생성
         return await this.calendarService.createGroupCalendar(calendarCreateDto, payload);
     }
 
@@ -69,7 +69,7 @@ export class CalendarController {
     }
 
     @Patch('delete/:calendarId')
-    @ApiOperation({ summary: 'Delete a calendar and its associated group events' })
+    @ApiOperation({ summary: '캘린더 삭제' })
     @ApiResponse({ status: 204, description: 'Calendar and associated group events deleted successfully' })
     @ApiResponse({ status: 404, description: 'Calendar not found' })
     @ApiResponse({ status: 500, description: 'Failed to delete calendar' })
@@ -94,6 +94,7 @@ export class CalendarController {
         }
     }
 
+    // 최신화 완료
     @Patch('participate/:calendarId')
     @ApiOperation({ summary: '그룹 캘린더 참여하기' })
     @ApiResponse({ status: 200, description: 'Attendee added successfully' })
@@ -110,6 +111,7 @@ export class CalendarController {
         return this.calendarService.addAttendeeToCalendar(calendarId, payload);
     }
 
+    // 최신화 완료
     @Patch('withdraw/:calendarId')
     @ApiOperation({ summary: '그룹 캘린더 나가기' })
     @ApiResponse({ status: 200, description: 'Attendee removed successfully' })

@@ -9,7 +9,7 @@ import { UserService } from 'src/db/user/user.service';
 import { ReadFeedDTO } from './dtos/feed.read.dto';
 import { ImageService } from 'src/image.upload/image.service';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
-import { UtilsService } from 'src/image.upload/aws.s3/utils/utils.service';
+import { UtilsService } from 'src/utils/utils.service';
 import { AwsService } from 'src/image.upload/aws.s3/aws.service';
 import { FeedImageBinded } from './interface/feedAndImageBinding';
 
