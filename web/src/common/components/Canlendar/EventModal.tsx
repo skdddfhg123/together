@@ -37,7 +37,10 @@ export default React.memo(function EventModal({
     if (!title) return alert('일정 제목이 비어있습니다.');
     if (!selectedDay) return alert('선택된 날이 없습니다.');
     if (!userInfo) return alert('유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
-    if (selectedCalendar === 'All') return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
+    if (selectedCalendar === 'All') {
+      onClose();
+      return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
+    }
 
     const eventData: reqGroupEvent = {
       groupCalendarId: selectedCalendar.calendarId,

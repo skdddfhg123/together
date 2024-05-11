@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (config.url?.endsWith('/login')) {
+    if (config.url?.endsWith('/login') || config.url?.endsWith('/signup')) {
       return config;
     }
 

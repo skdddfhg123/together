@@ -137,8 +137,6 @@ export async function createGroupEvent({
   reqMembers,
   color,
 }: reqGroupEvent) {
-  if (groupCalendarId === 'All') return alert('캘린더 목록에서 캘린더를 선택해주세요.');
-
   try {
     const { data: res } = await API.post(`/calendar/group/create/${groupCalendarId}`, {
       title,

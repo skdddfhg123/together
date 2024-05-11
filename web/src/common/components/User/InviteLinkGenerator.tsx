@@ -8,12 +8,14 @@ export default function InviteLinkGenerator() {
   // TODO CALENDAR ID를 직접 입력하지 않고 해쉬화 등 암호화 필요
   const handleGenerateLink = () => {
     // const inviteCode = Math.random().toString(36).substring(2, 15); // 간단한 랜덤 코드 생성
-    const link = `${window.location.origin}/invite?invite=${selectedCalendar}`;
+    if (selectedCalendar === 'All') return alert('그룹 캘린더를 선택해주세요.');
+    const link = `${window.location.origin}/invite?invite=${selectedCalendar.calendarId}`;
     setInviteLink(link);
   };
 
   const handleKakaoShare = () => {
-    const link = `${window.location.origin}/invite?invite=${selectedCalendar}`;
+    if (selectedCalendar === 'All') return alert('그룹 캘린더를 선택해주세요.');
+    const link = `${window.location.origin}/invite?invite=${selectedCalendar.calendarId}`;
 
     if (window.Kakao) {
       const kakao = window.Kakao;
@@ -30,7 +32,7 @@ export default function InviteLinkGenerator() {
           imageUrl:
             'https://jungle-toogether.s3.amazonaws.com/feeds/6ebd2b9b-e483-4cb4-a376-8bf0a6c5308f.jpg',
           link: {
-            mobileWebUrl: 'http://localhost:3001',
+            mobileWebUrl: 'http://localhost:3000',
             webUrl: link,
           },
         },

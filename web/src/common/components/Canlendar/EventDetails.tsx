@@ -22,7 +22,6 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
   const { selectedCalendar } = useSelectedCalendarStore();
   const { isLoaded, setIsLoaded } = useGroupEventInfoStore();
 
-  console.log(`이벤트 아이디 왜 안바뀜`, eventId);
   // *********************? 함수
   const deleteEvent = useCallback(async () => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
@@ -41,6 +40,7 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
 
   // *********************? 최초 Render
   useEffect(() => {
+    if (!isOn) return alert('수정을 먼저 완료해주세요.');
     const fetchEventInfo = async () => {
       if (eventId) await CALENDAR.getGroupOneEvent(eventId);
     };
@@ -52,7 +52,10 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
   }, [eventId, isLoaded]);
 
   // 그룹 캘린더 변경 시 자동으로 닫히기
-  useEffect(() => onClose(), [selectedCalendar]);
+  useEffect(() => {
+    onClose();
+    if (!isOn) toggle();
+  }, [selectedCalendar]);
 
   return (
     <div

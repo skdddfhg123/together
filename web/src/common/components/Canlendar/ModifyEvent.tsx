@@ -38,7 +38,7 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
   const debouncedSetColor = useCallback(
     debounce((newColor: string) => {
       setColor(newColor);
-    }, 300),
+    }, 100),
     [],
   );
 
@@ -155,6 +155,13 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
             style={{ width: '350px', height: '180px' }}
             color={color}
             onChange={handleColorChange}
+          />
+          <input
+            type="text"
+            value={color}
+            onChange={(e) => handleColorChange(e.target.value)}
+            className="INPUT w-28 my-2 text-center"
+            maxLength={8}
           />
         </section>
       </main>

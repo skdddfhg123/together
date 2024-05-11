@@ -20,7 +20,7 @@ export default React.memo(function UserModal() {
 
   const handleLogOut = async () => {
     await USER.logOut();
-    navigate('/signin');
+    window.location.replace('http://localhost:3000');
     setModalOpen(false);
   };
 
