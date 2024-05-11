@@ -37,7 +37,7 @@ export class GroupEventService {
         }
 
         const groupEvent = new GroupEvent();
-        groupEvent.author = payload.userCalendarId;
+        groupEvent.author = payload.useremail;
         groupEvent.calendarId = calendarId;
 
         const { title, color, startAt, endAt, members } = userCreateGroupEventDTO;
