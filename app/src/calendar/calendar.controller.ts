@@ -173,8 +173,8 @@ export class CalendarController {
         return await this.groupEventService.getAllGroupEventsByCalendarId(calendarId);
     }
 
-    @Get('group/get/v2/:calendarId')
-    @ApiOperation({ summary: '캘린더 그룹 이벤트 가져오기' })
+    @Get('group/get/all/v2/:calendarId')
+    @ApiOperation({ summary: '캘린더 별 그룹 일정 가져오기(필터:45일전후)' })
     @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
     @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
     @ApiBearerAuth('JWT-auth')
@@ -185,6 +185,20 @@ export class CalendarController {
     ): Promise<any> {
         console.log(calendarId);
         return await this.groupEventService.getAllGroupEventsByCalendarIdV2(calendarId);
+    }
+
+    @Get('group/get/v2/:calendarId')
+    @ApiOperation({ summary: '캘린더 그룹 이벤트 가져오기' })
+    @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
+    async getAllGroupEvent23(
+        @Param('calendarId') calendarId: string,
+    ): Promise<GetGroupDTO[]> {
+        console.log(calendarId);
+        return await this.groupEventService.getAllGroupEventsByCalendarId2(calendarId);
     }
 
     @Get('group/get/detail/:groupeventId')

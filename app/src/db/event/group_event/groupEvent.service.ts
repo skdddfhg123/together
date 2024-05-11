@@ -128,6 +128,10 @@ export class GroupEventService {
                 startAt: event.startAt,
                 endAt: event.endAt,
                 members: event.member,
+                color: event.color,
+                // pinned: event.pinned,
+                // alerts: event.alerts,
+                // attachment: event.attachment,
             }));
 
             return {
@@ -147,71 +151,71 @@ export class GroupEventService {
     }
 
 
-    // async getAllGroupEventsByCalendarId2(calendarId: string): Promise<GetGroupDTO[]> {
-    //     try {
-    //         const groupEvents = await this.groupEventRepository.find({
-    //             where: {
-    //                 calendarId,
-    //                 isDeleted: false
-    //             },
-    //             order: {
-    //                 startAt: 'ASC'
-    //             }
-    //         });
+    async getAllGroupEventsByCalendarId2(calendarId: string): Promise<GetGroupDTO[]> {
+        try {
+            const groupEvents = await this.groupEventRepository.find({
+                where: {
+                    calendarId,
+                    isDeleted: false
+                },
+                order: {
+                    startAt: 'ASC'
+                }
+            });
 
-    //         const groupEventDtos: GetGroupDTO[] = await Promise.all(groupEvents.map(async (event) => {
-    //             // Fetch author details
-    //             const userCalendar = await this.userCalendarRepository.findOne({
-    //                 where: { userCalendarId: event.author },
-    //                 relations: ['user']
-    //             });
+            const groupEventDtos: GetGroupDTO[] = await Promise.all(groupEvents.map(async (event) => {
+                // Fetch author details
+                const userCalendar = await this.userCalendarRepository.findOne({
+                    where: { userCalendarId: event.author },
+                    relations: ['user']
+                });
 
-    //             if (!userCalendar) {
-    //                 throw new Error(`Author with email ${event.author} not found.`);
-    //             }
+                if (!userCalendar) {
+                    throw new Error(`Author with email ${event.author} not found.`);
+                }
 
-    //             const authorInfo: MemberInfo = {
-    //                 useremail: userCalendar?.user.useremail,
-    //                 thumbnail: userCalendar?.user.thumbnail,
-    //                 nickname: userCalendar?.user.nickname
-    //             };
+                const authorInfo: MemberInfo = {
+                    useremail: userCalendar?.user.useremail,
+                    thumbnail: userCalendar?.user.thumbnail,
+                    nickname: userCalendar?.user.nickname
+                };
 
-    //             // Fetch member details
-    //             const memberInfos: MemberInfo[] = await Promise.all(event.member.map(async (memberEmail) => {
-    //                 const user = await this.userRepository.findOne({
-    //                     where: { useremail: memberEmail }
-    //                 });
+                // Fetch member details
+                const memberInfos: MemberInfo[] = await Promise.all(event.member.map(async (memberEmail) => {
+                    const user = await this.userRepository.findOne({
+                        where: { useremail: memberEmail }
+                    });
 
-    //                 return {
-    //                     useremail: user?.useremail,
-    //                     thumbnail: user?.thumbnail,
-    //                     nickname: user?.nickname
-    //                 };
-    //             }));
+                    return {
+                        useremail: user?.useremail,
+                        thumbnail: user?.thumbnail,
+                        nickname: user?.nickname
+                    };
+                }));
 
-    //             return {
-    //                 groupEventId: event.groupEventId,
-    //                 author: authorInfo,
-    //                 member: memberInfos,
-    //                 title: event.title,
-    //                 color: event.color,
-    //                 pinned: event.pinned,
-    //                 alerts: event.alerts,
-    //                 attachment: event.attachment,
-    //                 createdAt: event.createdAt,
-    //                 updatedAt: event.updatedAt,
-    //                 startAt: event.startAt,
-    //                 endAt: event.endAt,
-    //                 deletedAt: event.deletedAt,
-    //                 isDeleted: event.isDeleted
-    //             };
-    //         }));
+                return {
+                    groupEventId: event.groupEventId,
+                    author: authorInfo,
+                    member: memberInfos,
+                    title: event.title,
+                    color: event.color,
+                    pinned: event.pinned,
+                    alerts: event.alerts,
+                    attachment: event.attachment,
+                    createdAt: event.createdAt,
+                    updatedAt: event.updatedAt,
+                    startAt: event.startAt,
+                    endAt: event.endAt,
+                    deletedAt: event.deletedAt,
+                    isDeleted: event.isDeleted
+                };
+            }));
 
-    //         return groupEventDtos;
-    //     } catch (e) {
-    //         throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}: ${e.message}`);
-    //     }
-    // }
+            return groupEventDtos;
+        } catch (e) {
+            throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}: ${e.message}`);
+        }
+    }
 
 
 
