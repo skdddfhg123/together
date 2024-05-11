@@ -106,11 +106,11 @@ export async function firstRender() {
     useSelectedCalendarStore.getState().setSelectedCalendar('All');
 
     const AllEvents: AllEvent[] = res.events.filter((event: AllEvent) => event.group !== undefined);
-    const socialEvents: AllEvent[] = res.events.filter(
+    const SocialEvents: AllEvent[] = res.events.filter(
       (event: AllEvent) => event.social !== undefined,
     );
 
-    useSocialEventListStore.getState().setSocialEventList(socialEvents);
+    useSocialEventListStore.getState().setSocialEventList(SocialEvents);
     useAllEventListStore.getState().setAllEventList(AllEvents);
 
     return true;

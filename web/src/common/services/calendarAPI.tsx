@@ -3,12 +3,21 @@ import { UUID } from 'crypto';
 
 import * as API from '@utils/api';
 
-import { GroupEvent, Calendar, CreateCalendarForm, DefaultEvent } from '@type/index';
+import {
+  GroupEvent,
+  Calendar,
+  CreateCalendarForm,
+  DefaultEvent,
+  MemberWithEvent,
+  MemberEvent,
+} from '@type/index';
 import {
   useCalendarListStore,
   useGroupEventInfoStore,
   useGroupEventListStore,
+  useMemberEventListState,
   useSelectedCalendarStore,
+  useUserInfoStore,
 } from '@store/index';
 
 export async function getMyAllCalendar() {
@@ -91,14 +100,42 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
     return console.log(`CALENDAR - getMemberAndMemberEvents (캘린더 id 없음) : { ${calendarId} }`);
 
   try {
-    const { data: res } = await API.get(`/calendar/group/get/v2/${calendarId}`);
+    const { data: res } = await API.get(`/auth/all/getcalendar/v2/${calendarId}`);
     if (!res) throw new Error('CALENDAR - getMemberAndMemberEvents (db 조회 실패)');
     console.log(`CALENDAR - getMemberAndMemberEvents 성공 :`, res);
 
-    /*
-    TODO 1. zustand로 멤버들 정보 저장한 뒤 상세 정보 등에서 email 값으로 비교 해야함
-    TODO 2. zustand로 멤버들 일정 모두 담아야 함. -> 일정이 겹치면 어떡하지 ? , 일정
-    */
+    const MemberEventList: MemberEvent[] = [];
+    const userInfo = useUserInfoStore.getState().userInfo;
+
+    res.forEach((member: MemberWithEvent) => {
+      if (userInfo && member.useremail !== userInfo.useremail) {
+        member.allevents.forEach((event) => {
+          const existingEvent = MemberEventList.find(
+            (e) =>
+              e.title === event.title && e.startAt === event.startAt && e.endAt === event.endAt,
+          );
+
+          if (existingEvent) {
+            if (!existingEvent.useremail.includes(member.useremail)) {
+              existingEvent.useremail.push(member.useremail);
+            }
+            if (!existingEvent.nickname.includes(member.nickname)) {
+              existingEvent.nickname.push(member.nickname);
+            }
+          } else {
+            MemberEventList.push({
+              title: event.title,
+              startAt: event.startAt,
+              endAt: event.endAt,
+              useremail: [member.useremail],
+              nickname: [member.nickname],
+            });
+          }
+        });
+      }
+    });
+
+    useMemberEventListState.getState().setAllEventList(MemberEventList);
 
     return true;
   } catch (e) {

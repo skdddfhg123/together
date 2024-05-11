@@ -3,12 +3,13 @@ import { UUID } from 'crypto';
 
 import * as CALENDAR from '@services/calendarAPI';
 import * as USER from '@services/userAPI';
+
+import { Calendar, GroupEvent } from '@type/index';
+import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 import useToggle from '@hooks/useToggle';
 
 import ViewEvent from '@components/Canlendar/ViewEvent';
 import ModifyEvent from '@components/Canlendar/ModifyEvent';
-import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
-import { Calendar, GroupEvent } from '@type/index';
 
 interface EventDetailsProps {
   isOpen: boolean;

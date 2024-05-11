@@ -64,7 +64,7 @@ td.today:hover {
 }
 
 .group-event {
-  border-radius: 0.375rem; 
+  border-radius: 0.125rem;
   transition: transform 150ms; 
 }
 
@@ -73,14 +73,31 @@ td.today:hover {
   transform: translateY(-0.05rem);
 }
 
+.dayBox {
+  display: flex;
+  align-items: center; 
+  justify-content: space-between; 
+}
+
 .day {
   width: 2rem;
   height: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: large;
+}
 
-  font-size: medium;
+.member-section {
+  position: relative;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightblue;
+
+  margin: 0.5em; 
+  border-radius: 3px; 
 }
 
 th.day-0, .day-0 .day { /* 일요일 */
@@ -100,16 +117,72 @@ th.day-6, .day-6 .day { /* 토요일 */
   font-weight: bold;
 }
 
-.choiceDay {
-  background-color: #0086FF25;
-  font-size: larger;
+.choiceDay .day {
+  font-size: xx-large;
+  font-weight: bold;
 }
 
-.choiceDay.today .day { /* choiceDay와 today 클래스가 같은 요소에 적용될 때 */
-  /* color: white; */
+.choiceDay {
+  background-color: #0086FF25;
+  border-radius: 0.5rem;
 }
+
 
 .kakao-event {
   background: #F7E600;
   border-radius: 5px;
+}
+
+.tooltip-content {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+
+
+
+  z-index: 3000; 
+  height: 20rem;
+  width: 20rem; 
+  padding: 10px;
+
+  top: 20px;  
+  left: 50%; 
+  transform: translateX(-50%);  
+
+  white-space: normal;
+  border: 1px solid black;
+  border-radius: 1rem;
+  background-color: white;  
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); 
+  
+  text-align: center;
+}
+
+.title-container {
+  margin: 1rem;
+}
+
+.tooltip {
+  position: relative;  
+  display: inline-block;  
+  cursor: pointer;  
+}
+
+.date-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around; 
+  align-items: center; 
+  border-top: 1px solid #ccc;
+  margin-top: 10rem; 
+}
+
+.member-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px; 
+  border-top: 1px solid #ccc; 
+  margin-top: 10px;
 }

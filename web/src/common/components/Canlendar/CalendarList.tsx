@@ -12,6 +12,7 @@ import {
 } from '@store/index';
 
 import defaultCover from '@assets/default_cover.png';
+
 interface CalendarListProps {
   isOpen: boolean;
   onClose: () => void;
@@ -22,17 +23,11 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   const { groupEventList } = useGroupEventListStore();
   const { setSelectedCalendar } = useSelectedCalendarStore();
 
-  useEffect(() => {
-    CALENDAR.getMyAllCalendar();
-  }, []);
-
-  useEffect(() => {
-    onClose();
-  }, [groupEventList]);
-
   const ChangeCalendar = (calendar: Calendar | 'All') => {
-    if (calendar) setSelectedCalendar(calendar);
-    else console.error('캘린더 아이디를 찾을 수 없습니다.');
+    if (calendar) {
+      setSelectedCalendar(calendar);
+      if (calendar !== 'All') getMemberEventList(calendar);
+    } else console.error('캘린더 아이디를 찾을 수 없습니다.');
     onClose();
   };
 
@@ -59,6 +54,18 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
       <h2 className="text-center py-10">소속된 그룹 캘린더가 없습니다.</h2>
     );
   };
+
+  const getMemberEventList = async (calendar: Calendar) => {
+    await CALENDAR.getMemberAndMemberEvents(calendar.calendarId);
+  };
+
+  useEffect(() => {
+    CALENDAR.getMyAllCalendar();
+  }, []);
+
+  useEffect(() => {
+    onClose();
+  }, [groupEventList]);
 
   return (
     <section

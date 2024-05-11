@@ -4,8 +4,10 @@ import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
 import * as FEED from '@services/eventFeedAPI';
+
 import { Comment, EventFeed } from '@type/index';
-import FeedImgCarousel from './FeedImgCarousel';
+
+import FeedImgCarousel from '@components/Feed/FeedImgCarousel';
 
 import '@styles/modalStyle.css';
 

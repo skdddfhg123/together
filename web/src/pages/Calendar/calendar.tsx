@@ -8,13 +8,14 @@ import {
   useSocialEventListStore,
   useGroupEventListStore,
   useAllEventListStore,
+  useMemberEventListState,
 } from '@store/index';
 import * as CALENDAR from '@services/calendarAPI';
 
 import EventModal from '@components/Canlendar/EventModal';
 import EventDetails from '@components/Canlendar/EventDetails';
 import '@styles/calendar.css';
-import { AllEvent } from '@type/index';
+import { AllEvent, MemberEvent } from '@type/index';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -32,6 +33,7 @@ export default React.memo(function CalendarPage({
   const { socialEventList } = useSocialEventListStore();
   const { AllEventList } = useAllEventListStore();
   const { groupEventList } = useGroupEventListStore();
+  const { MemberEventList } = useMemberEventListState();
   const { selectedCalendar } = useSelectedCalendarStore();
 
   const today = new Date();
@@ -174,26 +176,40 @@ export default React.memo(function CalendarPage({
       const localDayKey = format(day, 'yyyy-MM-dd');
       const eventElements = eventMap.get(localDayKey) || [];
 
-      if (day.getMonth() < currentMonth.getMonth()) {
-        return (
-          <td key={i} className="prevMonthDay">
-            <div>{isPrevMonth ? day.getDate() : ''}</div>
-            <ul className="SCROLL-hide" id="event-box">
-              {eventElements}
-            </ul>
-          </td>
-        );
-      }
-      if (day.getMonth() > currentMonth.getMonth()) {
-        return (
-          <td key={i} className="nextMonthDay">
-            <div>{isNextMonth ? day.getDate() : ''}</div>
-            <ul className="SCROLL-hide" id="event-box">
-              {eventElements}
-            </ul>
-          </td>
-        );
-      }
+      const memberEventsForDay = MemberEventList.filter(
+        (e) => format(new Date(e.startAt), 'yyyy-MM-dd') === localDayKey,
+      ).map((event, index) => (
+        <span
+          key={index}
+          className="tooltip"
+          onMouseEnter={(e) => {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip-content';
+            const yearStart = format(new Date(event.startAt), 'yyyy년');
+            const dateStart = format(new Date(event.startAt), 'MM월 dd일');
+            const yearEnd = format(new Date(event.endAt), 'yyyy년');
+            const dateEnd = format(new Date(event.endAt), 'MM월 dd일');
+            const nicknames = event.nickname.map((nick) => `<span>${nick}</span>`);
+            tooltip.innerHTML = `
+            <p class="title-container">Title: ${event.title}</p>
+            <p>Nicknames</p> ${nicknames}</p>
+            <div class="date-container">
+            <p>Start:<br> ${yearStart}<br>${dateStart}</p>
+            <p>End:<br> ${yearEnd}<br>${dateEnd}</p>
+            </div>
+          `;
+            e.currentTarget.appendChild(tooltip);
+          }}
+          onMouseLeave={(e) => {
+            const tooltip = e.currentTarget.querySelector('.tooltip-content');
+            if (tooltip) {
+              tooltip.remove();
+            }
+          }}
+        >
+          {event.nickname[0][0]}
+        </span>
+      ));
 
       const dayOfWeek = day.getDay();
       const isToday = isSameDay(day, today);
@@ -202,13 +218,14 @@ export default React.memo(function CalendarPage({
       if (selectedDay && isSameDay(day, selectedDay)) dayClasses += ' choiceDay';
 
       return (
-        <td key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
+        <td key={i} className={dayClasses} onClick={(e) => handleDayClick(day, e)}>
           <div className="dayBox">
-            <div className="day">{day.getDate()}</div>
-            <ul className="SCROLL-hide" id="event-box">
-              {eventElements}
-            </ul>
+            <span className="day">{day.getDate()}</span>
+            <div className="member-section">{memberEventsForDay}</div>
           </div>
+          <ul className="SCROLL-hide" id="event-box">
+            {eventElements}
+          </ul>
         </td>
       );
     });

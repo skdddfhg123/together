@@ -1,5 +1,6 @@
-import { useSelectedCalendarStore } from '@store/index';
 import React, { useState } from 'react';
+
+import { useSelectedCalendarStore } from '@store/index';
 
 export default function InviteLinkGenerator() {
   const [inviteLink, setInviteLink] = useState('');

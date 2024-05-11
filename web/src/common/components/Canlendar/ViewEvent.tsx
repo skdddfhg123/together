@@ -3,7 +3,7 @@ import { format, parseISO } from 'date-fns';
 import { UUID } from 'crypto';
 
 import * as FEED from '@services/eventFeedAPI';
-import { AllEvent, Calendar, CalendarId, GroupEvent, Member } from '@type/index';
+import { AllEvent, Calendar, GroupEvent, Member } from '@type/index';
 import {
   useGroupEventInfoStore,
   useCalendarListStore,

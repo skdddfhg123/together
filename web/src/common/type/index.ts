@@ -82,35 +82,9 @@ export interface Author {
 
 export type Member = Author;
 
-// export interface reqGroupEvent {
-//   groupCalendarId?: CalendarId;
-//   title: string;
-//   color: string | null;
-//   reqMember?: string[] | null;
-//   startAt: string;
-//   endAt: string;
-// }
-
-// export interface GroupEvent extends reqGroupEvent {
-//   groupCalendarTitle?: string;
-//   groupEventId?: UUID;
-//   memberObj?: Member[] | null;
-//   member: string[];
-//   author?: Author; //TODO 받을 땐 email일걸 ?
-//   pinned: boolean;
-//   alerts?: number;
-//   attachment?: string;
-// }
-
-// export type SocialEvent = {
-//   userCalendarId?: string;
-//   socialEventId: UUID;
-//   title?: string;
-//   startAt: string;
-//   endAt: string;
-//   isPast: boolean;
-//   social: string;
-// };
+export interface MemberWithEvent extends Author {
+  allevents: DefaultEvent[];
+}
 
 export interface DefaultEvent {
   //* 그룹 멤버들 일정 + create 할 때
@@ -118,6 +92,11 @@ export interface DefaultEvent {
   title: string;
   startAt: string;
   endAt: string;
+}
+
+export interface MemberEvent extends DefaultEvent {
+  nickname: string[];
+  useremail: string[];
 }
 
 export interface AllEvent extends DefaultEvent {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import * as USER from '@services/userAPI';
+
 import defaultUserImg from '@assets/default_user.png';
 import '@styles/modalStyle.css';
 

@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 
-import { GroupEvent, UserInfo, Calendar, EventFeed, AllEvent } from '@type/index';
+import {
+  GroupEvent,
+  UserInfo,
+  Calendar,
+  EventFeed,
+  AllEvent,
+  DefaultEvent,
+  MemberEvent,
+} from '@type/index';
 
 interface UserInfoState {
   userInfo: UserInfo | null;
@@ -74,6 +82,16 @@ interface AllEventListState {
 export const useAllEventListStore = create<AllEventListState>((set) => ({
   AllEventList: [],
   setAllEventList: (events) => set({ AllEventList: events }),
+}));
+
+interface MemberEventListState {
+  MemberEventList: MemberEvent[];
+  setAllEventList: (events: MemberEvent[]) => void;
+}
+
+export const useMemberEventListState = create<MemberEventListState>((set) => ({
+  MemberEventList: [],
+  setAllEventList: (events) => set({ MemberEventList: events }),
 }));
 
 interface GroupEventInfoState {
