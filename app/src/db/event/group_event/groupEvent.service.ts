@@ -3,11 +3,12 @@ import { CreateGroupEventDTO } from "./dtos/groupEvent.create.dto";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
 import { GroupEvent } from "./entities/groupEvent.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Between, Repository } from "typeorm";
 import { Calendar } from "src/calendar/entities/calendar.entity";
 import { GetGroupDTO, MemberInfo } from "./dtos/groupEvent.get.dto";
 import { User } from "src/db/user/entities/user.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
+import { group } from "console";
 
 
 @Injectable()
@@ -40,12 +41,12 @@ export class GroupEventService {
         groupEvent.author = payload.userCalendarId;
         groupEvent.calendarId = calendarId;
 
-        const { title, color, startAt, endAt, emails } = userCreateGroupEventDTO;
+        const { title, color, startAt, endAt, members } = userCreateGroupEventDTO;
         groupEvent.title = title;
         groupEvent.color = color;
         groupEvent.startAt = startAt;
         groupEvent.endAt = endAt;
-        groupEvent.member = emails;
+        groupEvent.member = members;
 
         try {
             const savedGroupEventEvent = await this.groupEventRepository.save(groupEvent);
@@ -76,71 +77,141 @@ export class GroupEventService {
         }
     }
 
-    async getAllGroupEventsByCalendarId2(calendarId: string): Promise<GetGroupDTO[]> {
+    async getAllGroupEventsByCalendarIdV2(calendarId: string): Promise<any> {
         try {
-            const groupEvents = await this.groupEventRepository.find({
+            const today = new Date();
+            const fortyFiveDaysAgo = new Date();
+            fortyFiveDaysAgo.setDate(today.getDate() - 45);
+            const fortyFiveDaysLater = new Date();
+            fortyFiveDaysLater.setDate(today.getDate() + 45);
+
+            const calendar = await this.calendarRepository.findOne({
                 where: {
-                    calendarId,
+                    calendarId: calendarId,
                     isDeleted: false
                 },
-                order: {
-                    startAt: 'ASC'
-                }
+                select: ['calendarId', 'title', 'coverImage', 'bannerImage', 'type']
             });
 
-            const groupEventDtos: GetGroupDTO[] = await Promise.all(groupEvents.map(async (event) => {
-                // Fetch author details
-                const userCalendar = await this.userCalendarRepository.findOne({
-                    where: { userCalendarId: event.author },
-                    relations: ['user']
-                });
+            if (!calendar) {
+                throw new InternalServerErrorException(`No calendar found with ID ${calendarId}`);
+            }
 
-                if (!userCalendar) {
-                    throw new Error(`Author with email ${event.author} not found.`);
-                }
+            const groupEvents = await this.groupEventRepository
+                .createQueryBuilder("groupEvent")
+                .where("groupEvent.calendarId = :calendarId", { calendarId })
+                .andWhere("groupEvent.isDeleted = false")
+                .andWhere("groupEvent.startAt BETWEEN :startDate AND :endDate", {
+                    startDate: fortyFiveDaysAgo,
+                    endDate: fortyFiveDaysLater
+                })
+                .orderBy("groupEvent.startAt", "ASC")
+                .getMany();
 
-                const authorInfo: MemberInfo = {
-                    useremail: userCalendar?.user.useremail,
-                    thumbnail: userCalendar?.user.thumbnail,
-                    nickname: userCalendar?.user.nickname
-                };
-
-                // Fetch member details
-                const memberInfos: MemberInfo[] = await Promise.all(event.member.map(async (memberEmail) => {
-                    const user = await this.userRepository.findOne({
-                        where: { useremail: memberEmail }
-                    });
-
-                    return {
-                        useremail: user?.useremail,
-                        thumbnail: user?.thumbnail,
-                        nickname: user?.nickname
-                    };
-                }));
-
+            if (!groupEvents.length) {
+                console.log(`No group events found for calendar ID ${calendarId}`);
                 return {
-                    groupEventId: event.groupEventId,
-                    author: authorInfo,
-                    member: memberInfos,
-                    title: event.title,
-                    color: event.color,
-                    pinned: event.pinned,
-                    alerts: event.alerts,
-                    attachment: event.attachment,
-                    createdAt: event.createdAt,
-                    updatedAt: event.updatedAt,
-                    startAt: event.startAt,
-                    endAt: event.endAt,
-                    deletedAt: event.deletedAt,
-                    isDeleted: event.isDeleted
+                    groupCalendar: {
+                        calendarId: calendar.calendarId,
+                        title: calendar.title,
+                        coverImage: calendar.coverImage,
+                        bannerImage: calendar.bannerImage,
+                        type: calendar.type,
+                        events: []
+                    },
                 };
+            }
+
+            const events = groupEvents.map(event => ({
+                groupEventId: event.groupEventId,
+                title: event.title,
+                startAt: event.startAt,
+                endAt: event.endAt,
+                members: event.member,
             }));
 
-            return groupEventDtos;
+            return {
+                groupCalendar: {
+                    calendarId: calendar.calendarId,
+                    title: calendar.title,
+                    coverImage: calendar.coverImage,
+                    bannerImage: calendar.bannerImage,
+                    type: calendar.type,
+                    events: events
+                },
+            };
         } catch (e) {
-            throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}: ${e.message}`);
+            console.error('Error occurred while fetching group events:', e);
+            throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}`);
         }
     }
+
+
+    // async getAllGroupEventsByCalendarId2(calendarId: string): Promise<GetGroupDTO[]> {
+    //     try {
+    //         const groupEvents = await this.groupEventRepository.find({
+    //             where: {
+    //                 calendarId,
+    //                 isDeleted: false
+    //             },
+    //             order: {
+    //                 startAt: 'ASC'
+    //             }
+    //         });
+
+    //         const groupEventDtos: GetGroupDTO[] = await Promise.all(groupEvents.map(async (event) => {
+    //             // Fetch author details
+    //             const userCalendar = await this.userCalendarRepository.findOne({
+    //                 where: { userCalendarId: event.author },
+    //                 relations: ['user']
+    //             });
+
+    //             if (!userCalendar) {
+    //                 throw new Error(`Author with email ${event.author} not found.`);
+    //             }
+
+    //             const authorInfo: MemberInfo = {
+    //                 useremail: userCalendar?.user.useremail,
+    //                 thumbnail: userCalendar?.user.thumbnail,
+    //                 nickname: userCalendar?.user.nickname
+    //             };
+
+    //             // Fetch member details
+    //             const memberInfos: MemberInfo[] = await Promise.all(event.member.map(async (memberEmail) => {
+    //                 const user = await this.userRepository.findOne({
+    //                     where: { useremail: memberEmail }
+    //                 });
+
+    //                 return {
+    //                     useremail: user?.useremail,
+    //                     thumbnail: user?.thumbnail,
+    //                     nickname: user?.nickname
+    //                 };
+    //             }));
+
+    //             return {
+    //                 groupEventId: event.groupEventId,
+    //                 author: authorInfo,
+    //                 member: memberInfos,
+    //                 title: event.title,
+    //                 color: event.color,
+    //                 pinned: event.pinned,
+    //                 alerts: event.alerts,
+    //                 attachment: event.attachment,
+    //                 createdAt: event.createdAt,
+    //                 updatedAt: event.updatedAt,
+    //                 startAt: event.startAt,
+    //                 endAt: event.endAt,
+    //                 deletedAt: event.deletedAt,
+    //                 isDeleted: event.isDeleted
+    //             };
+    //         }));
+
+    //         return groupEventDtos;
+    //     } catch (e) {
+    //         throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}: ${e.message}`);
+    //     }
+    // }
 
 
 

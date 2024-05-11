@@ -17,7 +17,7 @@ export class CreateGroupEventDTO {
     @IsString()
     color: string;
 
-    
+
     @ApiProperty({
         description: 'Start date and time of the event',
         type: 'string',
@@ -46,5 +46,5 @@ export class CreateGroupEventDTO {
     })
     @IsArray()
     @IsString({ each: true })
-    emails: string[];
+    members: string[];
 }

@@ -12,8 +12,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GroupEventModule } from 'src/db/event/group_event/groupEvent.module';
 import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
-import { UtilsModule } from 'src/utils/utils.module';
 import { UtilsService } from 'src/utils/utils.service';
+import { User } from 'src/db/user/entities/user.entity';
 
 @Module({
   imports: [
@@ -24,11 +24,10 @@ import { UtilsService } from 'src/utils/utils.service';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Calendar, GroupEvent, UserCalendar]),
+    TypeOrmModule.forFeature([Calendar, GroupEvent, UserCalendar, User]),
     UserCalendarModule,
     TokensModule,
     GroupEventModule,
-    // UtilsModule,
   ],
   controllers: [CalendarController],
   providers: [CalendarService, JWTStrategy, RefreshStrategy, UtilsService]

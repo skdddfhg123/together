@@ -9,6 +9,7 @@ import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
 import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
 import { UtilsService } from 'src/utils/utils.service';
+import { User } from 'src/db/user/entities/user.entity';
 
 @Injectable()
 export class CalendarService {
@@ -17,6 +18,8 @@ export class CalendarService {
         private calendarRepository: Repository<Calendar>,
         @InjectRepository(GroupEvent)
         private groupEventRepository: Repository<GroupEvent>,
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
         @InjectRepository(UserCalendar)
         private userCalendarRepository: Repository<UserCalendar>,
         private userCalendarService: UserCalendarService,
@@ -106,6 +109,66 @@ export class CalendarService {
             throw new InternalServerErrorException('Failed to fetch calendars');
         }
     }
+
+    async findCalendarsByUserCalendarIdV2(userCalendarId: string): Promise<any[]> {
+        try {
+            const calendars = await this.calendarRepository
+                .createQueryBuilder("calendar")
+                .leftJoinAndSelect("calendar.author", "author")
+                .where("author.userCalendarId = :userCalendarId", { userCalendarId })
+                .andWhere("calendar.isDeleted = false")
+                .orWhere(":userCalendarId = ANY(calendar.attendees)", { userCalendarId })
+                .andWhere("calendar.isDeleted = false")
+                .getMany();
+
+            if (calendars.length === 0) {
+                console.log("No calendars found for the given user calendar ID.");
+                return [];
+            }
+
+            const calendarDetails = await Promise.all(calendars.map(async calendar => {
+                if (!calendar.attendees || calendar.attendees.length === 0) {
+                    return {
+                        calendarId: calendar.calendarId,
+                        title: calendar.title,
+                        coverImg: calendar.coverImage,
+                        type: calendar.type,
+                        attendees: []
+                    };
+                }
+                const attendeesInfo = await this.userCalendarRepository
+                    .createQueryBuilder("usercalendar")
+                    .leftJoinAndSelect("usercalendar.user", "user")
+                    .select([
+                        "usercalendar.userCalendarId",
+                        "user.nickname",
+                        "user.useremail",
+                        "user.thumbnail"
+                    ])
+                    .where("usercalendar.userCalendarId IN (:...userCalendarIds)", { userCalendarIds: calendar.attendees })
+                    .getMany();
+
+                return {
+                    calendarId: calendar.calendarId,
+                    title: calendar.title,
+                    coverImg: calendar.coverImage,
+                    type: calendar.type,
+                    attendees: attendeesInfo.map(usercalendar => ({
+                        nickname: usercalendar.user.nickname,
+                        useremail: usercalendar.user.useremail,
+                        thumbnail: usercalendar.user.thumbnail
+                    }))
+                };
+            }));
+
+            return calendarDetails;
+        } catch (e) {
+            console.error('Error occurred while fetching calendars:', e);
+            throw new InternalServerErrorException('Failed to fetch calendars');
+        }
+    }
+
+
 
     async deleteCalendar(calendarId: string): Promise<void> {
         const calendar = await this.calendarRepository.findOne({

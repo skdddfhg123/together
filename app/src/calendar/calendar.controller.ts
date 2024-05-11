@@ -52,6 +52,20 @@ export class CalendarController {
         return await this.calendarService.findCalendarsByUserCalendarId(payload.userCalendarId);
     }
 
+    @Get('get_calendar/v2')
+    @ApiOperation({ summary: '전체 그룹 캘린더 가져오기' })
+    @ApiResponse({ status: 200, description: 'Calendars retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'Calendars not found' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
+    async getGroupCalendarV2(
+        @getPayload() payload: PayloadResponse
+    ): Promise<Calendar[]> {
+        return await this.calendarService.findCalendarsByUserCalendarIdV2(payload.userCalendarId);
+    }
+
     @Patch('update/:calendarId')
     @ApiOperation({ summary: '캘린더 정보 업데이트' })
     @ApiResponse({ status: 200, description: 'Calendar updated successfully' })
@@ -168,9 +182,9 @@ export class CalendarController {
     // @UseGuards(RefreshAuthGuard)
     async getAllGroupEvent2(
         @Param('calendarId') calendarId: string,
-    ): Promise<GetGroupDTO[]> {
+    ): Promise<any> {
         console.log(calendarId);
-        return await this.groupEventService.getAllGroupEventsByCalendarId2(calendarId);
+        return await this.groupEventService.getAllGroupEventsByCalendarIdV2(calendarId);
     }
 
     @Get('group/get/detail/:groupeventId')
