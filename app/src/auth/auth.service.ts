@@ -187,10 +187,8 @@ export class AuthService {
 
 
             const today = new Date();
-            const fortyFiveDaysAgo = new Date(today);
-            fortyFiveDaysAgo.setDate(today.getDate() - 45);
-            const fortyFiveDaysLater = new Date(today);
-            fortyFiveDaysLater.setDate(today.getDate() + 45);
+            const fortyFiveDaysAgo = new Date(today.setDate(today.getDate() - 45));
+            const fortyFiveDaysLater = new Date(today.setDate(today.getDate() + 45));
 
             const [calendars, socialEvents] = await Promise.all([
                 this.getGroupEvents(userWithCalendar.userCalendarId.groupCalendars || [], fortyFiveDaysAgo, fortyFiveDaysLater),
@@ -219,27 +217,38 @@ export class AuthService {
 
     private async getGroupEvents(groupCalendarIds, startDate, endDate) {
         if (!groupCalendarIds.length) return [];
-        return this.calendarRepository.createQueryBuilder("calendar")
-            .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
+
+        // console.log(groupCalendarIds);
+        // 먼저 캘린더를 ID 배열로 조회
+        const calendars = await this.calendarRepository.createQueryBuilder("calendar")
+            .leftJoin("calendar.groupEvents", "groupEvent")
             .select([
+                "calendar.calendarId",
+                "calendar.title",
+                "calendar.type",
                 "groupEvent.groupEventId",
                 "groupEvent.title",
                 "groupEvent.startAt",
-                "groupEvent.endAt"
+                "groupEvent.endAt",
             ])
-            .where("calendar.calendarId IN (:...calendarIds)", { calendarIds: groupCalendarIds })
-            .andWhere("groupEvent.startAt BETWEEN :startDate AND :endDate", {
-                startDate, endDate
-            })
-            .getMany()
-            .then(calendars => calendars.flatMap(calendar =>
-                calendar.groupEvents.map(event => ({
-                    id: event.groupEventId,
-                    title: event.title,
-                    startAt: event.startAt,
-                    endAt: event.endAt
-                }))
-            ));
+            .where("calendar.calendarId IN (:...calendarIds) AND calendar.isDeleted = false", { calendarIds: groupCalendarIds })
+            .andWhere("groupEvent.isDeleted = false")
+            .andWhere("groupEvent.startAt BETWEEN :startDate AND :endDate", { startDate, endDate })
+            .getMany();
+
+        // console.log(calendars);
+        const events = calendars.flatMap(calendar => calendar.groupEvents.map(event => ({
+            id: event.groupEventId,
+            group: calendar.title,
+            type: calendar.type,
+            title: event.title,
+            startAt: event.startAt,
+            endAt: event.endAt,
+        })));
+        // console.log(events);
+
+
+        return events;
     }
 
     private async getSocialEvents(socialEvents, startDate, endDate) {

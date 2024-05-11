@@ -244,6 +244,7 @@ export class GroupEventService {
 
     async getGroupEventUpdateForm(groupEventId: string): Promise<GroupEvent> {
         try {
+
             const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId: groupEventId } });
 
             if (!groupEventToUpdate) {
