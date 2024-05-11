@@ -129,6 +129,7 @@ export class GroupEventService {
                 endAt: event.endAt,
                 members: event.member,
                 color: event.color,
+                // 이후 추가
                 // pinned: event.pinned,
                 // alerts: event.alerts,
                 // attachment: event.attachment,
@@ -244,8 +245,13 @@ export class GroupEventService {
 
     async getGroupEventUpdateForm(groupEventId: string): Promise<GroupEvent> {
         try {
+<<<<<<< Updated upstream
 
+=======
+            console.log(groupEventId);
+>>>>>>> Stashed changes
             const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId: groupEventId } });
+            console.log(groupEventToUpdate);
 
             if (!groupEventToUpdate) {
                 throw new Error('Group event not found');
