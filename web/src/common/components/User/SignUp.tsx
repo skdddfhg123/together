@@ -37,7 +37,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
     }
   };
 
-  const submitSignUp = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     const useremail = useremailRef.current?.value;
@@ -131,7 +131,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           {passwordsMatch ? '' : '비밀번호가 서로 일치하지 않습니다.'}
         </div>
       </fieldset>
-      <button onClick={submitSignUp}>회원가입</button>
+      <button onClick={handleSubmit}>회원가입</button>
     </form>
   );
 }

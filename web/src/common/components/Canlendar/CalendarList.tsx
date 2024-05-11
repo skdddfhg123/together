@@ -19,7 +19,7 @@ interface CalendarListProps {
 
 export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   const { calendars } = useCalendarListStore();
-  const { groupEvents } = useGroupEventListStore();
+  const { groupEventList } = useGroupEventListStore();
   const { setSelectedCalendar } = useSelectedCalendarStore();
 
   useEffect(() => {
@@ -28,10 +28,10 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
 
   useEffect(() => {
     onClose();
-  }, [groupEvents]);
+  }, [groupEventList]);
 
-  const ChangeCalendar = (calendarId: CalendarId) => {
-    if (calendarId) setSelectedCalendar(calendarId);
+  const ChangeCalendar = (calendar: Calendar | 'All') => {
+    if (calendar) setSelectedCalendar(calendar);
     else console.error('캘린더 아이디를 찾을 수 없습니다.');
     onClose();
   };
@@ -41,7 +41,7 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
       calendars.map((calendar: Calendar, idx: number) => (
         <li
           className={`w-full py-2 text-l cursor-pointer flex items-center`}
-          onClick={() => ChangeCalendar(calendar.calendarId)}
+          onClick={() => ChangeCalendar(calendar)}
           key={idx}
         >
           <img

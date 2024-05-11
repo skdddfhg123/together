@@ -48,11 +48,17 @@ export async function getOneFeed(feedId: UUID) {
   }
 }
 
-export async function createEventFeed({ groupEventId, content, images }: reqEventFeed) {
+export async function createEventFeed({
+  groupEventId,
+  feedType,
+  title,
+  content,
+  images,
+}: reqEventFeed) {
   try {
     const feedData = new FormData();
-    feedData.append('feedType', '1');
-    feedData.append('title', 'Title');
+    feedData.append('feedType', feedType.toString());
+    feedData.append('title', title);
     feedData.append('content', content);
 
     images.forEach((img: ImageFile) => {
@@ -68,6 +74,7 @@ export async function createEventFeed({ groupEventId, content, images }: reqEven
       ...EventFeeds,
       {
         feedId: res.feed.feedId,
+        feedType: res.feed.feedType,
         title: res.feed.title,
         content: res.feed.content,
         images: res.feedImages.map((img: FeedImage) => ({ imageSrc: img.imageSrc })),
@@ -101,7 +108,7 @@ export async function updateEventFeed({
   try {
     const { data: res } = await API.patch(`/feed/update/${feedId}`, {
       feedType: feedType || 1,
-      title, //TODO default로 'Title'로 저장했기 때문에 Title로 전달
+      title,
       content,
       // images
     });

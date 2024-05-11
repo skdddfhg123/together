@@ -28,8 +28,8 @@ export default React.memo(function CalendarPage({
 }: CalendarProps) {
   const { selectedDay, setSelectedDay } = useSelectedDayStore();
   const { socialEvents } = useSocialEventListStore();
-  const { groupEvents } = useGroupEventListStore();
-  const { SelectedCalendar } = useSelectedCalendarStore();
+  const { groupEventList } = useGroupEventListStore();
+  const { selectedCalendar } = useSelectedCalendarStore();
   const { setGroupEvents } = useGroupEventListStore();
 
   const today = new Date();
@@ -116,7 +116,7 @@ export default React.memo(function CalendarPage({
     });
 
     // ************* 그룹 이벤트 생성
-    groupEvents.forEach((event) => {
+    groupEventList.forEach((event) => {
       const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
       const existingEvents = eventMap.get(eventDate) || [];
       existingEvents.push(
@@ -193,11 +193,11 @@ export default React.memo(function CalendarPage({
 
   // *****************? 최초 달력 일정 Rendering
   useEffect(() => {
-    if (!SelectedCalendar) return;
+    if (!selectedCalendar) return;
 
-    if (SelectedCalendar === 'All') return console.log('전체 일정 그리기');
-    CALENDAR.getGroupAllEvents(SelectedCalendar);
-  }, [SelectedCalendar, setGroupEvents]);
+    if (selectedCalendar === 'All') return console.log('전체 일정 그리기');
+    CALENDAR.getGroupAllEvents(selectedCalendar.calendarId);
+  }, [selectedCalendar, setGroupEvents]);
 
   return (
     <div className="calendar">

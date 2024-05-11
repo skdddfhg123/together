@@ -76,6 +76,9 @@
   background-color: white;
   overflow: hidden;
   position: fixed; 
+  border-radius: 5px;
+
+  box-shadow: 0 10px 12px rgba(0,0,0,0.5); 
 }
 
 .feedOverlay {

@@ -66,7 +66,7 @@ export type CreateCalendarForm = {
 export type Calendar = {
   calendarId: UUID;
   title: string;
-  attendees: string[];
+  attendees: Member[];
   author: {
     userCalendarId: UUID;
   };
@@ -87,20 +87,20 @@ export type Member = Author;
 
 export interface reqGroupEvent {
   groupCalendarId?: CalendarId;
-  emails?: string[] | null;
-  color?: string | null;
   title: string;
+  color: string | null;
+  members: Member[] | null;
   startAt: string;
   endAt: string;
 }
 
 export interface GroupEvent extends reqGroupEvent {
-  groupEventId?: UUID | null;
-  author?: Member | null;
-  member: Member[] | null;
-  alerts?: number | null;
-  attachment?: string | null;
+  groupCalendarTitle?: string;
+  groupEventId?: UUID;
+  author?: Author;
   pinned: boolean;
+  alerts?: number;
+  attachment?: string;
 }
 
 export type SocialEvent = {
@@ -117,8 +117,8 @@ export type SocialEvent = {
 
 export interface reqEventFeed {
   groupEventId?: UUID | null;
-  feedType?: number;
-  title?: string; // TODO 필요없음 - 'title'로 저장
+  feedType: number | string;
+  title: 'Title';
   content: string;
   images: ImageFile[]; // image Type - string?
 }
@@ -141,7 +141,7 @@ export interface Comment extends reqComment {
   nickname: string;
   thumbnail: Image;
   feedCommentId: UUID;
-  createdAt: Date;
+  createdAt: string;
 }
 
 // ************************** 채팅

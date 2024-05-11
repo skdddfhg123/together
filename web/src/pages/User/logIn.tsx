@@ -12,14 +12,14 @@ export default function LogInPage() {
   const navigate = useNavigate();
   const { isOn, toggle } = useToggle(false);
 
-  const handleLogIn = async (formData: SignInForm) => {
+  const submitSignIn = async (formData: SignInForm) => {
     const res = await USER.logIn(formData);
     if (!res) return;
     alert('로그인 성공');
     navigate('/main');
   };
 
-  const handleSingUp = async (formData: SignUpForm) => {
+  const submitSignUp = async (formData: SignUpForm) => {
     const res = await USER.signUp(formData);
     if (!res) return;
     alert('정상적으로 가입되었습니다! ');
@@ -34,7 +34,7 @@ export default function LogInPage() {
           {isOn ? '로그인으로' : '회원가입으로'}
         </button>
       </section>
-      {isOn ? <SignUp onSubmit={handleSingUp} /> : <SignIn onSubmit={handleLogIn} />}
+      {isOn ? <SignUp onSubmit={submitSignUp} /> : <SignIn onSubmit={submitSignIn} />}
     </div>
   );
 }

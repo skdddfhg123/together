@@ -6,6 +6,7 @@ import * as API from '@utils/api';
 import { reqGroupEvent, GroupEvent, Calendar, CreateCalendarForm } from '@type/index';
 import {
   useCalendarListStore,
+  useGroupEventInfoStore,
   useGroupEventListStore,
   useSelectedCalendarStore,
 } from '@store/index';
@@ -62,10 +63,10 @@ export async function createGroupCalendar({ title, type }: CreateCalendarForm) {
   }
 }
 
-export async function removeGroupCalendar(groupCalendarId: string) {
-  if (groupCalendarId === 'All') return alert('캘린더 목록에서 캘린더를 선택해주세요.');
+export async function removeGroupCalendar(groupCalendar: Calendar | 'All') {
+  if (groupCalendar === 'All') return alert('캘린더 목록에서 캘린더를 선택해주세요.');
   try {
-    const res = await API.patch(`/calendar/remove/${groupCalendarId}`);
+    const res = await API.patch(`/calendar/remove/${groupCalendar.calendarId}`);
     console.log(`CALENDAR - removeGroupCalendar 성공 :`, res);
 
     useCalendarListStore.getState().setIsLoaded(false);
@@ -85,15 +86,12 @@ export async function removeGroupCalendar(groupCalendarId: string) {
   }
 }
 
-export async function getGroupAllEvents(calendarId: string) {
+export async function getGroupAllEvents(calendarId: UUID) {
   if (!calendarId)
     return console.log(`CALENDAR - getGroupAllEvents (캘린더 id 없음) : { ${calendarId} }`);
 
   try {
-    // TODO ************ get/calendarId 에서 get/all/calendarId로 변경 예정
-
     const { data: res } = await API.get(`/calendar/group/get/v2/${calendarId}`);
-    // const { data: res } = await API.get(`/calendar/group/get/${calendarId}`);
     if (!res) throw new Error('CALENDAR - getGroupAllEvents (db 조회 실패)');
     console.log(`CALENDAR - getGroupAllEvents 성공 :`, res);
 
@@ -111,14 +109,13 @@ export async function getGroupAllEvents(calendarId: string) {
   }
 }
 
-export default async function getGroupOneEvent(groupEventId: string) {
+export async function getGroupOneEvent(groupEventId: UUID) {
   try {
     const { data: res } = await API.get(`/calendar/group/get/detail/${groupEventId}`);
     if (!res) throw new Error('CALENDAR - getGroupOneEvent (db 조회 실패)');
     console.log(`CALENDAR - getGroupOneEvent 성공 :`, res);
-    console.log(`CALENDAR - getGroupOneEvent ( 데이터 가공 로직 추가 필요 )`);
 
-    // useGroupEventListStore.getState().setGroupEvents(res);
+    useGroupEventInfoStore.getState().setGroupEventInfo(res);
 
     return true;
   } catch (e) {
@@ -132,12 +129,13 @@ export default async function getGroupOneEvent(groupEventId: string) {
   }
 }
 
+// TODO 그룹 이벤트 등록시, 본인 email 포함되도록 수정
 export async function createGroupEvent({
   groupCalendarId,
   title,
   startAt,
   endAt,
-  emails,
+  members,
   color,
 }: reqGroupEvent) {
   if (groupCalendarId === 'All') return alert('캘린더 목록에서 캘린더를 선택해주세요.');
@@ -147,7 +145,7 @@ export async function createGroupEvent({
       title,
       startAt,
       endAt,
-      emails: emails || [],
+      member: members || [],
       color: color || '#badfff',
     });
     if (!res) throw new Error('CALENDAR - createGroupEvent (DB 이벤트 생성 실패)');
@@ -170,29 +168,27 @@ export async function updateGroupEvent({
   title,
   startAt,
   endAt,
-  member,
+  members,
   color,
   pinned,
   groupEventId,
   alerts,
-  emails,
 }: GroupEvent) {
   try {
     const { data: res } = await API.patch(`/calendar/group/update/${groupEventId}`, {
       title,
       startAt,
       endAt,
-      member,
+      members,
       color,
       pinned,
       alerts,
-      emails,
     });
     if (!res) throw new Error(`CALENDAR - updateGroupEvent (DB 수정 반영 실패)`);
     console.log(`CALENDAR - updateGroupEvent 성공 :`, res);
     alert('일정이 수정되었습니다.');
 
-    return res;
+    return true;
   } catch (e) {
     const err = e as AxiosError;
 

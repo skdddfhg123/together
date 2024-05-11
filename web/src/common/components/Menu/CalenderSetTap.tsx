@@ -9,11 +9,11 @@ interface CalenderTapProps {
 }
 
 export default function CalenderSetTap({ onClose }: CalenderTapProps) {
-  const { SelectedCalendar } = useSelectedCalendarStore();
+  const { selectedCalendar } = useSelectedCalendarStore();
 
   const handleDelete = async () => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
-    await CALENDAR.removeGroupCalendar(SelectedCalendar);
+    await CALENDAR.removeGroupCalendar(selectedCalendar);
     await USER.firstRender();
     onClose();
   };

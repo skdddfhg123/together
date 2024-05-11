@@ -110,9 +110,13 @@ export async function firstRender() {
     const allGroupEvents: GroupEvent[] = [];
 
     for (const calendar of db_user.userCalendarId.groupCalendar) {
-      if (calendar.groupEvents) {
-        allGroupEvents.push(...(calendar.groupEvents as GroupEvent[]));
-      }
+      const updatedEvents = calendar.groupEvents.map((event: GroupEvent) => ({
+        ...event,
+        groupCalendarId: calendar.CalendarId,
+        groupCalendarTitle: calendar.title,
+      }));
+
+      allGroupEvents.push(...updatedEvents);
     }
     useGroupEventListStore.getState().setGroupEvents(allGroupEvents);
 

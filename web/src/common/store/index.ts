@@ -38,23 +38,37 @@ export const useCalendarListStore = create<CalendarListState>((set) => ({
 }));
 
 interface SelectedCalendarState {
-  SelectedCalendar: UUID | 'All';
-  setSelectedCalendar: (calendarId: CalendarId) => void;
+  selectedCalendar: Calendar | 'All';
+  setSelectedCalendar: (calendar: Calendar | 'All') => void;
 }
 
 export const useSelectedCalendarStore = create<SelectedCalendarState>((set) => ({
-  SelectedCalendar: 'All',
-  setSelectedCalendar: (calendarId: CalendarId) => set({ SelectedCalendar: calendarId }),
+  selectedCalendar: 'All',
+  setSelectedCalendar: (calendar: Calendar | 'All') => set({ selectedCalendar: calendar }),
 }));
 
-interface GroupEventsState {
-  groupEvents: GroupEvent[];
+interface GroupEventListState {
+  groupEventList: GroupEvent[];
   setGroupEvents: (events: GroupEvent[]) => void;
 }
 
-export const useGroupEventListStore = create<GroupEventsState>((set) => ({
-  groupEvents: [],
-  setGroupEvents: (events: GroupEvent[]) => set({ groupEvents: events }),
+export const useGroupEventListStore = create<GroupEventListState>((set) => ({
+  groupEventList: [],
+  setGroupEvents: (events: GroupEvent[]) => set({ groupEventList: events }),
+}));
+
+interface GroupEventInfoState {
+  groupEventInfo: GroupEvent | null;
+  isLoaded: boolean;
+  setGroupEventInfo: (event: GroupEvent) => void;
+  setIsLoaded: (isLoaded: boolean) => void;
+}
+
+export const useGroupEventInfoStore = create<GroupEventInfoState>((set) => ({
+  groupEventInfo: null,
+  isLoaded: false,
+  setGroupEventInfo: (event: GroupEvent) => set({ groupEventInfo: event }),
+  setIsLoaded: (isLoaded: boolean) => set({ isLoaded: isLoaded }),
 }));
 
 interface SocialEventListState {

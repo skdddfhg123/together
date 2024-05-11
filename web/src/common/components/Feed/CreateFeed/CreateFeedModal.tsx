@@ -36,6 +36,8 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
 
     const feedData: reqEventFeed = {
       groupEventId: groupEventId,
+      feedType: 1,
+      title: 'Title',
       content,
       images: images,
     };

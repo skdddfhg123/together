@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Modal from 'react-modal';
+import { format, parseISO } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 import * as FEED from '@services/eventFeedAPI';
 import { Comment, EventFeed } from '@type/index';
@@ -14,23 +16,12 @@ interface FeedModalProps {
 }
 
 export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps) {
-  if (!feedInfo) return null;
-
   const [commentList, setCommentList] = useState<Comment[]>([]);
   const commentRef = useRef<HTMLInputElement>(null);
-
-  console.log(`modal`, feedInfo);
 
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
-
-  const fetchCommntList = useCallback(async () => {
-    const feedId = feedInfo?.feedId;
-    if (!feedId) return alert('피드 정보를 가져오지 못했습니다.');
-    const comments = await FEED.getFeedComment(feedId);
-    setCommentList(comments);
-  }, [feedInfo]);
 
   const submitNewComment = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -47,6 +38,19 @@ export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: Feed
     },
     [feedInfo],
   );
+
+  function formatDate(Feeddate: string) {
+    const date = parseISO(Feeddate);
+
+    return format(date, 'yy년 M월 d일, H시 m분', { locale: ko });
+  }
+
+  const fetchCommntList = useCallback(async () => {
+    const feedId = feedInfo?.feedId;
+    if (!feedId) return alert('피드 정보를 가져오지 못했습니다.');
+    const comments = await FEED.getFeedComment(feedId);
+    setCommentList(comments);
+  }, [feedInfo]);
 
   useEffect(() => {
     if (isOpen) {
@@ -65,36 +69,61 @@ export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: Feed
         <div className="FLEX-ver h-full">
           <FeedImgCarousel ImageList={feedInfo.images} />
           <main className="w-1/2 h-full border-l">
-            <section key="content-section" className="relative space-y-4 h-1/3 border-b">
-              <header className="FLEX-ver sticky top-0 h-16 p-3 items-center">
+            <section
+              key="content-section"
+              className="FLEX-horizC w-full h-1/3 space-y-4 p-2 border-b"
+            >
+              <header key="author" className="FLEX-horizC mx-auto text-center h-1/3">
                 {feedInfo.thumbnail ? (
                   <img src={feedInfo.thumbnail} alt="프로필" />
                 ) : (
-                  <p className="text-gray-700 w-24">{feedInfo.nickname}</p>
+                  <div className="text-gray-700 text-xl w-24">{feedInfo.nickname}</div>
                 )}
-                <h1 className="text-4xl font-bold">{feedInfo.title}</h1>
               </header>
-              <p className="h-2/3 text-2xl text-gray-700">{feedInfo.content}</p>
-              <div className=" text-gray-500">{new Date(feedInfo.createdAt).toLocaleString()}</div>
+              <div className="mx-auto text-left text-2xl h-1/2 w-full">{feedInfo.content}</div>
+              <div className="w-full text-left text-gray-400">{formatDate(feedInfo.createdAt)}</div>
             </section>
-            <section key="comment-section" className="h-2/3">
-              <div>
+            <section className="flex flex-col h-2/3 p-2">
+              <div className="overflow-y-auto flex-1">
                 {commentList.length > 0 ? (
                   <ul>
                     {commentList.map((cmt) => (
-                      <li key={cmt.feedCommentId}>
-                        {cmt.thumbnail ? <p>{cmt.thumbnail}</p> : <p>{cmt.nickname}</p>}
-                        <p>{cmt.content}</p>
+                      <li key={cmt.feedCommentId} className="flex flex-col p-2 border-b">
+                        <div className="flex items-center space-x-2">
+                          {cmt.thumbnail ? (
+                            <img
+                              src={cmt.thumbnail}
+                              alt={cmt.nickname}
+                              className="w-12 h-12 rounded-full"
+                            />
+                          ) : (
+                            <span className="font-semibold">{cmt.nickname}</span>
+                          )}
+                          <p className="flex-1">{cmt.content}</p>
+                        </div>
+                        <div className="text-sm text-gray-400 mt-1 pl-16">
+                          {formatDate(cmt.createdAt)}
+                        </div>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <div>댓글이 없습니다.</div>
+                  <div className="text-center text-gray-500">댓글이 없습니다.</div>
                 )}
               </div>
-              <form onSubmit={submitNewComment}>
-                <input ref={commentRef} className="INPUT" />
-                <button type="submit">전송</button>
+              <form
+                onSubmit={submitNewComment}
+                className="sticky bottom-0 bg-custom-line p-3 shadow-md"
+              >
+                <input
+                  ref={commentRef}
+                  className="input w-5/6 flex-1 rounded p-2 mr-2 border-gray-300"
+                  maxLength={150}
+                  placeholder="댓글을 입력해주세요."
+                />
+                <button type="submit" className="bg-custom-main text-white rounded p-2">
+                  전송
+                </button>
               </form>
             </section>
           </main>
@@ -105,36 +134,3 @@ export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: Feed
     </Modal>
   );
 });
-
-// interface FeedModalProps {
-//   feedId: UUID | null;
-//   isOpen: boolean;
-//   onClose: () => void;
-// }
-
-// export default React.memo(function FeedModal({ feedId, isOpen, onClose }: FeedModalProps) {
-//   console.log(`FeedModal`, feedId);
-//   const [feedInfo, setFeedInfo] = useState<EventFeed | null>(null);
-
-//   useEffect(() => {
-//     fetchFeedDetails();
-//   }, [feedId]);
-
-//   const fetchFeedDetails = async () => {
-//     if (!feedId) return;
-//     const res = await FEEd.getOneFeed(feedId);
-//     console.log(`res`, res);
-//     setFeedInfo(res);
-//   };
-//   const handleClose = useCallback(() => {
-//     // setImages([]);
-//     onClose();
-//   }, [onClose]);
-
-// {feedInfo.images && feedInfo.images.length > 0 ? (
-//   feedInfo.images.map((img, idx) => (
-//     <img key={idx} src={img.imageSrc} alt="Feed Image" className="1/2" />
-//   ))
-// ) : (
-//   <div>이미지가 없습니다.</div>
-// )}

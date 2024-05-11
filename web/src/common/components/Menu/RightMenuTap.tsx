@@ -12,7 +12,7 @@ type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
 export default React.memo(function RightMenuTap() {
   const navigate = useNavigate();
-  const { SelectedCalendar } = useSelectedCalendarStore();
+  const { selectedCalendar } = useSelectedCalendarStore();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [activeTap, setActiveTap] = useState<TapName | null>(null);
 
@@ -45,7 +45,7 @@ export default React.memo(function RightMenuTap() {
 
       newSocket.on('connect', () => {
         console.log('Connected to chat server'); //debug//
-        newSocket.emit('enterChatRoom', SelectedCalendar);
+        newSocket.emit('enterChatRoom', selectedCalendar);
       });
 
       newSocket.on('exception', (error) => {
@@ -59,11 +59,11 @@ export default React.memo(function RightMenuTap() {
         setSocket(null);
       };
     }
-  }, [activeTap, token, SelectedCalendar]);
+  }, [activeTap, token, selectedCalendar]);
 
   useEffect(() => {
     setActiveTap(null);
-  }, [SelectedCalendar]);
+  }, [selectedCalendar]);
 
   const toggleTap = useCallback((tap: TapName) => {
     setActiveTap(activeTap === tap ? null : tap);
@@ -85,12 +85,12 @@ export default React.memo(function RightMenuTap() {
           Chat
         </button>
         <button
-          disabled={SelectedCalendar === 'All'}
+          disabled={selectedCalendar === 'All'}
           className={`${
             activeTap === 'member' ? 'bg-custom-line' : ''
-          } ${SelectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
+          } ${selectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
           onClick={() => {
-            if (SelectedCalendar !== 'All') {
+            if (selectedCalendar !== 'All') {
               toggleTap('member');
             }
           }}
@@ -98,12 +98,12 @@ export default React.memo(function RightMenuTap() {
           Member
         </button>
         <button
-          disabled={SelectedCalendar === 'All'}
+          disabled={selectedCalendar === 'All'}
           className={`${
             activeTap === 'calendarSet' ? 'bg-custom-line' : ''
-          } ${SelectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
+          } ${selectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
           onClick={() => {
-            if (SelectedCalendar !== 'All') {
+            if (selectedCalendar !== 'All') {
               toggleTap('calendarSet');
             }
           }}

@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { UUID } from 'crypto';
 
 import { EventFeed } from '@type/index';
 import { useEventFeedListStore } from '@store/index';
@@ -21,8 +20,6 @@ export default React.memo(function EventFeedList() {
     setSelectedFeedInfo(null);
   }, []);
 
-  // TODO 피드 눌렀을 때, 각 피드 이벤트 모달 띄우기
-  // TODO 피드 모달에선 댓글 및 상세 정보 보여줘야함
   return (
     <div className="relative h-3/5">
       <h3 className="sticky top-0 w-5/6 py-1 mx-auto rounded border-y-2 text-3xl text-center">
@@ -30,7 +27,7 @@ export default React.memo(function EventFeedList() {
       </h3>
       <main className="FLEX-horiz items-center w-full h-full overflow-y-auto rounded">
         {eventFeedList.length === 0 ? (
-          <p>피드를 등록해주세요</p>
+          <p className="mt-12 text-xl">피드를 등록해주세요</p>
         ) : (
           eventFeedList.map((event, idx) =>
             event.images.length === 0 ? (

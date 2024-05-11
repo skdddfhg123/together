@@ -25,7 +25,7 @@ export default React.memo(function EventModal({
 }: EventModalProps) {
   const titleRef = useRef<HTMLInputElement>(null);
   const [modalStyle, setModalStyle] = useState<React.CSSProperties>({});
-  const { SelectedCalendar } = useSelectedCalendarStore();
+  const { selectedCalendar } = useSelectedCalendarStore();
 
   useUpdateModalStyle({ position, setModalStyle });
 
@@ -35,17 +35,20 @@ export default React.memo(function EventModal({
 
     if (!title) return alert('일정 제목이 비어있습니다.');
     if (!selectedDay) return alert('선택된 날이 없습니다.');
+    if (selectedCalendar === 'All') return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
 
     const eventData: reqGroupEvent = {
-      groupCalendarId: SelectedCalendar,
+      groupCalendarId: selectedCalendar.calendarId,
       title: title,
       startAt: format(selectedDay, 'yyyy-MM-dd'),
       endAt: format(selectedDay, 'yyyy-MM-dd'),
+      members: null,
+      color: null,
     };
 
     const res = await CALENDAR.createGroupEvent(eventData);
     if (res) {
-      await CALENDAR.getGroupAllEvents(SelectedCalendar);
+      await CALENDAR.getGroupAllEvents(selectedCalendar.calendarId);
     }
     onClose();
   };
