@@ -165,49 +165,94 @@ export class AuthService {
         }
     }
 
-    async GetAllByToken2(payload: PayloadResponse): Promise<any> {
+    async GetAllByTokenV2(payload: PayloadResponse): Promise<any> {
         try {
-            // 유저 및 유저 캘린더 정보 가져오기
             const userWithCalendar = await this.userRepository.createQueryBuilder("user")
                 .select([
+                    "user.nickname",
                     "user.useremail",
                     "user.phone",
-                    "user.nickname",
                     "user.thumbnail",
-                    "user.registeredAt",
-                    "user.updatedAt",
                     "user.birthDay",
                 ])
                 .leftJoinAndSelect("user.userCalendarId", "userCalendar")
-                .leftJoinAndSelect("userCalendar.socialEvents", "socialEvent")
                 .where("user.useremail = :useremail", { useremail: payload.useremail })
                 .getOne();
 
-            if (!userWithCalendar) {
-                throw new UnauthorizedException("User not found");
+            console.log(userWithCalendar);
+
+            if (!userWithCalendar || !userWithCalendar.userCalendarId) {
+                throw new NotFoundException("User or user calendar not found");
             }
 
-            // 유저 캘린더에서 groupCalendar 배열을 사용하여 모든 캘린더 정보 가져오기
-            const calendars = await this.calendarRepository.createQueryBuilder("calendar")
-                .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
-                .where("calendar.calendarId IN (:...calendarIds)", { calendarIds: userWithCalendar.userCalendarId.groupCalendars })
-                .getMany();
 
-            console.log(`calendars: ${calendars}\nuserWithCalendar: ${userWithCalendar}`);
+            const today = new Date();
+            const fortyFiveDaysAgo = new Date(today);
+            fortyFiveDaysAgo.setDate(today.getDate() - 45);
+            const fortyFiveDaysLater = new Date(today);
+            fortyFiveDaysLater.setDate(today.getDate() + 45);
+
+            const [calendars, socialEvents] = await Promise.all([
+                this.getGroupEvents(userWithCalendar.userCalendarId.groupCalendars || [], fortyFiveDaysAgo, fortyFiveDaysLater),
+                this.getSocialEvents(userWithCalendar.userCalendarId.socialEvents || [], fortyFiveDaysAgo, fortyFiveDaysLater)
+            ]);
 
             return {
-                user: userWithCalendar,
-                calendars
+                user: {
+                    nickname: userWithCalendar.nickname,
+                    useremail: userWithCalendar.useremail,
+                    phone: userWithCalendar.phone,
+                    thumbnail: userWithCalendar.thumbnail,
+                    birthDay: userWithCalendar.birthDay
+                },
+                events: [
+                    ...calendars,
+                    ...socialEvents
+                ]
             };
 
         } catch (error) {
-            if (error instanceof UnauthorizedException) {
-                throw error;
-            } else {
-                console.error('Error fetching data:', error);
-                throw new InternalServerErrorException("An error occurred while fetching user data");
-            }
+            console.error('Error fetching data:', error);
+            throw new InternalServerErrorException("An error occurred while fetching user data");
         }
+    }
+
+    private async getGroupEvents(groupCalendarIds, startDate, endDate) {
+        if (!groupCalendarIds.length) return [];
+        return this.calendarRepository.createQueryBuilder("calendar")
+            .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
+            .select([
+                "groupEvent.groupEventId",
+                "groupEvent.title",
+                "groupEvent.startAt",
+                "groupEvent.endAt"
+            ])
+            .where("calendar.calendarId IN (:...calendarIds)", { calendarIds: groupCalendarIds })
+            .andWhere("groupEvent.startAt BETWEEN :startDate AND :endDate", {
+                startDate, endDate
+            })
+            .getMany()
+            .then(calendars => calendars.flatMap(calendar =>
+                calendar.groupEvents.map(event => ({
+                    id: event.groupEventId,
+                    title: event.title,
+                    startAt: event.startAt,
+                    endAt: event.endAt
+                }))
+            ));
+    }
+
+    private async getSocialEvents(socialEvents, startDate, endDate) {
+        if (!socialEvents.length) return [];
+        return socialEvents.filter(event =>
+            event.startAt >= startDate && event.endAt <= endDate
+        ).map(event => ({
+            id: event.socialEventId,
+            title: event.title,
+            social: event.social,
+            startAt: event.startAt,
+            endAt: event.endAt
+        }));
     }
 
     async GetAllByUserCalendarId(userCalendarId: string): Promise<any> {
@@ -354,7 +399,23 @@ export class AuthService {
             }
 
             const results = await Promise.all(userCalendars.map(async userCalendar => {
-                const calendars = await this.calendarRepository.createQueryBuilder("calendar")
+                const socialEvents = Array.isArray(userCalendar.socialEvents) ? userCalendar.socialEvents.map(se => ({
+                    title: se.title,
+                    social: se.social,
+                    startAt: se.startAt,
+                    endAt: se.endAt
+                })) : [];
+
+                // groupCalendars 배열 확인
+                if (!userCalendar.groupCalendars || userCalendar.groupCalendars.length === 0) {
+                    return {
+                        useremail: userCalendar.user.useremail,
+                        nickname: userCalendar.user.nickname,
+                        allevents: [...socialEvents]
+                    };
+                }
+
+                let query = this.calendarRepository.createQueryBuilder("calendar")
                     .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
                     .select([
                         "calendar.title",
@@ -364,16 +425,13 @@ export class AuthService {
                         "groupEvent.endAt",
                     ])
                     .where("calendar.calendarId IN (:...calendarIds)", { calendarIds: userCalendar.groupCalendars })
-                    .andWhere("calendar.calendarId != :originalCalendarId", { originalCalendarId: calendarId })
-                    .andWhere("groupEvent.startAt BETWEEN :fortyFiveDaysAgo AND :fortyFiveDaysLater", { fortyFiveDaysAgo, fortyFiveDaysLater })
-                    .getMany();
+                    .andWhere("calendar.calendarId != :calendarId", { calendarId })
+                    .andWhere("groupEvent.startAt BETWEEN :startDate AND :endDate", {
+                        startDate: fortyFiveDaysAgo,
+                        endDate: fortyFiveDaysLater
+                    });
 
-                const socialEvents = Array.isArray(userCalendar.socialEvents) ? userCalendar.socialEvents.map(se => ({
-                    title: se.title,
-                    social: se.social,
-                    startAt: se.startAt,
-                    endAt: se.endAt
-                })) : [];
+                const calendars = await query.getMany();
 
                 const allGroupEvents = calendars.flatMap(calendar =>
                     calendar.groupEvents.map(ge => ({

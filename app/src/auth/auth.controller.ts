@@ -73,15 +73,17 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '로그인/리다이렉트 시 실행 (필터:앞뒤2달/멤버가 포함된 일정' })
   @ApiResponse({ status: 200, description: 'Successfully retrieved user data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @Get('all/v2')
   @UseGuards(JwtAuthGuard)
   GetAllByToken2(
     @getPayload() payload: PayloadResponse
   ): Promise<any> {
-    return this.authService.GetAllByToken2(payload);
+    return this.authService.GetAllByTokenV2(payload);
   }
 
   @ApiBearerAuth('JWT-auth')
@@ -118,7 +120,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: '캘린더 멤버 일정 불러오기 (필터:앞뒤2달/멤버가 포함된 일정' })
+  @ApiOperation({ summary: '캘린더 멤버 일정 불러오기 (필터:앞뒤2달/멤버가 포함된 일정)' })
   @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Calendar not found or no attendees' })
