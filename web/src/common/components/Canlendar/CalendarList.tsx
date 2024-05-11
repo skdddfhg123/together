@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import * as CALENDAR from '@services/calendarAPI';
 import * as USER from '@services/userAPI';
 
-import { Calendar, CalendarId } from '@type/index';
+import { Calendar } from '@type/index';
 import {
   useCalendarListStore,
   useGroupEventListStore,
@@ -18,12 +18,12 @@ interface CalendarListProps {
 }
 
 export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
-  const { calendars } = useCalendarListStore();
+  const { calendarList } = useCalendarListStore();
   const { groupEventList } = useGroupEventListStore();
   const { setSelectedCalendar } = useSelectedCalendarStore();
 
   useEffect(() => {
-    CALENDAR.getAllCalendar();
+    CALENDAR.getMyAllCalendar();
   }, []);
 
   useEffect(() => {
@@ -37,8 +37,8 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   };
 
   const renderCalendarList = () => {
-    return calendars.length > 0 ? (
-      calendars.map((calendar: Calendar, idx: number) => (
+    return calendarList.length > 0 ? (
+      calendarList.map((calendar: Calendar, idx: number) => (
         <li
           className={`w-full py-2 text-l cursor-pointer flex items-center`}
           onClick={() => ChangeCalendar(calendar)}

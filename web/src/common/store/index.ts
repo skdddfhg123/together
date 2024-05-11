@@ -1,17 +1,6 @@
 import { create } from 'zustand';
-import { UUID } from 'crypto';
 
-import { GroupEvent, UserInfo, Calendar, CalendarId, SocialEvent, EventFeed } from '@type/index';
-
-interface SelectedDayState {
-  selectedDay: Date | null;
-  setSelectedDay: (day: Date | null) => void;
-}
-
-export const useSelectedDayStore = create<SelectedDayState>((set) => ({
-  selectedDay: null,
-  setSelectedDay: (day: Date | null) => set({ selectedDay: day }),
-}));
+import { GroupEvent, UserInfo, Calendar, EventFeed, AllEvent } from '@type/index';
 
 interface UserInfoState {
   userInfo: UserInfo | null;
@@ -24,16 +13,16 @@ export const useUserInfoStore = create<UserInfoState>((set) => ({
 }));
 
 interface CalendarListState {
-  calendars: Calendar[];
+  calendarList: Calendar[];
   isLoaded: boolean;
-  setCalendars: (calendars: Calendar[]) => void;
+  setCalendarList: (calendarList: Calendar[]) => void;
   setIsLoaded: (isLoaded: boolean) => void;
 }
 
 export const useCalendarListStore = create<CalendarListState>((set) => ({
-  calendars: [],
+  calendarList: [],
   isLoaded: false,
-  setCalendars: (calendars) => set({ calendars }),
+  setCalendarList: (calendarList) => set({ calendarList }),
   setIsLoaded: (isLoaded: boolean) => set({ isLoaded: isLoaded }),
 }));
 
@@ -47,6 +36,16 @@ export const useSelectedCalendarStore = create<SelectedCalendarState>((set) => (
   setSelectedCalendar: (calendar: Calendar | 'All') => set({ selectedCalendar: calendar }),
 }));
 
+interface SelectedDayState {
+  selectedDay: Date | null;
+  setSelectedDay: (day: Date | null) => void;
+}
+
+export const useSelectedDayStore = create<SelectedDayState>((set) => ({
+  selectedDay: null,
+  setSelectedDay: (day: Date | null) => set({ selectedDay: day }),
+}));
+
 interface GroupEventListState {
   groupEventList: GroupEvent[];
   setGroupEvents: (events: GroupEvent[]) => void;
@@ -55,6 +54,26 @@ interface GroupEventListState {
 export const useGroupEventListStore = create<GroupEventListState>((set) => ({
   groupEventList: [],
   setGroupEvents: (events: GroupEvent[]) => set({ groupEventList: events }),
+}));
+
+interface SocialEventListState {
+  socialEventList: AllEvent[];
+  setSocialEventList: (events: AllEvent[]) => void;
+}
+
+export const useSocialEventListStore = create<SocialEventListState>((set) => ({
+  socialEventList: [],
+  setSocialEventList: (events) => set({ socialEventList: events }),
+}));
+
+interface AllEventListState {
+  AllEventList: AllEvent[];
+  setAllEventList: (events: AllEvent[]) => void;
+}
+
+export const useAllEventListStore = create<AllEventListState>((set) => ({
+  AllEventList: [],
+  setAllEventList: (events) => set({ AllEventList: events }),
 }));
 
 interface GroupEventInfoState {
@@ -69,16 +88,6 @@ export const useGroupEventInfoStore = create<GroupEventInfoState>((set) => ({
   isLoaded: false,
   setGroupEventInfo: (event: GroupEvent) => set({ groupEventInfo: event }),
   setIsLoaded: (isLoaded: boolean) => set({ isLoaded: isLoaded }),
-}));
-
-interface SocialEventListState {
-  socialEvents: SocialEvent[];
-  setSocialEvents: (events: SocialEvent[]) => void;
-}
-
-export const useSocialEventListStore = create<SocialEventListState>((set) => ({
-  socialEvents: [],
-  setSocialEvents: (events) => set({ socialEvents: events }),
 }));
 
 interface EventFeedListState {

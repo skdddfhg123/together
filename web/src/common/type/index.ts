@@ -31,10 +31,10 @@ export interface SignUpForm extends SignInForm {
 export type UserInfo = {
   nickname: string;
   useremail: string;
-  birthDay?: string | null;
-  phone?: string | null;
-  thumbnail?: Image;
-  userCalendarId: UserCalendarListInfo;
+  birthDay: string | null;
+  phone: string | null;
+  thumbnail: Image | null;
+  // userCalendarId: UserCalendarListInfo;
   // kakaoId?: number;    //TODO setting 객체로 받을 듯?
   // kakaoRefresh?: number;
 };
@@ -46,7 +46,7 @@ export type Image = string;
 export interface ImageFile {
   name?: string | UUID;
   file?: File;
-  imageSrc?: Image;
+  imageSrc?: Image; // DB에서 전달받는 src
   src: Image;
 }
 
@@ -54,8 +54,8 @@ export type CalendarId = UUID | 'All';
 
 export type UserCalendarListInfo = {
   userCalendarId: UUID;
-  groupCalendar: GroupEvent[] | null;
-  socialEvents: SocialEvent[] | null;
+  // groupCalendar: GroupEvent[] | null;
+  // socialEvents: SocialEvent[] | null;
 };
 
 export type CreateCalendarForm = {
@@ -66,13 +66,10 @@ export type CreateCalendarForm = {
 export type Calendar = {
   calendarId: UUID;
   title: string;
-  attendees: Member[];
-  author: {
-    userCalendarId: UUID;
-  };
-  bannerImage: ImageFile;
-  coverImage: ImageFile;
-  type: string; //TODO color로 변경?
+  coverImage: ImageFile | null;
+  bannerImage?: ImageFile;
+  type: string; // Color
+  attendees: Member[]; // 객체
 };
 
 // ************************** 이벤트 (일정)
@@ -85,34 +82,62 @@ export interface Author {
 
 export type Member = Author;
 
-export interface reqGroupEvent {
-  groupCalendarId?: CalendarId;
+// export interface reqGroupEvent {
+//   groupCalendarId?: CalendarId;
+//   title: string;
+//   color: string | null;
+//   reqMember?: string[] | null;
+//   startAt: string;
+//   endAt: string;
+// }
+
+// export interface GroupEvent extends reqGroupEvent {
+//   groupCalendarTitle?: string;
+//   groupEventId?: UUID;
+//   memberObj?: Member[] | null;
+//   member: string[];
+//   author?: Author; //TODO 받을 땐 email일걸 ?
+//   pinned: boolean;
+//   alerts?: number;
+//   attachment?: string;
+// }
+
+// export type SocialEvent = {
+//   userCalendarId?: string;
+//   socialEventId: UUID;
+//   title?: string;
+//   startAt: string;
+//   endAt: string;
+//   isPast: boolean;
+//   social: string;
+// };
+
+export interface DefaultEvent {
+  //* 그룹 멤버들 일정 + create 할 때
+  groupCalendarId?: UUID;
   title: string;
-  color: string | null;
-  reqMembers?: string[] | null;
   startAt: string;
   endAt: string;
 }
 
-export interface GroupEvent extends reqGroupEvent {
-  groupCalendarTitle?: string;
-  groupEventId?: UUID;
-  members: Member[] | null;
-  author?: Author;
+export interface AllEvent extends DefaultEvent {
+  id: UUID;
+  type?: string; // 그룹 캘린더에 지정된 색
+  group?: string;
+  social?: 'kakao'; //TODO 'kakao' | 'google' | 'outlook'
+}
+
+export interface GroupEvent extends DefaultEvent {
+  groupEventId: UUID;
+  member: string[];
+  color: string;
   pinned: boolean;
-  alerts?: number;
-  attachment?: string;
+  alerts: number | null;
+  groupCalendarTitle?: string;
+  author?: string;
+  createdAt?: string;
+  reqMember?: Member[];
 }
-
-export type SocialEvent = {
-  userCalendarId?: string;
-  socialEventId: UUID;
-  title?: string;
-  startAt: string;
-  endAt: string;
-  isPast: boolean;
-  social: string; //TODO 'kakao' | 'google' | 'outlook'
-};
 
 // ************************** 피드
 
@@ -121,7 +146,7 @@ export interface reqEventFeed {
   feedType: number | string;
   title: 'Title';
   content: string;
-  images: ImageFile[]; // image Type - string?
+  images: ImageFile[];
 }
 
 export interface EventFeed extends reqEventFeed {

@@ -5,7 +5,7 @@ import { formatISO } from 'date-fns';
 import * as CALENDAR from '@services/calendarAPI';
 import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
 
-import { reqGroupEvent } from '@type/index';
+import { DefaultEvent } from '@type/index';
 import { useSelectedCalendarStore, useUserInfoStore } from '@store/index';
 
 import '@styles/modalStyle.css';
@@ -42,18 +42,16 @@ export default React.memo(function EventModal({
       return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
     }
 
-    const eventData: reqGroupEvent = {
+    const eventData: DefaultEvent = {
       groupCalendarId: selectedCalendar.calendarId,
       title: title,
       startAt: formatISO(selectedDay, { representation: 'complete' }),
       endAt: formatISO(selectedDay, { representation: 'complete' }),
-      reqMembers: [userInfo.useremail],
-      color: null,
     };
 
     const res = await CALENDAR.createGroupEvent(eventData);
     if (res) {
-      await CALENDAR.getGroupAllEvents(selectedCalendar.calendarId);
+      await CALENDAR.getGroupAllEvents(selectedCalendar);
     }
     onClose();
   };

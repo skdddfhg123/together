@@ -2,15 +2,13 @@ import { AxiosError } from 'axios';
 import * as API from '@utils/api';
 import { setCookie, deleteCookie } from '@utils/cookie';
 
-import { Cookie, SignInForm, SignUpForm } from '@type/index';
+import { AllEvent, Cookie, SignInForm, SignUpForm } from '@type/index';
 import {
-  useGroupEventListStore,
+  useAllEventListStore,
   useSelectedCalendarStore,
   useSocialEventListStore,
   useUserInfoStore,
 } from '@store/index';
-
-import { GroupEvent } from '@type/index';
 
 export async function signUp(formData: SignUpForm) {
   try {
@@ -100,32 +98,25 @@ export async function logOut() {
 // TODO auth/all/v2 로 업그레이드 예정
 export async function firstRender() {
   try {
-    const {
-      data: [db_user],
-    } = await API.get(`/auth/all`);
-    if (!db_user) throw new Error('USER - firstRender (유저 정보 db 조회 실패)');
-    console.log(`USER - firstRender 성공`, db_user); //debug//
+    const { data: res } = await API.get(`/auth/all/v2`);
+    if (!res) throw new Error('USER - firstRender (유저 정보 db 조회 실패)');
+    console.log(`USER - firstRender 성공`, res); //debug//
 
-    useUserInfoStore.getState().setUserInfo(db_user);
+    useUserInfoStore.getState().setUserInfo(res.user);
     useSelectedCalendarStore.getState().setSelectedCalendar('All');
-    useSocialEventListStore.getState().setSocialEvents(db_user.userCalendarId.socialEvents);
 
-    const allGroupEvents: GroupEvent[] = [];
+    const AllEvents: AllEvent[] = res.events.filter((event: AllEvent) => event.group !== undefined);
+    const socialEvents: AllEvent[] = res.events.filter(
+      (event: AllEvent) => event.social !== undefined,
+    );
 
-    for (const calendar of db_user.userCalendarId.groupCalendar) {
-      const updatedEvents = calendar.groupEvents.map((event: GroupEvent) => ({
-        ...event,
-        groupCalendarId: calendar.CalendarId,
-        groupCalendarTitle: calendar.title,
-      }));
-
-      allGroupEvents.push(...updatedEvents);
-    }
-    useGroupEventListStore.getState().setGroupEvents(allGroupEvents);
+    useSocialEventListStore.getState().setSocialEventList(socialEvents);
+    useAllEventListStore.getState().setAllEventList(AllEvents);
 
     return true;
   } catch (e) {
     const err = e as AxiosError;
+    console.log(`err`, err);
     if (err.response?.status === 400) {
       console.error('USER - firstRender 실패 : ', err.response);
       alert('토큰 정보가 일치하지 않습니다');

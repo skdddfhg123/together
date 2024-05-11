@@ -36,7 +36,8 @@ export default function InvitePage() {
   };
 
   return (
-    <div className="FLEX-horizC h-full w-3/5 mt-28 mx-auto">
+    <div className="FLEX-horizC h-full w-3/5 mx-auto">
+      <h1 className="my-20 text-6xl text-custom-main text-shadow-blue">Tooghter</h1>
       <section>
         <button id="singin" onClick={toggle}>
           {isOn ? '로그인으로' : '회원가입으로'}

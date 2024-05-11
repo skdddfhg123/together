@@ -6,6 +6,8 @@ import debounce from 'lodash.debounce';
 import { GroupEvent, Member } from '@type/index';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 
+import default_user from '@assets/default_user.png';
+
 interface ModifyEventProps {
   eventId: UUID | null;
   setView: () => void;
@@ -17,8 +19,8 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
   const { groupEventInfo, setIsLoaded } = useGroupEventInfoStore();
   const { selectedCalendar } = useSelectedCalendarStore();
 
-  const [calendarMembers, setCalendarMembers] = useState<Member[]>([]);
-  const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+  const [calendarMember, setCalendarMember] = useState<Member[]>([]);
+  const [selectedMember, setSelectedMember] = useState<string[]>([]);
   const [color, setColor] = useState<string>(groupEventInfo?.color || '#ffffff00');
   const [pinned, setPinned] = useState<boolean>(groupEventInfo?.pinned || false);
   const titleRef = useRef<HTMLInputElement>(null);
@@ -29,11 +31,17 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
 
   useEffect(() => {
     if (selectedCalendar && selectedCalendar !== 'All') {
-      setCalendarMembers(selectedCalendar.attendees);
+      setCalendarMember(selectedCalendar.attendees);
     } else {
-      setCalendarMembers([]);
+      setCalendarMember([]);
     }
   }, [selectedCalendar]);
+
+  useEffect(() => {
+    if (groupEventInfo && groupEventInfo.member) {
+      setSelectedMember(groupEventInfo.member.map((email) => email));
+    }
+  }, [groupEventInfo]);
 
   const debouncedSetColor = useCallback(
     debounce((newColor: string) => {
@@ -47,10 +55,10 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
   };
 
   const handleMemberClick = useCallback((member: Member) => {
-    setSelectedMembers((prev) =>
-      prev.some((m) => m.useremail === member.useremail)
-        ? prev.filter((m) => m.useremail !== member.useremail)
-        : [...prev, member],
+    setSelectedMember((prev) =>
+      prev.includes(member.useremail)
+        ? prev.filter((email) => email !== member.useremail)
+        : [...prev, member.useremail],
     );
   }, []);
 
@@ -66,14 +74,16 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
         endAt: endAtRef.current?.value || groupEventInfo?.endAt || '종료 날짜',
         pinned: pinned,
         color: color,
-        members: selectedMembers,
+        member: selectedMember,
+        alerts: null,
       };
+
       onSubmit(formData);
-      setView();
       setIsLoaded(false);
+      setView();
       onClose();
     },
-    [eventId, color, selectedMembers, pinned, onClose, onSubmit, groupEventInfo, setView],
+    [eventId, color, selectedMember, pinned, onClose, onSubmit, groupEventInfo, setView],
   );
 
   // *********************? 렌더링 함수
@@ -89,8 +99,8 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
   }, [debouncedSetColor]);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <nav className="FLEX-verB mx-4 mt-4 mb-16">
+    <form className="h-full" onSubmit={handleSubmit}>
+      <nav className="FLEX-verB my-1 mx-2">
         <button type="button" className="p-2 hover:bg-custom-light rounded" onClick={setView}>
           취소
         </button>
@@ -99,7 +109,7 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
         </button>
       </nav>
       <header key="event-form">
-        <h2 className="FLEX-horizC h-28 mb-12 mx-auto justify-end">
+        <h2 className="FLEX-horizC h-28 mb-6 mx-auto justify-end">
           <input
             type="text"
             ref={titleRef}
@@ -110,7 +120,7 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
         </h2>
       </header>
       <main>
-        <section key="date-section" className="FLEX-verA h-20 items-center mx-auto mb-12">
+        <section key="date-section" className="FLEX-verA h-20 items-center mx-auto mb-10">
           <span className="FLEX-horizC py-2 border-b">
             Start
             <input type="date" ref={startAtRef} defaultValue={groupEventInfo?.startAt} />
@@ -120,28 +130,21 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
             <input type="date" ref={endAtRef} defaultValue={groupEventInfo?.endAt} />
           </span>
         </section>
-        <section key="member-section" className="m-4">
-          {'멤버: '}
-          <ul>
-            {calendarMembers.map((member: Member) => (
-              <li
-                key={member.useremail}
-                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-              >
+        <section key="member-section" className="FLEX-horizC my-6">
+          <p className="mb-2 mx-auto w-10 border-b-2 text-center">멤버</p>
+          <ul className="FLEX-verC space-x-2">
+            {calendarMember.map((member: Member) => (
+              <li key={member.useremail} className="FLEX-ver">
                 <div onClick={() => handleMemberClick(member)}>
-                  <img
-                    src={member.thumbnail ? member.thumbnail : 'default-thumbnail.jpg'}
-                    alt={member.nickname}
-                    style={{ marginRight: '10px', width: '50px', height: '50px' }}
-                  />
+                  <img className="w-14" src={member.thumbnail ? member.thumbnail : default_user} />
                   <div>{member.nickname}</div>
+                  <input
+                    className="w-full items-center"
+                    type="checkbox"
+                    checked={selectedMember.some((email) => email === member.useremail)}
+                    onChange={() => handleMemberClick(member)}
+                  />
                 </div>
-                <input
-                  type="checkbox"
-                  checked={selectedMembers.some((m) => m.useremail === member.useremail)}
-                  onChange={() => handleMemberClick(member)}
-                  style={{ marginLeft: 'auto' }}
-                />
               </li>
             ))}
           </ul>

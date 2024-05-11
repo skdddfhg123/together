@@ -14,7 +14,7 @@ async function LogIn() {
   try {
     const { data: res } = window.Kakao.Auth.authorize({
       redirectUri: process.env.REACT_APP_REDIRECT_URI,
-      // prompt: 'select_account',
+      prompt: 'select_account',
     });
     if (!res) throw new Error('kakao API - 로그인 실패');
 
@@ -85,6 +85,7 @@ async function LogOut() {
     const res = window.Kakao.Auth.logout();
     if (!res) throw new Error('kakao API - 연동 해제 및 로그아웃 실패');
     console.log(`KAKAO - Logout 성공 : `, res.id); //debug//
+    alert('카카오톡 연동 해제 성공');
 
     deleteCookie(`kakaoToken`);
 

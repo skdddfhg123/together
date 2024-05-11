@@ -5,14 +5,16 @@ import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
 import {
   useSelectedDayStore,
   useSelectedCalendarStore,
-  useGroupEventListStore,
   useSocialEventListStore,
+  useGroupEventListStore,
+  useAllEventListStore,
 } from '@store/index';
 import * as CALENDAR from '@services/calendarAPI';
 
 import EventModal from '@components/Canlendar/EventModal';
 import EventDetails from '@components/Canlendar/EventDetails';
 import '@styles/calendar.css';
+import { AllEvent } from '@type/index';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -27,10 +29,10 @@ export default React.memo(function CalendarPage({
   currentMonth,
 }: CalendarProps) {
   const { selectedDay, setSelectedDay } = useSelectedDayStore();
-  const { socialEvents } = useSocialEventListStore();
+  const { socialEventList } = useSocialEventListStore();
+  const { AllEventList } = useAllEventListStore();
   const { groupEventList } = useGroupEventListStore();
   const { selectedCalendar } = useSelectedCalendarStore();
-  const { setGroupEvents } = useGroupEventListStore();
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -104,36 +106,69 @@ export default React.memo(function CalendarPage({
     const eventMap = new Map<string, JSX.Element[]>();
 
     // ************* 소셜 이벤트 생성
-    socialEvents.forEach((event) => {
+    socialEventList.forEach((event: AllEvent) => {
       const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
       const existingEvents = eventMap.get(eventDate) || [];
       existingEvents.push(
-        <li className="social-title" key={existingEvents.length}>
-          {event.title || '카카오 일정'}
+        <li
+          className={`${
+            event.social === 'kakao'
+              ? 'kakao-event'
+              : event.social === 'google'
+                ? 'google-event'
+                : event.social === 'discord'
+                  ? 'discord-event'
+                  : 'outlook-event'
+          }`}
+          key={existingEvents.length}
+        >
+          {event.social}
         </li>,
       );
       eventMap.set(eventDate, existingEvents);
     });
 
-    // ************* 그룹 이벤트 생성
-    groupEventList.forEach((event) => {
-      const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
-      const existingEvents = eventMap.get(eventDate) || [];
-      existingEvents.push(
-        <li
-          onMouseEnter={(e) => e.stopPropagation()}
-          onMouseLeave={(e) => e.stopPropagation()}
-          onClick={(e) => event.groupEventId && handleDetails(event.groupEventId, e)}
-          className="group-event"
-          // style={{ backgroundColor: `${event.color === 'blue' ? '#0086FF' : '${event.color}'}` }}
-          style={{ backgroundColor: `${event.color}` }}
-          key={event.groupEventId}
-        >
-          {event.title || 'No Title'}
-        </li>,
-      );
-      eventMap.set(eventDate, existingEvents);
-    });
+    // ************* 그룹 이벤트 생성 or All 이벤트 생성
+    if (selectedCalendar === 'All') {
+      AllEventList.forEach((event) => {
+        const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
+        const existingEvents = eventMap.get(eventDate) || [];
+        existingEvents.push(
+          <li
+            onMouseEnter={(e) => e.stopPropagation()}
+            onMouseLeave={(e) => e.stopPropagation()}
+            onClick={(e) => event.id && handleDetails(event.id, e)}
+            className="group-event"
+            style={{ backgroundColor: `${event.type}` }}
+            key={event.id}
+          >
+            {event.title || 'No Title'}
+          </li>,
+        );
+        eventMap.set(eventDate, existingEvents);
+      });
+    } else {
+      groupEventList.forEach((event) => {
+        const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
+        const existingEvents = eventMap.get(eventDate) || [];
+        existingEvents.push(
+          <li
+            onMouseEnter={(e) => e.stopPropagation()}
+            onMouseLeave={(e) => e.stopPropagation()}
+            onClick={(e) => event.groupEventId && handleDetails(event.groupEventId, e)}
+            className="group-event"
+            style={{ backgroundColor: `${event.color}` }}
+            key={event.groupEventId}
+          >
+            {event.title || 'No Title'}
+          </li>,
+        );
+        eventMap.set(eventDate, existingEvents);
+      });
+    }
+    /*
+     * ********** 멤버 이벤트 생성
+     */
 
     return calendarDays.map((day: Date, i: number) => {
       const localDayKey = format(day, 'yyyy-MM-dd');
@@ -195,9 +230,9 @@ export default React.memo(function CalendarPage({
   useEffect(() => {
     if (!selectedCalendar) return;
 
-    if (selectedCalendar === 'All') return console.log('전체 일정 그리기');
-    CALENDAR.getGroupAllEvents(selectedCalendar.calendarId);
-  }, [selectedCalendar, setGroupEvents]);
+    if (selectedCalendar === 'All') return console.log('selectedCalendar - ALL (전체 일정 그리기)'); //debug//
+    CALENDAR.getGroupAllEvents(selectedCalendar);
+  }, [selectedCalendar]);
 
   return (
     <div className="calendar">

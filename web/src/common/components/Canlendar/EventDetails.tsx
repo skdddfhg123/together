@@ -8,7 +8,7 @@ import useToggle from '@hooks/useToggle';
 import ViewEvent from '@components/Canlendar/ViewEvent';
 import ModifyEvent from '@components/Canlendar/ModifyEvent';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
-import { GroupEvent } from '@type/index';
+import { Calendar, GroupEvent } from '@type/index';
 
 interface EventDetailsProps {
   isOpen: boolean;
@@ -19,23 +19,33 @@ interface EventDetailsProps {
 export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsProps) {
   const { isOn, toggle } = useToggle(true);
 
-  const { selectedCalendar } = useSelectedCalendarStore();
+  const { selectedCalendar, setSelectedCalendar } = useSelectedCalendarStore();
   const { isLoaded, setIsLoaded } = useGroupEventInfoStore();
 
   // *********************? 함수
-  const deleteEvent = useCallback(async () => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+  const handleRender = async () => {
+    if (selectedCalendar === 'All') return await USER.firstRender();
+    const res: Calendar = await CALENDAR.getGroupAllEvents(selectedCalendar);
+    if (res) {
+      //TODO bannerImage 업데이트 안됨
+      setSelectedCalendar({ ...selectedCalendar, bannerImage: res.bannerImage });
+    }
 
-    await CALENDAR.removeGroupEvent(eventId);
-  }, []);
+    onClose();
+  };
+
+  const deleteEvent = useCallback(
+    async (groupEventId: UUID | null) => {
+      if (!window.confirm('정말 삭제하시겠습니까?')) return;
+      await CALENDAR.removeGroupEvent(groupEventId);
+      handleRender();
+    },
+    [handleRender],
+  );
 
   const submitModifyEvent = async (formData: GroupEvent) => {
     await CALENDAR.updateGroupEvent(formData);
-
-    if (selectedCalendar === 'All') return await USER.firstRender();
-
-    await CALENDAR.getGroupAllEvents(selectedCalendar.calendarId);
-    onClose();
+    handleRender();
   };
 
   // *********************? 최초 Render
