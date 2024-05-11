@@ -245,11 +245,7 @@ export class GroupEventService {
 
     async getGroupEventUpdateForm(groupEventId: string): Promise<GroupEvent> {
         try {
-<<<<<<< Updated upstream
-
-=======
             console.log(groupEventId);
->>>>>>> Stashed changes
             const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId: groupEventId } });
             console.log(groupEventToUpdate);
 
