@@ -3,12 +3,11 @@ import { CreateGroupEventDTO } from "./dtos/groupEvent.create.dto";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
 import { GroupEvent } from "./entities/groupEvent.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Between, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Calendar } from "src/calendar/entities/calendar.entity";
 import { GetGroupDTO, MemberInfo } from "./dtos/groupEvent.get.dto";
 import { User } from "src/db/user/entities/user.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
-import { group } from "console";
 
 
 @Injectable()

@@ -191,7 +191,7 @@ export class AuthService {
             const fortyFiveDaysLater = new Date(today.setDate(today.getDate() + 45));
 
             const [calendars, socialEvents] = await Promise.all([
-                this.getGroupEvents(userWithCalendar.userCalendarId.groupCalendars || [], fortyFiveDaysAgo, fortyFiveDaysLater),
+                this.getGroupEvents(userWithCalendar.userCalendarId.groupCalendars || [], userWithCalendar.useremail, fortyFiveDaysAgo, fortyFiveDaysLater),
                 this.getSocialEvents(userWithCalendar.userCalendarId.socialEvents || [], fortyFiveDaysAgo, fortyFiveDaysLater)
             ]);
 
@@ -215,7 +215,7 @@ export class AuthService {
         }
     }
 
-    private async getGroupEvents(groupCalendarIds, startDate, endDate) {
+    private async getGroupEvents(groupCalendarIds, useremail, startDate, endDate) {
         if (!groupCalendarIds.length) return [];
 
         // console.log(groupCalendarIds);
@@ -233,10 +233,11 @@ export class AuthService {
             ])
             .where("calendar.calendarId IN (:...calendarIds) AND calendar.isDeleted = false", { calendarIds: groupCalendarIds })
             .andWhere("groupEvent.isDeleted = false")
+            .andWhere(":userEmail = ANY(string_to_array(groupEvent.member, ','))", { userEmail: useremail })
             .andWhere("groupEvent.startAt BETWEEN :startDate AND :endDate", { startDate, endDate })
             .getMany();
 
-        // console.log(calendars);
+        console.log(calendars);
         const events = calendars.flatMap(calendar => calendar.groupEvents.map(event => ({
             id: event.groupEventId,
             group: calendar.title,
@@ -434,11 +435,13 @@ export class AuthService {
                         "groupEvent.endAt",
                     ])
                     .where("calendar.calendarId IN (:...calendarIds)", { calendarIds: userCalendar.groupCalendars })
+                    .andWhere(":userEmail = ANY(string_to_array(groupEvent.member, ','))", { userEmail: userCalendar.user.useremail })
                     .andWhere("calendar.calendarId != :calendarId", { calendarId })
                     .andWhere("groupEvent.startAt BETWEEN :startDate AND :endDate", {
                         startDate: fortyFiveDaysAgo,
                         endDate: fortyFiveDaysLater
                     });
+
 
                 const calendars = await query.getMany();
 
