@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
 import Modal from 'react-modal';
-import { format } from 'date-fns';
+import { formatISO } from 'date-fns';
 
 import * as CALENDAR from '@services/calendarAPI';
 import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
 
 import { reqGroupEvent } from '@type/index';
-import { useSelectedCalendarStore } from '@store/index';
+import { useSelectedCalendarStore, useUserInfoStore } from '@store/index';
 
 import '@styles/modalStyle.css';
 
@@ -23,9 +23,10 @@ export default React.memo(function EventModal({
   selectedDay,
   position,
 }: EventModalProps) {
+  const { selectedCalendar } = useSelectedCalendarStore();
+  const { userInfo } = useUserInfoStore();
   const titleRef = useRef<HTMLInputElement>(null);
   const [modalStyle, setModalStyle] = useState<React.CSSProperties>({});
-  const { selectedCalendar } = useSelectedCalendarStore();
 
   useUpdateModalStyle({ position, setModalStyle });
 
@@ -35,14 +36,15 @@ export default React.memo(function EventModal({
 
     if (!title) return alert('일정 제목이 비어있습니다.');
     if (!selectedDay) return alert('선택된 날이 없습니다.');
+    if (!userInfo) return alert('유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
     if (selectedCalendar === 'All') return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
 
     const eventData: reqGroupEvent = {
       groupCalendarId: selectedCalendar.calendarId,
       title: title,
-      startAt: format(selectedDay, 'yyyy-MM-dd'),
-      endAt: format(selectedDay, 'yyyy-MM-dd'),
-      members: null,
+      startAt: formatISO(selectedDay, { representation: 'complete' }),
+      endAt: formatISO(selectedDay, { representation: 'complete' }),
+      reqMembers: [userInfo.useremail],
       color: null,
     };
 

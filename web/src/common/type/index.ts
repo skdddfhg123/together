@@ -89,7 +89,7 @@ export interface reqGroupEvent {
   groupCalendarId?: CalendarId;
   title: string;
   color: string | null;
-  members: Member[] | null;
+  reqMembers?: string[] | null;
   startAt: string;
   endAt: string;
 }
@@ -97,6 +97,7 @@ export interface reqGroupEvent {
 export interface GroupEvent extends reqGroupEvent {
   groupCalendarTitle?: string;
   groupEventId?: UUID;
+  members: Member[] | null;
   author?: Author;
   pinned: boolean;
   alerts?: number;

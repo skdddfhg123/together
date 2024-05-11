@@ -95,6 +95,7 @@ export async function logOut() {
   alert('로그아웃 되었습니다.');
 }
 
+// TODO auth/all/v2 로 업그레이드 예정
 export async function firstRender() {
   try {
     const {

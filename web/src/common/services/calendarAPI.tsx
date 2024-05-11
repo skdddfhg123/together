@@ -129,13 +129,12 @@ export async function getGroupOneEvent(groupEventId: UUID) {
   }
 }
 
-// TODO 그룹 이벤트 등록시, 본인 email 포함되도록 수정
 export async function createGroupEvent({
   groupCalendarId,
   title,
   startAt,
   endAt,
-  members,
+  reqMembers,
   color,
 }: reqGroupEvent) {
   if (groupCalendarId === 'All') return alert('캘린더 목록에서 캘린더를 선택해주세요.');
@@ -145,7 +144,7 @@ export async function createGroupEvent({
       title,
       startAt,
       endAt,
-      member: members || [],
+      members: reqMembers || [],
       color: color || '#badfff',
     });
     if (!res) throw new Error('CALENDAR - createGroupEvent (DB 이벤트 생성 실패)');
