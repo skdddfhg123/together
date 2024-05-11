@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import * as API from '@utils/api';
-import { setCookie } from '@utils/cookie';
+import { setCookie, deleteCookie } from '@utils/cookie';
 
 import { Cookie, SignInForm, SignUpForm } from '@type/index';
 import {
@@ -90,8 +90,9 @@ export async function logIn(formData: SignInForm) {
   }
 }
 
+// TODO 구체화 필요
 export async function logOut() {
-  sessionStorage.removeItem('accessToken');
+  deleteCookie('accessToken');
   alert('로그아웃 되었습니다.');
 }
 

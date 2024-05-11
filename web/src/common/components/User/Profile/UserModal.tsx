@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import * as USER from '@services/userAPI';
 import defaultUserImg from '@assets/default_user.png';
 import '@styles/modalStyle.css';
 
@@ -14,6 +15,12 @@ export default React.memo(function UserModal() {
 
   const handleRedirect = (path: string) => {
     navigate(path);
+    setModalOpen(false);
+  };
+
+  const handleLogOut = async () => {
+    await USER.logOut();
+    navigate('/signin');
     setModalOpen(false);
   };
 
@@ -45,6 +52,9 @@ export default React.memo(function UserModal() {
               onClick={() => handleRedirect('/userinfo')}
             >
               유저 정보 관리
+            </button>
+            <button className="w-full h-10 hover:bg-custom-light" onClick={() => handleLogOut()}>
+              로그아웃
             </button>
           </div>
         )}
