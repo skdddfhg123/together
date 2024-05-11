@@ -46,5 +46,5 @@ export class CreateGroupEventDTO {
     })
     @IsArray()
     @IsString({ each: true })
-    members: string[];
+    member: string[];
 }
