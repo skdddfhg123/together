@@ -4,7 +4,7 @@ import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { Feed } from './entities/feed.entity';
 import { GroupEventService } from 'src/db/event/group_event/groupEvent.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UserService } from 'src/db/user/user.service';
 import { ReadFeedDTO } from './dtos/feed.read.dto';
 import { ImageService } from 'src/image.upload/image.service';
@@ -12,6 +12,7 @@ import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
 import { AwsService } from 'src/image.upload/aws.s3/aws.service';
 import { FeedImageBinded } from './interface/feedAndImageBinding';
 import { UtilsService } from 'src/utils/utils.service';
+import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 
 
 @Injectable()
@@ -172,6 +173,28 @@ export class FeedService {
         }
     }
 
+    async getAllFeedInCalendarPage(calendarId: string, options: IPaginationOptions): Promise<Pagination<ReadFeedDTO>> {
+        const queryBuilder = this.feedRepository.createQueryBuilder('feed')
+            .leftJoinAndSelect('feed.user', 'user')
+            .leftJoinAndSelect('feed.feedImages', 'feedImage')
+            .leftJoinAndSelect('group_event', 'group_event', 'group_event.groupEventId = feed.groupEventId')
+            .select([
+                'feed.feedType',
+                'feed.feedId',
+                'feed.title',
+                'feed.content',
+                'feed.createdAt',
+                'feed.updatedAt',
+                'user.nickname',
+                'user.thumbnail',
+                'feedImage.imageSrc'
+            ])
+            .where('group_event.calendarId = :calendarId', { calendarId })
+            .andWhere('feed.deletedAt IS NULL')
+            .orderBy('feed.createdAt', 'DESC')
+
+        return paginate<ReadFeedDTO>(queryBuilder as unknown as SelectQueryBuilder<ReadFeedDTO>, options);
+    }
 
     async getAllFeedInGroupEvent(groupEventId: string): Promise<ReadFeedDTO[]> {
         try {
@@ -209,6 +232,28 @@ export class FeedService {
         } catch (e) {
             throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${groupEventId}: ${e.message}`);
         }
+    }
+
+    async getAllFeedInGroupEventPage(groupEventId: string, options: IPaginationOptions): Promise<Pagination<ReadFeedDTO>> {
+        const queryBuilder = this.feedRepository.createQueryBuilder('feed')
+            .leftJoinAndSelect('feed.user', 'user')
+            .leftJoinAndSelect('feed.feedImages', 'feedImage')
+            .select([
+                'feed.feedType',
+                'feed.feedId',
+                'feed.title',
+                'feed.content',
+                'feed.createdAt',
+                'feed.updatedAt',
+                'user.nickname',
+                'user.thumbnail',
+                'feedImage.imageSrc'
+            ])
+            .where('feed.groupEventId = :groupEventId', { groupEventId })
+            .andWhere('feed.deletedAt IS NULL')
+            .orderBy('feed.createdAt', 'DESC')
+
+        return paginate<ReadFeedDTO>(queryBuilder as unknown as SelectQueryBuilder<ReadFeedDTO>, options);
     }
 
     async getFeedDetail(feedId: string): Promise<ReadFeedDTO> {
