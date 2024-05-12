@@ -40,12 +40,12 @@ export class GroupEventService {
         groupEvent.author = payload.useremail;
         groupEvent.calendarId = calendarId;
 
-        const { title, color, startAt, endAt, members } = userCreateGroupEventDTO;
+        const { title, color, startAt, endAt, member } = userCreateGroupEventDTO;
         groupEvent.title = title;
         groupEvent.color = color;
         groupEvent.startAt = startAt;
         groupEvent.endAt = endAt;
-        groupEvent.member = members;
+        groupEvent.member = member;
 
         try {
             const savedGroupEventEvent = await this.groupEventRepository.save(groupEvent);
@@ -126,8 +126,9 @@ export class GroupEventService {
                 title: event.title,
                 startAt: event.startAt,
                 endAt: event.endAt,
-                members: event.member,
+                member: event.member,
                 color: event.color,
+                // 이후 추가
                 // pinned: event.pinned,
                 // alerts: event.alerts,
                 // attachment: event.attachment,
@@ -243,8 +244,9 @@ export class GroupEventService {
 
     async getGroupEventUpdateForm(groupEventId: string): Promise<GroupEvent> {
         try {
-
+            console.log(groupEventId);
             const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId: groupEventId } });
+            console.log(groupEventToUpdate);
 
             if (!groupEventToUpdate) {
                 throw new Error('Group event not found');

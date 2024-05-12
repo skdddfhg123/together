@@ -208,7 +208,7 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async getGroupEventUpdateForm(
-        @Param('groupeventid') groupEventId: string,
+        @Param('groupeventId') groupEventId: string,
     ): Promise<GroupEvent> {
         return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
     }
