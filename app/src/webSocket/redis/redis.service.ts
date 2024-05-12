@@ -4,11 +4,13 @@ import Redis, { Redis as RedisClient } from 'ioredis';
 @Injectable()
 export class RedisService {
     private readonly pubClient: RedisClient;
-    private readonly subClient: RedisClient;
     private readonly redisClient: RedisClient;
     private readonly logger = new Logger(RedisService.name);
+    public readonly subClient: RedisClient;
 
-    constructor() {
+    constructor(
+
+    ) {
         const options = {
             host: process.env.REDIS_HOST,
             port: parseInt(process.env.REDIS_PORT, 10),
@@ -31,7 +33,7 @@ export class RedisService {
 
     async subscribe(channel: string): Promise<void> {
         await this.subClient.subscribe(channel);
-        this.logger.log(`Subscribed to ${channel}`);
+        this.logger.log(`Restore Subscripbed ${channel}`);
     }
 
     async publish(channel: string, message: string): Promise<number> {

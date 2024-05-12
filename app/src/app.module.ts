@@ -1,8 +1,8 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
-import { RedisService } from './redis/redis.service';
-import { RedisController } from './redis/redis.controller';
+import { RedisService } from './webSocket/redis/redis.service';
+import { RedisController } from './webSocket/redis/redis.controller';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { AuthModule } from './auth/auth.module';
@@ -13,13 +13,13 @@ import { UserModule } from './db/user/user.module';
 import { DataSource } from 'typeorm';
 import { AuthLoggerMiddleware, CalendarLoggerMiddleware, FeedLoggerMiddleware, GroupEventLoggerMiddleware, KakaoLoggerMiddleware, LoggerMiddleware, PlatformLoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { GoogleModule } from './auth/google/google.module';
-import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
 import { FeedModule } from './feed/feed.module';
 import { ImageModule } from './image.upload/image.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { EmojiModule } from './emoji/emoji.module';
-import { ChatModule } from './calendar/chat/chat.module';
+import { EventModule } from './webSocket/event.module';
 import { UtilsModule } from './utils/utils.module';
+import { RedisGateway } from './webSocket/redis/redis.gateway';
 
 @Module({
   imports: [
@@ -45,10 +45,10 @@ import { UtilsModule } from './utils/utils.module';
     FeedModule,
     ImageModule,
     EmojiModule,
-    ChatModule,
+    EventModule,
   ],
   controllers: [RedisController],
-  providers: [RedisService],
+  providers: [RedisService, RedisGateway],
   exports: [RedisService],
 })
 export class AppModule implements NestModule {

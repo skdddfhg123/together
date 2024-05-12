@@ -1,9 +1,10 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, WsException } from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ChatService } from './chat.service';
+import { ChatService } from './chat/chat.service';
 import { SetInitDTO } from './dtos/createChat.dto';
 import * as jwt from 'jsonwebtoken';
 import { SaveMessageDTO } from './dtos/saveMessage.dto';
+import { RedisService } from './redis/redis.service';
 
 @WebSocketGateway(5000, {
     cors: {
@@ -11,11 +12,19 @@ import { SaveMessageDTO } from './dtos/saveMessage.dto';
         credentials: true, // 웹 소켓 연결 시 자격 증명(쿠키 등)포함 허용 옵션
     },
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-    constructor(private readonly chatService: ChatService) { }
+export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
+    constructor(
+        private readonly chatService: ChatService,
+        private readonly redisService: RedisService,
+    ) { }
 
     @WebSocketServer()
     server: Server;
+
+    // =================================================================================================================
+    // |                                                 Connect                                                       |
+    // =================================================================================================================
 
     public handleConnection(client: Socket): void {
         const token = client.handshake.headers.authorization.split(' ')[1];
@@ -23,8 +32,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            if (!decoded)
-                throw new WsException(`invalid token: ${token}`);
             client.data.nickname = decoded['nickname'];
             client.data.email = decoded['useremail'];
             console.log(client.data)
@@ -33,8 +40,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.join(`mainRoom${client.data.email}`);
         }
         catch (err) {
-            client.disconnect(true);
             console.log(err);
+            client.emit('exception', { message: `invalid token` })
+            client.disconnect();
         }
     }
 
@@ -47,6 +55,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         console.log('disconnected', client.id);
     }
+
+    // =================================================================================================================
+    // |                                                    Chat                                                       |
+    // =================================================================================================================
 
     @SubscribeMessage('sendMessage')
     async sendMessage(client: Socket, message: string): Promise<void> {
@@ -77,10 +89,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('sendCombinedMessage')
     async sendCombinedMessage(client: Socket, payload: { text: string, imageUrl: string }) {
-        // this.server.to(payload.calendarId).emit('receiveCombinedMessage', payload);
-
-        console.log(payload.text);
-        console.log(payload.imageUrl);
 
         client.rooms.forEach((roomId) =>
             client.to(roomId).emit('getMessage', {

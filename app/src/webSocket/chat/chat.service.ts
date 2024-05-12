@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { ChatRoomListDTO } from "./dtos/createChat.dto";
+import { ChatRoomListDTO } from "../dtos/createChat.dto";
 import { Socket } from 'socket.io';
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { Chat, ChatSchema } from "./entities/chat.schema";
+import { Chat, ChatSchema } from "../entities/chat.schema";
 import { Connection, Model } from "mongoose";
-import { SaveMessageDTO } from "./dtos/saveMessage.dto";
+import { SaveMessageDTO } from "../dtos/saveMessage.dto";
 
 @Injectable()
 export class ChatService {
@@ -52,6 +52,7 @@ export class ChatService {
         if (!roomName) {
             this.createChatRoom(client, roomId);
         }
+        console.log("enterRoom");
         client.rooms.clear();
         client.join(roomId);
     }
@@ -94,7 +95,7 @@ export class ChatService {
         const limit = 10;
         const skipNum = (skipPage - 1) * limit;
 
-        return await chatModel.find().sort({ registeredAt: -1 }).skip(skipNum).limit(limit);
+        return await chatModel.find().skip(skipNum).limit(10);
     }
 
     async getPagenationMessage(calendarId: string, lastTime: Date): Promise<Chat[]> {

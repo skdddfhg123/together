@@ -4,8 +4,8 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 // import * as compression from 'compression';
 import { SwaggerDocument } from './swagger';
-import { SocketIoAdapter } from './calendar/chat/adapter/socketIoAdapter';
-import { ChatModule } from './calendar/chat/chat.module';
+import { SocketIoAdapter } from './webSocket/adapter/socketIoAdapter';
+import { EventModule } from './webSocket/event.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -34,10 +34,10 @@ async function bootstrap() {
   //   profilesSampleRate: 1.0,
   // });
 
-  const swaggerDocument = SwaggerDocument(app, [ChatModule]);
+  const swaggerDocument = SwaggerDocument(app, [EventModule]);
   SwaggerModule.setup('api', app, swaggerDocument);
 
-  app.useWebSocketAdapter(new SocketIoAdapter(app))
+  app.useWebSocketAdapter(new SocketIoAdapter(app));
 
   await app.listen(3000);
 }

@@ -197,7 +197,6 @@ export class CalendarController {
     async getAllGroupEvent23(
         @Param('calendarId') calendarId: string,
     ): Promise<GetGroupDTO[]> {
-        console.log(calendarId);
         return await this.groupEventService.getAllGroupEventsByCalendarId2(calendarId);
     }
 
