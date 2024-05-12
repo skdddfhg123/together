@@ -13,7 +13,7 @@ import { CalendarUpdateDto } from './dtos/calendar.update.dto';
 import { UpdateGroupEventDTO } from 'src/db/event/group_event/dtos/groupEvent.update.dto';
 import { RefreshAuthGuard } from 'src/auth/strategy/refresh.guard';
 import { GetGroupDTO } from 'src/db/event/group_event/dtos/groupEvent.get.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { RedisService } from 'src/webSocket/redis/redis.service';
 
 @ApiTags("calendar")
 @Controller('calendar')
@@ -21,7 +21,6 @@ export class CalendarController {
     constructor(
         private calendarService: CalendarService,
         private groupEventService: GroupEventService,
-        private eventEmitter: EventEmitter2,
     ) { }
 
     // 최신화 완료
@@ -37,9 +36,7 @@ export class CalendarController {
         @Body() calendarCreateDto: CalendarCreateDto,
         @getPayload() payload: PayloadResponse
     ): Promise<Calendar> {
-        const newCalendar =  await this.calendarService.createGroupCalendar(calendarCreateDto, payload);
-        this.eventEmitter.emit('createGroupCalendar', { userEmail: payload.useremail, calendarId: newCalendar.calendarId});
-        return newCalendar;
+        return await this.calendarService.createGroupCalendar(calendarCreateDto, payload);
     }
 
     @Get('get_calendar')
@@ -126,7 +123,6 @@ export class CalendarController {
         @getPayload() payload: PayloadResponse
     ): Promise<string> {
         // 채팅방 참여
-        this.eventEmitter.emit('addAttendee', { userEmail: payload.useremail, calendarId: calendarId, message: 'heres new challenger'});
         return this.calendarService.addAttendeeToCalendar(calendarId, payload);
     }
 

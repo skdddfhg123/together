@@ -19,7 +19,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EmojiModule } from './emoji/emoji.module';
 import { EventModule } from './webSocket/event.module';
 import { UtilsModule } from './utils/utils.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { RedisGateway } from './webSocket/redis/redis.gateway';
 
@@ -39,17 +38,6 @@ import { RedisGateway } from './webSocket/redis/redis.gateway';
       port: parseInt(process.env.REDIS_PORT),
       password: process.env.REDIS_PASS,
     }),
-    ClientsModule.register([
-      {
-        name: 'Test',
-        transport: Transport.REDIS,
-        options: {
-          host: process.env.REDIS_HOST,
-          port: parseInt(process.env.REDIS_PORT),
-          password: process.env.REDIS_PASS,
-        }
-      },
-    ]),
     UtilsModule,
     UserModule,
     AuthModule,

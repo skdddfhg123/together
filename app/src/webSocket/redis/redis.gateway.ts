@@ -1,9 +1,8 @@
-// redis.gateway.ts
 import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { RedisService } from './redis.service';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway(5005, { // 다른 포트 번호 지정
+@WebSocketGateway(5005, {
     cors: {
         origin: 'http://localhost:3000',
         credentials: true,

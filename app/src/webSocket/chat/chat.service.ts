@@ -92,7 +92,13 @@ export class ChatService {
         const limit = 10;
         const skipNum = (skipPage - 1) * limit;
 
-        return await chatModel.find().skip(skipNum).limit(limit);
+        return await chatModel.find().skip(skipNum).limit(10);
+    }
+
+    async getPagenationMessage(calendarId: string, lastTime: Date): Promise<Chat[]> {
+        const chatModel = this.getModelForCalendar(calendarId);
+
+        return await chatModel.find({registeredAt: {$lt: lastTime}}).sort({registeredAt: -1}).limit(10);
     }
 
     async findThreeDaysAgoMessageByCalendarId(calendarId: string): Promise<Chat[]> {

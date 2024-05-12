@@ -6,31 +6,31 @@ import { ApiBody, ApiOperation } from '@nestjs/swagger';
 export class RedisController {
     constructor(private readonly redisService: RedisService) {}
 
-    // @Post('publish')
-    // @ApiOperation({ summary: 'Publish message to a channel' })
-    // @ApiBody({ 
-    //     schema: {
-    //         type: 'object',
-    //         required: ['channel', 'message'],
-    //         properties: { channel: { type: 'string' } , message: { type: 'string' } },
-    //     },
-    // })
-    // publish(@Body() payload: { channel: string; message: string }) {
-    //     const { channel, message } = payload;
-    //     return this.redisService.publish(channel, message);
-    // }
+    @Post('publish')
+    @ApiOperation({ summary: 'Publish message to a channel' })
+    @ApiBody({ 
+        schema: {
+            type: 'object',
+            required: ['channel', 'message'],
+            properties: { channel: { type: 'string' } , message: { type: 'string' } },
+        },
+    })
+    publish(@Body() payload: { channel: string; message: string }) {
+        const { channel, message } = payload;
+        return this.redisService.publish(channel, message);
+    }
 
-    // @Get('subscribe/:channel')
-    // @ApiOperation({ summary: 'Subscribe to a channel' })
-    // subscribe(@Param('channel') channel: string) {
-    //     return this.redisService.subscribe(channel);
-    // }
+    @Get('subscribe/:channel')
+    @ApiOperation({ summary: 'Subscribe to a channel' })
+    subscribe(@Param('channel') channel: string) {
+        return this.redisService.subscribe(channel);
+    }
 
-    // @Get('unsubscribe/:channel')
-    // @ApiOperation({ summary: 'UnSubscribe to a channel' })
-    // unsubscribe(@Param('channel') channel: string) {
-    //     return this.redisService.unsubscribe(channel);
-    // }
+    @Get('unsubscribe/:channel')
+    @ApiOperation({ summary: 'UnSubscribe to a channel' })
+    unsubscribe(@Param('channel') channel: string) {
+        return this.redisService.unsubscribe(channel);
+    }
 
     @ApiBody({ 
         schema: {

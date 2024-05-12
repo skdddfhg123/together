@@ -6,13 +6,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerDocument } from './swagger';
 import { SocketIoAdapter } from './webSocket/adapter/socketIoAdapter';
 import { EventModule } from './webSocket/event.module';
-import { Transport } from '@nestjs/microservices';
-import { RedisService } from './webSocket/redis/redis.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: 'http://localhost:3001',
+      origin: 'http://localhost:3000',
       credentials: true,
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       preflightContinue: false,
@@ -42,10 +40,7 @@ async function bootstrap() {
   const swaggerDocument = SwaggerDocument(app, [EventModule]);
   SwaggerModule.setup('api', app, swaggerDocument);
 
-  const redisService = app.get(RedisService);
-  const redisIoAdapter = new SocketIoAdapter(app, redisService);
-  await redisIoAdapter.connectToRedis();
-  app.useWebSocketAdapter(redisIoAdapter);
+  app.useWebSocketAdapter(new SocketIoAdapter(app));
 
   await app.listen(3000);
 }

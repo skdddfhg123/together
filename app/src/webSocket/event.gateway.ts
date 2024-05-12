@@ -5,8 +5,6 @@ import { SetInitDTO } from './dtos/createChat.dto';
 import * as jwt from 'jsonwebtoken';
 import { SaveMessageDTO } from './dtos/saveMessage.dto';
 import { RedisService } from './redis/redis.service';
-import { OnEvent } from '@nestjs/event-emitter';
-import { EventDto } from './dtos/event.dto';
 
 @WebSocketGateway(5000, {
     cors: {
@@ -90,7 +88,6 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('sendCombinedMessage')
     async sendCombinedMessage(client: Socket, payload: { text: string, imageUrl: string }) {
-        // this.server.to(payload.calendarId).emit('receiveCombinedMessage', payload);
 
         client.rooms.forEach((roomId) =>
             client.to(roomId).emit('getMessage', {
@@ -183,54 +180,19 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.to(payload.calendarId).emit('receiveImage', payload.imageUrl);
     }
 
-    @SubscribeMessage('enterRoom')
-    async enterRoom(client: Socket, channel: string) : Promise<void> {
-        const userEmail = client.data.email;
-        // const publisherEmail = await this.redisService.getPublisherInfo(channel);
+    @SubscribeMessage('getNextMessage')
+    async getNextMessage(client: Socket, payload: {calendarId: string, time: string}) : Promise<void> {
+        const lastTime = new Date(payload.time);
+        const newMessages = await this.chatService.getPagenationMessage(payload.calendarId, lastTime);
 
-        // if(userEmail === publisherEmail)
-            client.join(channel);
-            this.server.to(channel).emit('welcome', `Welcome to the room ${channel}`);
-    }
-
-    // =================================================================================================================
-    // |                                               Event Alarm                                                     |
-    // =================================================================================================================
-
-    @OnEvent('messageReceived')
-    handleEventReceived(data: EventDto) {
-        this.server.to(data.calendarId).emit('sendMessage', data.message);
-    }
-
-    @OnEvent('login')
-    async handleLoginEvent(event: EventDto): Promise<void> {
-        console.log("login redis")
-        try {
-            const temp = await this.redisService.restoreSubscription(event.userEmail)
-            console.log(temp);
-        }
-        catch(err) {
-            console.log('login:', err);
-        };
-    }
-
-    @OnEvent('addAttendee')
-    handleAttendeeAddedEvent(event: EventDto): void {
-
-        const temp = this.redisService.subscribeAndSave(event.userEmail, event.calendarId)
-            .then(() => {
-                console.log(temp)
-                this.redisService.publish(event.calendarId, event.message);
-                this.server.to(event.calendarId).emit(`${event.calendarId}`);
-                // this.redisService.setPublisherInfo(event.calendarId, event.userEmail);
-            })
-            .catch(err => {
-                console.log('addAttendee:', err);
+        newMessages.forEach((message) => {
+            client.emit('getNextMessage', {
+                id: message._id,
+                email: message.email,
+                nickname: message.nickname,
+                message: message.message,
+                registeredAt: message.registeredAt,
             });
-    }
-
-    @OnEvent('createGroupCalendar')
-    async handleCreateGroupCalendar(event: EventDto): Promise<void> {
-        await this.redisService.subscribeAndSave(event.userEmail, event.calendarId);
+        });
     }
 }

@@ -30,6 +30,11 @@ import { User } from 'src/db/user/entities/user.entity';
     GroupEventModule,
   ],
   controllers: [CalendarController],
-  providers: [CalendarService, JWTStrategy, RefreshStrategy, UtilsService]
+  providers: [
+    CalendarService,
+    JWTStrategy,
+    RefreshStrategy,
+    UtilsService,
+  ]
 })
 export class CalendarModule { }
