@@ -4,25 +4,18 @@ import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { Feed } from './entities/feed.entity';
 import { GroupEventService } from 'src/db/event/group_event/groupEvent.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UserService } from 'src/db/user/user.service';
 import { ReadFeedDTO } from './dtos/feed.read.dto';
 import { ImageService } from 'src/image.upload/image.service';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
-import { UtilsService } from 'src/image.upload/aws.s3/utils/utils.service';
 import { AwsService } from 'src/image.upload/aws.s3/aws.service';
-import { FeedImageBinded } from './interface/feedAndImageBinding';
-import { Calendar } from 'src/calendar/entities/calendar.entity';
-import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
-
+import { UtilsService } from 'src/utils/utils.service';
+import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class FeedService {
     constructor(
-        @InjectRepository(Calendar)
-        private calendarRepository: Repository<Calendar>,
-        @InjectRepository(Calendar)
-        private groupEventRepository: Repository<GroupEvent>,
         @InjectRepository(Feed)
         private readonly feedRepository: Repository<Feed>,
         @InjectRepository(FeedImage)
@@ -103,21 +96,20 @@ export class FeedService {
 
             let feedImages = []
             if (images && images.length) {
-                const imageUrls = await this.imageService.imageArrayUpload(images);
 
-                for (const imageUrl of imageUrls) {
+                for (const image of images) {
                     const feedImage = new FeedImage();
-                    const id = this.utilsService.extractFilename(imageUrl);
-                    feedImage.feedImageId = id
+                    feedImage.feedImageId = this.utilsService.getUUID();
                     feedImage.feed = feed;
-                    feedImage.imageSrc = imageUrl;
-                    const savedFeedImage = await this.feedImageRepository.save(feedImage);
+                    feedImage.imageSrc = await this.imageService.feedImageUpload(image, feedImage.feedImageId);
+
+                    await this.feedImageRepository.save(feedImage);
                     delete feedImage.feed;
                     const { imageSrc, feedImageId } = feedImage
                     const resImage = { imageSrc, feedImageId }
                     feedImages.push(resImage);
-                    }
                 }
+            }
 
             delete feed.user.useremail
             delete feed.user.password
@@ -143,31 +135,29 @@ export class FeedService {
         try {
 
             const feedsInCalendar = await this.feedRepository.createQueryBuilder('feed')
-            .leftJoinAndSelect('feed.user', 'user')
-            .leftJoinAndSelect('feed.feedImages', 'feedImage') 
-            .leftJoinAndSelect('group_event', 'group_event', 'group_event.groupEventId = feed.groupEventId')
-            .select([
-                'feed.feedType',
-                'feed.feedId',
-                'feed.groupEventId',
-                'feed.title',
-                'feed.content',
-                'feed.createdAt',
-                'feed.updatedAt',
-                'user.nickname',  
-                'user.thumbnail', 
-                'feedImage.imageSrc' 
-            ])
-            .where('group_event.calendarId = :calendarId', { calendarId }) 
-            .andWhere('feed.deletedAt IS NULL')
-            .orderBy('feed.createdAt', 'DESC')
-            .getMany();
+                .leftJoinAndSelect('feed.user', 'user')
+                .leftJoinAndSelect('feed.feedImages', 'feedImage')
+                .leftJoinAndSelect('group_event', 'group_event', 'group_event.groupEventId = feed.groupEventId')
+                .select([
+                    'feed.feedType',
+                    'feed.feedId',
+                    'feed.title',
+                    'feed.content',
+                    'feed.createdAt',
+                    'feed.updatedAt',
+                    'user.nickname',
+                    'user.thumbnail',
+                    'feedImage.imageSrc'
+                ])
+                .where('group_event.calendarId = :calendarId', { calendarId })
+                .andWhere('feed.deletedAt IS NULL')
+                .orderBy('feed.createdAt', 'DESC')
+                .getMany();
 
             return feedsInCalendar.map(feed => {
                 const dto = new ReadFeedDTO();
                 dto.feedId = feed.feedId;
                 dto.title = feed.title;
-                dto.groupEventId = feed.groupEventId;
                 dto.content = feed.content;
                 dto.createdAt = feed.createdAt;
                 dto.updatedAt = feed.updatedAt;
@@ -181,7 +171,28 @@ export class FeedService {
         }
     }
 
+    async getAllFeedInCalendarPage(calendarId: string, options: IPaginationOptions): Promise<Pagination<ReadFeedDTO>> {
+        const queryBuilder = this.feedRepository.createQueryBuilder('feed')
+            .leftJoinAndSelect('feed.user', 'user')
+            .leftJoinAndSelect('feed.feedImages', 'feedImage')
+            .leftJoinAndSelect('group_event', 'group_event', 'group_event.groupEventId = feed.groupEventId')
+            .select([
+                'feed.feedType',
+                'feed.feedId',
+                'feed.title',
+                'feed.content',
+                'feed.createdAt',
+                'feed.updatedAt',
+                'user.nickname',
+                'user.thumbnail',
+                'feedImage.imageSrc'
+            ])
+            .where('group_event.calendarId = :calendarId', { calendarId })
+            .andWhere('feed.deletedAt IS NULL')
+            .orderBy('feed.createdAt', 'DESC')
 
+        return paginate<ReadFeedDTO>(queryBuilder as unknown as SelectQueryBuilder<ReadFeedDTO>, options);
+    }
 
     async getAllFeedInGroupEvent(groupEventId: string): Promise<ReadFeedDTO[]> {
         try {
@@ -219,6 +230,28 @@ export class FeedService {
         } catch (e) {
             throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${groupEventId}: ${e.message}`);
         }
+    }
+
+    async getAllFeedInGroupEventPage(groupEventId: string, options: IPaginationOptions): Promise<Pagination<ReadFeedDTO>> {
+        const queryBuilder = this.feedRepository.createQueryBuilder('feed')
+            .leftJoinAndSelect('feed.user', 'user')
+            .leftJoinAndSelect('feed.feedImages', 'feedImage')
+            .select([
+                'feed.feedType',
+                'feed.feedId',
+                'feed.title',
+                'feed.content',
+                'feed.createdAt',
+                'feed.updatedAt',
+                'user.nickname',
+                'user.thumbnail',
+                'feedImage.imageSrc'
+            ])
+            .where('feed.groupEventId = :groupEventId', { groupEventId })
+            .andWhere('feed.deletedAt IS NULL')
+            .orderBy('feed.createdAt', 'DESC')
+
+        return paginate<ReadFeedDTO>(queryBuilder as unknown as SelectQueryBuilder<ReadFeedDTO>, options);
     }
 
     async getFeedDetail(feedId: string): Promise<ReadFeedDTO> {
@@ -266,8 +299,8 @@ export class FeedService {
     }
 
     async updateFeed(
-        payload: PayloadResponse, 
-        feedId: string, 
+        payload: PayloadResponse,
+        feedId: string,
         updateData: Partial<Feed>,
         newImages?: Express.Multer.File[]
     ): Promise<{ feed: Feed, updatedFeedImages?: FeedImage[] }> {
@@ -275,8 +308,8 @@ export class FeedService {
             const feedToUpdate = await this.feedRepository.createQueryBuilder('feed')
                 .innerJoinAndSelect('feed.user', 'user')
                 .leftJoinAndSelect('feed.feedImages', 'feedImage')
-                .where('feed.feedId = :feedId', { feedId }) 
-                .andWhere('feed.deletedAt IS NULL') 
+                .where('feed.feedId = :feedId', { feedId })
+                .andWhere('feed.deletedAt IS NULL')
                 .getOne();
 
             if (!feedToUpdate) {
@@ -288,7 +321,7 @@ export class FeedService {
             }
 
             const updatedFeed = this.feedRepository.merge(feedToUpdate, updateData);
-            updatedFeed.updatedAt = new Date();  
+            updatedFeed.updatedAt = new Date();
 
             let updatedFeedImages = [];
             if (newImages && newImages.length) {
@@ -299,18 +332,18 @@ export class FeedService {
                 });
 
                 // 새 이미지를 S3에 업로드 및 저장
-            const imageUrls = await this.imageService.imageArrayUpload(newImages);
-            for (const imageUrl of imageUrls) {
-                const feedImage = new FeedImage();
-                feedImage.feed = updatedFeed;
-                feedImage.imageSrc = imageUrl;
-                const savedFeedImage = await this.feedImageRepository.save(feedImage);
-                updatedFeedImages.push({
-                    imageSrc: savedFeedImage.imageSrc,
-                    feedImageId: savedFeedImage.feedImageId
-                });
+                const imageUrls = await this.imageService.imageArrayUpload(newImages);
+                for (const imageUrl of imageUrls) {
+                    const feedImage = new FeedImage();
+                    feedImage.feed = updatedFeed;
+                    feedImage.imageSrc = imageUrl;
+                    const savedFeedImage = await this.feedImageRepository.save(feedImage);
+                    updatedFeedImages.push({
+                        imageSrc: savedFeedImage.imageSrc,
+                        feedImageId: savedFeedImage.feedImageId
+                    });
+                }
             }
-        }
 
             await this.feedRepository.save(updatedFeed);
             return { feed: updatedFeed, updatedFeedImages };
@@ -336,11 +369,11 @@ export class FeedService {
     //             .where('feed.feedId = :feedId', { feedId }) 
     //             .andWhere('feed.deletedAt IS NULL') 
     //             .getOne();
-    
+
     //         if (!feedToUpdate) {
     //             throw new NotFoundException('Feed not found');
     //         }
-    
+
     //         if (feedToUpdate.user?.useremail !== payload.useremail) {
     //             throw new ForbiddenException('Access denied'); 
     //         }
@@ -383,7 +416,7 @@ export class FeedService {
 
 
 
-    
+
     // async updateFeed(
     //     payload: PayloadResponse, 
     //     feedId: string, 
@@ -395,11 +428,11 @@ export class FeedService {
     //             .where('feed.feedId = :feedId', { feedId }) 
     //             .andWhere('feed.deletedAt IS NULL') 
     //             .getOne();
-    
+
     //         if (!feedToUpdate) {
     //             throw new NotFoundException('Feed not found');
     //         }
-    
+
     //         if (feedToUpdate.user?.useremail !== payload.useremail) {
     //             throw new ForbiddenException('Access denied'); 
     //         }
@@ -418,8 +451,8 @@ export class FeedService {
 
 
 
-    
-    async removeFeed(payload: PayloadResponse, feedId: string): Promise<Feed>{
+
+    async removeFeed(payload: PayloadResponse, feedId: string): Promise<Feed> {
         try {
             const feed = await this.feedRepository.findOne({
                 where: { feedId: feedId },

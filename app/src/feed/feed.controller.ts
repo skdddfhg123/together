@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PayloadResponse } from 'src/auth/dtos/payload-response';
 import { getPayload } from 'src/auth/getPayload.decorator';
@@ -16,6 +16,7 @@ import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express
 import { FeedImageBinded } from './interface/feedAndImageBinding';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt.guard';
+import { Pagination } from 'nestjs-typeorm-paginate';
 
 @ApiTags("feed")
 @Controller('feed')
@@ -25,29 +26,6 @@ export class FeedController {
         private feedService: FeedService,
         private feedCommentService: FeedCommentService
     ) { }
-
-    // 피드 작성
-    // @Post('create/:groupeventId')
-    // @UseInterceptors(FileFieldsInterceptor([
-    //     { name: 'images', maxCount: 5 }
-    //   ]))
-    // @ApiConsumes('multipart/form-data', 'application/json')
-    // @ApiOperation({ summary: 'group event 내에서 피드 생성' })
-    // @ApiResponse({ status: 201, description: 'Feed created successfully' })
-    // @ApiResponse({ status: 403, description: 'Forbidden' })
-    // @ApiBearerAuth('JWT-auth')
-    // @ApiBody({ type: CreateFeedDTO })
-    // @UseGuards(JwtAuthGuard)
-    // async createFeed(
-
-    //   @Body() createFeedDto: CreateFeedDTO,
-    //   @getPayload() payload: PayloadResponse,
-    //   @Param('groupeventId') groupEventId: string,
-    //   @UploadedFiles() files: { images?: Express.Multer.File[] }
-
-    // )   { 
-    //      await this.feedService.createFeed(createFeedDto, payload, groupEventId, files.images);
-    // }
 
     @Post('create/:groupeventId')
     @UseInterceptors(FileFieldsInterceptor([
@@ -71,7 +49,38 @@ export class FeedController {
         return await this.feedService.createFeed(createFeedDto, payload, groupEventId, files.images);
     }
 
+    @Get('get/calendar/:calendarId')
+    @ApiConsumes('multipart/form-data', 'application/json')
+    @ApiOperation({ summary: 'group calendar의 전체 피드 가져오기' })
+    @ApiResponse({ status: 200, description: 'Get Feeds successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch feeds for group event ID' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async getAllFeedInCalendar(
 
+        @Param('calendarId') calendarId: string,
+
+    ): Promise<ReadFeedDTO[]> {
+        return await this.feedService.getAllFeedInCalendar(calendarId);
+    }
+
+    @Get('get/calendar/page/:calendarId')
+    @ApiOperation({ summary: 'group event의 전체 피드 가져오기' })
+    @ApiResponse({ status: 200, description: 'Get Feeds successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch feeds for group event ID' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async getAllGroupEventPage(
+        @Param('calendarId') calendarId: string,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    ): Promise<Pagination<ReadFeedDTO>> {
+        limit = Math.min(100, limit); // 최대 100개 제한
+        return this.feedService.getAllFeedInCalendarPage(calendarId, {
+            page,
+            limit,
+        });
+    }
 
     //그룹 캘린더에서 피드 일괄 출력
     @Get('get/calendar/:calendarId')
@@ -106,6 +115,24 @@ export class FeedController {
         return await this.feedService.getAllFeedInGroupEvent(groupEventId);
     }
 
+    @Get('get/groupevent/page/:groupeventId')
+    @ApiOperation({ summary: 'group event의 전체 피드 가져오기' })
+    @ApiResponse({ status: 200, description: 'Get Feeds successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch feeds for group event ID' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    async getAllFeedInGroupEventPage(
+        @Param('groupeventId') groupeventId: string,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    ): Promise<Pagination<ReadFeedDTO>> {
+        limit = Math.min(100, limit); // 최대 100개 제한
+        return this.feedService.getAllFeedInGroupEventPage(groupeventId, {
+            page,
+            limit,
+        });
+    }
+
 
     // 특정 피드 보기, 피드 수정 form 
     @Get('get/detail/:feedId')
@@ -122,25 +149,6 @@ export class FeedController {
     }
 
     // 피드 수정하기
-    // @Patch('update/:feedId')
-    // @ApiOperation({ summary: '피드 업데이트' })
-    // @ApiResponse({ status: 200, description: 'Feed updated successfully' })
-    // @ApiResponse({ status: 403, description: 'You do not have permission to update this feed' })
-    // @ApiResponse({ status: 404, description: 'Feed not found' })
-    // @ApiResponse({ status: 500, description: 'Error updating feed' })
-    // @ApiBearerAuth('JWT-auth')
-    // @UseGuards(JwtAuthGuard)
-    // async updateFeed(
-
-    //     @getPayload() payload: PayloadResponse,
-    //     @Param('feedId') feedId: string, 
-    //     @Body() feedDTO: UpdateFeedDTO
-
-    // ): Promise<Feed> {
-    //         return await this.feedService.updateFeed(payload, feedId, feedDTO);
-    // }
-
-    // 피드 수정하기
     @Patch('update/:feedId')
     @ApiOperation({ summary: '피드 업데이트' })
     @ApiConsumes('multipart/form-data')
@@ -153,16 +161,16 @@ export class FeedController {
     @UseInterceptors(FileFieldsInterceptor
         ([
             { name: 'images', maxCount: 5 }
-          ]
-    ))
+        ]
+        ))
     async updateFeed(
 
         @getPayload() payload: PayloadResponse,
-        @Param('feedId') feedId: string, 
+        @Param('feedId') feedId: string,
         @Body() feedDTO: UpdateFeedDTO,
         @UploadedFiles() images: Express.Multer.File[]
     ): Promise<{ feed: Feed, updatedFeedImages?: FeedImage[] }> {
-            return await this.feedService.updateFeed(payload, feedId, feedDTO, images);
+        return await this.feedService.updateFeed(payload, feedId, feedDTO, images);
     }
 
 
@@ -254,7 +262,7 @@ export class FeedController {
         return await this.feedCommentService.updateFeedComment(payload, feedCommentId, updateFeedCommentDTO);
     }
 
-    // 특정 댓글 삭제하기기
+    // 특정 댓글 삭제하기
     @Patch('comment/remove/:feedcommentId')
     @ApiOperation({ summary: '피드댓글 삭제' })
     @ApiResponse({ status: 200, description: 'Feed comment removed successfully' })

@@ -37,15 +37,15 @@ export class GroupEventService {
         }
 
         const groupEvent = new GroupEvent();
-        groupEvent.author = payload.userCalendarId;
+        groupEvent.author = payload.useremail;
         groupEvent.calendarId = calendarId;
 
-        const { title, color, startAt, endAt, emails } = userCreateGroupEventDTO;
+        const { title, color, startAt, endAt, member } = userCreateGroupEventDTO;
         groupEvent.title = title;
         groupEvent.color = color;
         groupEvent.startAt = startAt;
         groupEvent.endAt = endAt;
-        groupEvent.member = emails;
+        groupEvent.member = member;
 
         try {
             const savedGroupEventEvent = await this.groupEventRepository.save(groupEvent);
@@ -75,6 +75,81 @@ export class GroupEventService {
             throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${CalendarId}`);
         }
     }
+
+    async getAllGroupEventsByCalendarIdV2(calendarId: string): Promise<any> {
+        try {
+            const today = new Date();
+            const fortyFiveDaysAgo = new Date();
+            fortyFiveDaysAgo.setDate(today.getDate() - 45);
+            const fortyFiveDaysLater = new Date();
+            fortyFiveDaysLater.setDate(today.getDate() + 45);
+
+            const calendar = await this.calendarRepository.findOne({
+                where: {
+                    calendarId: calendarId,
+                    isDeleted: false
+                },
+                select: ['calendarId', 'title', 'coverImage', 'bannerImage', 'type']
+            });
+
+            if (!calendar) {
+                throw new InternalServerErrorException(`No calendar found with ID ${calendarId}`);
+            }
+
+            const groupEvents = await this.groupEventRepository
+                .createQueryBuilder("groupEvent")
+                .where("groupEvent.calendarId = :calendarId", { calendarId })
+                .andWhere("groupEvent.isDeleted = false")
+                .andWhere("groupEvent.startAt BETWEEN :startDate AND :endDate", {
+                    startDate: fortyFiveDaysAgo,
+                    endDate: fortyFiveDaysLater
+                })
+                .orderBy("groupEvent.startAt", "ASC")
+                .getMany();
+
+            if (!groupEvents.length) {
+                console.log(`No group events found for calendar ID ${calendarId}`);
+                return {
+                    groupCalendar: {
+                        calendarId: calendar.calendarId,
+                        title: calendar.title,
+                        coverImage: calendar.coverImage,
+                        bannerImage: calendar.bannerImage,
+                        type: calendar.type,
+                        events: []
+                    },
+                };
+            }
+
+            const events = groupEvents.map(event => ({
+                groupEventId: event.groupEventId,
+                title: event.title,
+                startAt: event.startAt,
+                endAt: event.endAt,
+                member: event.member,
+                color: event.color,
+                // 이후 추가
+                // pinned: event.pinned,
+                // alerts: event.alerts,
+                // attachment: event.attachment,
+            }));
+
+            return {
+                groupCalendar: {
+                    calendarId: calendar.calendarId,
+                    title: calendar.title,
+                    coverImage: calendar.coverImage,
+                    bannerImage: calendar.bannerImage,
+                    type: calendar.type,
+                    events: events
+                },
+            };
+        } catch (e) {
+            console.error('Error occurred while fetching group events:', e);
+            throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}`);
+        }
+    }
+
 
     async getAllGroupEventsByCalendarId2(calendarId: string): Promise<GetGroupDTO[]> {
         try {
@@ -169,7 +244,9 @@ export class GroupEventService {
 
     async getGroupEventUpdateForm(groupEventId: string): Promise<GroupEvent> {
         try {
+            console.log(groupEventId);
             const groupEventToUpdate = await this.groupEventRepository.findOne({ where: { groupEventId: groupEventId } });
+            console.log(groupEventToUpdate);
 
             if (!groupEventToUpdate) {
                 throw new Error('Group event not found');

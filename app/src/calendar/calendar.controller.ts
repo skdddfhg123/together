@@ -22,6 +22,7 @@ export class CalendarController {
         private groupEventService: GroupEventService,
     ) { }
 
+    // 최신화 완료
     @Post('create')
     @ApiOperation({ summary: '그룹 캘린더 생성' })
     @ApiResponse({ status: 201, description: 'Calendar created successfully' })
@@ -51,6 +52,20 @@ export class CalendarController {
         return await this.calendarService.findCalendarsByUserCalendarId(payload.userCalendarId);
     }
 
+    @Get('get_calendar/v2')
+    @ApiOperation({ summary: '전체 그룹 캘린더 가져오기' })
+    @ApiResponse({ status: 200, description: 'Calendars retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'Calendars not found' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
+    async getGroupCalendarV2(
+        @getPayload() payload: PayloadResponse
+    ): Promise<Calendar[]> {
+        return await this.calendarService.findCalendarsByUserCalendarIdV2(payload.userCalendarId);
+    }
+
     @Patch('update/:calendarId')
     @ApiOperation({ summary: '캘린더 정보 업데이트' })
     @ApiResponse({ status: 200, description: 'Calendar updated successfully' })
@@ -68,7 +83,7 @@ export class CalendarController {
     }
 
     @Patch('delete/:calendarId')
-    @ApiOperation({ summary: 'Delete a calendar and its associated group events' })
+    @ApiOperation({ summary: '캘린더 삭제' })
     @ApiResponse({ status: 204, description: 'Calendar and associated group events deleted successfully' })
     @ApiResponse({ status: 404, description: 'Calendar not found' })
     @ApiResponse({ status: 500, description: 'Failed to delete calendar' })
@@ -93,6 +108,7 @@ export class CalendarController {
         }
     }
 
+    // 최신화 완료
     @Patch('participate/:calendarId')
     @ApiOperation({ summary: '그룹 캘린더 참여하기' })
     @ApiResponse({ status: 200, description: 'Attendee added successfully' })
@@ -105,9 +121,11 @@ export class CalendarController {
         @Param('calendarId') calendarId: string,
         @getPayload() payload: PayloadResponse
     ): Promise<string> {
+        // 채팅방 참여
         return this.calendarService.addAttendeeToCalendar(calendarId, payload);
     }
 
+    // 최신화 완료
     @Patch('withdraw/:calendarId')
     @ApiOperation({ summary: '그룹 캘린더 나가기' })
     @ApiResponse({ status: 200, description: 'Attendee removed successfully' })
@@ -120,6 +138,7 @@ export class CalendarController {
         @Param('calendarId') calendarId: string,
         @getPayload() payload: PayloadResponse
     ): Promise<string> {
+        //채팅방 나가기
         return this.calendarService.removeAttendeeFromCalendar(calendarId, payload.userCalendarId);
     }
 
@@ -154,6 +173,20 @@ export class CalendarController {
         return await this.groupEventService.getAllGroupEventsByCalendarId(calendarId);
     }
 
+    @Get('group/get/all/v2/:calendarId')
+    @ApiOperation({ summary: '캘린더 별 그룹 일정 가져오기(필터:45일전후)' })
+    @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
+    @ApiResponse({ status: 500, description: 'Failed to fetch group events for calendar ID' })
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
+    // @UseGuards(RefreshAuthGuard)
+    async getAllGroupEvent2(
+        @Param('calendarId') calendarId: string,
+    ): Promise<any> {
+        console.log(calendarId);
+        return await this.groupEventService.getAllGroupEventsByCalendarIdV2(calendarId);
+    }
+
     @Get('group/get/v2/:calendarId')
     @ApiOperation({ summary: '캘린더 그룹 이벤트 가져오기' })
     @ApiResponse({ status: 200, description: 'Get GroupEvent successfully' })
@@ -161,7 +194,7 @@ export class CalendarController {
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
-    async getAllGroupEvent2(
+    async getAllGroupEvent23(
         @Param('calendarId') calendarId: string,
     ): Promise<GetGroupDTO[]> {
         console.log(calendarId);
@@ -174,7 +207,7 @@ export class CalendarController {
     @UseGuards(JwtAuthGuard)
     // @UseGuards(RefreshAuthGuard)
     async getGroupEventUpdateForm(
-        @Param('groupeventid') groupEventId: string,
+        @Param('groupeventId') groupEventId: string,
     ): Promise<GroupEvent> {
         return await this.groupEventService.getGroupEventUpdateForm(groupEventId);
     }

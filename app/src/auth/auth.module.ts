@@ -11,6 +11,7 @@ import { RefreshStrategy } from './strategy/refresh.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/db/user/entities/user.entity';
 import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
+import { Calendar } from 'src/calendar/entities/calendar.entity';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity'
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User, UserCalendar]),
+    TypeOrmModule.forFeature([User, UserCalendar, Calendar]),
     UserModule,
     UserCalendarModule,
     TokensModule,

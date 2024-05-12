@@ -3,13 +3,13 @@ import { UserCalendar } from "../../../user_calendar/entities/userCalendar.entit
 import { IsNotEmpty, IsOptional } from "class-validator";
 
 @Entity('social_event')
-@Unique(['social', 'startAt', 'endAt', 'userCalendar'] )
+@Unique(['social', 'startAt', 'endAt', 'userCalendar'])
 export class SocialEvent {
 
     @PrimaryGeneratedColumn('uuid')
     socialEventId: string;
 
-    @ManyToOne(() => UserCalendar, calendar => calendar.socialEvents, {nullable: true})
+    @ManyToOne(() => UserCalendar, calendar => calendar.socialEvents, { nullable: true })
     @JoinColumn({ name: 'userCalendarId' })
     userCalendar: UserCalendar;
 
@@ -17,7 +17,7 @@ export class SocialEvent {
     @IsNotEmpty()
     social: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     @IsOptional()
     title: string;
 
@@ -31,5 +31,4 @@ export class SocialEvent {
 
     @Column({ default: false })
     deactivatedAt: boolean;
-
 }

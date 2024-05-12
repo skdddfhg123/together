@@ -7,6 +7,9 @@ import { CreateUserDTO } from './dtos/create-user.dto';
 import { SaveAccessTokenDto } from '../tokens/dtos/saveAccessToken.dto';
 import { SaveRefreshTokenDto } from '../tokens/dtos/saveRefreshToken.dto';
 import { TokensService } from '../tokens/tokens.service';
+import { ImageService } from 'src/image.upload/image.service';
+import { PayloadResponse } from 'src/auth/dtos/payload-response';
+import { UserUpdateDto } from './dtos/user.update.dto';
 
 @Injectable()
 export class UserService {
@@ -15,7 +18,9 @@ export class UserService {
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
 
-        private readonly tokensService: TokensService
+        private readonly tokensService: TokensService,
+
+        private readonly imageService: ImageService
     ) { }
 
     async signUp(userDTO: CreateUserDTO): Promise<User> {
@@ -52,6 +57,28 @@ export class UserService {
             return savedUser;
         } catch (e) {
             throw new InternalServerErrorException('Failed to create user');
+        }
+    }
+
+    async updateThumbnail(payload: PayloadResponse, file: Express.Multer.File): Promise<UserUpdateDto> {
+        try {
+            const user = await this.userRepository.findOneBy({ useremail: payload.useremail });
+            if (!user) {
+                throw new Error('User not found');
+            }
+            const imageUrl = await this.imageService.thumbnailImageUpload(file, user.userId);
+
+            user.thumbnail = imageUrl;
+
+            const ret = await this.userRepository.save(user);
+            delete ret.password;
+            delete ret.prePwd;
+            delete ret.deletedAt;
+            delete ret.birthDayFlag;
+
+            return ret;
+        } catch (e) {
+            throw new InternalServerErrorException("Failed to saved the userThumbnail");
         }
     }
 

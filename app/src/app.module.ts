@@ -17,9 +17,9 @@ import { SocialEventModule } from './db/event/socialEvent/socialEvent.module';
 import { FeedModule } from './feed/feed.module';
 import { ImageModule } from './image.upload/image.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UtilModule } from './util/util.module';
 import { EmojiModule } from './emoji/emoji.module';
-import { GifModule } from './test/gif.compress.test/gif.module';
+import { ChatModule } from './calendar/chat/chat.module';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -28,6 +28,7 @@ import { GifModule } from './test/gif.compress.test/gif.module';
       envFilePath: '.env'
     }),
     TypeOrmModule.forRoot(typeORMConfig),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     CacheModule.register({
       isGlobal: true,
       store: redisStore,
@@ -35,21 +36,16 @@ import { GifModule } from './test/gif.compress.test/gif.module';
       port: parseInt(process.env.REDIS_PORT),
       password: process.env.REDIS_PASS,
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
-    UtilModule,
+    UtilsModule,
     UserModule,
     AuthModule,
     CalendarModule,
     GoogleModule,
     KakaoModule,
-    CalendarModule,
-    SocialEventModule,
     FeedModule,
     ImageModule,
     EmojiModule,
-
-    //Modules for Tests
-    GifModule
+    ChatModule,
   ],
   controllers: [RedisController],
   providers: [RedisService],
@@ -61,11 +57,11 @@ export class AppModule implements NestModule {
   }
   configure(consumer: MiddlewareConsumer) {
     // consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
-    consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
-    consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
-    consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');
-    consumer.apply(PlatformLoggerMiddleware).forRoutes('/google');
-    consumer.apply(KakaoLoggerMiddleware).forRoutes('/kakao');
-    consumer.apply(FeedLoggerMiddleware).forRoutes('/feed');
+    // consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
+    // consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
+    // consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');
+    // consumer.apply(PlatformLoggerMiddleware).forRoutes('/google');
+    // consumer.apply(KakaoLoggerMiddleware).forRoutes('/kakao');
+    // consumer.apply(FeedLoggerMiddleware).forRoutes('/feed');
   }
 }
