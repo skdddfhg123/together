@@ -8,7 +8,9 @@ export class RedisService {
     private readonly redisClient: RedisClient;
     private readonly logger = new Logger(RedisService.name);
 
-    constructor() {
+    constructor(
+
+    ) {
         const options = {
             host: process.env.REDIS_HOST,
             port: parseInt(process.env.REDIS_PORT, 10),
@@ -29,19 +31,56 @@ export class RedisService {
         this.redisClient = new Redis(options);
     }
 
+    getRedisClient(): Redis {
+        return this.pubClient;
+    }
+
+    async subscribeAndSave(userEmail: string, channel: string): Promise<number> {
+        console.log('subscribeAndSave');
+        await this.subClient.subscribe(channel);
+        const temp = await this.redisClient.sadd(userEmail, channel);
+        this.logger.log(`Subscribed to ${channel}`);
+        return temp;
+    }
+
     async subscribe(channel: string): Promise<void> {
         await this.subClient.subscribe(channel);
-        this.logger.log(`Subscribed to ${channel}`);
+        this.logger.log(`Restore Subscripbed ${channel}`);
     }
 
     async publish(channel: string, message: string): Promise<number> {
         return await this.pubClient.publish(channel, message);
     }
 
-    async unsubscribe(channel: string): Promise<void> {
+    async unsubscribe(userEmail: string, channel: string): Promise<void> {
         await this.subClient.unsubscribe(channel);
+        await this.redisClient.srem(userEmail, channel);
         this.logger.log(`Unsubscribed from ${channel}`);
     }
+
+    async getSubscription(userEmail: string): Promise<string[]> {
+        console.log('getSubscription:', userEmail);
+        const temp = await this.redisClient.smembers(userEmail);
+        console.log(temp);
+        return temp;
+    }
+
+    async restoreSubscription(userEmail: string): Promise<string[]> {
+        const channels = await this.getSubscription(userEmail);
+        for (let channel of channels) {
+            await this.subscribe(channel);
+        }
+
+        return channels;
+    }
+
+    // async setPublisherInfo(channel: string, userEmail: string): Promise<void> {
+    //     await this.redisClient.set(channel, userEmail);
+    // }
+
+    // async getPublisherInfo(channel: string): Promise<string> {
+    //     return await this.redisClient.get(channel);
+    // }
 
     // Look Aside Cache Strategy
     async get(key: string): Promise<string | null> {

@@ -10,6 +10,7 @@ import { getPayload } from './getPayload.decorator';
 import { RefreshStrategy } from './strategy/refresh.strategy';
 import { RefreshAuthGuard } from './strategy/refresh.guard';
 import { ApiOperation } from '@nestjs/swagger';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @ApiTags("auth")
 @Controller('auth')
@@ -18,6 +19,7 @@ export class AuthController {
     private authService: AuthService,
     private userService: UserService,
     private userCalendarService: UserCalendarService,
+    private eventEmitter: EventEmitter2,
   ) { }
 
   @ApiResponse({
@@ -47,6 +49,7 @@ export class AuthController {
   async login(
     @Body(ValidationPipe) loginDTO: LoginDTO,
   ): Promise<{ accessToken: string; refreshToken: string }> {
+    this.eventEmitter.emit('login', { userEmail: loginDTO.useremail, message: 'login'});
     return this.authService.login(loginDTO);
   }
 

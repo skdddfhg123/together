@@ -1,21 +1,32 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, WsException } from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ChatService } from './chat.service';
+import { ChatService } from './chat/chat.service';
 import { SetInitDTO } from './dtos/createChat.dto';
 import * as jwt from 'jsonwebtoken';
 import { SaveMessageDTO } from './dtos/saveMessage.dto';
+import { RedisService } from './redis/redis.service';
+import { OnEvent } from '@nestjs/event-emitter';
+import { EventDto } from './dtos/event.dto';
 
 @WebSocketGateway(5000, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: 'http://localhost:3001',
         credentials: true,
     },
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-    constructor(private readonly chatService: ChatService) { }
+export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
+    constructor(
+        private readonly chatService: ChatService,
+        private readonly redisService: RedisService,
+    ) {}
 
     @WebSocketServer()
     server: Server;
+
+    // =================================================================================================================
+    // |                                                 Connect                                                       |
+    // =================================================================================================================
 
     public handleConnection(client: Socket): void {
         const token = client.handshake.headers.authorization.split(' ')[1];
@@ -47,6 +58,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log('disconnected', client.id);
     }
 
+    // =================================================================================================================
+    // |                                                    Chat                                                       |
+    // =================================================================================================================
+
     @SubscribeMessage('sendMessage')
     async sendMessage(client: Socket, message: string): Promise<void> {
         client.rooms.forEach(roomId =>
@@ -76,9 +91,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('sendCombinedMessage')
     async sendCombinedMessage(client: Socket, payload: { text: string, imageUrl: string }) {
         // this.server.to(payload.calendarId).emit('receiveCombinedMessage', payload);
-
-        console.log(payload.text);
-        console.log(payload.imageUrl);
 
         client.rooms.forEach((roomId) =>
             client.to(roomId).emit('getMessage', {
@@ -169,5 +181,56 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('sendImage')
     handleImage(client: Socket, payload: { imageUrl: string, calendarId: string }) {
         client.to(payload.calendarId).emit('receiveImage', payload.imageUrl);
+    }
+
+    @SubscribeMessage('enterRoom')
+    async enterRoom(client: Socket, channel: string) : Promise<void> {
+        const userEmail = client.data.email;
+        // const publisherEmail = await this.redisService.getPublisherInfo(channel);
+
+        // if(userEmail === publisherEmail)
+            client.join(channel);
+            this.server.to(channel).emit('welcome', `Welcome to the room ${channel}`);
+    }
+
+    // =================================================================================================================
+    // |                                               Event Alarm                                                     |
+    // =================================================================================================================
+
+    @OnEvent('messageReceived')
+    handleEventReceived(data: EventDto) {
+        this.server.to(data.calendarId).emit('sendMessage', data.message);
+    }
+
+    @OnEvent('login')
+    async handleLoginEvent(event: EventDto): Promise<void> {
+        console.log("login redis")
+        try {
+            const temp = await this.redisService.restoreSubscription(event.userEmail)
+            console.log(temp);
+        }
+        catch(err) {
+            console.log('login:', err);
+        };
+    }
+
+    @OnEvent('addAttendee')
+    handleAttendeeAddedEvent(event: EventDto): void {
+
+        const temp = this.redisService.subscribeAndSave(event.userEmail, event.calendarId)
+            .then(() => {
+                console.log(temp)
+                this.redisService.publish(event.calendarId, event.message);
+                this.server.to(event.calendarId).emit(`${event.calendarId}`);
+                // this.redisService.setPublisherInfo(event.calendarId, event.userEmail);
+            })
+            .catch(err => {
+                console.log('addAttendee:', err);
+            });
+    }
+
+    @OnEvent('createGroupCalendar')
+    async handleCreateGroupCalendar(event: EventDto): Promise<void> {
+        await this.redisService.subscribeAndSave(event.userEmail, event.calendarId);
     }
 }

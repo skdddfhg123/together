@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { ChatRoomListDTO } from "./dtos/createChat.dto";
+import { ChatRoomListDTO } from "../dtos/createChat.dto";
 import { Socket } from 'socket.io';
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { Chat, ChatSchema } from "./entities/chat.schema";
+import { Chat, ChatSchema } from "../entities/chat.schema";
 import { Connection, Model } from "mongoose";
-import { SaveMessageDTO } from "./dtos/saveMessage.dto";
+import { SaveMessageDTO } from "../dtos/saveMessage.dto";
 
 @Injectable()
 export class ChatService {
@@ -12,7 +12,6 @@ export class ChatService {
     constructor(
         @InjectConnection()
         private chatConnection: Connection,
-        @InjectModel(Chat.name) private chatModel: Model<Chat>,
     ) {
         this.chatRoomList = {
             'roomMain': {
@@ -53,6 +52,7 @@ export class ChatService {
         if (!roomName) {
             this.createChatRoom(client, roomId);
         }
+        console.log("enterRoom");
         client.rooms.clear();
         client.join(roomId);
     }
@@ -73,15 +73,11 @@ export class ChatService {
         return this.chatRoomList[roomId];
     }
 
-    // async saveMessage(saveMessageDto: SaveMessageDTO): Promise<Chat> {
-    //     const { roomId } = saveMessageDto;
-    //     const chatModel = this.getModelForCalendar(roomId);
-    //     const saveMessage = new chatModel(saveMessageDto);
-    //     return await saveMessage.save();
-    // }
-    async saveMessage(data: any): Promise<Chat> {
-        const newMessage = new this.chatModel(data);
-        return await newMessage.save();
+    async saveMessage(saveMessageDto: SaveMessageDTO): Promise<Chat> {
+        const { roomId } = saveMessageDto;
+        const chatModel = this.getModelForCalendar(roomId);
+        const saveMessage = new chatModel(saveMessageDto);
+        return await saveMessage.save();
     }
 
     async findAllMessageByCalendarId(calendarId: string): Promise<Chat[]> {
