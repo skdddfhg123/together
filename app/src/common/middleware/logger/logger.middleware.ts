@@ -5,22 +5,22 @@ import { CustomLoggerService } from 'src/utils/logger.service';
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
 
-  // use(req: Request, res: Response, next: NextFunction) {
-  //   console.log(`[Request] ${req.method} - ${req.url}`);
-  //   res.on('finish', () => {
-  //     console.log(`[Response] ${req.method} - ${req.url} - Status: ${res.statusCode}`);
-  //   });
-  //   next();
-  // }
-
-  constructor(
-    private readonly loggerService: CustomLoggerService,
-  ) { }
-
   use(req: Request, res: Response, next: NextFunction) {
-    this.loggerService.logRequestResponse(req, res, '1237047183753347174', '1237643537047355453');
+    console.log(`[Request] ${req.method} - ${req.url}`);
+    res.on('finish', () => {
+      console.log(`[Response] ${req.method} - ${req.url} - Status: ${res.statusCode}`);
+    });
     next();
   }
+
+  // constructor(
+  //   private readonly loggerService: CustomLoggerService,
+  // ) { }
+
+  // use(req: Request, res: Response, next: NextFunction) {
+  //   this.loggerService.logRequestResponse(req, res, '1237047183753347174', '1237643537047355453');
+  //   next();
+  // }
 }
 
 @Injectable()

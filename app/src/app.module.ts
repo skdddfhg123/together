@@ -20,6 +20,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EmojiModule } from './emoji/emoji.module';
 import { ChatModule } from './calendar/chat/chat.module';
 import { UtilsModule } from './utils/utils.module';
+import { RedisGateway } from './redis/redis.gateway';
 
 @Module({
   imports: [
@@ -48,7 +49,7 @@ import { UtilsModule } from './utils/utils.module';
     ChatModule,
   ],
   controllers: [RedisController],
-  providers: [RedisService],
+  providers: [RedisService, RedisGateway],
   exports: [RedisService],
 })
 export class AppModule implements NestModule {
@@ -56,7 +57,7 @@ export class AppModule implements NestModule {
     console.log(dataSource.driver.database);
   }
   configure(consumer: MiddlewareConsumer) {
-    // consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
+    consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
     // consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
     // consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
     // consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');

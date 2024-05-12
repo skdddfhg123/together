@@ -4,9 +4,9 @@ import Redis, { Redis as RedisClient } from 'ioredis';
 @Injectable()
 export class RedisService {
     private readonly pubClient: RedisClient;
-    private readonly subClient: RedisClient;
     private readonly redisClient: RedisClient;
     private readonly logger = new Logger(RedisService.name);
+    public readonly subClient: RedisClient;
 
     constructor() {
         const options = {

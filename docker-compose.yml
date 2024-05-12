@@ -33,6 +33,7 @@ services:
     ports:
       - "3000:3000"
       - "5000:5000" #웹소켓 포트
+      - "5005:5005"
     depends_on:
       - postgresql
       - mongodb
