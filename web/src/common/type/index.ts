@@ -83,7 +83,8 @@ export interface Author {
 export type Member = Author;
 
 export interface MemberWithEvent extends Author {
-  allevents: DefaultEvent[];
+  allevents?: DefaultEvent[];
+  groupedEvent: GroupingMemberEvent;
 }
 
 export interface DefaultEvent {
@@ -94,11 +95,9 @@ export interface DefaultEvent {
   endAt: string;
 }
 
-export interface MemberEvent extends DefaultEvent {
-  nickname: string[];
-  useremail: string[];
+export interface GroupingMemberEvent {
+  [key: string]: DefaultEvent[];
 }
-
 export interface AllEvent extends DefaultEvent {
   id: UUID;
   type?: string; // 그룹 캘린더에 지정된 색

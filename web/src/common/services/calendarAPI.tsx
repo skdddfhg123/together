@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
+import { format } from 'date-fns';
 
 import * as API from '@utils/api';
 
@@ -9,7 +10,7 @@ import {
   CreateCalendarForm,
   DefaultEvent,
   MemberWithEvent,
-  MemberEvent,
+  GroupingMemberEvent,
 } from '@type/index';
 import {
   useCalendarListStore,
@@ -104,35 +105,21 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
     if (!res) throw new Error('CALENDAR - getMemberAndMemberEvents (db 조회 실패)');
     console.log(`CALENDAR - getMemberAndMemberEvents 성공 :`, res);
 
-    const MemberEventList: MemberEvent[] = [];
-    const userInfo = useUserInfoStore.getState().userInfo;
+    const MemberEventList = res.map((member: MemberWithEvent) => {
+      const GroupedEvents: GroupingMemberEvent = {};
+      member.allevents?.forEach((event) => {
+        const formattedStartAt = format(new Date(event.startAt), 'yyyy-MM-dd');
+        if (!GroupedEvents[formattedStartAt]) {
+          GroupedEvents[formattedStartAt] = [];
+        }
+        GroupedEvents[formattedStartAt].push(event);
+      });
 
-    res.forEach((member: MemberWithEvent) => {
-      if (userInfo && member.useremail !== userInfo.useremail) {
-        member.allevents.forEach((event) => {
-          const existingEvent = MemberEventList.find(
-            (e) =>
-              e.title === event.title && e.startAt === event.startAt && e.endAt === event.endAt,
-          );
-
-          if (existingEvent) {
-            if (!existingEvent.useremail.includes(member.useremail)) {
-              existingEvent.useremail.push(member.useremail);
-            }
-            if (!existingEvent.nickname.includes(member.nickname)) {
-              existingEvent.nickname.push(member.nickname);
-            }
-          } else {
-            MemberEventList.push({
-              title: event.title,
-              startAt: event.startAt,
-              endAt: event.endAt,
-              useremail: [member.useremail],
-              nickname: [member.nickname],
-            });
-          }
-        });
-      }
+      return {
+        useremail: member.useremail,
+        nickname: member.nickname,
+        groupedEvent: GroupedEvents,
+      };
     });
 
     useMemberEventListState.getState().setAllEventList(MemberEventList);
@@ -200,7 +187,7 @@ export async function createGroupEvent({ groupCalendarId, title, startAt, endAt 
       title,
       startAt,
       endAt,
-      member: [],
+      member: [useUserInfoStore.getState().userInfo?.useremail],
       color: '#badfff',
     });
     if (!res) throw new Error('CALENDAR - createGroupEvent (DB 이벤트 생성 실패)');
@@ -276,3 +263,36 @@ export async function removeGroupEvent(groupEventId: UUID | null) {
     }
   }
 }
+
+// const MemberEventList: MemberEvent[] = [];
+// const userInfo = useUserInfoStore.getState().userInfo;
+
+// res.forEach((member: MemberWithEvent) => {
+//   if (userInfo && member.useremail !== userInfo.useremail) {
+//     member.allevents.forEach((event) => {
+//       const existingEvent = MemberEventList.find(
+//         (e) =>
+//           e.title === event.title && e.startAt === event.startAt && e.endAt === event.endAt,
+//       );
+
+//       if (existingEvent) {
+//         if (!existingEvent.useremail.includes(member.useremail)) {
+//           existingEvent.useremail.push(member.useremail);
+//         }
+//         if (!existingEvent.nickname.includes(member.nickname)) {
+//           existingEvent.nickname.push(member.nickname);
+//         }
+//       } else {
+//         MemberEventList.push({
+//           title: event.title,
+//           startAt: event.startAt,
+//           endAt: event.endAt,
+//           useremail: [member.useremail],
+//           nickname: [member.nickname],
+//         });
+//       }
+//     });
+//   }
+// });
+
+// useMemberEventListState.getState().setAllEventList(MemberEventList);

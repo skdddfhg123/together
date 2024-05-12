@@ -1,14 +1,6 @@
 import { create } from 'zustand';
 
-import {
-  GroupEvent,
-  UserInfo,
-  Calendar,
-  EventFeed,
-  AllEvent,
-  DefaultEvent,
-  MemberEvent,
-} from '@type/index';
+import { GroupEvent, UserInfo, Calendar, EventFeed, AllEvent, MemberWithEvent } from '@type/index';
 
 interface UserInfoState {
   userInfo: UserInfo | null;
@@ -85,13 +77,13 @@ export const useAllEventListStore = create<AllEventListState>((set) => ({
 }));
 
 interface MemberEventListState {
-  MemberEventList: MemberEvent[];
-  setAllEventList: (events: MemberEvent[]) => void;
+  MemberEventList: MemberWithEvent[];
+  setAllEventList: (memberAndEvent: MemberWithEvent[]) => void;
 }
 
 export const useMemberEventListState = create<MemberEventListState>((set) => ({
   MemberEventList: [],
-  setAllEventList: (events) => set({ MemberEventList: events }),
+  setAllEventList: (memberAndEvent) => set({ MemberEventList: memberAndEvent }),
 }));
 
 interface GroupEventInfoState {

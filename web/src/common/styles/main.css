@@ -1,7 +1,7 @@
 /* ************************* main ************************* */
 #mainSection {
   /* height:53rem; */
-  height:92vh;
+  height:85vh;
 
   display: flex;
   flex-direction: row;
@@ -10,7 +10,7 @@
 /* ************************* header ************************* */
 #calHeader {
   /* height: 5rem; */
-  height: 8vh;
+  height: 15vh;
 
   display: flex;
   align-items: center;
