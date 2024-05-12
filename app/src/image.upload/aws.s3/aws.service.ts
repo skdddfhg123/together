@@ -20,6 +20,7 @@ export class AwsService {
   }
 
 
+  // AWS S3에 이미지를 그대로 업로드
   async imageUploadToS3(
     fileName: string,
     file: Express.Multer.File,

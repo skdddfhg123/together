@@ -10,10 +10,8 @@ import { ReadFeedDTO } from './dtos/feed.read.dto';
 import { ImageService } from 'src/image.upload/image.service';
 import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
 import { AwsService } from 'src/image.upload/aws.s3/aws.service';
-import { FeedImageBinded } from './interface/feedAndImageBinding';
 import { UtilsService } from 'src/utils/utils.service';
 import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
-
 
 @Injectable()
 export class FeedService {

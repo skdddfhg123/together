@@ -10,6 +10,7 @@ import { ReadEmojiDTO } from "./dtos/emoji.detail.dto";
 import { ReadFeedDTO } from "src/feed/dtos/feed.read.dto";
 import { EmojiInFeed } from "src/db/emoji_feed/entities/emoji.feed.entity";
 import { JwtAuthGuard } from "src/auth/strategy/jwt.guard";
+import { EmojiNameDto } from "./dtos/emoji.name.dto";
 
 
 
@@ -21,28 +22,49 @@ export class EmojiController {
        private emojiService: EmojiService,
     ) {}
 
+    /*
+    @Post('confirmName')
+    //@ApiBearerAuth('JWT-auth')               
+    @ApiOperation({ summary: '이모지 이름 중복 확인' }) 
+    @ApiResponse({ status: 201, description: 'Feed created successfully' }) 
+    @ApiResponse({ status: 403, description: 'Forbidden' })               
+    @ApiBody({ type: EmojiNameDto })       
+    @ApiConsumes('application/json') 
+    //@UseGuards(JwtAuthGuard)                 
+    async confirmEmojiName(
+      @Body() emojiNameDto: EmojiNameDto,
+    ): Promise<{ isAvailable: boolean }> { 
+        const isAvailable = await this.emojiService.confirmEmojiName(emojiNameDto.name);
+        return { isAvailable };
+    }
+    */
+
+
+    
+
    // 그룹 이모지 등록 
    @Post('create/:calendarId')
-   @ApiBearerAuth('JWT-auth')               
+   //@ApiBearerAuth('JWT-auth')               
    @ApiOperation({ summary: '이모지 업로드' }) 
    @ApiResponse({ status: 201, description: 'Feed created successfully' }) 
-   @ApiResponse({ status: 403, description: 'Forbidden' })               
+   @ApiResponse({ status: 403, description: 'Forbidden' })        
+   @ApiResponse({ status: 409, description: 'Conflict' })          
    //@ApiBody({ type: CreateEmojiDTO })       
    @ApiBody({
     schema: {
-        type: 'object',
-        properties: {
-            emojiName: { type: 'string' },
-            emojiFile: {
-                type: 'string',
-                format: 'binary',
-                description: 'Emoji image file'
+            type: 'object',
+            properties: {
+                emojiName: { type: 'string' },
+                emojiFile: {
+                    type: 'string',
+                    format: 'binary',
+                    description: 'Emoji image file'
+                }
             }
         }
-    }
-})
+    })
    @ApiConsumes('multipart/form-data', 'application/json') 
-   @UseGuards(JwtAuthGuard)                 
+   //@UseGuards(JwtAuthGuard)                 
    @UseInterceptors(FileInterceptor('emojiFile')) 
    async createEmoji(
      @Param('calendarId') calendarId: string,
@@ -67,8 +89,8 @@ export class EmojiController {
     @ApiResponse({ status: 403, description: 'You do not have permission to remove this emoji' })
     @ApiResponse({ status: 404, description: 'Emoji not found' })
     @ApiResponse({ status: 500, description: 'Error removing emoji' })
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
+    //@ApiBearerAuth('JWT-auth')
+    //@UseGuards(JwtAuthGuard)
     async removeEmoji(
 
         @getPayload() payload: PayloadResponse,
@@ -100,8 +122,8 @@ export class EmojiController {
     @ApiOperation({ summary: 'calendar에 등록된 그룹 이모지 목록 가져오기' })
     @ApiResponse({ status: 200, description: 'Get Emojis successfully' })
     @ApiResponse({ status: 500, description: 'Failed to fetch emojis for group event ID' })
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
+    //@ApiBearerAuth('JWT-auth')
+    //@UseGuards(JwtAuthGuard)
     async getAllGroupEvent(
 
         @Param('calendarId') calendarId: string,
@@ -135,8 +157,8 @@ export class EmojiController {
     @ApiResponse({ status: 403, description: 'You do not have permission to remove this feed' })
     @ApiResponse({ status: 404, description: 'Feed not found' })
     @ApiResponse({ status: 500, description: 'Error removing feed' })
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
+    //@ApiBearerAuth('JWT-auth')
+    //@UseGuards(JwtAuthGuard)
     async removeEmojiInFeed(
 
         @getPayload() payload: PayloadResponse,

@@ -23,7 +23,7 @@ import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity'
     AwsModule,
     UtilsModule,
     ImageModule,
-    // FeedCommentModule,
+    
   ],
   controllers: [FeedController],
   providers: [FeedService, FeedCommentService],

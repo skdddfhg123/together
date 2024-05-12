@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateEmojiDTO } from "./dtos/emoji.create.dto";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
@@ -61,8 +61,12 @@ export class EmojiService {
             return await this.emojiRepository.save(emoji);
 
         } catch (e) {
-            console.error('Error saving emoji:', e);
-            throw new InternalServerErrorException('Error saving emoji');
+            // console.error('Error saving emoji:', e);
+            if (e instanceof ConflictException) {
+                throw e;
+            } else {
+                throw new InternalServerErrorException('Error saving emoji');
+            }
         }
     }
 
@@ -253,7 +257,7 @@ export class EmojiService {
                 .getMany();
 
             return emojis.map(emojiInFeed => {
-                const dto = new ReadEmojiDTO();
+                const dto = new ReadEmojiFeedDTO();
                 dto.emojiId = emojiInFeed.emojiInFeedId
                 dto.emojiUrl = emojiInFeed.emoji.emojiUrl
                 dto.emojiName = emojiInFeed.emoji.emojiName

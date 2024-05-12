@@ -17,6 +17,10 @@ export class ReadFeedDTO {
     
     @ApiProperty()
     @IsString()
+    groupEventId: string;
+
+    @ApiProperty()
+    @IsString()
     title: string;
 
     @ApiProperty()
