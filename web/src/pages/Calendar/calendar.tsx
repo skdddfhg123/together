@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { UUID } from 'crypto';
 import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
-import DOMPurify from 'dompurify';
 
 import { AllEvent } from '@type/index';
 import {
@@ -10,16 +9,13 @@ import {
   useSocialEventListStore,
   useGroupEventListStore,
   useAllEventListStore,
-  useUserInfoStore,
-  useMemberEventListState,
 } from '@store/index';
 import * as CALENDAR from '@services/calendarAPI';
 
 import EventModal from '@components/Canlendar/EventModal';
 import EventDetails from '@components/Canlendar/EventDetails';
+import GroupMemberEvent from '@components/Canlendar/GroupMemberEvent';
 import '@styles/calendar.css';
-
-import default_user from '@assets/default_user.png';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -33,15 +29,12 @@ export default React.memo(function CalendarPage({
   isNextMonth,
   currentMonth,
 }: CalendarProps) {
-  const { userInfo } = useUserInfoStore();
   const { selectedDay, setSelectedDay } = useSelectedDayStore();
 
   const { selectedCalendar } = useSelectedCalendarStore();
-
   const { socialEventList } = useSocialEventListStore();
   const { AllEventList } = useAllEventListStore();
   const { groupEventList } = useGroupEventListStore();
-  const { MemberEventList } = useMemberEventListState();
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -89,7 +82,7 @@ export default React.memo(function CalendarPage({
   }, []);
 
   // *****************? 달력 생성 Logic
-  const buildCalendarDays = () => {
+  const buildCalendarDays = useCallback(() => {
     const firstDayOfMonth = startOfMonth(currentMonth);
     const lastDayOfMonth = endOfMonth(currentMonth);
 
@@ -108,7 +101,7 @@ export default React.memo(function CalendarPage({
     }
 
     return days;
-  };
+  }, []);
 
   // *****************? 세부 일정 및 이벤트 생성 Logic
   const buildCalendarTag = (calendarDays: Date[]) => {
@@ -204,68 +197,6 @@ export default React.memo(function CalendarPage({
         );
       }
 
-      const memberEventsForDay = MemberEventList.flatMap((member) => {
-        if (
-          !member.groupedEvent ||
-          !member.groupedEvent[localDayKey] ||
-          member.useremail === userInfo?.useremail
-        )
-          return [];
-
-        const eventsDetail = member.groupedEvent[localDayKey]
-          .map(
-            (event) => `
-            <div class="content-container">
-            <p>Title: ${event.title}</p>
-            <p>Start: ${format(new Date(event.startAt), 'yyyy년 MM월 dd일 HH:mm')}</p>
-            <p>End: ${format(new Date(event.endAt), 'yyyy년 MM월 dd일 HH:mm')}</p>
-            </div>
-          `,
-          )
-          .join('');
-
-        if (selectedCalendar === 'All') return;
-
-        const matchingAttendee = selectedCalendar.attendees.find(
-          (attendee) => attendee.useremail === member.useremail,
-        );
-
-        return (
-          <div
-            key={`${member.nickname}-${localDayKey}`}
-            className="tooltip"
-            onMouseEnter={(e) => {
-              const tooltip = document.createElement('div');
-              tooltip.className = 'tooltip-content';
-              tooltip.innerHTML = DOMPurify.sanitize(`
-              ${
-                matchingAttendee
-                  ? `<img 
-                    class="thumbnail-container"
-                    src="${matchingAttendee.thumbnail ? matchingAttendee.thumbnail : default_user}" 
-                    alt="thumbnail"
-                    <span>${matchingAttendee.nickname}</span>`
-                  : ''
-              }
-              ${eventsDetail}
-            `);
-              e.currentTarget.appendChild(tooltip);
-            }}
-            onMouseLeave={(e) => {
-              const tooltip = e.currentTarget.querySelector('.tooltip-content');
-              if (tooltip) {
-                tooltip.remove();
-              }
-            }}
-          >
-            <img
-              className="thumbnail"
-              src={`${matchingAttendee?.thumbnail ? matchingAttendee.thumbnail : default_user}`}
-            />
-          </div>
-        );
-      });
-
       const dayOfWeek = day.getDay();
       const isToday = isSameDay(day, today);
       let dayClasses = `Day day-${dayOfWeek}`;
@@ -276,7 +207,9 @@ export default React.memo(function CalendarPage({
         <td key={i} className={dayClasses} onClick={(e) => handleDayClick(day, e)}>
           <div className="dayBox">
             <span className="day">{day.getDate()}</span>
-            <div className="member-section">{memberEventsForDay}</div>
+            <span className="Groupmember-Box">
+              <GroupMemberEvent selectedCalendar={selectedCalendar} localDayKey={localDayKey} />
+            </span>
           </div>
           <ul className="SCROLL-hide" id="event-box">
             {eventElements}

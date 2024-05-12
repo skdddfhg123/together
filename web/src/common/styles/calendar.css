@@ -31,6 +31,7 @@ td {
   width: calc(100% / 7);
   height: 100%;
   
+  overflow: hidden;
   border-top: 1px solid rgb(242, 242, 242);
 }
 
@@ -74,6 +75,7 @@ td.today:hover {
 }
 
 .dayBox {
+  height: 2.5rem;
   display: flex;
   align-items: center; 
   justify-content: space-between; 
@@ -86,16 +88,15 @@ td.today:hover {
   justify-content: center;
   align-items: center;
   font-size: large;
+  
 }
 
-.member-section {
-  position: relative;
-  z-index: 50;
+.Groupmember-Box {
   display: flex;
-  justify-content: center;
-  align-items: center;
+}
 
-  margin: 0.5em;  
+.Groupmember-Box > * + * {
+  margin-left: 0.3rem;
 }
 
 th.day-0, .day-0 .day { /* 일요일 */
@@ -129,40 +130,4 @@ th.day-6, .day-6 .day { /* 토요일 */
 .kakao-event {
   background: #F7E600;
   border-radius: 3px;
-}
-
-
-/*************** 멤버 일정 표시 ***************/
-.tooltip-content {
-  z-index: 99999;
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-
-  min-width: 20rem;
-  width: auto;
-  padding: 10px;
-
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  border: 1px solid black;
-  border-radius: 1rem;
-  background-color: white;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-
-  text-align: center;
-  overflow: hidden;
-  white-space: nowrap; 
-}
-
-.tooltip .thumbnail {
-  width: 2rem;
-  z-index: 1;
-}
-
-.thumbnail-container {
-  width: 5rem;
-  margin: auto;
 }

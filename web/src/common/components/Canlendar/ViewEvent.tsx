@@ -66,29 +66,49 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
     if (selectedCalendar === 'All') {
       const matchingEvent = AllEventList.find((event) => event.id === eventInfo.groupEventId);
       return (
-        <div className="mb-2 text-xl text-gray-600">
-          {matchingEvent ? matchingEvent.group : 'Event not found'}
-        </div>
+        <>
+          <div className="mb-2 text-xl text-gray-600">
+            {matchingEvent ? matchingEvent.group : 'Event not found'}
+          </div>
+          <h2
+            className="w-11/12 py-2 mx-2 text-3xl text-center rounded"
+            style={{
+              backgroundColor: `${matchingEvent?.type}`,
+            }}
+          >
+            {eventInfo?.title}
+          </h2>
+        </>
       );
     } else {
       const matchingMember = calendarMember.find(
         (member) => member.useremail === eventInfo?.author,
       );
       return (
-        <div className="FLEX-verC items-center mb-2 text-gray-600">
-          {matchingMember ? (
-            <>
-              <img
-                className="w-8 mr-2"
-                src={matchingMember.thumbnail || default_user}
-                alt={matchingMember.nickname}
-              />
-              <p>{matchingMember.nickname}</p>
-            </>
-          ) : (
-            <></>
-          )}
-        </div>
+        <>
+          <div className="FLEX-verC items-center mb-2 text-gray-600">
+            {matchingMember ? (
+              <>
+                <img
+                  className="w-8 mr-2"
+                  src={matchingMember.thumbnail || default_user}
+                  alt={matchingMember.nickname}
+                />
+                <p>{matchingMember.nickname}</p>
+              </>
+            ) : (
+              <></>
+            )}
+          </div>
+          <h2
+            className="w-11/12 py-2 mx-2 text-3xl text-center rounded"
+            style={{
+              backgroundColor: `${eventInfo?.color}`,
+            }}
+          >
+            {eventInfo?.title}
+          </h2>
+        </>
       );
     }
   };
@@ -141,12 +161,6 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
         <header className="FLEX-horizC justify-en">
           {eventInfo &&
             renderAuthorOrGroupTitle({ eventInfo, calendarMember, AllEventList, selectedCalendar })}
-          <h2
-            className="w-11/12 py-2 mx-2 text-3xl text-center rounded"
-            style={{ backgroundColor: `${eventInfo?.color}` }}
-          >
-            {eventInfo?.title}
-          </h2>
         </header>
         <main className="space-y-4">
           <section key="date-section" className="FLEX-verA items-center">
