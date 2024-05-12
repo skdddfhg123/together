@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:calendar/models/message.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,75 +9,39 @@ class ChatPage extends StatefulWidget {
   final String calendarId;
   final String calendartitle;
 
-  const ChatPage(
-      {super.key, required this.calendarId, required this.calendartitle});
+  ChatPage({Key? key, required this.calendarId, required this.calendartitle})
+      : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  late io.Socket socket;
+  late io.Socket _socket; // socket 변수를 인스턴스 변수로 변경
   final TextEditingController _controller = TextEditingController();
   List<Message> messages = [];
-  bool isSocketInitialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (!isSocketInitialized) {
-      initializeSocket();
-    }
-  }
-
-  void initializeSocket() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token')?.trim();
-
-    if (token == null) {
-      print("No token available.");
-      return;
-    }
-
-    if (!isSocketInitialized) {
-      socket = io.io('http://15.164.174.224:5000', {
-        'extraHeaders': {'Authorization': 'Bearer $token'},
-        'transports': ['websocket']
-      });
-
-      socket.onConnect((_) {
-        print('Connected to the chat server.');
-        socket.emit('enterChatRoom', widget.calendarId);
-        print(widget.calendarId);
-      });
-
-      socket.on('getMessage', (data) {
-        if (!mounted) return;
-        setState(() {
-          messages.add(Message.fromJson(data));
-        });
-      });
-
-      socket.onDisconnect((_) {
-        print('Disconnected from the chat server.');
-      });
-
-      isSocketInitialized = true;
-    }
-  }
-
-  @override
-  void dispose() {
-    if (isSocketInitialized && socket.connected) {
-      socket.disconnect();
-    }
-    super.dispose();
-  }
+  bool _socketInitialized = false; // 변수 이름 변경
 
   @override
   Widget build(BuildContext context) {
+    if (!_socketInitialized) {
+      initializeSocket();
+      _socketInitialized = true;
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat Room')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Chat Room'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.exit_to_app),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -95,7 +61,7 @@ class _ChatPageState extends State<ChatPage> {
                 icon: const Icon(Icons.send),
                 onPressed: () {
                   if (_controller.text.isNotEmpty) {
-                    socket.emit('sendMessage', _controller.text);
+                    _socket.emit('sendMessage', _controller.text);
                     _controller.clear();
                   }
                 },
@@ -105,5 +71,47 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
+  }
+
+  void initializeSocket() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token')?.trim();
+
+    if (token == null) {
+      print("No token available.");
+      return;
+    }
+
+    _socket = io.io('http://15.164.174.224:5000', {
+      'extraHeaders': {'Authorization': 'Bearer $token'},
+      'transports': ['websocket']
+    });
+
+    // onConnect 콜백을 한 번만 등록
+    _socket.onConnect((_) {
+      print('Connected to the chat server. ${widget.calendarId}');
+      _socket.emit('enterChatRoom', widget.calendarId);
+    });
+
+    _socket.on('getMessage', (data) {
+      if (!mounted) return;
+      setState(() {
+        messages.add(Message.fromJson(data));
+      });
+    });
+
+    _socket.onDisconnect((_) {
+      print('Disconnected from the chat server.');
+    });
+  }
+
+  @override
+  void dispose() {
+    if (_socket.connected) {
+      _socket.disconnect();
+      messages.clear();
+      print(messages);
+    }
+    super.dispose();
   }
 }
