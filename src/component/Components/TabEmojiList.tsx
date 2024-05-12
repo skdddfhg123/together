@@ -48,20 +48,20 @@ const TabEmojiList: React.FC = ( ) => {
   };
 
   return (
-    <div className="grid grid-cols-5 gap-4 p-4">
+    <div className="grid grid-cols-4 gap-4 p-4">
     {emojis.map((emoji, index) => (
-    <div key={emoji.id} className="w-27 h-27 bg-gray-200 cursor-pointer flex justify-center items-center" onClick={() => handleImageClick(emoji)}>
-      <img src={emoji.src} alt={`Emoji ${index}`} title={emoji.name} style={{ width: '108px', height: '108px', objectFit: 'cover' }} />
-    </div>
-      ))}
-      {modalOpen && selectedEmoji && <EmojiDetailModal 
-      isOpen={modalOpen} 
-      onClose={() => setModalOpen(false)}
-      onDeleteSuccess={handleDeleteSuccess} 
-      emojiId={selectedEmoji.id} 
-      emoji={selectedEmoji.src} 
-      emojiName={selectedEmoji.name} 
-      uploadDate={selectedEmoji.date} />}
+        <div key={emoji.id} className="w-27 h-27 bg-gray-200 cursor-pointer flex justify-center items-center" onClick={() => handleImageClick(emoji)}>
+        <img src={emoji.src} alt={`Emoji ${index}`} title={emoji.name} style={{ width: '108px', height: '108px', objectFit: 'cover' }} />
+        </div>
+        ))}
+        {modalOpen && selectedEmoji && <EmojiDetailModal 
+        isOpen={modalOpen} 
+        onClose={() => setModalOpen(false)}
+        onDeleteSuccess={handleDeleteSuccess} 
+        emojiId={selectedEmoji.id} 
+        emoji={selectedEmoji.src} 
+        emojiName={selectedEmoji.name} 
+        uploadDate={selectedEmoji.date} />}
     </div>
   );
 };

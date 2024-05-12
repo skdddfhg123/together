@@ -11,6 +11,9 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onC
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="relative bg-white rounded-lg shadow-lg p-4 w-2/5 max-w-4xl h-auto">
+        <div className="text-2xl font-bold text-black-500 mb-4">
+            {tabIndex === 0 ? '그룹 이모지 업로드' : '그룹 이모지 리스트'}
+        </div>
         <div className="flex border-b border-gray-300 pb-3">
           <button
             onClick={() => setTabIndex(0)}
@@ -26,7 +29,7 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onC
           </button>
         </div>
         <div className="py-4">
-          {tabIndex === 0 ? <TabEmojiUpload /> : <TabEmojiList />}
+          {tabIndex === 0 ? <TabEmojiUpload onClose={onClose}/> : <TabEmojiList />}
         </div>
         <button
           onClick={onClose}
