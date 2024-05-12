@@ -12,8 +12,8 @@ import {
 } from '@store/index';
 
 import CreateFeedModal from '@components/Feed/CreateFeed/CreateFeedModal';
-import EventFeedList from '@components/Canlendar/EventFeedList';
-import EventMember from '@components/Canlendar/EventMember';
+import EventFeedList from '@components/Canlendar/EventDetails/EventFeedList';
+import EventMember from '@components/Canlendar/EventDetails/EventMember';
 
 import default_user from '@assets/default_user.png';
 

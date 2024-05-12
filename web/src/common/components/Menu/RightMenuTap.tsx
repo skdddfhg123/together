@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Socket, io } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
+import { Tooltip } from 'react-tooltip';
+import { Socket, io } from 'socket.io-client';
 
 import { useSelectedCalendarStore } from '@store/index';
 
@@ -8,6 +9,11 @@ import BookMarkTap from '@components/Menu/BookMarkTap';
 import ChatTap from '@components/Menu/Chat/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
 import CalendarSetTap from '@components/Menu/CalenderSetTap';
+
+import optionImg from '@assets/r-optrion.png';
+import chatImg from '@assets/r-chat.png';
+import memberImg from '@assets/r-member.png';
+import feedImg from '@assets/r-feed.png';
 
 type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
@@ -49,11 +55,11 @@ export default React.memo(function RightMenuTap() {
         newSocket.emit('enterChatRoom', selectedCalendar);
       });
 
-      newSocket.on('exception', (error) => {
-        console.log(`채팅 Error`, error); //debug//
-        alert('로그인 세션이 만료되었습니다.');
-        navigate('/signin');
-      });
+      // newSocket.on('exception', (error) => {
+      //   console.log(`채팅 Error`, error); //debug//
+      // alert('로그인 세션이 만료되었습니다.');
+      // navigate('/signin');
+      // });
 
       return () => {
         newSocket.close();
@@ -72,44 +78,60 @@ export default React.memo(function RightMenuTap() {
 
   return (
     <div className="FLEX-verC h-full border-l">
-      <div className="FLEX-horiz">
+      <div className="FLEX-horiz space-y-3">
         <button
-          className={`${activeTap === 'bookmark' ? 'bg-custom-line' : ''} py-4`}
+          {...(selectedCalendar === 'All' ? { 'data-tooltip-id': 'tool-tip' } : {})}
+          disabled={selectedCalendar === 'All'}
+          className={`
+                    FLEX-verC items-center h-16 w-16 hover:bg-custom-light
+                    ${
+                      activeTap === 'calendarSet' ? 'bg-custom-line' : ''
+                    } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
           onClick={() => toggleTap('bookmark')}
         >
-          Bookmark
+          <img className="w-12" src={feedImg} />
         </button>
         <button
-          className={`${activeTap === 'chat' ? 'bg-custom-line' : ''} py-4`}
+          {...(selectedCalendar === 'All' ? { 'data-tooltip-id': 'tool-tip' } : {})}
+          disabled={selectedCalendar === 'All'}
+          className={`
+                    FLEX-verC items-center h-16 w-16 hover:bg-custom-light
+                    ${
+                      activeTap === 'calendarSet' ? 'bg-custom-line' : ''
+                    } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
           onClick={() => toggleTap('chat')}
         >
-          Chat
+          <img className="w-12 mx-auto" src={chatImg} />
         </button>
         <button
+          {...(selectedCalendar === 'All' ? { 'data-tooltip-id': 'tool-tip' } : {})}
           disabled={selectedCalendar === 'All'}
-          className={`${
-            activeTap === 'member' ? 'bg-custom-line' : ''
-          } ${selectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
+          className={`FLEX-verC items-center h-16 w-16 hover:bg-custom-light
+          ${
+            activeTap === 'calendarSet' ? 'bg-custom-line' : ''
+          } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
           onClick={() => {
             if (selectedCalendar !== 'All') {
               toggleTap('member');
             }
           }}
         >
-          Member
+          <img className="w-16 mx-auto" src={memberImg} />
         </button>
         <button
+          {...(selectedCalendar === 'All' ? { 'data-tooltip-id': 'tool-tip' } : {})}
           disabled={selectedCalendar === 'All'}
-          className={`${
+          className={`FLEX-verC items-center h-16 w-16 hover:bg-custom-light
+          ${
             activeTap === 'calendarSet' ? 'bg-custom-line' : ''
-          } ${selectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''} py-4`}
+          } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
           onClick={() => {
             if (selectedCalendar !== 'All') {
               toggleTap('calendarSet');
             }
           }}
         >
-          CalendarSet
+          <img className="w-12 mx-auto" src={optionImg} />
         </button>
       </div>
       <section
@@ -130,6 +152,9 @@ export default React.memo(function RightMenuTap() {
           {activeTap === 'calendarSet' && <CalendarSetTap onClose={() => setActiveTap(null)} />}
         </div>
       </section>
+      <Tooltip id="tool-tip">
+        <div>그룹 캘린더를 먼저 선택해주세요.</div>
+      </Tooltip>
     </div>
   );
 });

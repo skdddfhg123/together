@@ -32,7 +32,7 @@ export default React.memo(function ChatTap({ socket, onClose }: ChatTapProps) {
   useEffect(() => {
     //TODO 이모지 로직 바꿔야함 -> 그룹 채팅방 별로
     if (emoji) return;
-    fetchImages();
+    // fetchImages();
   }, []);
 
   useEffect(() => {

@@ -60,10 +60,6 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   };
 
   useEffect(() => {
-    CALENDAR.getMyAllCalendar();
-  }, []);
-
-  useEffect(() => {
     onClose();
   }, [groupEventList]);
 

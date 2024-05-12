@@ -88,14 +88,13 @@ td.today:hover {
   justify-content: center;
   align-items: center;
   font-size: large;
-  
 }
 
-.Groupmember-Box {
+.GroupMember-Box {
   display: flex;
 }
 
-.Groupmember-Box > * + * {
+.GroupMember-Box > * + * {
   margin-left: 0.3rem;
 }
 

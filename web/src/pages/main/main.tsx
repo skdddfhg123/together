@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 import * as KAKAO from '@services/KakaoAPI';
 import * as USER from '@services/userAPI';
+import * as CALENDAR from '@services/calendarAPI';
 import useToggle from '@hooks/useToggle';
 
 import Calendar from '@pages/Calendar/calendar';
@@ -52,6 +53,7 @@ export default function MainPage() {
 
   // *****************? 최초 렌더링
   useEffect(() => {
+    CALENDAR.getMyAllCalendar();
     RendarUserAndCalendar();
   }, []);
 

@@ -13,7 +13,7 @@ import {
 import * as CALENDAR from '@services/calendarAPI';
 
 import EventModal from '@components/Canlendar/EventModal';
-import EventDetails from '@components/Canlendar/EventDetails';
+import EventDetails from '@components/Canlendar/EventDetails/EventDetails';
 import GroupMemberEvent from '@components/Canlendar/GroupMemberEvent';
 import '@styles/calendar.css';
 
@@ -204,10 +204,10 @@ export default React.memo(function CalendarPage({
       if (selectedDay && isSameDay(day, selectedDay)) dayClasses += ' choiceDay';
 
       return (
-        <td key={i} className={dayClasses} onClick={(e) => handleDayClick(day, e)}>
+        <td key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
           <div className="dayBox">
             <span className="day">{day.getDate()}</span>
-            <span className="Groupmember-Box">
+            <span className="GroupMember-Box">
               <GroupMemberEvent selectedCalendar={selectedCalendar} localDayKey={localDayKey} />
             </span>
           </div>

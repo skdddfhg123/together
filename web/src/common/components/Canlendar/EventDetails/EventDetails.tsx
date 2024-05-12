@@ -8,8 +8,8 @@ import { Calendar, GroupEvent } from '@type/index';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 import useToggle from '@hooks/useToggle';
 
-import ViewEvent from '@components/Canlendar/ViewEvent';
-import ModifyEvent from '@components/Canlendar/ModifyEvent';
+import ViewEvent from '@components/Canlendar/EventDetails/ViewEvent';
+import ModifyEvent from '@components/Canlendar/EventDetails/ModifyEvent';
 
 interface EventDetailsProps {
   isOpen: boolean;

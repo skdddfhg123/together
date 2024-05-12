@@ -55,17 +55,20 @@ export default React.memo(function GroupMemberEvent({
         const tooltipId = `${member.nickname}-${localDayKey}-tooltip`;
 
         return (
-          <span key={tooltipId} className="bg-white">
+          <span
+            key={tooltipId}
+            data-tooltip-id={tooltipId}
+            data-tooltip-place="bottom"
+            data-tooltip-variant="dark"
+            // data-tooltip-variant="light"
+            // data-tooltip-variant="info"
+          >
             <img
               className="w-10"
               src={matchingAttendee?.thumbnail ? matchingAttendee.thumbnail : default_user}
               alt={matchingAttendee?.nickname}
-              data-tooltip-id={tooltipId}
-              // data-tooltip-variant="dark"
-              // data-tooltip-variant="light"
-              data-tooltip-variant="info"
             />
-            <Tooltip id={tooltipId} className="bg-white">
+            <Tooltip id={tooltipId} data-tooltip-class-name="tooltip-box">
               <div className="FLEX-horizC">
                 {matchingAttendee && (
                   <>
