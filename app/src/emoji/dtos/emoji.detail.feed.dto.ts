@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString, IsString } from "class-validator";
 
 
-export class ReadEmojiDTO {
+export class ReadEmojiFeedDTO {
     
     @ApiProperty()
     @IsString()
@@ -20,6 +20,11 @@ export class ReadEmojiDTO {
     @IsDateString()
     createdAt: Date;
 
+    @ApiProperty()
+    @IsString()
+    nickname: string;
+
+  
   
 }
 

@@ -26,7 +26,7 @@ export class Emoji {
     @Column()
     emojiUrl: string;
 
-    @Column()
+    @Column({ unique : true })
     emojiName: string;
 
 

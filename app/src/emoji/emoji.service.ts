@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateEmojiDTO } from "./dtos/emoji.create.dto";
 import { PayloadResponse } from "src/auth/dtos/payload-response";
@@ -12,6 +12,7 @@ import { EmojiInFeed } from "src/db/emoji_feed/entities/emoji.feed.entity";
 import { Feed } from "src/feed/entities/feed.entity";
 import { UtilsService } from "src/image.upload/aws.s3/utils/utils.service";
 import { AwsService } from "src/image.upload/aws.s3/aws.service";
+import { ReadEmojiFeedDTO } from "./dtos/emoji.detail.feed.dto";
 
 
 @Injectable()
@@ -30,6 +31,18 @@ export class EmojiService {
         private utilService: UtilsService,
     ) {}
 
+    async confirmEmojiName (
+        emojiName: string 
+    ):Promise<boolean> {
+        try{
+            const nameExists = await this.emojiRepository.findOneBy({ emojiName });
+            return !nameExists;
+            } catch (e) {
+                console.error('Error confirm emoji Name:', e);
+                throw new InternalServerErrorException('Error confirm emojiName');
+            }
+        }
+
     async createEmoji (  
         body: CreateEmojiDTO,
         payload: PayloadResponse,
@@ -43,14 +56,20 @@ export class EmojiService {
                 throw new NotFoundException('Calendar not found');
             }
             // 이모지를 저장할 유저 불러오기
-            const user = await this.userService.findOne({useremail : payload.useremail})
-            if (!user) {
-                throw new UnauthorizedException('User not found');
-            }
-            if (!calendar.attendees.includes(payload.userCalendarId)) {
-                throw new ForbiddenException('You do not have permission to add an event to this calendar');
-            }
             
+            // const user = await this.userService.findOne({useremail : payload.useremail})
+            // if (!user) {
+            //     throw new UnauthorizedException('User not found');
+            // }
+            // if (!calendar.attendees.includes(payload.userCalendarId)) {
+            //     throw new ForbiddenException('You do not have permission to add an event to this calendar');
+            // }
+            
+            const nameExists = await this.emojiRepository.findOneBy({ emojiName : body.emojiName });
+            if (nameExists) {
+                console.log(nameExists);
+                throw new ConflictException ('Emoji Name Already Exist');
+            }
             const emoji = new Emoji();
             // emoji.user = user;
             emoji.emojiId = this.utilService.getUUID();
@@ -62,8 +81,12 @@ export class EmojiService {
             return await this.emojiRepository.save(emoji);
 
         } catch (e) {
-            console.error('Error saving emoji:', e);
-            throw new InternalServerErrorException('Error saving emoji');
+            // console.error('Error saving emoji:', e);
+            if (e instanceof ConflictException) {
+                throw e;
+            } else {
+                throw new InternalServerErrorException('Error saving emoji');
+            }
         }
     }
 
@@ -72,7 +95,7 @@ export class EmojiService {
         try {
             const emoji = await this.emojiRepository.findOne({
                 where: { emojiId : emojiId },
-                relations: ["user"]
+                //relations: ["user"]
             });
     
             if (!emoji) {
@@ -254,7 +277,7 @@ export class EmojiService {
                 .getMany();
 
             return emojis.map(emojiInFeed => {
-                const dto = new ReadEmojiDTO();
+                const dto = new ReadEmojiFeedDTO();
                 dto.emojiId = emojiInFeed.emojiInFeedId
                 dto.emojiUrl = emojiInFeed.emoji.emojiUrl
                 dto.emojiName = emojiInFeed.emoji.emojiName

@@ -45,7 +45,6 @@ export class CreateFeedDTO { // 유저로부터 실제로 받는 data
           type: 'string', format: 'binary'
         }
       })
-      @IsArray()
       @IsOptional()
       @ValidateNested({ each: true })
       @Type(() => ImageDto)

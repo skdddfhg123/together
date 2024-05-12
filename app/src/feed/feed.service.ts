@@ -12,11 +12,17 @@ import { FeedImage } from 'src/db/feedImage/entities/feedImage.entity';
 import { UtilsService } from 'src/image.upload/aws.s3/utils/utils.service';
 import { AwsService } from 'src/image.upload/aws.s3/aws.service';
 import { FeedImageBinded } from './interface/feedAndImageBinding';
+import { Calendar } from 'src/calendar/entities/calendar.entity';
+import { GroupEvent } from 'src/db/event/group_event/entities/groupEvent.entity';
 
 
 @Injectable()
 export class FeedService {
     constructor(
+        @InjectRepository(Calendar)
+        private calendarRepository: Repository<Calendar>,
+        @InjectRepository(Calendar)
+        private groupEventRepository: Repository<GroupEvent>,
         @InjectRepository(Feed)
         private readonly feedRepository: Repository<Feed>,
         @InjectRepository(FeedImage)
@@ -133,6 +139,50 @@ export class FeedService {
     }
 
 
+    async getAllFeedInCalendar(calendarId: string): Promise<ReadFeedDTO[]> {
+        try {
+
+            const feedsInCalendar = await this.feedRepository.createQueryBuilder('feed')
+            .leftJoinAndSelect('feed.user', 'user')
+            .leftJoinAndSelect('feed.feedImages', 'feedImage') 
+            .leftJoinAndSelect('group_event', 'group_event', 'group_event.groupEventId = feed.groupEventId')
+            .select([
+                'feed.feedType',
+                'feed.feedId',
+                'feed.groupEventId',
+                'feed.title',
+                'feed.content',
+                'feed.createdAt',
+                'feed.updatedAt',
+                'user.nickname',  
+                'user.thumbnail', 
+                'feedImage.imageSrc' 
+            ])
+            .where('group_event.calendarId = :calendarId', { calendarId }) 
+            .andWhere('feed.deletedAt IS NULL')
+            .orderBy('feed.createdAt', 'DESC')
+            .getMany();
+
+            return feedsInCalendar.map(feed => {
+                const dto = new ReadFeedDTO();
+                dto.feedId = feed.feedId;
+                dto.title = feed.title;
+                dto.groupEventId = feed.groupEventId;
+                dto.content = feed.content;
+                dto.createdAt = feed.createdAt;
+                dto.updatedAt = feed.updatedAt;
+                dto.nickname = feed.user.nickname;
+                dto.thumbnail = feed.user.thumbnail;
+                dto.images = feed.feedImages;
+                return dto;
+            });
+        } catch (e) {
+            throw new InternalServerErrorException(`Failed to fetch group events for calendar ID ${calendarId}: ${e.message}`);
+        }
+    }
+
+
+
     async getAllFeedInGroupEvent(groupEventId: string): Promise<ReadFeedDTO[]> {
         try {
             const feeds = await this.feedRepository.createQueryBuilder('feed')
@@ -147,7 +197,7 @@ export class FeedService {
                     'feed.updatedAt',
                     'user.nickname',
                     'user.thumbnail',
-                    'feedImage.feedImageId'
+                    'feedImage.imageSrc'
                 ])
                 .where('feed.groupEventId = :groupEventId', { groupEventId })
                 .andWhere('feed.deletedAt IS NULL')

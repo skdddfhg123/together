@@ -19,6 +19,7 @@ import { ImageModule } from './image.upload/image.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UtilModule } from './util/util.module';
 import { EmojiModule } from './emoji/emoji.module';
+import { GifModule } from './test/gif.compress.test/gif.module';
 
 @Module({
   imports: [
@@ -46,6 +47,9 @@ import { EmojiModule } from './emoji/emoji.module';
     FeedModule,
     ImageModule,
     EmojiModule,
+
+    //Modules for Tests
+    GifModule
   ],
   controllers: [RedisController],
   providers: [RedisService],
