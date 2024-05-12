@@ -8,7 +8,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTab
 
 @Entity()
 export class Calendar {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn('uuid')
     calendarId: string;
 
     @Column()

@@ -11,6 +11,9 @@ import { RefreshStrategy } from 'src/auth/strategy/refresh.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GroupEventModule } from 'src/db/event/group_event/groupEvent.module';
+import { UserCalendar } from 'src/db/user_calendar/entities/userCalendar.entity';
+import { UtilsService } from 'src/utils/utils.service';
+import { User } from 'src/db/user/entities/user.entity';
 
 @Module({
   imports: [
@@ -21,12 +24,12 @@ import { GroupEventModule } from 'src/db/event/group_event/groupEvent.module';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Calendar, GroupEvent]),
+    TypeOrmModule.forFeature([Calendar, GroupEvent, UserCalendar, User]),
     UserCalendarModule,
     TokensModule,
     GroupEventModule,
   ],
   controllers: [CalendarController],
-  providers: [CalendarService, JWTStrategy, RefreshStrategy]
+  providers: [CalendarService, JWTStrategy, RefreshStrategy, UtilsService]
 })
-export class CalendarModule {}
+export class CalendarModule { }

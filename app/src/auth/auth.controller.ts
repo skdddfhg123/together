@@ -1,15 +1,15 @@
-import { Body, Controller, Get, Param, Post, Req, Request, UseGuards, ValidationPipe } from '@nestjs/common'; import { AuthService } from './auth.service';
+import { Body, Controller, Get, InternalServerErrorException, NotFoundException, Param, ParseUUIDPipe, Post, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common'; import { AuthService } from './auth.service';
 import { UserService } from 'src/db/user/user.service';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDTO } from 'src/db/user/dtos/create-user.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { UserCalendarService } from 'src/db/user_calendar/userCalendar.service';
 import { PayloadResponse } from './dtos/payload-response';
 import { JwtAuthGuard } from './strategy/jwt.guard';
 import { getPayload } from './getPayload.decorator';
-import { RefreshStrategy } from './strategy/refresh.strategy';
-import { RefreshAuthGuard } from './strategy/refresh.guard';
-import { ApiOperation } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadDto } from 'src/feed/dtos/file.upload.dto';
+import { UserUpdateDto } from 'src/db/user/dtos/user.update.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @ApiTags("auth")
@@ -76,6 +76,20 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '로그인/리다이렉트 시 실행 (필터:앞뒤2달/멤버가 포함된 일정' })
+  @ApiResponse({ status: 200, description: 'Successfully retrieved user data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Get('all/v2')
+  @UseGuards(JwtAuthGuard)
+  GetAllByToken2(
+    @getPayload() payload: PayloadResponse
+  ): Promise<any> {
+    return this.authService.GetAllByTokenV2(payload);
+  }
+
+  @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
@@ -88,6 +102,48 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '캘린더 멤버 일정 불러오기 (필터:앞뒤2달/멤버가 포함된 일정' })
+  @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Calendar not found or no attendees' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Get('all/getcalendar/:calendarId')
+  async GetAllEvenByCalendarId(
+    @Param('calendarId', ParseUUIDPipe) calendarId: string
+  ): Promise<any> {
+    try {
+      return await this.authService.GetAllEventByCalendarId(calendarId, new Date());
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new InternalServerErrorException('An unexpected error occurred while fetching the calendar data');
+      }
+    }
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '캘린더 멤버 일정 불러오기 (필터:앞뒤2달/멤버가 포함된 일정)' })
+  @ApiResponse({ status: 200, description: 'Successfully retrieved user calendar data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Calendar not found or no attendees' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Get('all/getcalendar/V2/:calendarId')
+  async GetAllEvenByCalendarIdV2(
+    @Param('calendarId', ParseUUIDPipe) calendarId: string
+  ): Promise<any> {
+    try {
+      return await this.authService.GetAllEventByCalendarIdV2(calendarId, new Date());
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new InternalServerErrorException('An unexpected error occurred while fetching the calendar data');
+      }
+    }
+  }
+
+  @ApiBearerAuth('JWT-auth')
   @Get('token-test')
   @UseGuards(JwtAuthGuard)
   // @UseGuards(RefreshAuthGuard)
@@ -95,5 +151,21 @@ export class AuthController {
     @getPayload() payload: PayloadResponse,
   ): any {
     return payload;
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBody({
+    description: 'Update profile thumbnail',
+    type: FileUploadDto,
+  })
+  @Post('update/thumbnail')
+  async updateProfile(
+    @getPayload() payload: PayloadResponse,
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<UserUpdateDto> {
+    return await this.userService.updateThumbnail(payload, file);
   }
 }

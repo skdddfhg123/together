@@ -32,8 +32,9 @@ export class AwsService {
       ACL: 'public-read',
       ContentType: `image/${ext}`,
     });
+    console.log(command);
     await this.s3Client.send(command);
-    return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+    return `${process.env.AWS_S3_CLOUDFRONT_URL}/${fileName}`;
   }
 
   async optimizeGif(inputPath: string, outputPath: string): Promise<void> {

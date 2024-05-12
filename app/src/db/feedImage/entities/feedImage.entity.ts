@@ -29,5 +29,6 @@ export class FeedImage {
     // Discard Later
     @Column({ default: false })
     isDeleted: boolean;
+
     url: any;
 }

@@ -16,11 +16,12 @@ import { GoogleModule } from './auth/google/google.module';
 import { FeedModule } from './feed/feed.module';
 import { ImageModule } from './image.upload/image.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UtilModule } from './util/util.module';
 import { EmojiModule } from './emoji/emoji.module';
 import { EventModule } from './webSocket/event.module';
+import { UtilsModule } from './utils/utils.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { RedisGateway } from './webSocket/redis/redis.gateway';
 
 @Module({
   imports: [
@@ -49,7 +50,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         }
       },
     ]),
-    UtilModule,
+    UtilsModule,
     UserModule,
     AuthModule,
     CalendarModule,
@@ -61,7 +62,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     EventModule,
   ],
   controllers: [RedisController],
-  providers: [RedisService],
+  providers: [RedisService, RedisGateway],
   exports: [RedisService],
 })
 export class AppModule implements NestModule {
@@ -69,7 +70,7 @@ export class AppModule implements NestModule {
     console.log(dataSource.driver.database);
   }
   configure(consumer: MiddlewareConsumer) {
-    // consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
+    consumer.apply(LoggerMiddleware).forRoutes('*'); //option no 3
     // consumer.apply(AuthLoggerMiddleware).forRoutes('/auth');
     // consumer.apply(GroupEventLoggerMiddleware).forRoutes('/calendar/group');
     // consumer.apply(CalendarLoggerMiddleware).exclude('/calendar/group').forRoutes('/calendar');

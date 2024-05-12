@@ -1,22 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsArray, IsDate, IsString } from "class-validator";
+import { IsDate, IsString } from "class-validator";
 
-export class CreateGroupEventDTO {
+
+export class AllEventDTO {
     @ApiProperty({
         description: 'Title of the event',
         example: 'Team Meeting',
     })
     @IsString()
-    title: string;
+    title?: string;
+
+    @ApiProperty({
+        description: 'Type of the event',
+        example: 'kakao',
+    })
+    social?: string;
 
     @ApiProperty({
         description: 'Color of the event',
         example: 'Blue',
     })
     @IsString()
-    color: string;
-
+    color?: string;
 
     @ApiProperty({
         description: 'Start date and time of the event',
@@ -28,7 +34,6 @@ export class CreateGroupEventDTO {
     @Type(() => Date)
     startAt: Date;
 
-
     @ApiProperty({
         description: 'End date and time of the event',
         type: 'string',
@@ -38,13 +43,4 @@ export class CreateGroupEventDTO {
     @IsDate()
     @Type(() => Date)
     endAt: Date;
-
-    @ApiProperty({
-        description: 'Array of emails for participants',
-        example: ['user1@example.com', 'user2@example.com'],
-        isArray: true,
-    })
-    @IsArray()
-    @IsString({ each: true })
-    members: string[];
 }
