@@ -153,6 +153,7 @@ export class GroupEventService {
 
     async getAllGroupEventsByCalendarId2(calendarId: string): Promise<GetGroupDTO[]> {
         try {
+
             const groupEvents = await this.groupEventRepository.find({
                 where: {
                     calendarId,
@@ -165,19 +166,34 @@ export class GroupEventService {
 
             const groupEventDtos: GetGroupDTO[] = await Promise.all(groupEvents.map(async (event) => {
                 // Fetch author details
-                const userCalendar = await this.userCalendarRepository.findOne({
-                    where: { userCalendarId: event.author },
-                    relations: ['user']
-                });
+                const user = await this.userRepository.findOne({
+                    where: { useremail: event.author },
+                    relations: ['userCalendarId']
+                })
+
+                if (!user) {
+                    console.log("####################################################################")
+                    throw new Error(`User with email ${event.author} not found.`);
+                }
+
+                const userCalendar = user.userCalendarId;
+
+                console.log(user);
+                console.log(userCalendar);
+
+                // const userCalendar = await this.userCalendarRepository.findOne({
+                //     where: { userCalendarId: event.author },
+                //     relations: ['user']
+                // });
 
                 if (!userCalendar) {
                     throw new Error(`Author with email ${event.author} not found.`);
                 }
 
                 const authorInfo: MemberInfo = {
-                    useremail: userCalendar?.user.useremail,
-                    thumbnail: userCalendar?.user.thumbnail,
-                    nickname: userCalendar?.user.nickname
+                    useremail: user?.useremail,
+                    thumbnail: user?.thumbnail,
+                    nickname: user?.nickname
                 };
 
                 // Fetch member details

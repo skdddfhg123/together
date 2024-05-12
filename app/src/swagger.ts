@@ -3,8 +3,8 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 export function SwaggerDocument(app: INestApplication, modulesToExclude: any[]) {
     const swaggerOptions = new DocumentBuilder()
-        .setTitle('Example API')
-        .setDescription('The API description')
+        .setTitle('Toogether API')
+        .setDescription('Toogether API 문서')
         .setVersion('1.0')
         .addTag('test')
         .addBearerAuth(

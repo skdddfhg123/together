@@ -12,7 +12,6 @@ export class ChatService {
     constructor(
         @InjectConnection()
         private chatConnection: Connection,
-        @InjectModel(Chat.name) private chatModel: Model<Chat>,
     ) {
         this.chatRoomList = {
             'roomMain': {
@@ -73,15 +72,11 @@ export class ChatService {
         return this.chatRoomList[roomId];
     }
 
-    // async saveMessage(saveMessageDto: SaveMessageDTO): Promise<Chat> {
-    //     const { roomId } = saveMessageDto;
-    //     const chatModel = this.getModelForCalendar(roomId);
-    //     const saveMessage = new chatModel(saveMessageDto);
-    //     return await saveMessage.save();
-    // }
-    async saveMessage(data: any): Promise<Chat> {
-        const newMessage = new this.chatModel(data);
-        return await newMessage.save();
+    async saveMessage(saveMessageDto: SaveMessageDTO): Promise<Chat> {
+        const { roomId } = saveMessageDto;
+        const chatModel = this.getModelForCalendar(roomId);
+        const saveMessage = new chatModel(saveMessageDto);
+        return await saveMessage.save();
     }
 
     async findAllMessageByCalendarId(calendarId: string): Promise<Chat[]> {
@@ -93,10 +88,19 @@ export class ChatService {
     async findLimitCntMessageByCalendarId(calendarId: string, skipPage: number): Promise<Chat[]> {
         const chatModel = this.getModelForCalendar(calendarId);
 
+        console.log(calendarId);
+        console.log(chatModel.name);
+
         const limit = 10;
         const skipNum = (skipPage - 1) * limit;
 
-        return await chatModel.find().skip(skipNum).limit(limit);
+        return await chatModel.find().sort({ registeredAt: -1 }).skip(skipNum).limit(limit);
+    }
+
+    async getPagenationMessage(calendarId: string, lastTime: Date): Promise<Chat[]> {
+        const chatModel = this.getModelForCalendar(calendarId);
+
+        return await chatModel.find({ registeredAt: { $lt: lastTime } }).sort({ registeredAt: -1 }).limit(10);
     }
 
     async findThreeDaysAgoMessageByCalendarId(calendarId: string): Promise<Chat[]> {

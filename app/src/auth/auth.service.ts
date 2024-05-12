@@ -176,6 +176,7 @@ export class AuthService {
                     "user.birthDay",
                 ])
                 .leftJoinAndSelect("user.userCalendarId", "userCalendar")
+                .leftJoinAndSelect("userCalendar.socialEvents", "socialEvents")  // 이 부분을 추가
                 .where("user.useremail = :useremail", { useremail: payload.useremail })
                 .getOne();
 
@@ -189,6 +190,8 @@ export class AuthService {
             const today = new Date();
             const fortyFiveDaysAgo = new Date(today.setDate(today.getDate() - 45));
             const fortyFiveDaysLater = new Date(today.setDate(today.getDate() + 45));
+
+            console.log(userWithCalendar.userCalendarId);
 
             const [calendars, socialEvents] = await Promise.all([
                 this.getGroupEvents(userWithCalendar.userCalendarId.groupCalendars || [], userWithCalendar.useremail, fortyFiveDaysAgo, fortyFiveDaysLater),
@@ -334,6 +337,8 @@ export class AuthService {
                 throw new NotFoundException("UserCalendar details not found for attendees");
             }
 
+
+
             const calendarsData = await Promise.all(userCalendars.map(async userCalendar => {
                 const calendars = await this.calendarRepository.createQueryBuilder("calendar")
                     .leftJoinAndSelect("calendar.groupEvents", "groupEvent")
@@ -407,6 +412,8 @@ export class AuthService {
             if (!userCalendars.length) {
                 throw new NotFoundException("UserCalendar details not found for attendees");
             }
+
+            console.log(`GetAllEventByCalendarId\n\n[calendar]\n${JSON.stringify(calendar)}\n[userCalendars]\n${JSON.stringify(userCalendars)}`);
 
             const results = await Promise.all(userCalendars.map(async userCalendar => {
                 const socialEvents = Array.isArray(userCalendar.socialEvents) ? userCalendar.socialEvents.map(se => ({

@@ -8,7 +8,7 @@ import { SaveMessageDTO } from './dtos/saveMessage.dto';
 @WebSocketGateway(5000, {
     cors: {
         origin: 'http://localhost:3000',
-        credentials: true,
+        credentials: true, // 웹 소켓 연결 시 자격 증명(쿠키 등)포함 허용 옵션
     },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -73,6 +73,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         console.log(client.rooms);
     }
+
 
     @SubscribeMessage('sendCombinedMessage')
     async sendCombinedMessage(client: Socket, payload: { text: string, imageUrl: string }) {
@@ -145,9 +146,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
 
+        console.log(client.rooms);
+        console.log(client.id);
+
         this.chatService.enterChatRoom(client, room);
 
-        const messages = await this.chatService.findLimitCntMessageByCalendarId(room, 1);
+        // const messages = await this.chatService.findLimitCntMessageByCalendarId(room, 1);
+        const messages = await this.chatService.findAllMessageByCalendarId(room);
 
         console.log(messages);
 
@@ -170,5 +175,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('sendImage')
     handleImage(client: Socket, payload: { imageUrl: string, calendarId: string }) {
         client.to(payload.calendarId).emit('receiveImage', payload.imageUrl);
+    }
+
+    @SubscribeMessage('getNextMessage')
+    async getNextMessage(client: Socket, payload: { calendarId: string, time: string }): Promise<void> {
+        const lastTime = new Date(payload.time);
+        const newMessages = await this.chatService.getPagenationMessage(payload.calendarId, lastTime);
+
+        newMessages.forEach((message) => {
+            client.emit('getNextMessage', {
+                id: message._id,
+                email: message.email,
+                nickname: message.nickname,
+                message: message.message,
+                registeredAt: message.registeredAt,
+            });
+        });
     }
 }
