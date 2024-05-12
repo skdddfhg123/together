@@ -137,23 +137,22 @@ interface TabEmojiUploadProps {
                 그룹 이모지는 해당 그룹 캘린더 내부에서 모든 사용자가 사용할 수 있습니다. 
                 그룹 이모지 리스트 탭에서 우리 그룹 캘린더의 이모지를 살펴볼 수 있습니다.
             </div>
-            {/* <hr className="my-4 border-t border-gray-300"/>   */}
             <div className="text-lg font-bold text-black-500 mt-5">
-            1. 이미지 파일 업로드
+                1. 이미지 파일 업로드
             </div>
             <div className="mb-4 ml-4 text-gray-500">
-            이미지 파일은 108 * 108 pixel 
+                이미지 파일은 108 * 108 pixel 
             </div>
             <div className="flex p-0 pl-3 ml-4">
                 <div className="flex  w-full max-w-xs">
                     <div className="w-1/2 bg-gray-200 cursor-pointer flex-grow-0" style={{ height: '108px', width: '108px' }}>
                         {previewUrl ? (
-                            <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                         ) : (
-                            <div className="w-full h-full bg-gray-200 flex items-center justify-center" style={{ color: '#333' }}>
-                                <ImFilePicture size={50} />
-                            </div>
-                        )}
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center" style={{ color: '#333' }}>
+                            <ImFilePicture size={50} />
+                        </div>
+                            )}
                     </div>
                     <div className="pl-5 flex flex-col">
                         <span className="text-lg mb-1 mt-auto text-gray-500" >{fileName || "이모지 선택"}</span>
@@ -169,51 +168,50 @@ interface TabEmojiUploadProps {
             </div>
             <hr className="my-4 border-t border-gray-300"/>  
             <div className="text-lg font-bold text-black-500">
-            2. 이모지 이름
+                2. 이모지 이름
             </div>
             <div className="mb-0 ml-3 text-gray-500">
                 이모지 이름은 서비스 전체 단위에서 중복 허용이 되지 않습니다.
             </div>
             <div>
-            <div className="relative flex items-center w-full my-4">
-            <input
-                ref={emojiNameInputRef}
-                type="text"
-                className={`ml-4 mr-4 p-2 border flex-grow rounded-lg shadow-sm focus:outline-none ${isValid ? 'border-gray-300 focus:ring-blue-200 focus:border-blue-300' : 'border-red-500 focus:ring-red-500'}`}
-                placeholder=":emojiname:"
-                value={emojiName.replace(/:/g, '')}
-                onChange={handleEmojiNameChange}
-                style={{ minHeight: '1em' }}
-            />
-            </div>
-            {!isValid && (
+                <div className="relative flex items-center w-full my-4">
+                    <input
+                    ref={emojiNameInputRef}
+                    type="text"
+                    className={`ml-4 mr-4 p-2 border flex-grow rounded-lg shadow-sm focus:outline-none ${isValid ? 'border-gray-300 focus:ring-blue-200 focus:border-blue-300' : 'border-red-500 focus:ring-red-500'}`}
+                    placeholder=":emojiname:"
+                    value={emojiName.replace(/:/g, '')}
+                    onChange={handleEmojiNameChange}
+                    style={{ minHeight: '1em' }}
+                    />
+                </div>
+                {!isValid && (
                 <div className="flex items-center text-red-500 mt-1 ml-4 mr-4 ">
                     <FiAlertCircle size={24} className="mr-2" /> {/* 경고 아이콘 */}
                     <span>이름은 소문자만 포함해야 하며, 공백, 마침표 또는 대부분의 문장 부호를 포함할 수 없습니다.</span>
                 </div>
-            )}
-        {isNameValid === false && (
-            <div className="text-red-500 text-sm mt-1">이미 사용 중인 이름입니다.</div>
-        )}
-
+                )}
+                {isNameValid === false && (
+                <div className="text-red-500 text-sm mt-1">이미 사용 중인 이름입니다.</div>
+                )}
             </div>
-            <div className="flex justify-end mt-12">
-            <button
-                className="font-bold px-7 py-1 border ml-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 transition duration-150 ease-in-out"
-                onClick={onClose}  // 여기에서 onClose 함수를 호출합니다
-            >
-                취소
-          </button>
-            <button
-                className={`font-bold px-7 py-1 border ml-2 border-gray-300 text-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 transition duration-150 ease-in-out ${
-                    fileName && emojiName ? "bg-blue-600 hover:bg-blue-500 text-gray-100" : "bg-gray-300 hover:bg-gray-400 cursor-not-allowed"
-                }`}
-                onClick={handleUpload}
-                disabled={!fileName || !emojiName} // 버튼 활성화 상태도 조절
-                >
-                저장
-            </button>
-        </div>
+                <div className="flex justify-end mt-12">
+                    <button
+                        className="font-bold px-7 py-1 border ml-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 transition duration-150 ease-in-out"
+                        onClick={onClose}  // 여기에서 onClose 함수를 호출합니다
+                        >
+                        취소
+                    </button>
+                    <button
+                        className={`font-bold px-7 py-1 border ml-2 border-gray-300 text-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 transition duration-150 ease-in-out ${
+                        fileName && emojiName ? "bg-blue-600 hover:bg-blue-500 text-gray-100" : "bg-gray-300 hover:bg-gray-400 cursor-not-allowed"
+                        }`}
+                        onClick={handleUpload}
+                        disabled={!fileName || !emojiName} // 버튼 활성화 상태도 조절
+                        >
+                        저장
+                    </button>
+                </div>
 
         </div>
     </div>
