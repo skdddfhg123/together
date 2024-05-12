@@ -14,7 +14,6 @@ export async function getImages() {
     if (err.response) {
       const data = err.response;
       console.log(`CHAT - getEmoji 실패:`, data); //debug//
-      // console.error(`Chat - getEmoji 실패:`, data); //debug//
     }
   }
 }

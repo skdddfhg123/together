@@ -17,7 +17,7 @@ interface EventModalProps {
   position: { x: number; y: number };
 }
 
-export default React.memo(function EventModal({
+export default React.memo(function CreateEventSimple({
   isOpen,
   onClose,
   selectedDay,
@@ -48,7 +48,7 @@ export default React.memo(function EventModal({
       startAt: formatISO(selectedDay, { representation: 'complete' }),
       endAt: formatISO(selectedDay, { representation: 'complete' }),
     };
-
+    console.log(`만드는 데이터`, eventData);
     const res = await CALENDAR.createGroupEvent(eventData);
     if (res) {
       await CALENDAR.getGroupAllEvents(selectedCalendar);

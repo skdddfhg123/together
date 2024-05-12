@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { UUID } from 'crypto';
 import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 
 import { AllEvent } from '@type/index';
 import {
@@ -12,7 +13,7 @@ import {
 } from '@store/index';
 import * as CALENDAR from '@services/calendarAPI';
 
-import EventModal from '@components/Canlendar/EventModal';
+import EventModal from '@components/Canlendar/CreateEventSimple';
 import EventDetails from '@components/Canlendar/EventDetails/EventDetails';
 import GroupMemberEvent from '@components/Canlendar/GroupMemberEvent';
 import '@styles/calendar.css';
@@ -82,9 +83,11 @@ export default React.memo(function CalendarPage({
   }, []);
 
   // *****************? 달력 생성 Logic
-  const buildCalendarDays = useCallback(() => {
-    const firstDayOfMonth = startOfMonth(currentMonth);
-    const lastDayOfMonth = endOfMonth(currentMonth);
+  const buildCalendarDays = () => {
+    const timeZone = 'Asia/Seoul';
+
+    const firstDayOfMonth = toZonedTime(startOfMonth(currentMonth), timeZone);
+    const lastDayOfMonth = toZonedTime(endOfMonth(currentMonth), timeZone);
 
     const days: Date[] = [];
     for (let day = firstDayOfMonth; day <= lastDayOfMonth; day = addDays(day, 1)) {
@@ -101,7 +104,7 @@ export default React.memo(function CalendarPage({
     }
 
     return days;
-  }, []);
+  };
 
   // *****************? 세부 일정 및 이벤트 생성 Logic
   const buildCalendarTag = (calendarDays: Date[]) => {
@@ -168,9 +171,6 @@ export default React.memo(function CalendarPage({
         eventMap.set(eventDate, existingEvents);
       });
     }
-    /*
-     * ********** 멤버 이벤트 생성
-     */
 
     return calendarDays.map((day: Date, i: number) => {
       const localDayKey = format(day, 'yyyy-MM-dd');

@@ -64,7 +64,7 @@ export default React.memo(function GroupMemberEvent({
             // data-tooltip-variant="info"
           >
             <img
-              className="w-10"
+              className="w-8"
               src={matchingAttendee?.thumbnail ? matchingAttendee.thumbnail : default_user}
               alt={matchingAttendee?.nickname}
             />

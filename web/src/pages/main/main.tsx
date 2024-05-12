@@ -7,7 +7,7 @@ import useToggle from '@hooks/useToggle';
 
 import Calendar from '@pages/Calendar/calendar';
 import CalendarList from '@components/Canlendar/CalendarList';
-import UserModal from '@components/User/Profile/UserModal';
+import UserModal from '@components/User/Profile/UserSetting';
 import RightMenuTap from '@components/Menu/RightMenuTap';
 
 import menuImg from '@assets/calendar_menu.webp';
