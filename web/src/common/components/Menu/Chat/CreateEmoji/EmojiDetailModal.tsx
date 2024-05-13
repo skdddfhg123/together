@@ -10,7 +10,8 @@ interface EmojiDetailModalProps {
   uploadDate: string;
 }
 
-const EmojiDetailModal: React.FC<EmojiDetailModalProps> = ({
+// TODO 이모지 만들기 모달 전체 수정 필요
+export default function EmojiDetailModal({
   isOpen,
   onClose,
   onDeleteSuccess,
@@ -18,33 +19,32 @@ const EmojiDetailModal: React.FC<EmojiDetailModalProps> = ({
   emoji,
   emojiName,
   uploadDate,
-}) => {
+}: EmojiDetailModalProps) {
   if (!isOpen) return null;
 
   const handleDelete = async () => {
-    if (window.confirm(`'${emojiName}'를 삭제하시겠습니까?`)) {
-      try {
-        const response = await fetch(`http://localhost:3000/emoji/remove/${emojiId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Bearer ${yourJwtToken}`,  // JWT 토큰 설정 필요
-          },
-        });
+    //   if (window.confirm(`'${emojiName}'를 삭제하시겠습니까?`)) {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_HOST_URL}/emoji/remove/${emojiId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': `Bearer ${yourJwtToken}`,  // JWT 토큰 설정 필요
+        },
+      });
 
-        if (!response.ok) {
-          const errorResponse = await response.json(); // 서버 응답 내용을 로그로 출력
-          console.error('Server response:', errorResponse);
-          throw new Error(`Emoji 삭제 실패: ${errorResponse.message}`);
-        }
-
-        alert('Emoji가 성공적으로 삭제되었습니다.');
-        onDeleteSuccess(); // 삭제 성공 콜백 호출
-        onClose(); // 모달 닫기
-      } catch (error) {
-        console.error('Emoji 삭제 중 오류 발생:', error);
-        alert('삭제 중 오류가 발생했습니다.');
+      if (!response.ok) {
+        const errorResponse = await response.json(); // 서버 응답 내용을 로그로 출력
+        console.error('Server response:', errorResponse);
+        throw new Error(`Emoji 삭제 실패: ${errorResponse.message}`);
       }
+
+      alert('Emoji가 성공적으로 삭제되었습니다.');
+      onDeleteSuccess(); // 삭제 성공 콜백 호출
+      onClose(); // 모달 닫기
+    } catch (error) {
+      console.error('Emoji 삭제 중 오류 발생:', error);
+      alert('삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -77,6 +77,4 @@ const EmojiDetailModal: React.FC<EmojiDetailModalProps> = ({
       </div>
     </div>
   );
-};
-
-export default EmojiDetailModal;
+}

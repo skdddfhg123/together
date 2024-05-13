@@ -33,7 +33,7 @@ export default function InviteLinkGenerator() {
           imageUrl:
             'https://jungle-toogether.s3.amazonaws.com/feeds/6ebd2b9b-e483-4cb4-a376-8bf0a6c5308f.jpg',
           link: {
-            mobileWebUrl: 'http://localhost:3000',
+            mobileWebUrl: process.env.REACT_APP_HOST_URL as string,
             webUrl: link,
           },
         },

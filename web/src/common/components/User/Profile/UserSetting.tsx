@@ -6,6 +6,8 @@ import * as USER from '@services/userAPI';
 import defaultUserImg from '@assets/default_user.png';
 import '@styles/modalStyle.css';
 
+const Web_Url = process.env.REACT_APP_HOST_URL || `http://localhost:3000`;
+
 export default React.memo(function UserModal() {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ export default React.memo(function UserModal() {
 
   const handleLogOut = async () => {
     await USER.logOut();
-    window.location.replace('http://localhost:3000');
+    window.location.replace(`${Web_Url}/signin`);
     setModalOpen(false);
   };
 

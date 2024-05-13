@@ -24,7 +24,7 @@ export default function InvitePage() {
     const res = await USER.logIn(formData);
     if (!res) return;
     if (inviteCode) await USER.joinCalendar(inviteCode);
-    // alert('로그인 성공');
+    alert('로그인 성공');
     navigate('/main');
   };
 

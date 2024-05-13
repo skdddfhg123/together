@@ -12,10 +12,11 @@ interface Data {
   [key: string]: unknown;
 }
 
-const serverUrl = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
+const Server_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
+const Web_Url = process.env.REACT_APP_HOST_URL || `http://localhost:3000`;
 
 const axiosInstance = axios.create({
-  baseURL: serverUrl,
+  baseURL: Server_Url,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,7 +32,7 @@ axiosInstance.interceptors.request.use(
     const token = getCookie('accessToken');
     if (!token) {
       alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
-      window.location.href = 'http://localhost:3000/signin';
+      window.location.href = `${Web_Url}/signin`;
     }
     config.headers.Authorization = `Bearer ${token}`;
     return config;
@@ -59,18 +60,18 @@ axiosInstance.interceptors.response.use(
         }
       }
       window.alert('인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
-      window.location.href = 'http://localhost:3000/signin';
+      window.location.href = `${Web_Url}/signin`;
     }
   },
 );
 
-// endpoint : serverUrl 뒤에 오는 path
+// endpoint : Server_Url 뒤에 오는 path
 // ex) 로그인일 때, endpoint는 '/login'
 //     const response = await get('/login');
 
 async function get(endpoint: string, params?: Params): Promise<AxiosResponse> {
-  if (params) console.log(`%cGET 요청 ${serverUrl + endpoint + '/' + params}`, 'color: #a25cd1;');
-  else console.log(`%cGET 요청 ${serverUrl + endpoint}`, 'color: #a25cd1;');
+  if (params) console.log(`%cGET 요청 ${Server_Url + endpoint + '/' + params}`, 'color: #a25cd1;');
+  else console.log(`%cGET 요청 ${Server_Url + endpoint}`, 'color: #a25cd1;');
 
   return axiosInstance.get(endpoint, { params });
 }
@@ -83,12 +84,12 @@ async function post(endpoint: string, data: Data | FormData): Promise<AxiosRespo
         'Content-Type': 'multipart/form-data',
       },
     };
-    console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
+    console.log(`%cPOST 요청: ${Server_Url + endpoint}`, 'color: #296aba;');
     console.log(`%cPOST 요청 데이터: `, FormData, 'color: #296aba;');
   } else {
     const bodydata = JSON.stringify(data);
 
-    console.log(`%cPOST 요청: ${serverUrl + endpoint}`, 'color: #296aba;');
+    console.log(`%cPOST 요청: ${Server_Url + endpoint}`, 'color: #296aba;');
     console.log(`%cPOST 요청 데이터: ${bodydata}`, 'color: #296aba;');
   }
 
@@ -103,12 +104,12 @@ async function patch(endpoint: string, data?: Data | FormData): Promise<AxiosRes
         'Content-Type': 'multipart/form-data',
       },
     };
-    console.log(`%cPATCH 요청: ${serverUrl + endpoint}`, 'color: #059c4b;');
+    console.log(`%cPATCH 요청: ${Server_Url + endpoint}`, 'color: #059c4b;');
     console.log(`%cPATCH 요청 데이터: `, FormData, 'color: #059c4b;');
   } else if (data) {
     const bodydata = JSON.stringify(data);
 
-    console.log(`%cPATCH 요청: ${serverUrl + endpoint}`, 'color: #059c4b;');
+    console.log(`%cPATCH 요청: ${Server_Url + endpoint}`, 'color: #059c4b;');
     console.log(`%cPATCH 요청 데이터: ${bodydata}`, 'color: #059c4b;');
   }
 
@@ -116,8 +117,9 @@ async function patch(endpoint: string, data?: Data | FormData): Promise<AxiosRes
 }
 
 async function del(endpoint: string, params?: Params): Promise<AxiosResponse> {
-  if (params) console.log(`%cDELETE 요청 ${serverUrl + endpoint + '/' + params}`, 'color: #c36999');
-  else console.log(`%cDELETE 요청 ${serverUrl + endpoint}`, 'color: #c36999');
+  if (params)
+    console.log(`%cDELETE 요청 ${Server_Url + endpoint + '/' + params}`, 'color: #c36999');
+  else console.log(`%cDELETE 요청 ${Server_Url + endpoint}`, 'color: #c36999');
 
   return axiosInstance.delete(endpoint, params);
 }

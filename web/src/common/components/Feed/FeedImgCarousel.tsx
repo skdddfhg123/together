@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-
+import { Tooltip } from 'react-tooltip';
 import { ImageFile } from '@type/index';
 
 interface FeedImgCarouselProps {
@@ -35,21 +35,36 @@ export default React.memo(function FeedImgCarousel({ ImageList }: FeedImgCarouse
     <div className="flex items-center justify-center w-full">
       <div className="relative w-full h-full overflow-hidden">
         <button
+          disabled={currIndex === 0}
           type="button"
-          className="
+          {...(currIndex === 0 ? { 'data-tooltip-id': 'tooltip-first' } : {})}
+          data-tooltip-place="bottom-start"
+          className={`
           absolute top-1/2 -translate-y-1/2 left-4 z-10 p-2 
           bg-gray-100 text-gray-500
-          hover:scale-150 hover:text-custom-main transition duration-300 ease-in-out"
+          ${
+            currIndex === 0
+              ? 'cursor-not-allowed'
+              : 'hover:scale-150 hover:text-custom-main transition duration-300 ease-in-out'
+          }`}
           onClick={() => handleSwipe(-1)}
         >
           &lt;
         </button>
         <button
+          disabled={currIndex === ImageList?.length}
           type="button"
-          className="
+          {...(currIndex + 1 === ImageList?.length ? { 'data-tooltip-id': 'tooltip-last' } : {})}
+          data-tooltip-place="bottom-end"
+          className={`
           absolute top-1/2 -translate-y-1/2 right-4 z-10 p-2 
           bg-gray-100 text-gray-500
-          hover:scale-150 hover:text-custom-main transition duration-300 ease-in-out"
+          
+          ${
+            currIndex + 1 === ImageList?.length
+              ? 'cursor-not-allowed'
+              : 'hover:scale-150 hover:text-custom-main transition duration-300 ease-in-out'
+          }`}
           onClick={() => handleSwipe(1)}
         >
           &gt;
@@ -66,6 +81,12 @@ export default React.memo(function FeedImgCarousel({ ImageList }: FeedImgCarouse
           ))}
         </ul>
       </div>
+      <Tooltip id="tooltip-first" data-tooltip-class-name="tooltip-box">
+        <div>첫번째 사진입니다.</div>
+      </Tooltip>
+      <Tooltip id="tooltip-last" data-tooltip-class-name="tooltip-box">
+        <div>마지막 사진입니다.</div>
+      </Tooltip>
     </div>
   );
 });
