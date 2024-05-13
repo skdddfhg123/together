@@ -24,6 +24,8 @@ class MeetingDataSource extends CalendarDataSource {
   List<CalendarAppointment> calendarAppointments; // 기존 일정
   List<MemberAppointment> memberAppointments; // 멤버 일정
 
+  Set<String> displayedMarkers = {};
+
   MeetingDataSource({
     required this.calendarAppointments,
     required this.memberAppointments,
@@ -55,5 +57,16 @@ class MeetingDataSource extends CalendarDataSource {
       }
     }
     return null;
+  }
+
+  bool shouldDisplayMarker(Appointment appointment, MemberAppointment member) {
+    String markerKey =
+        '${member.useremail}-${appointment.startTime.toIso8601String()}';
+    if (displayedMarkers.contains(markerKey)) {
+      return false; // 이미 표시된 마커
+    } else {
+      displayedMarkers.add(markerKey);
+      return true; // 마커를 표시해야 함
+    }
   }
 }
