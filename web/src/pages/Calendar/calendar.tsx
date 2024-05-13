@@ -10,10 +10,11 @@ import {
   useSocialEventListStore,
   useGroupEventListStore,
   useAllEventListStore,
+  useMemberEventListState,
 } from '@store/index';
 import * as CALENDAR from '@services/calendarAPI';
 
-import EventModal from '@components/Canlendar/CreateEventSimple';
+import CreateEventModal from '@components/Canlendar/CreateEventSimple';
 import EventDetails from '@components/Canlendar/EventDetails/EventDetails';
 import GroupMemberEvent from '@components/Canlendar/GroupMemberEvent';
 import '@styles/calendar.css';
@@ -31,11 +32,12 @@ export default React.memo(function CalendarPage({
   currentMonth,
 }: CalendarProps) {
   const { selectedDay, setSelectedDay } = useSelectedDayStore();
-
   const { selectedCalendar } = useSelectedCalendarStore();
+
   const { socialEventList } = useSocialEventListStore();
   const { AllEventList } = useAllEventListStore();
   const { groupEventList } = useGroupEventListStore();
+  const { MemberEventList } = useMemberEventListState();
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -110,29 +112,6 @@ export default React.memo(function CalendarPage({
   const buildCalendarTag = (calendarDays: Date[]) => {
     const eventMap = new Map<string, JSX.Element[]>();
 
-    // ************* 소셜 이벤트 생성
-    socialEventList.forEach((event: AllEvent) => {
-      const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
-      const existingEvents = eventMap.get(eventDate) || [];
-      existingEvents.push(
-        <li
-          className={`${
-            event.social === 'kakao'
-              ? 'kakao-event'
-              : event.social === 'google'
-                ? 'google-event'
-                : event.social === 'discord'
-                  ? 'discord-event'
-                  : 'outlook-event'
-          }`}
-          key={existingEvents.length}
-        >
-          {event.social}
-        </li>,
-      );
-      eventMap.set(eventDate, existingEvents);
-    });
-
     // ************* 그룹 이벤트 생성 or All 이벤트 생성
     if (selectedCalendar === 'All') {
       AllEventList.forEach((event) => {
@@ -148,6 +127,29 @@ export default React.memo(function CalendarPage({
             key={event.id}
           >
             {event.title || 'No Title'}
+          </li>,
+        );
+        eventMap.set(eventDate, existingEvents);
+      });
+
+      // ************* 소셜 이벤트 생성
+      socialEventList.forEach((event: AllEvent) => {
+        const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
+        const existingEvents = eventMap.get(eventDate) || [];
+        existingEvents.push(
+          <li
+            className={`${
+              event.social === 'kakao'
+                ? 'kakao-event'
+                : event.social === 'google'
+                  ? 'google-event'
+                  : event.social === 'discord'
+                    ? 'discord-event'
+                    : 'outlook-event'
+            }`}
+            key={existingEvents.length}
+          >
+            {event.social}
           </li>,
         );
         eventMap.set(eventDate, existingEvents);
@@ -208,7 +210,11 @@ export default React.memo(function CalendarPage({
           <div className="dayBox">
             <span className="day">{day.getDate()}</span>
             <span className="GroupMember-Box">
-              <GroupMemberEvent selectedCalendar={selectedCalendar} localDayKey={localDayKey} />
+              <GroupMemberEvent
+                selectedCalendar={selectedCalendar}
+                MemberEventList={MemberEventList}
+                localDayKey={localDayKey}
+              />
             </span>
           </div>
           <ul className="SCROLL-hide" id="event-box">
@@ -258,7 +264,8 @@ export default React.memo(function CalendarPage({
         </tbody>
       </table>
       <EventDetails isOpen={detailsOn} eventId={groupEventId} onClose={detailsClose} />
-      <EventModal
+      <CreateEventModal
+        selectedCalendar={selectedCalendar}
         isOpen={eventModalOn}
         onClose={eventModalClose}
         selectedDay={selectedDay}

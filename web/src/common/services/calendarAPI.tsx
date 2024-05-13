@@ -18,6 +18,7 @@ import {
   useGroupEventListStore,
   useMemberEventListState,
   useSelectedCalendarStore,
+  useSocialEventListStore,
   useUserInfoStore,
 } from '@store/index';
 
@@ -118,9 +119,32 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
       return {
         useremail: member.useremail,
         nickname: member.nickname,
+        thumbnail: member.thumbnail,
         groupedEvent: GroupedEvents,
       };
     });
+
+    const userInfo = useUserInfoStore.getState().userInfo;
+    const socialEventList = useSocialEventListStore.getState().socialEventList;
+    if (userInfo) {
+      MemberEventList.forEach((member: MemberWithEvent) => {
+        if (member.useremail === userInfo.useremail) {
+          socialEventList.forEach((socialEvent) => {
+            const eventKey = format(new Date(socialEvent.startAt), 'yyyy-MM-dd');
+            if (!member.groupedEvent[eventKey]) {
+              member.groupedEvent[eventKey] = [];
+            }
+            member.groupedEvent[eventKey].push({
+              title: socialEvent.type || '소셜 일정',
+              startAt: socialEvent.startAt,
+              endAt: socialEvent.endAt,
+            });
+          });
+        }
+      });
+    }
+
+    useMemberEventListState.getState().setAllEventList(MemberEventList);
 
     useMemberEventListState.getState().setAllEventList(MemberEventList);
 

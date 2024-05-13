@@ -96,7 +96,6 @@ export async function logOut() {
   alert('로그아웃 되었습니다.');
 }
 
-// TODO auth/all/v2 로 업그레이드 예정
 export async function firstRender() {
   try {
     const { data: res } = await API.get(`/auth/all/v2`);
@@ -106,7 +105,7 @@ export async function firstRender() {
     useUserInfoStore.getState().setUserInfo(res.user);
     useSelectedCalendarStore.getState().setSelectedCalendar('All');
 
-    REDIS.Connect(res.user.useremail);
+    // REDIS.Connect(res.user.useremail);
     const AllEvents: AllEvent[] = res.events.filter((event: AllEvent) => event.group !== undefined);
     const SocialEvents: AllEvent[] = res.events.filter(
       (event: AllEvent) => event.social !== undefined,

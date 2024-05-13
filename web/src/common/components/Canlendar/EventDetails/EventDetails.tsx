@@ -62,7 +62,6 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
     }
   }, [eventId, isLoaded]);
 
-  // 그룹 캘린더 변경 시 자동으로 닫히기
   useEffect(() => {
     onClose();
     if (!isOn) toggle();

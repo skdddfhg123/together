@@ -6,12 +6,13 @@ import * as CALENDAR from '@services/calendarAPI';
 import * as REDIS from '@services/redisAPI';
 import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
 
-import { DefaultEvent } from '@type/index';
-import { useSelectedCalendarStore, useUserInfoStore } from '@store/index';
+import { Calendar, DefaultEvent } from '@type/index';
+import { useUserInfoStore } from '@store/index';
 
 import '@styles/modalStyle.css';
 
 interface EventModalProps {
+  selectedCalendar: Calendar | 'All';
   isOpen: boolean;
   onClose: () => void;
   selectedDay: Date | null;
@@ -19,12 +20,12 @@ interface EventModalProps {
 }
 
 export default React.memo(function CreateEventSimple({
+  selectedCalendar,
   isOpen,
   onClose,
   selectedDay,
   position,
 }: EventModalProps) {
-  const { selectedCalendar } = useSelectedCalendarStore();
   const { userInfo } = useUserInfoStore();
   const titleRef = useRef<HTMLInputElement>(null);
   const [modalStyle, setModalStyle] = useState<React.CSSProperties>({});

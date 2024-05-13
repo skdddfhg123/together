@@ -50,9 +50,10 @@ export default React.memo(function RightMenuTap() {
 
       setSocket(newSocket);
 
+      if (selectedCalendar === 'All') return alert('캘린더를 선택해주세요.');
       newSocket.on('connect', () => {
         console.log('Connected to chat server'); //debug//
-        newSocket.emit('enterChatRoom', selectedCalendar);
+        newSocket.emit('enterChatRoom', selectedCalendar.calendarId);
       });
 
       // newSocket.on('exception', (error) => {

@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_ALERT_SOCKET_PORT}/redis`;
+const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}/redis`;
 
 const axiosInstance = axios.create({
   baseURL: Redis_Url,

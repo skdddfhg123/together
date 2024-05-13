@@ -17,7 +17,7 @@ import syncImg from '@assets/sync.png';
 import '@styles/main.css';
 import { useNavigate } from 'react-router-dom';
 
-const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_ALERT_SOCKET_PORT}`;
+const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -61,19 +61,19 @@ export default function MainPage() {
   }, []);
 
   // *****************? 실시간 알림을 위한 소켓 연결
-  useEffect(() => {
-    const socket = io(Redis_Url);
-    console.log(`Redis Socket Connected`); //debug//
+  // useEffect(() => {
+  //   const socket = io(Redis_Url);
+  //   console.log(`Redis Socket Connected`); //debug//
 
-    // TODO TOAST로 만들기
-    socket.on('redisMessage', ({ channel, message }) => {
-      alert(`${channel}님이 보내셨습니다. ${message}`);
-    });
+  //   // TODO TOAST로 만들기
+  //   socket.on('redisMessage', ({ channel, message }) => {
+  //     alert(`${channel}님이 보내셨습니다. ${message}`);
+  //   });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
 
   return (
     <>

@@ -2,33 +2,25 @@ import React from 'react';
 import { Tooltip } from 'react-tooltip';
 import { format } from 'date-fns';
 
-import { Calendar } from '@type/index';
-import { useMemberEventListState, useUserInfoStore } from '@store/index';
+import { Calendar, MemberWithEvent } from '@type/index';
 
 import default_user from '@assets/default_user.png';
 
 interface GroupMemberProps {
   selectedCalendar: Calendar | 'All';
+  MemberEventList: MemberWithEvent[];
   localDayKey: string;
-  // buildCalendarDays: () => Date[];
 }
 
 export default React.memo(function GroupMemberEvent({
   selectedCalendar,
+  MemberEventList,
   localDayKey,
 }: GroupMemberProps) {
-  const { MemberEventList } = useMemberEventListState();
-  const { userInfo } = useUserInfoStore();
-
   return (
     <>
       {MemberEventList.flatMap((member) => {
-        if (
-          !member.groupedEvent ||
-          !member.groupedEvent[localDayKey] ||
-          member.useremail === userInfo?.useremail
-        )
-          return [];
+        if (!member.groupedEvent || !member.groupedEvent[localDayKey]) return [];
 
         const eventsDetail = member.groupedEvent[localDayKey].map((event, idx) => (
           <div key={event.title + idx} className="FLEX-horizC">
@@ -48,10 +40,6 @@ export default React.memo(function GroupMemberEvent({
 
         if (selectedCalendar === 'All') return;
 
-        const matchingAttendee = selectedCalendar.attendees.find(
-          (attendee) => attendee.useremail === member.useremail,
-        );
-
         const tooltipId = `${member.nickname}-${localDayKey}-tooltip`;
 
         return (
@@ -65,19 +53,19 @@ export default React.memo(function GroupMemberEvent({
           >
             <img
               className="w-8"
-              src={matchingAttendee?.thumbnail ? matchingAttendee.thumbnail : default_user}
-              alt={matchingAttendee?.nickname}
+              src={member?.thumbnail ? member.thumbnail : default_user}
+              alt={member?.nickname}
             />
             <Tooltip id={tooltipId} data-tooltip-class-name="tooltip-box">
               <div className="FLEX-horizC">
-                {matchingAttendee && (
+                {member && (
                   <>
                     <img
                       className="w-24 mx-auto"
-                      src={matchingAttendee.thumbnail ? matchingAttendee.thumbnail : default_user}
+                      src={member.thumbnail ? member.thumbnail : default_user}
                       alt="thumbnail"
                     />
-                    <span className="text-xl">{matchingAttendee.nickname}</span>
+                    <span className="text-xl">{member.nickname}</span>
                   </>
                 )}
                 <div>{eventsDetail}</div>
