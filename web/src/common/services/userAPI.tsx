@@ -11,6 +11,41 @@ import {
   useUserInfoStore,
 } from '@store/index';
 
+export async function firstRender() {
+  try {
+    const { data: res } = await API.get(`/auth/all/v2`);
+    if (!res) throw new Error('USER - firstRender (유저 정보 db 조회 실패)');
+    console.log(`USER - firstRender 성공`, res); //debug//
+
+    useUserInfoStore.getState().setUserInfo(res.user);
+    useSelectedCalendarStore.getState().setSelectedCalendar('All');
+
+    // REDIS.Connect(res.user.useremail);
+    const AllEvents: AllEvent[] = res.events.filter((event: AllEvent) => event.group !== undefined);
+    const SocialEvents: AllEvent[] = res.events.filter(
+      (event: AllEvent) => event.social !== undefined,
+    );
+
+    useSocialEventListStore.getState().setSocialEventList(SocialEvents);
+    useAllEventListStore.getState().setAllEventList(AllEvents);
+
+    return true;
+  } catch (e) {
+    const err = e as AxiosError;
+    console.log(`err`, err);
+    if (err.response?.status === 400) {
+      console.error('USER - firstRender 실패 : ', err.response);
+      alert('토큰 정보가 일치하지 않습니다');
+    } else if (err.response?.data) {
+      const data = err.response.data as API.ErrorResponse;
+      console.error('USER - firstRender 실패 2 : ', data); //debug//
+      alert(data.message);
+    } else {
+      console.error('USER - firstRender 실패 3 : ', err);
+    }
+  }
+}
+
 export async function signUp(formData: SignUpForm) {
   try {
     const { useremail, nickname, password } = formData;
@@ -96,41 +131,6 @@ export async function logOut() {
   alert('로그아웃 되었습니다.');
 }
 
-export async function firstRender() {
-  try {
-    const { data: res } = await API.get(`/auth/all/v2`);
-    if (!res) throw new Error('USER - firstRender (유저 정보 db 조회 실패)');
-    console.log(`USER - firstRender 성공`, res); //debug//
-
-    useUserInfoStore.getState().setUserInfo(res.user);
-    useSelectedCalendarStore.getState().setSelectedCalendar('All');
-
-    // REDIS.Connect(res.user.useremail);
-    const AllEvents: AllEvent[] = res.events.filter((event: AllEvent) => event.group !== undefined);
-    const SocialEvents: AllEvent[] = res.events.filter(
-      (event: AllEvent) => event.social !== undefined,
-    );
-
-    useSocialEventListStore.getState().setSocialEventList(SocialEvents);
-    useAllEventListStore.getState().setAllEventList(AllEvents);
-
-    return true;
-  } catch (e) {
-    const err = e as AxiosError;
-    console.log(`err`, err);
-    if (err.response?.status === 400) {
-      console.error('USER - firstRender 실패 : ', err.response);
-      alert('토큰 정보가 일치하지 않습니다');
-    } else if (err.response?.data) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error('USER - firstRender 실패 2 : ', data); //debug//
-      alert(data.message);
-    } else {
-      console.error('USER - firstRender 실패 3 : ', err);
-    }
-  }
-}
-
 export async function joinCalendar(calendarId: string) {
   try {
     const { data: res } = await API.patch(`/calendar/participate/${calendarId}`);
@@ -149,6 +149,32 @@ export async function joinCalendar(calendarId: string) {
       const data = err.response?.data as API.ErrorResponse;
       console.error('그룹 캘린더 가입 에러', data); //debug//
       alert(data?.message);
+    }
+  }
+}
+
+export async function updateThumbnail(thumbnailFormData: FormData) {
+  try {
+    const { data: res } = await API.post('/auth/update/thumbnail', thumbnailFormData);
+    if (!res) throw new Error('USER - joinCalendar (DB에서 그룹 캘린터 가입 실패)');
+    console.log(`USER - updateThumbnail 성공`, res); //debug//
+
+    const currentUserInfo = useUserInfoStore.getState().userInfo;
+    if (currentUserInfo)
+      await useUserInfoStore
+        .getState()
+        .setUserInfo({ ...currentUserInfo, thumbnail: res.thumbnail });
+
+    alert(`프로필이 수정되었습니다.`);
+
+    return true;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as API.ErrorResponse;
+      console.error('USER - updateThumbnail 실패', data); //debug//
+      alert(data.message);
     }
   }
 }

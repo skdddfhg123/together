@@ -13,7 +13,7 @@ interface Data {
 }
 
 const Server_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
-const Web_Url = process.env.REACT_APP_HOST_URL || `http://localhost:3000`;
+const Web_Url = process.env.REACT_APP_HOST_URL;
 
 const axiosInstance = axios.create({
   baseURL: Server_Url,

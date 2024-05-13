@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import useToggle from '@hooks/useToggle';
 import * as USER from '@services/userAPI';
+import { useUserInfoStore } from '@store/index';
 
+import UpdateThumbnail from '@components/User/Profile/UpdateThumbnail';
 import defaultUserImg from '@assets/default_user.png';
 import '@styles/modalStyle.css';
 
-const Web_Url = process.env.REACT_APP_HOST_URL || `http://localhost:3000`;
-
 export default React.memo(function UserModal() {
-  const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { isOn, toggle } = useToggle(false);
+
+  const { userInfo } = useUserInfoStore();
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleToggle = () => {
     setModalOpen(!modalOpen);
@@ -23,15 +27,20 @@ export default React.memo(function UserModal() {
 
   const handleLogOut = async () => {
     await USER.logOut();
-    window.location.replace(`${Web_Url}/signin`);
+    window.location.replace(`/signin`);
     setModalOpen(false);
   };
+
+  useEffect(() => {
+    console.log(`썸네일 변경됨`);
+  }, [userInfo]);
 
   return (
     <div className="relative inline-block">
       <img
-        className="w-12 h-12 cursor-pointer"
-        src={defaultUserImg}
+        key={userInfo?.thumbnail}
+        className="w-16 h-16 object-contain p-1 border rounded-full cursor-pointer"
+        src={userInfo?.thumbnail ? userInfo.thumbnail : defaultUserImg}
         onClick={handleToggle}
         alt="user-button"
       />
@@ -40,7 +49,10 @@ export default React.memo(function UserModal() {
           <div className="FLEX-horizC mx-auto">
             <button
               className="w-full h-10 hover:bg-custom-light"
-              onClick={() => handleRedirect('/userinfo')}
+              onClick={() => {
+                handleToggle();
+                toggle();
+              }}
             >
               프로필 사진 수정
             </button>
@@ -62,6 +74,7 @@ export default React.memo(function UserModal() {
           </div>
         )}
       </section>
+      <UpdateThumbnail userInfo={userInfo} isOpen={isOn} onClose={toggle} />
     </div>
   );
 });

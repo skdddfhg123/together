@@ -32,11 +32,15 @@ export default function EventMember({
           const useremail = email as string;
           const foundMember = calendarMember.find((m) => m.useremail === useremail);
           return (
-            <span key={useremail} className="FLEX-horizC font-semibold">
+            <span key={useremail} className="FLEX-horizC min-w-16 max-w-16 font-semibold">
               {foundMember && foundMember.thumbnail ? (
-                <img src={foundMember.thumbnail} alt={foundMember.nickname} />
+                <img
+                  className="w-full h-14 object-contain"
+                  src={foundMember.thumbnail}
+                  alt={foundMember.nickname}
+                />
               ) : (
-                <img className="w-14" src={default_user} alt="default Img" />
+                <img className="w-full h-14 object-contain" src={default_user} alt="default Img" />
               )}
               {foundMember ? foundMember.nickname : '알 수 없는 멤버'}
             </span>
