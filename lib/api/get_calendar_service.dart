@@ -80,14 +80,22 @@ class CalendarApiService {
           startTime: DateTime.parse(data['startAt']),
           endTime: DateTime.parse(data['endAt']),
           subject: data['title'],
-          color: _parseColor(data['color']),
+          color: calendar.color,
         );
         // 서버 응답에서 groupeventId 추출
         String groupEventId = data['groupEventId'];
+        var author = data['author'];
 
         // 일정과 groupeventId를 meetingController에 추가
         meetingController.addCalendarAppointment(
-            newAppointment, calendar.calendarId, groupEventId, false);
+            newAppointment,
+            calendar.calendarId,
+            groupEventId,
+            false,
+            author['useremail'],
+            author['nickname'],
+            author['thumbnail'] ??
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s');
       }
       meetingController.update(); // 일정 추가 후 UI 업데이트
     } else {

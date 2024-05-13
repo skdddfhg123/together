@@ -112,7 +112,7 @@ class AllCalendar extends StatelessWidget {
                                           appointment.appointment.color,
                                       userProfileImageUrl:
                                           authController.user?.thumbnail ?? '',
-                                      groupEventId: appointment.groupeventId,
+                                      groupEventId: appointment.groupEventId,
                                     ),
                                   ),
                                 );

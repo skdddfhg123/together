@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'package:calendar/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class CalendarEventService {
   static const String baseUrl = 'http://15.164.174.224:3000/calendar/group/';
+  final AuthController authController = Get.find<AuthController>();
 
   // 색상 객체를 16진수 문자열로 변환하는 함수
   String colorToHex(Color color) {
@@ -30,7 +33,7 @@ class CalendarEventService {
           'color': colorToHex(color),
           'startAt': startAt.toIso8601String(),
           'endAt': endAt.toIso8601String(),
-          'emails': [],
+          'member': [authController.user?.useremail],
         }));
 
     if (response.statusCode == 201) {

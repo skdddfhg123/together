@@ -12,6 +12,7 @@ import 'controllers/auth_controller.dart';
 import 'controllers/meeting_controller.dart';
 import 'screens/login_page.dart';
 import 'screens/signup_page.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +50,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Group Calendar App',
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', ''),
+        Locale('ko', ''),
+      ],
       // initialRoute: token != null ? '/home' : '/',
       initialRoute: '/',
       getPages: [

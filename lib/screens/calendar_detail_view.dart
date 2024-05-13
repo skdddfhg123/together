@@ -1,3 +1,4 @@
+import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
@@ -20,6 +21,7 @@ class CalendarDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final calendarController = Get.find<UserCalendarController>();
     final meetingController = Get.find<MeetingController>();
+    final authController = Get.find<AuthController>();
 
     Calendar? selectedCalendar = calendarController.calendars.firstWhere(
       (cal) => cal.calendarId == calendarId,
@@ -91,13 +93,15 @@ class CalendarDetailView extends StatelessWidget {
         // MeetingController에서 변경 사항을 감지하여 UI를 갱신합니다.
         final dataSource = MeetingDataSource(
             meetingController.getAppointmentsForCalendar(calendarId));
+
         return SfCalendar(
           view: CalendarView.month,
           firstDayOfWeek: 7,
           monthViewSettings: const MonthViewSettings(
             appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
           ),
-          dataSource: dataSource,
+          dataSource: dataSource, // 여기서 dataSource를 설정
+
           onTap: _onCalendarTapped,
         );
       }),

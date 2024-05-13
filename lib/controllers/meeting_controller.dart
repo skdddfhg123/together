@@ -3,6 +3,7 @@ import 'package:calendar/api/comment_service.dart';
 import 'package:calendar/api/delete_event_service.dart';
 import 'package:calendar/api/event_creates_service.dart';
 import 'package:calendar/api/post_service.dart';
+import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/models/comment.dart';
 import 'package:calendar/models/post.dart';
@@ -18,14 +19,21 @@ import 'package:timezone/data/latest.dart' as tz;
 class CalendarAppointment {
   final Appointment appointment;
   final String calendarId;
-  final String groupeventId;
+  final String groupEventId;
   final bool isSocial;
+  final String authorEmail;
+  final String authorNickname;
+  final String? authorThumbnail;
 
-  CalendarAppointment(
-      {required this.appointment,
-      required this.calendarId,
-      required this.groupeventId,
-      required this.isSocial});
+  CalendarAppointment({
+    required this.appointment,
+    required this.calendarId,
+    required this.groupEventId,
+    required this.isSocial,
+    required this.authorEmail,
+    required this.authorNickname,
+    this.authorThumbnail,
+  });
 }
 
 class FeedWithId {
@@ -157,13 +165,26 @@ class MeetingController extends GetxController {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////// 캘린더, 일정 부분 //////////////////////////////////////
-  void addCalendarAppointment(Appointment appointment, String calendarId,
-      String groupeventId, bool isSocial) {
+
+  final AuthController authController = Get.find<AuthController>();
+
+  void addCalendarAppointment(
+    Appointment appointment,
+    String calendarId,
+    String groupeventId,
+    bool isSocial,
+    String? useremail,
+    String? nickname,
+    String? thumbnail,
+  ) {
     var newCalendarAppointment = CalendarAppointment(
         appointment: appointment,
         calendarId: calendarId,
-        groupeventId: groupeventId,
-        isSocial: isSocial);
+        groupEventId: groupeventId,
+        isSocial: isSocial,
+        authorEmail: useremail!,
+        authorNickname: nickname!,
+        authorThumbnail: thumbnail);
     calendarAppointments.add(newCalendarAppointment);
     update();
   }
@@ -200,20 +221,28 @@ class MeetingController extends GetxController {
         event.userCalendarId,
         event.socialEventId,
         true,
+        'example',
+        'example',
+        'example',
       );
     }
   }
 
-  List<Appointment> getAppointmentsForCalendar(String calendarId) {
+  List<CalendarAppointment> getAppointmentsForCalendar(String calendarId) {
     return calendarAppointments
         .where((calendarAppointment) =>
             calendarAppointment.calendarId == calendarId)
-        .map((calendarAppointment) => calendarAppointment.appointment)
         .toList();
   }
 
-  List<Appointment> getAllAppointments() {
-    return calendarAppointments.map((c) => c.appointment).toList();
+  List<CalendarAppointment> getAllAppointments() {
+    // 현재 로그인한 사용자의 이메일
+    String currentUserEmail = authController.user?.useremail ?? '';
+
+    // 현재 사용자가 생성한 일정만 필터링
+    return calendarAppointments
+        .where((appointment) => appointment.authorEmail == currentUserEmail)
+        .toList();
   }
 
   List<CalendarAppointment> getAppointmentsForCalendarAndDate(
@@ -241,7 +270,7 @@ class MeetingController extends GetxController {
     bool isDeleted = await deleteEventService.deleteEvent(groupEventId);
     if (isDeleted) {
       int index = calendarAppointments
-          .indexWhere((item) => item.groupeventId == groupEventId);
+          .indexWhere((item) => item.groupEventId == groupEventId);
       if (index != -1) {
         calendarAppointments.removeAt(index);
         await deleteFeedsForEvent(groupEventId); // 연관된 피드들도 삭제
@@ -333,8 +362,8 @@ class MeetingController extends GetxController {
                                       calendarColor:
                                           appointment.appointment.color,
                                       userProfileImageUrl:
-                                          "https://cdn.pixabay.com/photo/2020/05/17/20/21/cat-5183427_640.jpg",
-                                      groupEventId: appointment.groupeventId,
+                                          appointment.authorThumbnail ?? '',
+                                      groupEventId: appointment.groupEventId,
                                     ),
                                   ),
                                 );
@@ -376,9 +405,10 @@ class MeetingController extends GetxController {
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                  const CircleAvatar(
+                                  CircleAvatar(
                                     backgroundImage: NetworkImage(
-                                        "https://cdn.pixabay.com/photo/2020/05/17/20/21/cat-5183427_640.jpg" // 유저 프로필 이미지 URL
+                                        appointment.authorThumbnail ??
+                                            '' // 유저 프로필 이미지 URL
                                         ),
                                   ),
                                 ],

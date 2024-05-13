@@ -2,6 +2,7 @@
 
 import 'package:calendar/api/event_creates_service.dart';
 import 'package:calendar/api/kakao_auth_service.dart';
+import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/screens/sync_login_page.dart';
@@ -85,6 +86,8 @@ class DialogService {
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 String? token = prefs.getString('token');
+                final AuthController authController =
+                    Get.find<AuthController>();
 
                 // 백엔드에 일정 추가 요청
                 var result = await CalendarEventService().createEvent(
@@ -106,7 +109,13 @@ class DialogService {
                     id: calendarId.toString(),
                   );
                   meetingController.addCalendarAppointment(
-                      newAppointment, calendarId, groupEventId, false);
+                      newAppointment,
+                      calendarId,
+                      groupEventId,
+                      false,
+                      authController.user?.useremail,
+                      authController.user?.nickname,
+                      authController.user?.thumbnail);
                   Navigator.pop(context);
                 } else {
                   Get.snackbar("Error", "Failed to create event");
