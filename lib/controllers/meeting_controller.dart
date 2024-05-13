@@ -36,6 +36,36 @@ class CalendarAppointment {
   });
 }
 
+class MemberAppointment {
+  final String useremail;
+  final String nickname;
+  final List<Appointment> appointments;
+
+  MemberAppointment({
+    required this.useremail,
+    required this.nickname,
+    required this.appointments,
+  });
+
+  // JSON에서 MemberAppointment 객체로 변환
+  factory MemberAppointment.fromJson(Map<String, dynamic> json) {
+    List<Appointment> appointments = (json['allevents'] as List)
+        .map((event) => Appointment(
+              startTime: DateTime.parse(event['startAt']),
+              endTime: DateTime.parse(event['endAt']),
+              subject: event['title'],
+              color: Colors.grey, // 예시 색상, 실제 색상은 변경 가능
+            ))
+        .toList();
+
+    return MemberAppointment(
+      useremail: json['useremail'],
+      nickname: json['nickname'],
+      appointments: appointments,
+    );
+  }
+}
+
 class FeedWithId {
   final Feed feed;
   final String groupeventId;
@@ -69,6 +99,9 @@ class CommentWithFeedId {
 class MeetingController extends GetxController {
   final RxList<CalendarAppointment> calendarAppointments =
       <CalendarAppointment>[].obs;
+
+  final RxList<MemberAppointment> memberAppointments =
+      <MemberAppointment>[].obs;
 
   final DeleteEventService deleteEventService = DeleteEventService();
   final CalendarEventService eventService = CalendarEventService();
@@ -233,6 +266,10 @@ class MeetingController extends GetxController {
         .where((calendarAppointment) =>
             calendarAppointment.calendarId == calendarId)
         .toList();
+  }
+
+  List<MemberAppointment> getMemberAppointments() {
+    return memberAppointments.toList();
   }
 
   List<CalendarAppointment> getAllAppointments() {

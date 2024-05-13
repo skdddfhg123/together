@@ -30,14 +30,14 @@ void main() async {
 
   Get.put(AuthController());
   Get.put(MeetingController());
+  // 종속성 등록 순서 조정
+  Get.put(CalendarCreateApiService());
   Get.put(KakaoAuthService());
   Get.put(EventSelectionController());
-  Get.put(CalendarCreateApiService());
 
   var calendarService = CalendarApiService();
   await calendarService.initializePrefs(); // 서비스 초기화 보장
   Get.put(UserCalendarController(calendarService)); // 의존성 주입
-
   runApp(MyApp(token: token));
 }
 

@@ -1,6 +1,7 @@
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
+import 'package:calendar/models/all_data.dart';
 import 'package:calendar/models/meeting_data.dart';
 import 'package:calendar/models/userinfo.dart';
 import 'package:calendar/screens/event_detail.dart';
@@ -33,7 +34,7 @@ class AllCalendar extends StatelessWidget {
       body: GetBuilder<MeetingController>(
         builder: (meetingController) => SfCalendar(
           view: CalendarView.month,
-          dataSource: MeetingDataSource(meetingController.getAllAppointments()),
+          dataSource: AllDataSource(meetingController.getAllAppointments()),
           monthViewSettings: const MonthViewSettings(
             appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
           ),

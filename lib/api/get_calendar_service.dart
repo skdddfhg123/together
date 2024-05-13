@@ -110,4 +110,38 @@ class CalendarApiService {
     }
     return Color(int.parse(hexColor, radix: 16));
   }
+
+  //////////////////////////////////////멤 버 일 정 ///////////////////////////////////////
+  ///
+  ///// 멤버들의 일정 정보를 불러오는 메소드
+  Future<void> loadMemberAppointmentsForCalendar(String calendarId) async {
+    String? token = await _loadToken();
+    final String url =
+        "http://15.164.174.224:3000/auth/all/getcalendar/V2/$calendarId";
+
+    // 기존 데이터를 비우기
+    meetingController.memberAppointments.clear();
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = json.decode(response.body);
+        for (var memberData in responseData) {
+          MemberAppointment memberAppointment =
+              MemberAppointment.fromJson(memberData);
+          meetingController.memberAppointments
+              .add(memberAppointment); // 멤버 일정 리스트에 추가
+        }
+        meetingController.update();
+      } else {
+        print('Failed to load member appointments: ${response.body}');
+      }
+    } catch (e) {
+      print('Error fetching member appointments: $e');
+    }
+  }
 }

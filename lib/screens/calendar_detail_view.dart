@@ -92,7 +92,10 @@ class CalendarDetailView extends StatelessWidget {
       body: Obx(() {
         // MeetingController에서 변경 사항을 감지하여 UI를 갱신합니다.
         final dataSource = MeetingDataSource(
-            meetingController.getAppointmentsForCalendar(calendarId));
+          calendarAppointments:
+              meetingController.getAppointmentsForCalendar(calendarId),
+          memberAppointments: meetingController.getMemberAppointments(),
+        );
 
         return SfCalendar(
           view: CalendarView.month,
@@ -101,7 +104,50 @@ class CalendarDetailView extends StatelessWidget {
             appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
           ),
           dataSource: dataSource, // 여기서 dataSource를 설정
+          appointmentBuilder:
+              (BuildContext context, CalendarAppointmentDetails details) {
+            final appointment = details.appointments.first;
+            final isMember = dataSource.isMemberAppointment(appointment);
+            final memberInfo = dataSource.getMemberInfo(appointment);
 
+            if (isMember) {
+              return Container(
+                width: details.bounds.width,
+                height: details.bounds.height,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  memberInfo!.nickname[0],
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              );
+            } else {
+              return Container(
+                decoration: BoxDecoration(
+                  color: selectedCalendar.color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        appointment.subject,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
           onTap: _onCalendarTapped,
         );
       }),

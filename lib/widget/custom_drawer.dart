@@ -1,3 +1,4 @@
+import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/screens/myprofile_page.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final calendarController = Get.find<UserCalendarController>();
     final authController = Get.find<AuthController>();
-
+    final calendarApiService = CalendarApiService();
     return Drawer(
       child: Column(
         children: [
@@ -157,6 +158,8 @@ class CustomDrawer extends StatelessWidget {
                         onTap: () {
                           Navigator.pop(context);
                           onCalendarChanged(calendar.calendarId);
+                          calendarApiService.loadMemberAppointmentsForCalendar(
+                              calendar.calendarId);
                         },
                       );
                     }),
