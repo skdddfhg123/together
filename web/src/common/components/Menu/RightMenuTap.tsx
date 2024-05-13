@@ -142,7 +142,11 @@ export default React.memo(function RightMenuTap() {
         </div>
         <div id={activeTap === 'chat' ? 'SLIDEchatIn-right' : 'SLIDEchatOut-right'}>
           {activeTap === 'chat' && socket ? (
-            <ChatTap socket={socket} onClose={() => setActiveTap(null)} />
+            <ChatTap
+              selectedCalendar={selectedCalendar}
+              socket={socket}
+              onClose={() => setActiveTap(null)}
+            />
           ) : null}
         </div>
         <div id={activeTap === 'member' ? 'SLIDEin-right' : 'SLIDEout-right'}>

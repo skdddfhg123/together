@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { io } from 'socket.io-client';
 
 import * as KAKAO from '@services/KakaoAPI';
 import * as USER from '@services/userAPI';
@@ -15,6 +16,8 @@ import syncImg from '@assets/sync.png';
 
 import '@styles/main.css';
 import { useNavigate } from 'react-router-dom';
+
+const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_ALERT_SOCKET_PORT}`;
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -55,6 +58,21 @@ export default function MainPage() {
   useEffect(() => {
     CALENDAR.getMyAllCalendar();
     RendarUserAndCalendar();
+  }, []);
+
+  // *****************? 실시간 알림을 위한 소켓 연결
+  useEffect(() => {
+    const socket = io(Redis_Url);
+    console.log(`Redis Socket Connected`); //debug//
+
+    // TODO TOAST로 만들기
+    socket.on('redisMessage', ({ channel, message }) => {
+      alert(`${channel}님이 보내셨습니다. ${message}`);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return (

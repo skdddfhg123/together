@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import { formatISO } from 'date-fns';
 
 import * as CALENDAR from '@services/calendarAPI';
+import * as REDIS from '@services/redisAPI';
 import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
 
 import { DefaultEvent } from '@type/index';
@@ -48,10 +49,11 @@ export default React.memo(function CreateEventSimple({
       startAt: formatISO(selectedDay, { representation: 'complete' }),
       endAt: formatISO(selectedDay, { representation: 'complete' }),
     };
-    console.log(`만드는 데이터`, eventData);
+
     const res = await CALENDAR.createGroupEvent(eventData);
     if (res) {
       await CALENDAR.getGroupAllEvents(selectedCalendar);
+      await REDIS.MessagePost({ channel: userInfo?.useremail, message: `일정 등록` });
     }
     onClose();
   };

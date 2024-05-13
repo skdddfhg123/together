@@ -1,8 +1,9 @@
 import { AxiosError } from 'axios';
 import * as API from '@utils/api';
-import { setCookie, deleteCookie } from '@utils/cookie';
+import * as REDIS from '@services/redisAPI';
+import { Cookie, setCookie, deleteCookie } from '@utils/cookie';
 
-import { AllEvent, Cookie, SignInForm, SignUpForm } from '@type/index';
+import { AllEvent, SignInForm, SignUpForm } from '@type/index';
 import {
   useAllEventListStore,
   useSelectedCalendarStore,
@@ -105,6 +106,7 @@ export async function firstRender() {
     useUserInfoStore.getState().setUserInfo(res.user);
     useSelectedCalendarStore.getState().setSelectedCalendar('All');
 
+    REDIS.Connect(res.user.useremail);
     const AllEvents: AllEvent[] = res.events.filter((event: AllEvent) => event.group !== undefined);
     const SocialEvents: AllEvent[] = res.events.filter(
       (event: AllEvent) => event.social !== undefined,

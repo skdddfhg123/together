@@ -263,36 +263,3 @@ export async function removeGroupEvent(groupEventId: UUID | null) {
     }
   }
 }
-
-// const MemberEventList: MemberEvent[] = [];
-// const userInfo = useUserInfoStore.getState().userInfo;
-
-// res.forEach((member: MemberWithEvent) => {
-//   if (userInfo && member.useremail !== userInfo.useremail) {
-//     member.allevents.forEach((event) => {
-//       const existingEvent = MemberEventList.find(
-//         (e) =>
-//           e.title === event.title && e.startAt === event.startAt && e.endAt === event.endAt,
-//       );
-
-//       if (existingEvent) {
-//         if (!existingEvent.useremail.includes(member.useremail)) {
-//           existingEvent.useremail.push(member.useremail);
-//         }
-//         if (!existingEvent.nickname.includes(member.nickname)) {
-//           existingEvent.nickname.push(member.nickname);
-//         }
-//       } else {
-//         MemberEventList.push({
-//           title: event.title,
-//           startAt: event.startAt,
-//           endAt: event.endAt,
-//           useremail: [member.useremail],
-//           nickname: [member.nickname],
-//         });
-//       }
-//     });
-//   }
-// });
-
-// useMemberEventListState.getState().setAllEventList(MemberEventList);

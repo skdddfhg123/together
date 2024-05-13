@@ -1,6 +1,17 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { getCookie } from '@utils/cookie';
 
+export type ErrorResponse = {
+  message: string;
+};
+interface Params {
+  [key: string]: unknown;
+}
+
+interface Data {
+  [key: string]: unknown;
+}
+
 const serverUrl = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
 
 const axiosInstance = axios.create({
@@ -52,17 +63,6 @@ axiosInstance.interceptors.response.use(
     }
   },
 );
-
-export type ErrorResponse = {
-  message: string;
-};
-interface Params {
-  [key: string]: unknown;
-}
-
-interface Data {
-  [key: string]: unknown;
-}
 
 // endpoint : serverUrl 뒤에 오는 path
 // ex) 로그인일 때, endpoint는 '/login'

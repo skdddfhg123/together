@@ -1,23 +1,5 @@
 import { UUID } from 'crypto';
 
-// ************************** 쿠키
-
-export type Cookie = {
-  name: string;
-  value: string;
-  options: CookieOptions;
-};
-
-type CookieOptions = {
-  expires?: Date;
-  maxAge?: number;
-  domain?: string;
-  path?: string;
-  secure?: boolean;
-  httpOnly?: boolean;
-  sameSite?: 'lax' | 'strict' | 'none';
-};
-
 // ************************** 회원가입 / 로그인
 export interface SignInForm {
   useremail: string;
@@ -155,4 +137,16 @@ export type Message = {
   nickname: string;
   message: string;
   image?: Image;
+};
+
+export type reqEmoji = {
+  calendarId?: UUID;
+  emojiFormData: FormData;
+};
+
+export type Emoji = {
+  emojiId: UUID;
+  emojiUrl: Image;
+  emojiName: string;
+  createdAt: string;
 };

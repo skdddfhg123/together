@@ -152,7 +152,7 @@ export async function removeEventFeed({ feedId }: EventFeed) {
 export async function createFeedComment({ feedId, content }: reqComment) {
   try {
     const res = await API.post(`/feed/comment/create/${feedId}`, { content });
-    if (!res) throw new Error('FEEd - createFeedComment 실패 : (DB 댓글 등록 실패)');
+    if (!res) throw new Error('COMMENT - createFeedComment 실패 : (DB 댓글 등록 실패)');
     console.log(`COMMENT - createFeedComment 성공 :`, res); //debug//
     alert('댓글이 등록되었습니다.');
 
@@ -171,7 +171,7 @@ export async function createFeedComment({ feedId, content }: reqComment) {
 export async function getFeedComment(feedId: UUID) {
   try {
     const { data: res } = await API.get(`/feed/comment/${feedId}`);
-    if (!res) throw new Error('FEEd - getFeedComment 실패 : (DB 댓글 불러오기 실패)');
+    if (!res) throw new Error('COMMENT - getFeedComment 실패 : (DB 댓글 불러오기 실패)');
     console.log(`COMMENT - getFeedComment 성공 :`, res); //debug//
 
     return res;

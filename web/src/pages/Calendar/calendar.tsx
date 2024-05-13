@@ -83,7 +83,7 @@ export default React.memo(function CalendarPage({
   }, []);
 
   // *****************? 달력 생성 Logic
-  const buildCalendarDays = () => {
+  const buildCalendarDays = useCallback(() => {
     const timeZone = 'Asia/Seoul';
 
     const firstDayOfMonth = toZonedTime(startOfMonth(currentMonth), timeZone);
@@ -104,7 +104,7 @@ export default React.memo(function CalendarPage({
     }
 
     return days;
-  };
+  }, [currentMonth]);
 
   // *****************? 세부 일정 및 이벤트 생성 Logic
   const buildCalendarTag = (calendarDays: Date[]) => {
