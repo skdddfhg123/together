@@ -13,7 +13,6 @@ interface Data {
 }
 
 const Server_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
-const Web_Url = process.env.REACT_APP_HOST_URL;
 
 const axiosInstance = axios.create({
   baseURL: Server_Url,
@@ -29,11 +28,11 @@ axiosInstance.interceptors.request.use(
       return config;
     }
 
-    // const token = getCookie('accessToken');
-    const token = sessionStorage.getItem('accessToken');
+    const token = getCookie('accessToken');
+    // const token = sessionStorage.getItem('accessToken');
     if (!token) {
       alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
-      window.location.href = `${Web_Url}/signin`;
+      window.location.href = `/signin`;
     }
     config.headers.Authorization = `Bearer ${token}`;
     return config;
@@ -61,7 +60,7 @@ axiosInstance.interceptors.response.use(
         }
       }
       window.alert('인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
-      window.location.href = `${Web_Url}/signin`;
+      window.location.href = `/signin`;
     }
   },
 );

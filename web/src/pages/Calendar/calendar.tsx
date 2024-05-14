@@ -42,6 +42,15 @@ export default React.memo(function CalendarPage({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // *****************? 자식컴포넌트 전달을 위한 callback 최적화
+  const eventModalClose = useCallback(() => {
+    setEventModalOn(false);
+  }, []);
+
+  const detailsClose = useCallback(() => {
+    setDetailsOn(false);
+  }, []);
+
   // *****************? 특정 일자 이벤트 등록 Modal
   const [eventModalOn, setEventModalOn] = useState<boolean>(false);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
@@ -52,6 +61,9 @@ export default React.memo(function CalendarPage({
 
   // *****************? 더블 클릭으로 이벤트 등록 Modal 띄움
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
+    if (selectedCalendar === 'All') {
+      return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
+    }
     const rect = e.currentTarget.getBoundingClientRect();
     setModalPosition({ x: rect.left, y: rect.top });
 
@@ -79,17 +91,8 @@ export default React.memo(function CalendarPage({
         setGroupEventId(null);
       }
     },
-    [groupEventId],
+    [groupEventId, detailsClose],
   );
-
-  // *****************? 자식컴포넌트 전달을 위한 callback 최적화
-  const eventModalClose = useCallback(() => {
-    setEventModalOn(false);
-  }, []);
-
-  const detailsClose = useCallback(() => {
-    setDetailsOn(false);
-  }, []);
 
   // *****************? 달력 생성 Logic
   const buildCalendarDays = useCallback(() => {
@@ -145,14 +148,15 @@ export default React.memo(function CalendarPage({
         const existingEvents = eventMap.get(eventDate) || [];
         existingEvents.push(
           <li
-            className={`${event.social === 'kakao'
-              ? 'kakao-event'
-              : event.social === 'google'
-                ? 'google-event'
-                : event.social === 'discord'
-                  ? 'discord-event'
-                  : 'outlook-event'
-              }`}
+            className={`${
+              event.social === 'kakao'
+                ? 'kakao-event'
+                : event.social === 'google'
+                  ? 'google-event'
+                  : event.social === 'discord'
+                    ? 'discord-event'
+                    : 'outlook-event'
+            }`}
             key={existingEvents.length}
           >
             {event.social}

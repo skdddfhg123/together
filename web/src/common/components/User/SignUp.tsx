@@ -28,7 +28,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
     if (ref === useremailRef) {
       setEmailValid(emailRegex.test(value));
     } else if (ref === nicknameRef) {
-      setNicknameValid(value.length >= 4 && value.length <= 10);
+      setNicknameValid(value.length > 0 && value.length <= 10);
     } else if (ref === passwordRef || ref === confirmPasswordRef) {
       const password = passwordRef.current?.value ?? '';
       const confirmPassword = confirmPasswordRef.current?.value ?? '';
@@ -40,8 +40,8 @@ export default function SignUp({ onSubmit }: SignUpProps) {
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    const useremail = useremailRef.current?.value;
-    const nickname = nicknameRef.current?.value;
+    const useremail = useremailRef.current?.value.trim();
+    const nickname = nicknameRef.current?.value.trim();
     const password = passwordRef.current?.value;
     const confirmPassword = confirmPasswordRef.current?.value;
 
@@ -99,7 +99,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           autoComplete="off"
           required
         />
-        <div className="FLEX-verC h-10">{nicknameValid ? '' : '4~10자 사이여야 합니다.'}</div>
+        <div className="FLEX-verC h-10">{nicknameValid ? '' : '10글자 이하로 입력해주세요.'}</div>
         <label className="w-full mb-2" htmlFor="password">
           PASSWORD
         </label>

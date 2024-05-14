@@ -1,0 +1,253 @@
+.relative-height {
+  position: relative;
+  height: 92vh;
+  width: 100%;
+  padding: 0.3rem;
+}
+
+.overflow-container {
+  overflow-y: auto;
+  height: 84vh;
+  gap: 0.25rem;
+  padding-top: 4rem;
+}
+
+.date-label {
+  text-align: center;
+  color: gray;
+  margin: 1rem 0;
+}
+
+.nickname-right {
+  position: relative;
+  top:-1rem;
+}
+
+.nickname-left {
+  min-width: 2rem;
+  max-width: 5rem;
+  position: relative;
+  top:-1rem;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.no-messages {
+  padding-top: 5rem;
+  height: 84vh;
+}
+
+.message-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.message-item.right {
+  justify-content: flex-end;
+}
+
+.message-item.left {
+  justify-content: flex-start;
+}
+
+ .message-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.message-content.right {
+  min-width: 3rem;
+  min-height: 2rem;
+  max-width: 18rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  background-color: #badfff;
+}
+
+.message-content.left {
+  min-width: 3rem;
+  max-width: 18rem;
+  min-height: 2rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  background-color: #f1f1f1;
+}
+
+.message-image {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+}
+
+.attendee-thumbnail {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  position: relative;
+  top:-1rem;
+  object-fit: cover;
+}
+
+.message-bubble {
+  margin-left: 0.5rem;
+  border-radius: 0.5rem;
+  position: relative;
+  word-wrap: break-word;
+}
+
+.message-item.right .message-bubble::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent transparent transparent #badfff;
+  transform: translateY(-50%);
+}
+
+.message-item.left .message-bubble::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent #f1f1f1 transparent transparent;
+  transform: translateY(-50%);
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: gray;
+  margin-top: 0.2rem;
+}
+
+.timestamp.right {
+  display: flex;
+  align-items: end;
+  margin-bottom: 0.5rem;
+}
+
+.timestamp.left {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-bottom: 0.5rem;
+}
+
+.emoji-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 75%;
+  max-width: 28rem;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+}
+
+.emoji-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+}
+
+.emoji-container {
+  overflow-y: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.emoji-item {
+  width: 5rem;
+  height: 5rem;
+  margin: 0.125rem;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-style {
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.button-style:hover {
+  background-color: var(--custom-light);
+}
+
+.form-container {
+  position: relative;
+  bottom: 0;
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  background-color: var(--custom-main);
+}
+
+.image-preview {
+  position: absolute;
+  bottom: 5rem;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 6rem;
+  height: 6rem;
+  background-color: white;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.emoji-button {
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+}
+
+.input-style {
+  width: 8lvh;
+  height: 3rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  flex-grow: 1;
+}
+
+.submit-button {
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+}

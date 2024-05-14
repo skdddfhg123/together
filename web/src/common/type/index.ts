@@ -1,6 +1,8 @@
 import { UUID } from 'crypto';
 
 // ************************** 회원가입 / 로그인
+export type Image = string;
+
 export interface SignInForm {
   useremail: string;
   password: string;
@@ -23,8 +25,6 @@ export type UserInfo = {
 
 // ************************** 캘린더
 
-export type Image = string;
-
 export interface ImageFile {
   name?: string | UUID;
   file?: File;
@@ -33,12 +33,6 @@ export interface ImageFile {
 }
 
 export type CalendarId = UUID | 'All';
-
-export type UserCalendarListInfo = {
-  userCalendarId: UUID;
-  // groupCalendar: GroupEvent[] | null;
-  // socialEvents: SocialEvent[] | null;
-};
 
 export type CreateCalendarForm = {
   title: string;
@@ -78,8 +72,8 @@ export interface DefaultEvent {
 }
 
 export interface reqEvent extends DefaultEvent {
-  member: string[];
   color: string;
+  member: string[] | null;
 }
 
 export interface GroupingMemberEvent {
@@ -142,6 +136,11 @@ export type Message = {
   nickname: string;
   message: string;
   image?: Image;
+  registeredAt: string;
+};
+
+export type ChatList = {
+  [date: string]: Message[];
 };
 
 export type reqEmoji = {

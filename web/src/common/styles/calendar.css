@@ -51,8 +51,9 @@ td {
 
 td.Day:hover,
 td.today:hover {
-  box-shadow: 0 0 0 3px #0086FF inset;
+  box-shadow: 0 0 0 0.5px #0086FF inset;
   cursor: pointer;
+  border-radius: 5px;
 }
 
 #event-box {

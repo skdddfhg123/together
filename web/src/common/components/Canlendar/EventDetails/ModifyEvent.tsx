@@ -47,7 +47,7 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
     debounce((newColor: string) => {
       setColor(newColor);
     }, 100),
-    [],
+    [setColor],
   );
 
   const handleColorChange = (newColor: string) => {
@@ -83,7 +83,17 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
       setView();
       onClose();
     },
-    [eventId, color, selectedMember, pinned, onClose, onSubmit, groupEventInfo, setView],
+    [
+      eventId,
+      color,
+      selectedMember,
+      pinned,
+      onClose,
+      onSubmit,
+      groupEventInfo,
+      setView,
+      setIsLoaded,
+    ],
   );
 
   // *********************? 렌더링 함수
@@ -136,7 +146,11 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
             {calendarMember.map((member: Member) => (
               <li key={member.useremail} className="FLEX-ver">
                 <div onClick={() => handleMemberClick(member)}>
-                  <img className="w-14" src={member.thumbnail ? member.thumbnail : default_user} />
+                  <img
+                    className="max-h-14 max-w-14 mx-auto object-contain rounded-full"
+                    src={member.thumbnail ? member.thumbnail : default_user}
+                    alt={member.nickname}
+                  />
                   <div>{member.nickname}</div>
                   <input
                     className="w-full items-center"

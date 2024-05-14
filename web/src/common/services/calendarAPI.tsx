@@ -8,7 +8,6 @@ import {
   GroupEvent,
   Calendar,
   CreateCalendarForm,
-  DefaultEvent,
   MemberWithEvent,
   GroupingMemberEvent,
   reqEvent,
@@ -19,7 +18,6 @@ import {
   useGroupEventListStore,
   useMemberEventListState,
   useSelectedCalendarStore,
-  useSocialEventListStore,
   useUserInfoStore,
 } from '@store/index';
 
@@ -125,28 +123,6 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
       };
     });
 
-    const userInfo = useUserInfoStore.getState().userInfo;
-    const socialEventList = useSocialEventListStore.getState().socialEventList;
-    if (userInfo) {
-      MemberEventList.forEach((member: MemberWithEvent) => {
-        if (member.useremail === userInfo.useremail) {
-          socialEventList.forEach((socialEvent) => {
-            const eventKey = format(new Date(socialEvent.startAt), 'yyyy-MM-dd');
-            if (!member.groupedEvent[eventKey]) {
-              member.groupedEvent[eventKey] = [];
-            }
-            member.groupedEvent[eventKey].push({
-              title: socialEvent.type || '소셜 일정',
-              startAt: socialEvent.startAt,
-              endAt: socialEvent.endAt,
-            });
-          });
-        }
-      });
-    }
-
-    useMemberEventListState.getState().setAllEventList(MemberEventList);
-
     useMemberEventListState.getState().setAllEventList(MemberEventList);
 
     return true;
@@ -206,14 +182,20 @@ export async function getGroupOneEvent(groupEventId: UUID) {
   }
 }
 
-export async function createGroupEvent({ groupCalendarId, title, startAt, endAt, color, member }: reqEvent) {
+export async function createGroupSimpleEvent({
+  groupCalendarId,
+  title,
+  startAt,
+  endAt,
+  member,
+  color,
+}: reqEvent) {
   try {
     const { data: res } = await API.post(`/calendar/group/create/${groupCalendarId}`, {
       title,
       startAt,
       endAt,
-      // member: [useUserInfoStore.getState().userInfo?.useremail],
-      member: member,
+      member: member || [useUserInfoStore.getState().userInfo?.useremail],
       color: color,
     });
     if (!res) throw new Error('CALENDAR - createGroupEvent (DB 이벤트 생성 실패)');
