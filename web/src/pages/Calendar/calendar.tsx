@@ -63,17 +63,23 @@ export default React.memo(function CalendarPage({
     }
   };
 
-  const handleDetails = useCallback((eventId: UUID, e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-
-    if (!groupEventId || eventId !== groupEventId) {
-      setGroupEventId(eventId);
-      setDetailsOn(true);
-    } else {
-      detailsClose();
-      setGroupEventId(null);
-    }
-  }, []);
+  const handleDetails = useCallback(
+    (eventId: UUID, e: React.MouseEvent<HTMLElement>) => {
+      e.stopPropagation();
+      console.log(`누른 이벤트`, eventId);
+      console.log(`보고있는 이벤트`, groupEventId);
+      if (!groupEventId || eventId !== groupEventId) {
+        setGroupEventId(eventId);
+        setDetailsOn(true);
+        return;
+      }
+      if (eventId && eventId === groupEventId) {
+        detailsClose();
+        setGroupEventId(null);
+      }
+    },
+    [groupEventId],
+  );
 
   // *****************? 자식컴포넌트 전달을 위한 callback 최적화
   const eventModalClose = useCallback(() => {

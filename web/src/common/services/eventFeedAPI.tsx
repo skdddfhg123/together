@@ -67,7 +67,7 @@ export async function createEventFeed({
 
     const { data: res } = await API.post(`/feed/create/${groupEventId}`, feedData);
     if (!res) throw new Error(`FEED - createEventFeed 실패 (DB 피드 생성 실패)`);
-    console.log(`FEED - createEventFeed 성공 :`, res.feedImages); //debug//
+    console.log(`FEED - createEventFeed 성공 :`, res); //debug//
 
     const EventFeeds = useEventFeedListStore.getState().eventFeedList;
     useEventFeedListStore.getState().setEventFeedList([
@@ -79,7 +79,7 @@ export async function createEventFeed({
         content: res.feed.content,
         images: res.feedImages.map((img: FeedImage) => ({ imageSrc: img.imageSrc })),
         createdAt: res.feed.createdAt,
-        thumbnail: res.feed.user.thumnail,
+        thumbnail: res.feed.user.thumbnail,
         nickname: res.feed.user.nickname,
       },
     ]);

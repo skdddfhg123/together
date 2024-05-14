@@ -17,7 +17,7 @@ interface FeedModalProps {
   onClose: () => void;
 }
 
-export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps) {
+export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps) {
   const [commentList, setCommentList] = useState<Comment[]>([]);
   const commentRef = useRef<HTMLInputElement>(null);
 
@@ -55,8 +55,9 @@ export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: Feed
   }, [feedInfo]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && feedInfo) {
       fetchCommntList();
+      // FEED.getOneFeed(feedInfo?.feedId);
     }
   }, [isOpen, fetchCommntList]);
 
@@ -73,19 +74,21 @@ export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: Feed
           <main className="w-1/2 h-full border-l">
             <section
               key="content-section"
-              className="FLEX-horizC w-full h-1/3 space-y-4 p-2 border-b"
+              className="FLEX-horizC w-full h-2/5 space-y-4 p-2 border-b"
             >
               <header key="author" className="FLEX-horizC mx-auto text-center h-1/3">
                 {feedInfo.thumbnail ? (
-                  <img src={feedInfo.thumbnail} alt="프로필" />
+                  <img className="max-w-24" src={feedInfo.thumbnail} alt="프로필" />
                 ) : (
                   <div className="text-gray-700 text-xl w-24">{feedInfo.nickname}</div>
                 )}
               </header>
-              <div className="mx-auto text-left text-2xl h-1/2 w-full">{feedInfo.content}</div>
+              <div className="overflow-auto scroll-y-auto mx-auto text-left text-xl h-2/3 w-full">
+                {feedInfo.content}
+              </div>
               <div className="w-full text-left text-gray-400">{formatDate(feedInfo.createdAt)}</div>
             </section>
-            <section className="flex flex-col h-2/3 p-2">
+            <section className="flex flex-col h-3/5 p-2">
               <div className="overflow-y-auto flex-1">
                 {commentList.length > 0 ? (
                   <ul>
@@ -133,6 +136,13 @@ export default React.memo(function FeedModal({ feedInfo, isOpen, onClose }: Feed
       ) : (
         <p>Loading feed details...</p>
       )}
+      <button
+        onClick={onClose}
+        className="absolute top-0 right-2 text-xl text-black hover:text-gray-600"
+        aria-label="Close"
+      >
+        &times;
+      </button>
     </Modal>
   );
-});
+}

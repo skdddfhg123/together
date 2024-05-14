@@ -49,17 +49,13 @@ export default function CreateEmojiModal({ isOpen, onClose }: CreateEmojiProps) 
             <TabEmojiList selectedCalendar={selectedCalendar} />
           )}
         </div>
-
-        {
-          //* 취소 버튼
-          /* <button 
+        <button
           onClick={onClose}
           className="absolute top-0 right-0 m-2 text-xl text-black hover:text-gray-600"
           aria-label="Close"
         >
           &times;
-        </button> */
-        }
+        </button>
       </Modal>
     </>
   );
