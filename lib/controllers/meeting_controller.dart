@@ -1,18 +1,21 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:calendar/api/calendar_delete_service.dart';
 import 'package:calendar/api/comment_service.dart';
 import 'package:calendar/api/delete_event_service.dart';
 import 'package:calendar/api/event_creates_service.dart';
+import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/api/post_service.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/models/comment.dart';
-import 'package:calendar/models/meeting_data.dart';
 import 'package:calendar/models/post.dart';
 import 'package:calendar/models/social_event.dart';
 import 'package:calendar/screens/event_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -112,6 +115,46 @@ class MeetingController extends GetxController {
   final CalendarEventService eventService = CalendarEventService();
   final DeleteCalendarService deleteCalendarService = DeleteCalendarService();
 
+/////////////////////////////////////멤 버 일 정 ////////////////////////////////////
+
+  final AuthController authController = Get.find<AuthController>();
+
+  Future<void> loadMemberAppointmentsForCalendar(String calendarId) async {
+    String? token = await _loadToken();
+    final String url =
+        "http://15.164.174.224:3000/auth/all/getcalendar/V2/$calendarId";
+
+    memberAppointments.clear();
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = json.decode(response.body);
+        for (var memberData in responseData) {
+          MemberAppointment memberAppointment =
+              MemberAppointment.fromJson(memberData);
+          memberAppointments.add(memberAppointment); // 멤버 일정 리스트에 추가
+        }
+        update();
+      } else {
+        print('Failed to load member appointments: ${response.body}');
+      }
+    } catch (e) {
+      print('Error fetching member appointments: $e');
+    }
+  }
+
+  Future<String?> _loadToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token')?.trim();
+  }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////피드 부분 /////////////////////////////////////////
   final FeedService feedService = FeedService();
   final RxList<FeedWithId> feeds = <FeedWithId>[].obs;
@@ -205,8 +248,6 @@ class MeetingController extends GetxController {
 
 //////////////////////////////////////// 캘린더, 일정 부분 //////////////////////////////////////
 
-  final AuthController authController = Get.find<AuthController>();
-
   void addCalendarAppointment(
     Appointment appointment,
     String calendarId,
@@ -225,6 +266,7 @@ class MeetingController extends GetxController {
         authorNickname: nickname!,
         authorThumbnail: thumbnail);
     calendarAppointments.add(newCalendarAppointment);
+    loadMemberAppointmentsForCalendar(calendarId);
     update();
   }
 
@@ -315,8 +357,10 @@ class MeetingController extends GetxController {
       int index = calendarAppointments
           .indexWhere((item) => item.groupEventId == groupEventId);
       if (index != -1) {
+        final calendarId = calendarAppointments[index].calendarId;
         calendarAppointments.removeAt(index);
         await deleteFeedsForEvent(groupEventId); // 연관된 피드들도 삭제
+        await loadMemberAppointmentsForCalendar(calendarId);
         update(); // UI 갱신
         Get.back(); // 현재 페이지 닫기
         Get.snackbar(
