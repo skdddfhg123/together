@@ -120,18 +120,18 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                               Text(
                                 appBarTitle,
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   foreground: Paint()
                                     ..style = PaintingStyle.stroke
-                                    ..strokeWidth = 3
+                                    ..strokeWidth = 2
                                     ..color = Colors.white,
                                 ),
                               ),
                               Text(
                                 appBarTitle,
                                 style: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
@@ -150,7 +150,7 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                       Text(
                         '${selectedCalendar.title} (${selectedCalendar.attendees.length}명)',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 10,
                           fontWeight: FontWeight.normal,
                           color: Color.fromARGB(255, 114, 113, 113),
                         ),
