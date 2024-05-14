@@ -1,5 +1,6 @@
 import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/controllers/auth_controller.dart';
+import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/screens/myprofile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,30 +20,13 @@ class CustomDrawer extends StatelessWidget {
     final calendarController = Get.find<UserCalendarController>();
     final authController = Get.find<AuthController>();
     final calendarApiService = Get.find<CalendarApiService>();
+    final meetingController = Get.find<MeetingController>();
     return Drawer(
       child: Column(
         children: [
           Expanded(
             child: ListView(
               children: [
-                // DrawerHeader(
-                //   decoration: BoxDecoration(
-                //     color: Colors.blue[200],
-                //   ),
-                //   child: Column(
-                //     children: [
-                //       ListTile(
-                //         title: const Text('연동 앱 관리'),
-                //         trailing: const Icon(Icons.phone_android), // 아이콘 추가
-                //         onTap: () {
-                //           Navigator.of(context).pop();
-                //           showSyncLoginPageModal(context);
-                //         }, // 클릭 이벤트 핸들러
-                //       ),
-                //       syncButton(),
-                //     ],
-                //   ),
-                // ),
                 UserAccountsDrawerHeader(
                   accountName: Text(
                     authController.user?.nickname ?? '반가워요, 사용자님',
@@ -77,6 +61,7 @@ class CustomDrawer extends StatelessWidget {
                             onPressed: () {
                               Navigator.pop(context);
                               onCalendarChanged('all_calendar');
+                              calendarController.loadCalendars();
                             },
                           ),
                           const Text(

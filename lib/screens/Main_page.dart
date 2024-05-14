@@ -1,3 +1,4 @@
+import 'package:calendar/screens/calendar_setting.dart';
 import 'package:calendar/widget/calendar_utils.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
@@ -19,6 +20,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
+  String calendarId = 'default_calendar_id'; // 초기 값 설정
 
   @override
   void initState() {
@@ -28,18 +30,21 @@ class _MainPageState extends State<MainPage> {
       const MemoPage(),
       const MemoPage(),
       const NotificationPage(),
-      const MemoPage()
+      CalendarSettingsPage(calendarId: calendarId),
     ];
   }
 
-  void _changePage(String calendarId) {
+  void _changePage(String newCalendarId) {
     setState(() {
-      if (calendarId == 'all_calendar') {
+      calendarId = newCalendarId;
+      if (newCalendarId == 'all_calendar') {
         _pages[0] = AllCalendar(onCalendarChanged: _changePage);
       } else {
         _pages[0] = CalendarDetailView(
-            calendarId: calendarId, onCalendarChanged: _changePage);
+            calendarId: newCalendarId, onCalendarChanged: _changePage);
       }
+      _pages[4] =
+          CalendarSettingsPage(calendarId: calendarId); // 업데이트된 calendarId 전달
       _selectedIndex = 0; // 일정 탭으로 돌아가기
     });
   }

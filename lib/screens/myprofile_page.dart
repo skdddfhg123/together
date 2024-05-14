@@ -1,5 +1,6 @@
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/screens/edit_profile_page.dart';
+import 'package:calendar/widget/calendar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -105,6 +106,14 @@ class MyProfile extends StatelessWidget {
             ),
           ),
           const Divider(height: 30, thickness: 2),
+          ListTile(
+            title: const Text('연동된 앱 관리', style: TextStyle(fontSize: 16)),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              showSyncLoginPageModal(context);
+            },
+          ),
+          syncButton(),
         ],
       ),
     );

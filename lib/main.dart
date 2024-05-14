@@ -7,12 +7,14 @@ import 'package:calendar/screens/Main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/meeting_controller.dart';
 import 'screens/login_page.dart';
 import 'screens/signup_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,11 +55,14 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
+        MonthYearPickerLocalizations.delegate,
+        SfGlobalLocalizations.delegate,
       ],
       supportedLocales: const [
         Locale('en', ''),
         Locale('ko', ''),
       ],
+      locale: const Locale('ko'),
       // initialRoute: token != null ? '/home' : '/',
       initialRoute: '/',
       getPages: [

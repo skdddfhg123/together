@@ -18,6 +18,13 @@ class AuthController extends GetxController {
     _userInfo.value = null;
   }
 
+  void updateThumbnail(String newThumbnail) {
+    if (_userInfo.value != null) {
+      _userInfo.value = _userInfo.value!.copyWith(thumbnail: newThumbnail);
+      update(); // Notify listeners
+    }
+  }
+
   Future<void> setAccessToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);

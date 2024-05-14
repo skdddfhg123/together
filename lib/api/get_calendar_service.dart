@@ -42,15 +42,14 @@ class CalendarApiService {
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      print(response.body);
       if (response.statusCode == 201 || response.statusCode == 200) {
         List<Calendar> calendars = (json.decode(response.body) as List)
             .map((data) => Calendar.fromJson(data))
             .toList();
-
+        meetingController.calendarAppointments.clear();
         // 각 캘린더에 대한 일정 정보도 함께 로드
         for (var calendar in calendars) {
-          await loadAppointmentsForCalendar(calendar, token);
+          await loadAppointmentsForCalendar(calendar);
         }
         isLoading.value = false;
         meetingController.update();
@@ -66,8 +65,8 @@ class CalendarApiService {
   }
 
   // 특정 캘린더에 대한 일정 정보 로드
-  Future<void> loadAppointmentsForCalendar(
-      Calendar calendar, String token) async {
+  Future<void> loadAppointmentsForCalendar(Calendar calendar) async {
+    String? token = await _loadToken();
     var response = await http.get(
         Uri.parse("$apiUrl/group/get/v2/${calendar.calendarId}"),
         headers: {'Authorization': 'Bearer $token'});

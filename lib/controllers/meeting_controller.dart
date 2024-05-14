@@ -116,8 +116,16 @@ class MeetingController extends GetxController {
   final DeleteCalendarService deleteCalendarService = DeleteCalendarService();
 
 /////////////////////////////////////멤 버 일 정 ////////////////////////////////////
+  final RxMap<DateTime, Set<String>> processedNicknames =
+      <DateTime, Set<String>>{}.obs;
 
   final AuthController authController = Get.find<AuthController>();
+
+  MemberAppointment? getMemberInfoForNickname(String nickname) {
+    return memberAppointments.firstWhere(
+        (member) => member.nickname == nickname,
+        orElse: () => null!);
+  }
 
   Future<void> loadMemberAppointmentsForCalendar(String calendarId) async {
     String? token = await _loadToken();
@@ -244,7 +252,11 @@ class MeetingController extends GetxController {
   }
 
 //////////////////////////////////////////멤 버 일 정 /////////////////////////////////////////
-  ///
+  void printMemberAppointments() {
+    for (var memberAppointment in memberAppointments) {
+      print(memberAppointment.nickname);
+    }
+  }
 
 //////////////////////////////////////// 캘린더, 일정 부분 //////////////////////////////////////
 
@@ -302,9 +314,9 @@ class MeetingController extends GetxController {
         event.userCalendarId,
         event.socialEventId,
         true,
-        'example',
-        'example',
-        'example',
+        authController.user?.useremail,
+        authController.user?.nickname,
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrnkGghQpkEKOXPtDt1jMo5qFoCHkBbUe9Ew&usqp=CAU',
       );
     }
   }
@@ -321,13 +333,10 @@ class MeetingController extends GetxController {
   }
 
   List<CalendarAppointment> getAllAppointments() {
-    // 현재 로그인한 사용자의 이메일
-    String currentUserEmail = authController.user?.useremail ?? '';
-
     // 현재 사용자가 생성한 일정만 필터링
-    return calendarAppointments
-        .where((appointment) => appointment.authorEmail == currentUserEmail)
-        .toList();
+    return calendarAppointments.toList();
+    // .where((appointment) => appointment.authorEmail == currentUserEmail)
+    // .toList();
   }
 
   List<CalendarAppointment> getAppointmentsForCalendarAndDate(
@@ -339,6 +348,12 @@ class MeetingController extends GetxController {
             appointment.appointment.startTime.month == date.month &&
             appointment.appointment.startTime.year == date.year)
         .toList();
+  }
+
+  // 특정 캘린더 ID와 일치하는 일정을 모두 삭제하는 메서드
+  Future<void> deleteAppointmentsForCalendar(String calendarId) async {
+    calendarAppointments
+        .removeWhere((appointment) => appointment.calendarId == calendarId);
   }
 
   // 특정 날짜에 해당하는 모든 일정을 가져오는 메소드

@@ -19,6 +19,7 @@ class AuthAPIService {
 
     if (response.statusCode == 201) {
       var data = json.decode(response.body);
+      print(response.body);
       var token = data['accessToken'];
       var userInfo = UserInfo(
           useremail: data['useremail'],

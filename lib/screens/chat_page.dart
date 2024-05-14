@@ -1,8 +1,8 @@
 import 'package:calendar/controllers/auth_controller.dart';
+import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/message.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +25,7 @@ class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
   List<Message> messages = [];
   final AuthController authController = Get.find<AuthController>();
+  final MeetingController meetingController = Get.find<MeetingController>();
   bool isLoading = false;
   String? lastMessageDate;
 
@@ -32,7 +33,6 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     initializeSocket();
     super.initState();
-    // _scrollController.addListener(_onScroll);
   }
 
   // 스크롤을 마지막으로 이동하는 함수
@@ -43,47 +43,6 @@ class _ChatPageState extends State<ChatPage> {
         duration: Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-    }
-  }
-
-  // void _onScroll() {
-  //   if (_scrollController.position.pixels ==
-  //           _scrollController.position.maxScrollExtent &&
-  //       !isLoading &&
-  //       lastMessageDate != null) {
-  //     fetchMoreMessages();
-  //   }
-  // }
-
-  void fetchMoreMessages() async {
-    if (!isLoading && lastMessageDate != null) {
-      setState(() => isLoading = true);
-      // 서버에 'getNextMessage' 이벤트로 데이터 요청
-      _socket.emit('getNextMessage', {widget.calendarId, lastMessageDate});
-
-      // 소켓에서 'nextMessages' 이벤트를 수신 대기
-      _socket.on('getNextMessage', (data) {
-        List<Message> newMessages =
-            (data as List).map((m) => Message.fromJson(m)).toList();
-        if (newMessages.isNotEmpty) {
-          setState(() {
-            messages.addAll(newMessages); // 새로운 메시지를 리스트에 추가
-            lastMessageDate = newMessages.last.registerdAt; // 마지막 메시지 날짜 업데이트
-            isLoading = false;
-          });
-        } else {
-          // 추가 메시지가 없는 경우
-          setState(() {
-            isLoading = false;
-          });
-        }
-      });
-
-      // 오류 처리 또는 연결이 끊어졌을 때의 대응 로직
-      _socket.on('error', (error) {
-        print("Error receiving messages: $error");
-        setState(() => isLoading = false);
-      });
     }
   }
 
@@ -119,6 +78,8 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             onPressed: () {
               Navigator.pop(context);
+              meetingController
+                  .loadMemberAppointmentsForCalendar(widget.calendarId);
             },
             icon: const Icon(Icons.exit_to_app),
           ),
@@ -133,6 +94,12 @@ class _ChatPageState extends State<ChatPage> {
               itemBuilder: (context, index) {
                 final message = messages[index];
                 final isMine = message.email == authController.user?.useremail;
+
+                // 메시지 보낸 유저의 썸네일 가져오기
+                final member = meetingController.memberAppointments
+                    .firstWhereOrNull(
+                        (member) => member.useremail == message.email);
+                final thumbnailUrl = member?.thumbnail ?? '';
 
                 return Column(
                   crossAxisAlignment: isMine
@@ -161,8 +128,7 @@ class _ChatPageState extends State<ChatPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      authController.user?.thumbnail ?? ''),
+                                  backgroundImage: NetworkImage(thumbnailUrl),
                                   radius: 15,
                                 ),
                                 const SizedBox(width: 8),
@@ -175,31 +141,54 @@ class _ChatPageState extends State<ChatPage> {
                             mainAxisAlignment: isMine
                                 ? MainAxisAlignment.end
                                 : MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               if (isMine)
-                                Text(
-                                  formatDateTime(message.registerdAt),
-                                  style: TextStyle(
-                                      color: Colors.grey[600], fontSize: 10),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      formatDateTime(message.registerdAt),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                  ],
                                 ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: isMine
-                                      ? Colors.blue[200]
-                                      : Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(20),
+                              Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isMine
+                                        ? Colors.blue[200]
+                                        : Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    message.message,
+                                    maxLines: null,
+                                    overflow: TextOverflow.visible,
+                                  ),
                                 ),
-                                child: Text(message.message),
                               ),
                               const SizedBox(width: 8),
                               if (!isMine)
-                                Text(
-                                  formatDateTime(message.registerdAt),
-                                  style: TextStyle(
-                                      color: Colors.grey[600], fontSize: 10),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      formatDateTime(message.registerdAt),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                             ],
                           ),

@@ -8,4 +8,12 @@ class UserInfo {
     required this.nickname,
     required this.thumbnail,
   });
+
+  UserInfo copyWith({String? useremail, String? nickname, String? thumbnail}) {
+    return UserInfo(
+      useremail: useremail ?? this.useremail,
+      nickname: nickname ?? this.nickname,
+      thumbnail: thumbnail ?? this.thumbnail,
+    );
+  }
 }

@@ -1,4 +1,3 @@
-import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
@@ -8,9 +7,10 @@ import 'package:calendar/widget/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import '../models/calendar.dart';
 
-class CalendarDetailView extends StatelessWidget {
+class CalendarDetailView extends StatefulWidget {
   final String calendarId;
   final Function(String) onCalendarChanged; // 페이지 변경을 위한 콜백
 
@@ -18,12 +18,65 @@ class CalendarDetailView extends StatelessWidget {
       {super.key, required this.calendarId, required this.onCalendarChanged});
 
   @override
+  _CalendarDetailViewState createState() => _CalendarDetailViewState();
+}
+
+class _CalendarDetailViewState extends State<CalendarDetailView> {
+  late String appBarTitle;
+  DateTime selectedDate = DateTime.now();
+  final CalendarController _calendarController = CalendarController();
+
+  @override
+  void initState() {
+    super.initState();
+    appBarTitle = formatDate(selectedDate);
+  }
+
+  String formatDate(DateTime date) {
+    return '${date.year}년${date.month}월${date.day}일';
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showMonthYearPicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Container(
+                height: 520,
+                child: child,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        appBarTitle = formatDate(selectedDate);
+        _calendarController.displayDate = selectedDate;
+        if (selectedDate.month != DateTime.now().month) {
+          _calendarController.selectedDate = selectedDate;
+        } else {
+          _calendarController.selectedDate = DateTime.now();
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final calendarController = Get.find<UserCalendarController>();
     final meetingController = Get.find<MeetingController>();
 
     Calendar? selectedCalendar = calendarController.calendars.firstWhere(
-      (cal) => cal.calendarId == calendarId,
+      (cal) => cal.calendarId == widget.calendarId,
     );
 
     void _onCalendarTapped(CalendarTapDetails details) {
@@ -32,154 +85,343 @@ class CalendarDetailView extends StatelessWidget {
         final DateTime selectedDate = details.date!;
         final EventSelectionController eventController =
             Get.find<EventSelectionController>();
-        eventController.saveSelection(calendarId, selectedDate);
+        eventController.saveSelection(widget.calendarId, selectedDate);
+        setState(() {
+          this.selectedDate = selectedDate;
+          appBarTitle = formatDate(selectedDate);
+        });
       }
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(selectedCalendar.title),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              bool confirmDelete = await showDialog<bool>(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("캘린더 삭제"),
-                        content: const Text(
-                            "캘린더를 삭제 하면 캘린더의 일정이 모두 다 삭제 됩니다. 삭제 하시겠습니까?"),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text("취소"),
-                            onPressed: () => Navigator.of(context).pop(false),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 168, 200, 226),
+          leadingWidth: 30, // leadingWidth 조정
+          title: Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => _selectDate(context),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero, // 패딩을 0으로 설정
+                    alignment: Alignment.centerLeft, // 텍스트 버튼의 정렬을 왼쪽으로 설정
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Text(
+                                appBarTitle,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  foreground: Paint()
+                                    ..style = PaintingStyle.stroke
+                                    ..strokeWidth = 3
+                                    ..color = Colors.white,
+                                ),
+                              ),
+                              Text(
+                                appBarTitle,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
                           ),
-                          TextButton(
-                            child: const Text("삭제"),
-                            onPressed: () => Navigator.of(context).pop(true),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 2.5),
+                            child: Icon(
+                              Icons.calendar_month,
+                              color: Color.fromARGB(255, 163, 161, 161),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '${selectedCalendar.title} (${selectedCalendar.attendees.length}명)',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
+                          color: Color.fromARGB(255, 114, 113, 113),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              onPressed: () async {
+                bool confirmDelete = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("캘린더 삭제"),
+                          content: const Text(
+                              "캘린더를 삭제 하면 캘린더의 일정이 모두 다 삭제 됩니다. 삭제 하시겠습니까?"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("취소"),
+                              onPressed: () => Navigator.of(context).pop(false),
+                            ),
+                            TextButton(
+                              child: const Text("삭제"),
+                              onPressed: () => Navigator.of(context).pop(true),
+                            ),
+                          ],
+                        );
+                      },
+                    ) ??
+                    false;
+
+                if (confirmDelete) {
+                  await meetingController
+                      .deleteCalendarAndAppointments(widget.calendarId);
+                  widget.onCalendarChanged(
+                      'all_calendar'); // All Calendar 페이지로 리디렉션
+                }
+              },
+              icon: const Icon(Icons.delete_forever_rounded),
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                        calendarId: selectedCalendar.calendarId,
+                        calendartitle: selectedCalendar.title),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.chat),
+            ),
+          ],
+        ),
+        drawer: CustomDrawer(
+            onCalendarChanged: (id) => widget.onCalendarChanged(id)),
+        body: Obx(() {
+          final dataSource = MeetingDataSource(
+            calendarAppointments:
+                meetingController.getAppointmentsForCalendar(widget.calendarId),
+            memberAppointments: meetingController.getMemberAppointments(),
+          );
+
+          final Map<DateTime, Set<String>> processedNicknames = {};
+
+          return SfCalendar(
+            view: CalendarView.month,
+            controller: _calendarController,
+            dataSource: dataSource,
+            monthViewSettings: const MonthViewSettings(
+              appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
+            ),
+            headerHeight: 0,
+            onTap: _onCalendarTapped,
+            selectionDecoration: BoxDecoration(
+              color: Colors.transparent,
+              border: Border.all(
+                color: Colors.transparent,
+                width: 0,
+              ),
+            ),
+            onViewChanged: (ViewChangedDetails details) {
+              DateTime firstDateOfMonth = details.visibleDates.firstWhere(
+                  (date) => date.day == 1,
+                  orElse: () => details.visibleDates.first);
+
+              DateTime now = DateTime.now();
+              DateTime today = DateTime(now.year, now.month, now.day);
+              bool isCurrentMonth = firstDateOfMonth.year == now.year &&
+                  firstDateOfMonth.month == now.month;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                setState(() {
+                  if (isCurrentMonth) {
+                    appBarTitle = formatDate(today); // 오늘 날짜로 설정
+                  } else {
+                    appBarTitle = formatDate(firstDateOfMonth); // 해당 달의 첫 날로 설정
+                  }
+                  if (isCurrentMonth) {
+                    if (_calendarController.selectedDate != today) {
+                      _calendarController.selectedDate = today;
+                      _calendarController.displayDate = today;
+                    }
+                  } else {
+                    if (_calendarController.selectedDate != firstDateOfMonth) {
+                      _calendarController.selectedDate = firstDateOfMonth;
+                      _calendarController.displayDate = firstDateOfMonth;
+                    }
+                  }
+                });
+              });
+
+              // 추가: 멤버 일정 로드 함수 호출
+              meetingController
+                  .loadMemberAppointmentsForCalendar(widget.calendarId);
+            },
+            initialSelectedDate: DateTime.now(),
+            monthCellBuilder: (context, details) {
+              TextStyle textStyle = const TextStyle(
+                color: Colors.black,
+                fontSize: 11,
+              );
+
+              Color cellColor = Colors.transparent;
+
+              if (details.date.year == _calendarController.selectedDate!.year &&
+                  details.date.month ==
+                      _calendarController.selectedDate!.month &&
+                  details.date.day == _calendarController.selectedDate!.day) {
+                cellColor = const Color.fromARGB(50, 158, 158, 158);
+              }
+
+              if (details.date.year == selectedDate.year &&
+                  details.date.month == selectedDate.month &&
+                  details.date.day == selectedDate.day) {
+                cellColor = Colors.grey.shade300; // 선택된 날짜의 배경을 회색으로 설정
+              }
+
+              DateTime now = DateTime.now();
+              bool isToday = now.year == details.date.year &&
+                  now.month == details.date.month &&
+                  now.day == details.date.day;
+
+              if (isToday) {
+                textStyle = textStyle.copyWith(color: Colors.white);
+              }
+
+              bool isCurrentMonth = details.date.month ==
+                  details.visibleDates[details.visibleDates.length ~/ 2].month;
+              if (details.date.weekday == DateTime.sunday) {
+                if (!isToday) textStyle = textStyle.copyWith(color: Colors.red);
+              } else if (details.date.weekday == DateTime.saturday) {
+                if (!isToday)
+                  textStyle = textStyle.copyWith(color: Colors.blue);
+              }
+
+              double opacity = isCurrentMonth ? 1.0 : 0.5;
+              textStyle = textStyle.copyWith(
+                  color: textStyle.color!.withOpacity(opacity));
+
+              return Container(
+                alignment: Alignment.topCenter,
+                decoration: BoxDecoration(
+                  color: cellColor,
+                  border: const Border(
+                    top: BorderSide(
+                      color: Color.fromARGB(50, 158, 158, 158),
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    if (isToday)
+                      Container(
+                        width: 23,
+                        height: 23,
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 0, 0, 0),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    Container(
+                      height: 19.5,
+                      alignment: Alignment.center,
+                      child: Text(
+                        details.date.day.toString(),
+                        style: textStyle,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+            appointmentBuilder:
+                (BuildContext context, CalendarAppointmentDetails details) {
+              final appointment = details.appointments.first;
+              final appointmentDate = DateTime(appointment.startTime.year,
+                  appointment.startTime.month, appointment.startTime.day);
+
+              if (!processedNicknames.containsKey(appointmentDate)) {
+                processedNicknames[appointmentDate] = {};
+              }
+
+              final isMemberAppointment =
+                  dataSource.isMemberAppointment(appointment);
+
+              if (isMemberAppointment) {
+                final uniqueMembers = <MemberAppointment>{};
+                for (var member in dataSource.memberAppointments) {
+                  if (member.appointments.any((appt) =>
+                      appt.startTime.year == appointment.startTime.year &&
+                      appt.startTime.month == appointment.startTime.month &&
+                      appt.startTime.day == appointment.startTime.day)) {
+                    if (!processedNicknames[appointmentDate]!
+                        .contains(member.nickname)) {
+                      uniqueMembers.add(member);
+                      processedNicknames[appointmentDate]!.add(member.nickname);
+                    }
+                  }
+                }
+
+                return Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: uniqueMembers.map((member) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(member.thumbnail),
+                            radius: 9.2,
                           ),
                         ],
                       );
-                    },
-                  ) ??
-                  false;
-
-              if (confirmDelete) {
-                await meetingController
-                    .deleteCalendarAndAppointments(calendarId);
-                onCalendarChanged('all_calendar'); // All Calendar 페이지로 리디렉션
-              }
-            },
-            icon: const Icon(Icons.delete_forever_rounded),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                      calendarId: selectedCalendar.calendarId,
-                      calendartitle: selectedCalendar.title),
-                ),
-              );
-            },
-            icon: const Icon(Icons.chat),
-          ),
-        ],
-      ),
-      drawer: CustomDrawer(onCalendarChanged: (id) => onCalendarChanged(id)),
-      body: Obx(() {
-        // MeetingController에서 변경 사항을 감지하여 UI를 갱신합니다.
-        final dataSource = MeetingDataSource(
-          calendarAppointments:
-              meetingController.getAppointmentsForCalendar(calendarId),
-          memberAppointments: meetingController.getMemberAppointments(),
-        );
-
-        // 이미 처리된 닉네임을 추적하는 맵
-        final Map<DateTime, Set<String>> processedNicknames = {};
-
-        return SfCalendar(
-          view: CalendarView.month,
-          firstDayOfWeek: 7,
-          monthViewSettings: const MonthViewSettings(
-            appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
-          ),
-          dataSource: dataSource, // 여기서 dataSource를 설정
-          appointmentBuilder:
-              (BuildContext context, CalendarAppointmentDetails details) {
-            final appointment = details.appointments.first;
-            final isMember = dataSource.isMemberAppointment(appointment);
-            final memberInfo = dataSource.getMemberInfo(appointment);
-
-            // 해당 날짜에 이미 처리된 닉네임을 확인하고 추가
-            final appointmentDate = DateTime(appointment.startTime.year,
-                appointment.startTime.month, appointment.startTime.day);
-            if (!processedNicknames.containsKey(appointmentDate)) {
-              processedNicknames[appointmentDate] = {};
-            }
-
-            if (isMember) {
-              final nickname = memberInfo!.nickname;
-              if (processedNicknames[appointmentDate]!.contains(nickname)) {
-                // 이미 처리된 닉네임인 경우 빈 컨테이너 반환
-                return Container();
+                    }).toList(),
+                  ),
+                );
               } else {
-                // 새로운 닉네임인 경우 처리하고 닉네임을 추가
-                processedNicknames[appointmentDate]!.add(nickname);
-
-                // 처리된 닉네임의 개수에 따라 위치를 조정하기 위해 인덱스를 계산
-                final index = processedNicknames[appointmentDate]!.length - 1;
-                final leftOffset = index * 20.0;
-
-                return Stack(
-                  children: [
-                    Positioned(
-                      right: leftOffset,
-                      top: 5,
-                      child: Container(
-                        width: details.bounds.width / 2,
-                        height: details.bounds.height / 2,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: NetworkImage(memberInfo.thumbnail),
-                            fit: BoxFit.cover,
+                return Container(
+                  decoration: BoxDecoration(
+                    color: selectedCalendar.color,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          appointment.subject,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               }
-            } else {
-              return Container(
-                decoration: BoxDecoration(
-                  color: selectedCalendar.color,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        appointment.subject,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-          },
-          onTap: _onCalendarTapped,
-        );
-      }),
+            },
+          );
+        }),
+      ),
     );
   }
 }
