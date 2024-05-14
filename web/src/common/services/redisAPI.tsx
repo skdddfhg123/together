@@ -1,22 +1,35 @@
 import { AxiosError } from 'axios';
 import * as redisAxios from '@utils/redis';
+import { Calendar, Member } from '@type/index';
 
 interface RedisSubscribe {
   channel: string; // 받는 사람 email
 }
 
-interface RedisPublish extends RedisSubscribe {
-  message: string; // 남들에게 보여줄 메세지
+interface RedisPublish {
+  selectedCalendar: Calendar;
+  method: string;
 }
 
-export async function MessagePost({ channel, message }: RedisPublish) {
+export async function MessagePost({ selectedCalendar, method }: RedisPublish) {
   try {
-    const res = await redisAxios.post('/publish', {
-      channel,
-      message,
-    });
-    if (!res) throw new Error('Redis 메세지 전송 실패');
-    console.log(`Redis 메세지 전송 성공 :`, res);
+    const calendarTitle = selectedCalendar.title;
+    const memberList: Member[] = selectedCalendar.attendees;
+
+    for (const member of memberList) {
+      const message = `
+      <div>
+        <span>${calendarTitle}</span>의 
+        <span style="font-size: 2rem; color: #DCFF76;">${member.nickname}</span>님이 
+        <span style="font-size: 2rem; color: #FFED30;">${method}</span>하셨습니다.
+      </div>`;
+      const res = await redisAxios.post('/publish', {
+        channel: member.useremail,
+        message,
+      });
+      if (!res) throw new Error('Redis 메세지 전송 실패');
+      console.log(`Redis 메세지 전송 성공 :`, res);
+    }
 
     return true;
   } catch (e) {
@@ -42,7 +55,7 @@ export async function Connect(useremail: string) {
 
 export async function Unconnect(channel: RedisSubscribe) {
   try {
-    await redisAxios.get(`/unsubscribe/${channel}`);
+    const res = await redisAxios.get(`/unsubscribe/${channel}`);
 
     return true;
   } catch (e) {

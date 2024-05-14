@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import DOMPurify from 'dompurify';
 import { io } from 'socket.io-client';
 
 import * as KAKAO from '@services/KakaoAPI';
@@ -17,7 +21,7 @@ import syncImg from '@assets/sync.png';
 import '@styles/main.css';
 import { useNavigate } from 'react-router-dom';
 
-const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}`;
+const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_ALERT_SOCKET_PORT}`;
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -40,7 +44,7 @@ export default function MainPage() {
 
     console.log(`Main 동기화 종료`); //debug//
     RendarUserAndCalendar();
-  }, []);
+  }, [RendarUserAndCalendar]);
 
   const prevCalendar = (): void => {
     setCurrentMonth(
@@ -58,25 +62,37 @@ export default function MainPage() {
   useEffect(() => {
     CALENDAR.getMyAllCalendar();
     RendarUserAndCalendar();
-  }, []);
+  }, [RendarUserAndCalendar]);
 
   // *****************? 실시간 알림을 위한 소켓 연결
-  // useEffect(() => {
-  //   const socket = io(Redis_Url);
-  //   console.log(`Redis Socket Connected`); //debug//
+  useEffect(() => {
+    const socket = io(Redis_Url);
+    console.log(`Redis Socket Connected`); //debug//
 
-  //   // TODO TOAST로 만들기
-  //   socket.on('redisMessage', ({ channel, message }) => {
-  //     alert(`${channel}님이 보내셨습니다. ${message}`);
-  //   });
+    // TODO TOAST로 만들기
+    socket.on('redisMessage', ({ message }) => {
+      const cleanMessage = DOMPurify.sanitize(message);
+      toast.info(<div dangerouslySetInnerHTML={{ __html: cleanMessage }} />);
+    });
 
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <>
+      <ToastContainer
+        position="bottom-right"
+        style={{ width: '30rem', textAlign: 'center', fontSize: '1.5rem', color: 'lightgray' }}
+        limit={6}
+        pauseOnHover={false}
+        closeButton={true}
+        autoClose={5000}
+        theme="colored"
+        stacked
+        hideProgressBar
+      />
       <header id="calHeader">
         <img id="calHeader-leftSidebar" src={menuImg} alt="calendarList-button" onClick={toggle} />
         <h1 id="calendarLogo">Toogether</h1>

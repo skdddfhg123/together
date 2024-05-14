@@ -99,7 +99,7 @@ export default React.memo(function CreateEventSimple({
       const res = await CALENDAR.createGroupSimpleEvent(eventData);
       if (res) {
         await CALENDAR.getGroupAllEvents(selectedCalendar);
-        await REDIS.MessagePost({ channel: userInfo?.useremail, message: `일정 등록` });
+        await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정 등록` });
       }
       setTitle('');
       onClose();

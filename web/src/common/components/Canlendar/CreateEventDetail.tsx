@@ -32,6 +32,37 @@ import { useMemberEventListState, useUserInfoStore } from '@store/index';
 import default_user from '@assets/default_user.png';
 import { Calendar, reqEvent } from '@type/index';
 
+const selectStyles = css`
+  &::before,
+  &::after {
+    border-bottom: none !important;
+  }
+  & .MuiSelect-icon {
+    display: none;
+  }
+  & .MuiSelect-select {
+    padding: 8px;
+    background-color: transparent;
+  }
+`;
+
+const menuItemStyles = css`
+  display: flex;
+  justify-content: center;
+  color: #1e1e1e;
+  &:hover {
+    background-color: #e0e0e0;
+  }
+`;
+
+const StyledSelect = styled(Select)`
+  ${selectStyles}
+`;
+
+const StyledMenuItem = styled(MenuItem)`
+  ${menuItemStyles}
+`;
+
 interface ModalComponentProps {
   isOpen: boolean;
   onClose: () => void;
@@ -116,7 +147,7 @@ export default function DetailModal({
     const res = await CALENDAR.createGroupSimpleEvent(eventData);
     if (res) {
       await CALENDAR.getGroupAllEvents(selectedCalendar);
-      await REDIS.MessagePost({ channel: userInfo?.useremail, message: `일정 등록` });
+      await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정 등록` });
     }
     resetForm();
     onClose();
@@ -366,34 +397,3 @@ export default function DetailModal({
     </Dialog>
   );
 }
-
-const selectStyles = css`
-  &::before,
-  &::after {
-    border-bottom: none !important;
-  }
-  & .MuiSelect-icon {
-    display: none;
-  }
-  & .MuiSelect-select {
-    padding: 8px;
-    background-color: transparent;
-  }
-`;
-
-const menuItemStyles = css`
-  display: flex;
-  justify-content: center;
-  color: #1e1e1e;
-  &:hover {
-    background-color: #e0e0e0;
-  }
-`;
-
-const StyledSelect = styled(Select)`
-  ${selectStyles}
-`;
-
-const StyledMenuItem = styled(MenuItem)`
-  ${menuItemStyles}
-`;
