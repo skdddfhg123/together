@@ -23,8 +23,9 @@ export default React.memo(function RightMenuTap() {
     (tap: TapName) => {
       if (activeTap !== tap) {
         setActiveTap(tap);
+        return;
       } else {
-        setActiveTap(activeTap === tap ? null : tap);
+        setActiveTap(null);
       }
     },
     [activeTap],

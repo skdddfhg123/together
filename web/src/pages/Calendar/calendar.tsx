@@ -3,6 +3,8 @@ import { UUID } from 'crypto';
 import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
+import { hexToRgba } from '@hooks/useHexToRgba';
+
 import { AllEvent } from '@type/index';
 import {
   useSelectedDayStore,
@@ -133,7 +135,9 @@ export default React.memo(function CalendarPage({
             onMouseLeave={(e) => e.stopPropagation()}
             onClick={(e) => event.id && handleDetails(event.id, e)}
             className="group-event"
-            style={{ backgroundColor: `${event.type}` }}
+            style={{
+              backgroundColor: `${event.type && hexToRgba(event.type)}`,
+            }}
             key={event.id}
           >
             {event.title || 'No Title'}
@@ -273,7 +277,6 @@ export default React.memo(function CalendarPage({
           ))}
         </tbody>
       </table>
-      <EventDetails isOpen={detailsOn} eventId={groupEventId} onClose={detailsClose} />
       <CreateEventModal
         selectedCalendar={selectedCalendar}
         isOpen={eventModalOn}
@@ -281,6 +284,7 @@ export default React.memo(function CalendarPage({
         selectedDay={selectedDay}
         position={modalPosition}
       />
+      <EventDetails isOpen={detailsOn} eventId={groupEventId} onClose={detailsClose} />
     </div>
   );
 });

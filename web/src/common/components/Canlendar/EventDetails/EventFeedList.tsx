@@ -30,7 +30,7 @@ export default React.memo(function EventFeedList() {
           eventFeedList.map((event, idx) =>
             event.images.length === 0 ? (
               <div
-                className="outline outline-gray-300 hover:outline-2 hover:outline-custom-light rounded"
+                className="outline outline-1 outline-gray-300 hover:outline-custom-light rounded"
                 key={`no-Img-${idx}`}
                 onClick={() => openFeedModal(event)}
               >
@@ -38,9 +38,9 @@ export default React.memo(function EventFeedList() {
               </div>
             ) : (
               <img
-                className="w-36 h-36 object-cover text-center outline outline-gray-300 rounded
+                className="w-36 h-36 object-cover text-center outline outline-1 outline-gray-300 rounded
                 transition-all duration-300 ease-in-out
-                hover:object-contain hover:w-72 hover:h-72 hover:outline-2 hover:outline-custom-light"
+                hover:object-contain hover:w-72 hover:h-72 hover:outline-custom-light"
                 src={event.images[0]?.imageSrc}
                 alt="피드 사진"
                 key={event.feedId}

@@ -25,7 +25,8 @@ export default function memberTap({ selectedCalendar, onClose }: memberTapProps)
             {selectedCalendar.attendees.map((attendee, index) => (
               <div key={index} className="FLEX-ver items-center m-2 space-x-4">
                 <img
-                  className="w-24"
+                  className="w-24 h-24 object-cover transition-all duration-300 ease-in-out                  
+                  hover:object-contain hover:w-48 hover:h-48 hover:rounded-none"
                   src={attendee.thumbnail || default_user}
                   alt={attendee.nickname}
                 />

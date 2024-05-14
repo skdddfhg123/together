@@ -11,6 +11,8 @@ import {
   useAllEventListStore,
 } from '@store/index';
 
+import { hexToRgba } from '@hooks/useHexToRgba';
+
 import CreateFeedModal from '@components/Feed/CreateFeed/CreateFeedModal';
 import EventFeedList from '@components/Canlendar/EventDetails/EventFeedList';
 import EventMember from '@components/Canlendar/EventDetails/EventMember';
@@ -73,7 +75,7 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
           <h2
             className="w-11/12 py-2 mx-2 text-3xl text-center rounded"
             style={{
-              backgroundColor: `${matchingEvent?.type}`,
+              backgroundColor: `${matchingEvent?.type && hexToRgba(matchingEvent.type)}`,
             }}
           >
             {eventInfo?.title}
