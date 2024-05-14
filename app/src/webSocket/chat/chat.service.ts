@@ -76,8 +76,14 @@ export class ChatService {
     async saveMessage(saveMessageDto: SaveMessageDTO): Promise<Chat> {
         const { roomId } = saveMessageDto;
         const chatModel = this.getModelForCalendar(roomId);
-        const saveMessage = new chatModel(saveMessageDto);
-        return await saveMessage.save();
+        try {
+            const saveMessage = new chatModel(saveMessageDto);
+            
+            return await saveMessage.save();
+        }
+        catch(err) {
+            console.log(err);
+        }
     }
 
     async findAllMessageByCalendarId(calendarId: string): Promise<Chat[]> {
