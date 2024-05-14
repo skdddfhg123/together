@@ -180,7 +180,7 @@ class _ChatPageState extends State<ChatPage> {
                                 Text(
                                   formatDateTime(message.registerdAt),
                                   style: TextStyle(
-                                      color: Colors.grey[600], fontSize: 12),
+                                      color: Colors.grey[600], fontSize: 10),
                                 ),
                               const SizedBox(width: 8),
                               Container(

@@ -29,13 +29,13 @@ void main() async {
       javaScriptAppKey: '51a0dace612e8ce24408eae4fbe6e10d');
 
   Get.put(AuthController());
-  Get.put(MeetingController());
-  // 종속성 등록 순서 조정
+  Get.put(MeetingController()); // MeetingController를 먼저 등록합니다.
+  Get.put(CalendarApiService()); // CalendarApiService를 이후에 등록합니다.
   Get.put(CalendarCreateApiService());
   Get.put(KakaoAuthService());
   Get.put(EventSelectionController());
 
-  var calendarService = CalendarApiService();
+  var calendarService = Get.find<CalendarApiService>(); // 이미 등록된 인스턴스를 가져옵니다.
   await calendarService.initializePrefs(); // 서비스 초기화 보장
   Get.put(UserCalendarController(calendarService)); // 의존성 주입
   runApp(MyApp(token: token));

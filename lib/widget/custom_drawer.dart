@@ -18,7 +18,7 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final calendarController = Get.find<UserCalendarController>();
     final authController = Get.find<AuthController>();
-    final calendarApiService = CalendarApiService();
+    final calendarApiService = Get.find<CalendarApiService>();
     return Drawer(
       child: Column(
         children: [

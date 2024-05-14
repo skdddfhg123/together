@@ -6,6 +6,7 @@ import 'package:calendar/api/post_service.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/models/comment.dart';
+import 'package:calendar/models/meeting_data.dart';
 import 'package:calendar/models/post.dart';
 import 'package:calendar/models/social_event.dart';
 import 'package:calendar/screens/event_detail.dart';
@@ -39,12 +40,14 @@ class CalendarAppointment {
 class MemberAppointment {
   final String useremail;
   final String nickname;
+  final String thumbnail;
   final List<Appointment> appointments;
 
   MemberAppointment({
     required this.useremail,
     required this.nickname,
     required this.appointments,
+    required this.thumbnail,
   });
 
   // JSON에서 MemberAppointment 객체로 변환
@@ -59,6 +62,8 @@ class MemberAppointment {
         .toList();
 
     return MemberAppointment(
+      thumbnail: json['thumbnail'] ??
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s',
       useremail: json['useremail'],
       nickname: json['nickname'],
       appointments: appointments,
@@ -195,7 +200,8 @@ class MeetingController extends GetxController {
     }
   }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////멤 버 일 정 /////////////////////////////////////////
+  ///
 
 //////////////////////////////////////// 캘린더, 일정 부분 //////////////////////////////////////
 

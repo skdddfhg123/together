@@ -21,7 +21,6 @@ class CalendarDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final calendarController = Get.find<UserCalendarController>();
     final meetingController = Get.find<MeetingController>();
-    final authController = Get.find<AuthController>();
 
     Calendar? selectedCalendar = calendarController.calendars.firstWhere(
       (cal) => cal.calendarId == calendarId,
@@ -97,6 +96,9 @@ class CalendarDetailView extends StatelessWidget {
           memberAppointments: meetingController.getMemberAppointments(),
         );
 
+        // 이미 처리된 닉네임을 추적하는 맵
+        final Map<DateTime, Set<String>> processedNicknames = {};
+
         return SfCalendar(
           view: CalendarView.month,
           firstDayOfWeek: 7,
@@ -110,21 +112,48 @@ class CalendarDetailView extends StatelessWidget {
             final isMember = dataSource.isMemberAppointment(appointment);
             final memberInfo = dataSource.getMemberInfo(appointment);
 
+            // 해당 날짜에 이미 처리된 닉네임을 확인하고 추가
+            final appointmentDate = DateTime(appointment.startTime.year,
+                appointment.startTime.month, appointment.startTime.day);
+            if (!processedNicknames.containsKey(appointmentDate)) {
+              processedNicknames[appointmentDate] = {};
+            }
+
             if (isMember) {
-              return Container(
-                width: details.bounds.width,
-                height: details.bounds.height,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  memberInfo!.nickname[0],
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-              );
+              final nickname = memberInfo!.nickname;
+              if (processedNicknames[appointmentDate]!.contains(nickname)) {
+                // 이미 처리된 닉네임인 경우 빈 컨테이너 반환
+                return Container();
+              } else {
+                // 새로운 닉네임인 경우 처리하고 닉네임을 추가
+                processedNicknames[appointmentDate]!.add(nickname);
+
+                // 처리된 닉네임의 개수에 따라 위치를 조정하기 위해 인덱스를 계산
+                final index = processedNicknames[appointmentDate]!.length - 1;
+                final leftOffset = index * 20.0;
+
+                return Stack(
+                  children: [
+                    Positioned(
+                      right: leftOffset,
+                      top: 5,
+                      child: Container(
+                        width: details.bounds.width / 2,
+                        height: details.bounds.height / 2,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: NetworkImage(memberInfo.thumbnail),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
             } else {
               return Container(
                 decoration: BoxDecoration(
