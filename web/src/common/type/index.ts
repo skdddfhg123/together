@@ -77,6 +77,11 @@ export interface DefaultEvent {
   endAt: string;
 }
 
+export interface reqEvent extends DefaultEvent {
+  member: string[];
+  color: string;
+}
+
 export interface GroupingMemberEvent {
   [key: string]: DefaultEvent[];
 }

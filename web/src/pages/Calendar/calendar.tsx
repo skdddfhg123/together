@@ -58,6 +58,7 @@ export default React.memo(function CalendarPage({
     if (selectedDay && isSameDay(day, selectedDay)) {
       setEventModalOn(!eventModalOn);
     } else {
+      console.log(`선택한 날짜`, day);
       setSelectedDay(day);
       setEventModalOn(false);
     }
@@ -144,15 +145,14 @@ export default React.memo(function CalendarPage({
         const existingEvents = eventMap.get(eventDate) || [];
         existingEvents.push(
           <li
-            className={`${
-              event.social === 'kakao'
-                ? 'kakao-event'
-                : event.social === 'google'
-                  ? 'google-event'
-                  : event.social === 'discord'
-                    ? 'discord-event'
-                    : 'outlook-event'
-            }`}
+            className={`${event.social === 'kakao'
+              ? 'kakao-event'
+              : event.social === 'google'
+                ? 'google-event'
+                : event.social === 'discord'
+                  ? 'discord-event'
+                  : 'outlook-event'
+              }`}
             key={existingEvents.length}
           >
             {event.social}

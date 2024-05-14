@@ -11,6 +11,7 @@ import {
   DefaultEvent,
   MemberWithEvent,
   GroupingMemberEvent,
+  reqEvent,
 } from '@type/index';
 import {
   useCalendarListStore,
@@ -205,14 +206,15 @@ export async function getGroupOneEvent(groupEventId: UUID) {
   }
 }
 
-export async function createGroupEvent({ groupCalendarId, title, startAt, endAt }: DefaultEvent) {
+export async function createGroupEvent({ groupCalendarId, title, startAt, endAt, color, member }: reqEvent) {
   try {
     const { data: res } = await API.post(`/calendar/group/create/${groupCalendarId}`, {
       title,
       startAt,
       endAt,
-      member: [useUserInfoStore.getState().userInfo?.useremail],
-      color: '#badfff',
+      // member: [useUserInfoStore.getState().userInfo?.useremail],
+      member: member,
+      color: color,
     });
     if (!res) throw new Error('CALENDAR - createGroupEvent (DB 이벤트 생성 실패)');
     console.log(`CALENDAR - createGroupEvent 성공 :`, res);

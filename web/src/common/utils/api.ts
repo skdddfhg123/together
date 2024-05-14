@@ -29,7 +29,8 @@ axiosInstance.interceptors.request.use(
       return config;
     }
 
-    const token = getCookie('accessToken');
+    // const token = getCookie('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (!token) {
       alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
       window.location.href = `${Web_Url}/signin`;
