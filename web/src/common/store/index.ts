@@ -109,3 +109,9 @@ export const useEventFeedListStore = create<EventFeedListState>((set) => ({
   eventFeedList: [],
   setEventFeedList: (eventFeeds) => set({ eventFeedList: eventFeeds }),
 }));
+
+// ================================ 동민
+export const useMemberEventListByDateState = create<MemberEventListState>((set) => ({
+  MemberEventList: [],
+  setAllEventList: (newList) => set({ MemberEventList: newList }),
+}));

@@ -2,6 +2,10 @@ import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 import { format } from 'date-fns';
 
+// ===================== 동민
+import { addDays } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
+
 import * as API from '@utils/api';
 
 import {
@@ -17,6 +21,7 @@ import {
   useCalendarListStore,
   useGroupEventInfoStore,
   useGroupEventListStore,
+  useMemberEventListByDateState,
   useMemberEventListState,
   useSelectedCalendarStore,
   useSocialEventListStore,
@@ -98,6 +103,22 @@ export async function removeGroupCalendar(groupCalendar: Calendar | 'All') {
   }
 }
 
+// ===================== 동민
+function convertUtcToKst(date: any) {
+  return toZonedTime(date, 'Asia/Seoul');
+}
+
+// ===================== 동민
+function getDatesInRange(startDate: any, endDate: any) {
+  const dates = [];
+  let currentDate = startDate;
+  while (currentDate <= endDate) {
+    dates.push(new Date(currentDate));
+    currentDate = addDays(currentDate, 1);
+  }
+  return dates;
+}
+
 export async function getMemberAndMemberEvents(calendarId: UUID) {
   if (!calendarId)
     return console.log(`CALENDAR - getMemberAndMemberEvents (캘린더 id 없음) : { ${calendarId} }`);
@@ -115,6 +136,37 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
           GroupedEvents[formattedStartAt] = [];
         }
         GroupedEvents[formattedStartAt].push(event);
+      });
+
+      return {
+        useremail: member.useremail,
+        nickname: member.nickname,
+        thumbnail: member.thumbnail,
+        groupedEvent: GroupedEvents,
+      };
+    });
+
+    // ===================== 동민
+    const MemberEventList2 = res.map((member: MemberWithEvent) => {
+      const GroupedEvents: GroupingMemberEvent = {};
+
+      member.allevents?.forEach((event) => {
+        const startAt = convertUtcToKst(new Date(event.startAt));
+        const endAt = convertUtcToKst(new Date(event.endAt));
+
+        const eventDates = getDatesInRange(startAt, endAt);
+
+        eventDates.forEach(date => {
+          const formattedDate = format(date, 'yyyy-MM-dd');
+          if (!GroupedEvents[formattedDate]) {
+            GroupedEvents[formattedDate] = [];
+          }
+          GroupedEvents[formattedDate].push({
+            title: event.title,
+            startAt: event.startAt,
+            endAt: event.endAt,
+          });
+        });
       });
 
       return {
@@ -147,7 +199,8 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
 
     useMemberEventListState.getState().setAllEventList(MemberEventList);
 
-    useMemberEventListState.getState().setAllEventList(MemberEventList);
+    console.log(`CALENDAR - getMemberAndMemberEvents 성공 :`, MemberEventList2); //debug//
+    useMemberEventListByDateState.getState().setAllEventList(MemberEventList2);
 
     return true;
   } catch (e) {

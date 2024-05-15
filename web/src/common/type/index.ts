@@ -155,3 +155,12 @@ export type Emoji = {
   emojiName: string;
   createdAt: string;
 };
+
+
+// ===================================  동민 //
+
+interface MemberEventListState {
+  memberEventList: MemberWithEvent[];
+  setAllEventList: (newList: MemberWithEvent[]) => void;
+}
+

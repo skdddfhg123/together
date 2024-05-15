@@ -23,11 +23,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    {/* <QueryProvider> */}
-    {/* <Suspense fallback={<Loading />}> */}
-    <RouterProvider router={router} />
-    {/* </Suspense> */}
-    {/* </QueryProvider> */}
-  </React.StrictMode>,
+
+  < RouterProvider router={router} />,
+
 );
