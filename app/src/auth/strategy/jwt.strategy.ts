@@ -20,7 +20,7 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(request: Request, payload: { nickname: string; useremail: string, userCalendarId: string }) {
+    async validate(request: Request, payload: { nickname: string; useremail: string, userCalendarId: string, isFirst: boolean }) {
         const accessToken = request.headers.authorization;
 
         const isMatch = await this.tokensService.accessTokenMatches(accessToken, payload);
@@ -32,7 +32,8 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
         return { 
             nickname: payload.nickname, 
             useremail: payload.useremail, 
-            userCalendarId: payload.userCalendarId 
+            userCalendarId: payload.userCalendarId,
+            isFirst: payload.isFirst
         };
     }
 }

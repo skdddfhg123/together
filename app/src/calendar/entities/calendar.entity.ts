@@ -3,7 +3,8 @@ import { IsNotEmpty, IsString } from "class-validator";
 import { Emoji } from "src/emoji/entities/emoji.entity";
 import { GroupEvent } from "src/db/event/group_event/entities/groupEvent.entity";
 import { UserCalendar } from "src/db/user_calendar/entities/userCalendar.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Banner } from "../banner/entities/banner.entity";
 
 
 @Entity()
@@ -54,4 +55,7 @@ export class Calendar {
     @OneToMany(() => Emoji, emoji => emoji.calendar)
     emojis: Emoji[];
 
+    @OneToOne(() => Banner, banner => banner.calendar)
+    @JoinColumn({ name: 'bannerId' })
+    banner: Banner;
 }

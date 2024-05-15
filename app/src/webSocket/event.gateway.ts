@@ -90,6 +90,9 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('sendCombinedMessage')
     async sendCombinedMessage(client: Socket, payload: { text: string, imageUrl: string }) {
 
+        console.log(payload.text);
+        console.log(payload.imageUrl);
+
         client.rooms.forEach((roomId) =>
             client.to(roomId).emit('getMessage', {
                 id: client.id,
@@ -99,6 +102,8 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 image: payload?.imageUrl,
             }),
         );
+
+        console.log(client.data.roomId)
 
         try {
             const newChatDto = new SaveMessageDTO();
@@ -153,9 +158,6 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (client.rooms.has(room)) {
             return;
         }
-
-        console.log(client.rooms);
-        console.log(client.id);
 
         this.chatService.enterChatRoom(client, room);
 

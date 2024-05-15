@@ -52,7 +52,18 @@ export class ImageService {
     return imageUrl;
   }
 
-  // 테스트용 
+  async bannerImageUpload(file: Express.Multer.File, imageName: string): Promise<string> {
+    // const imageName = this.utilsService.getUUID();
+    const ext = file.originalname.split('.').pop();
+
+    const imageUrl = await this.awsService.imageUploadToS3Unchache(
+      `banner/${imageName}.${ext}`,
+      file,
+      ext,
+    );
+    return imageUrl;
+  }
+
   //다수 이미지 파일 대해 S3에 비동기 업로드 후 각각의 url을 반환하는 Promise 배열을 생성
   async multipleImageUpload(files: Express.Multer.File[]): Promise<string[]> {
     const uploadPromises = files.map(async file => {

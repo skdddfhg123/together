@@ -52,6 +52,9 @@ export class User extends BaseEntity {
     @Column({ nullable: false, default: false })
     birthDayFlag: boolean;
 
+    @Column({default: true})
+    isFrist: boolean;
+
     @OneToOne(() => UserCalendar, userCalendar => userCalendar.user)
     @JoinColumn({ name: 'userCalendarId' })
     userCalendarId: UserCalendar

@@ -20,6 +20,7 @@ import { EmojiModule } from './emoji/emoji.module';
 import { EventModule } from './webSocket/event.module';
 import { UtilsModule } from './utils/utils.module';
 import { RedisGateway } from './webSocket/redis/redis.gateway';
+import { BannerModule } from './calendar/banner/banner.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { RedisGateway } from './webSocket/redis/redis.gateway';
     ImageModule,
     EmojiModule,
     EventModule,
+    BannerModule,
   ],
   controllers: [RedisController],
   providers: [RedisService, RedisGateway],
