@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway(5005, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: 'http://localhost:3001',
         credentials: true,
     },
 })
