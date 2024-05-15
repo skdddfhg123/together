@@ -1,4 +1,5 @@
 import 'package:calendar/api/get_calendar_service.dart';
+import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:calendar/models/calendar.dart';
@@ -10,6 +11,7 @@ class UserCalendarController extends GetxController {
   UserCalendarController(this.getapiService);
   RxList<Calendar> calendars = <Calendar>[].obs;
   final CalendarCreateApiService apiService = CalendarCreateApiService();
+  final meetingController = Get.find<MeetingController>();
 
   @override
   void onInit() {
@@ -42,5 +44,6 @@ class UserCalendarController extends GetxController {
     if (loadedCalendars != null) {
       calendars.assignAll(loadedCalendars);
     }
+    meetingController.getKakaoEvents();
   }
 }

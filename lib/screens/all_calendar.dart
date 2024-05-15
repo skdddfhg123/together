@@ -34,7 +34,7 @@ class _AllCalendarState extends State<AllCalendar> {
   }
 
   String formatDate(DateTime date) {
-    return '${date.year}년${date.month}월${date.day}일';
+    return '${date.year}년${date.month}월';
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -191,9 +191,9 @@ class _AllCalendarState extends State<AllCalendar> {
             ), // 선택한 날짜의 테두리를 없앱니다.
             monthCellBuilder: (BuildContext context, MonthCellDetails details) {
               TextStyle textStyle = const TextStyle(
-                color: Colors.black,
-                fontSize: 11,
-              );
+                  color: Colors.black,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold);
 
               Color cellColor = Colors.transparent;
 
@@ -209,16 +209,20 @@ class _AllCalendarState extends State<AllCalendar> {
                   now.day == details.date.day;
 
               if (isToday) {
-                textStyle = textStyle.copyWith(color: Colors.white);
+                textStyle = textStyle.copyWith(
+                    color: Colors.white, fontWeight: FontWeight.bold);
               }
 
               bool isCurrentMonth = details.date.month ==
                   details.visibleDates[details.visibleDates.length ~/ 2].month;
               if (details.date.weekday == DateTime.sunday) {
-                if (!isToday) textStyle = textStyle.copyWith(color: Colors.red);
+                if (!isToday)
+                  textStyle = textStyle.copyWith(
+                      color: Colors.red, fontWeight: FontWeight.bold);
               } else if (details.date.weekday == DateTime.saturday) {
                 if (!isToday)
-                  textStyle = textStyle.copyWith(color: Colors.blue);
+                  textStyle = textStyle.copyWith(
+                      color: Colors.blue, fontWeight: FontWeight.bold);
               }
 
               double opacity = isCurrentMonth ? 1.0 : 0.5;

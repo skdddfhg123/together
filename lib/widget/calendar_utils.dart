@@ -54,15 +54,31 @@ class DialogService {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('일정 추가하기'),
-          content: SingleChildScrollView(
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 1.5, // 다이얼로그 너비 설정
+            height: MediaQuery.of(context).size.height * 1.5, // 다이얼로그 높이 설정
+            padding: const EdgeInsets.all(16.0),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                const Text(
+                  '일정 추가하기',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
                 TextField(
                   controller: _subjectController,
-                  decoration: const InputDecoration(labelText: "타이틀"),
+                  decoration: const InputDecoration(
+                    labelText: "타이틀",
+                    border: OutlineInputBorder(),
+                  ),
                 ),
+                const SizedBox(height: 16),
                 ListTile(
                   leading: const Icon(Icons.timer),
                   title: const Text("시작 시간"),
@@ -77,58 +93,71 @@ class DialogService {
                       DateFormat('yyyy-MM-dd HH:mm').format(_selectedEndTime)),
                   onTap: () => _pickDateTime(context, false),
                 ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    TextButton(
+                      child: const Text('Cancel'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      child: const Text('Add'),
+                      onPressed: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String? token = prefs.getString('token');
+                        final AuthController authController =
+                            Get.find<AuthController>();
+
+                        // 백엔드에 일정 추가 요청
+                        var result = await CalendarEventService().createEvent(
+                          _subjectController.text,
+                          _selectedStartTime,
+                          _selectedEndTime,
+                          calendarId,
+                          token!,
+                          color,
+                        );
+
+                        if (result['isCreated']) {
+                          String groupEventId = result['groupEventId'];
+                          Appointment newAppointment = Appointment(
+                            startTime: _selectedStartTime,
+                            endTime: _selectedEndTime,
+                            subject: _subjectController.text,
+                            color: color,
+                            id: calendarId.toString(),
+                          );
+                          meetingController.addCalendarAppointment(
+                              newAppointment,
+                              calendarId,
+                              groupEventId,
+                              false,
+                              authController.user?.useremail,
+                              authController.user?.nickname,
+                              authController.user?.thumbnail);
+                          Navigator.pop(context);
+                        } else {
+                          Get.snackbar("Error", "Failed to create event");
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Add'),
-              onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                String? token = prefs.getString('token');
-                final AuthController authController =
-                    Get.find<AuthController>();
-
-                // 백엔드에 일정 추가 요청
-                var result = await CalendarEventService().createEvent(
-                  _subjectController.text,
-                  _selectedStartTime,
-                  _selectedEndTime,
-                  calendarId,
-                  token!,
-                  color,
-                );
-
-                if (result['isCreated']) {
-                  String groupEventId = result['groupEventId'];
-                  Appointment newAppointment = Appointment(
-                    startTime: _selectedStartTime,
-                    endTime: _selectedEndTime,
-                    subject: _subjectController.text,
-                    color: color,
-                    id: calendarId.toString(),
-                  );
-                  meetingController.addCalendarAppointment(
-                      newAppointment,
-                      calendarId,
-                      groupEventId,
-                      false,
-                      authController.user?.useremail,
-                      authController.user?.nickname,
-                      authController.user?.thumbnail);
-                  Navigator.pop(context);
-                } else {
-                  Get.snackbar("Error", "Failed to create event");
-                }
-              },
-            ),
-          ],
         );
       },
     );
   }
 }
 
+//////////////////////////////////////// 동기화 페이지 /////////////////////////////////////////
 void showSyncLoginPageModal(BuildContext context) {
   showDialog(
     context: context,
@@ -142,6 +171,30 @@ void showSyncLoginPageModal(BuildContext context) {
     },
   );
 }
+
+///////////////////////// 동기화 버튼 ///////////////////////////////////////////////
+Widget syncButton() {
+  final KakaoAuthService kakaoAuthService = Get.find<KakaoAuthService>();
+  return ListTile(
+    title: const Text('동기화 하기'),
+    trailing: const Icon(Icons.sync),
+    onTap: () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? jwtToken = prefs.getString('token');
+      String? accessToken = prefs.getString('kakaoAccessToken');
+      String? refreshToken = prefs.getString('kakaoRefreshToken');
+
+      if (jwtToken != null && accessToken != null) {
+        kakaoAuthService.sendTokensToServer(
+            jwtToken, accessToken, refreshToken);
+      } else {
+        print('No token available for syncing');
+      }
+    },
+  );
+}
+
+///////////////////////////////////////캘린더 추가하기 ////////////////////////////////////////
 
 void showAddCalendarDialog(BuildContext context) {
   final UserCalendarController calendarController =
@@ -215,27 +268,6 @@ void showAddCalendarDialog(BuildContext context) {
           ),
         ],
       );
-    },
-  );
-}
-
-Widget syncButton() {
-  final KakaoAuthService kakaoAuthService = Get.find<KakaoAuthService>();
-  return ListTile(
-    title: const Text('동기화 하기'),
-    trailing: const Icon(Icons.sync),
-    onTap: () async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? jwtToken = prefs.getString('token');
-      String? accessToken = prefs.getString('kakaoAccessToken');
-      String? refreshToken = prefs.getString('kakaoRefreshToken');
-
-      if (jwtToken != null && accessToken != null) {
-        kakaoAuthService.sendTokensToServer(
-            jwtToken, accessToken, refreshToken);
-      } else {
-        print('No token available for syncing');
-      }
     },
   );
 }

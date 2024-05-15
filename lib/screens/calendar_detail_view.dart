@@ -33,7 +33,7 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
   }
 
   String formatDate(DateTime date) {
-    return '${date.year}년${date.month}월${date.day}일';
+    return '${date.year}년${date.month}월';
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -219,8 +219,6 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
             memberAppointments: meetingController.getMemberAppointments(),
           );
 
-          final Map<DateTime, Set<String>> processedNicknames = {};
-
           return SfCalendar(
             view: CalendarView.month,
             controller: _calendarController,
@@ -270,15 +268,15 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
               });
 
               // 추가: 멤버 일정 로드 함수 호출
-              meetingController
-                  .loadMemberAppointmentsForCalendar(widget.calendarId);
+              // meetingController
+              //     .loadMemberAppointmentsForCalendar(widget.calendarId);
             },
             initialSelectedDate: DateTime.now(),
             monthCellBuilder: (context, details) {
               TextStyle textStyle = const TextStyle(
-                color: Colors.black,
-                fontSize: 11,
-              );
+                  color: Colors.black,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold);
 
               Color cellColor = Colors.transparent;
 
@@ -301,24 +299,42 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                   now.day == details.date.day;
 
               if (isToday) {
-                textStyle = textStyle.copyWith(color: Colors.white);
+                textStyle = textStyle.copyWith(
+                    color: Colors.white, fontWeight: FontWeight.bold);
               }
 
               bool isCurrentMonth = details.date.month ==
                   details.visibleDates[details.visibleDates.length ~/ 2].month;
               if (details.date.weekday == DateTime.sunday) {
-                if (!isToday) textStyle = textStyle.copyWith(color: Colors.red);
+                if (!isToday)
+                  textStyle = textStyle.copyWith(
+                      color: Colors.red, fontWeight: FontWeight.bold);
               } else if (details.date.weekday == DateTime.saturday) {
                 if (!isToday)
-                  textStyle = textStyle.copyWith(color: Colors.blue);
+                  textStyle = textStyle.copyWith(
+                      color: Colors.blue, fontWeight: FontWeight.bold);
               }
 
-              double opacity = isCurrentMonth ? 1.0 : 0.5;
+              double opacity = isCurrentMonth ? 1.0 : 0.4;
               textStyle = textStyle.copyWith(
                   color: textStyle.color!.withOpacity(opacity));
 
+              final appointmentDate = DateTime(
+                  details.date.year, details.date.month, details.date.day);
+
+              final Set<MemberAppointment> uniqueMembers = {};
+              for (var member in dataSource.memberAppointments) {
+                if (member.appointments.any((appt) =>
+                    appt.startTime.year == appointmentDate.year &&
+                    appt.startTime.month == appointmentDate.month &&
+                    appt.startTime.day == appointmentDate.day)) {
+                  uniqueMembers.add(member);
+                }
+              }
+
               return Container(
-                alignment: Alignment.topCenter,
+                alignment: Alignment.topLeft,
+                padding: const EdgeInsets.only(left: 2),
                 decoration: BoxDecoration(
                   color: cellColor,
                   border: const Border(
@@ -328,24 +344,40 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                     ),
                   ),
                 ),
-                child: Stack(
-                  alignment: Alignment.topCenter,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (isToday)
                       Container(
                         width: 23,
                         height: 23,
+                        alignment: Alignment.center,
                         decoration: const BoxDecoration(
                           color: Color.fromARGB(255, 0, 0, 0),
                           shape: BoxShape.circle,
                         ),
-                      ),
-                    Container(
-                      height: 19.5,
-                      alignment: Alignment.center,
-                      child: Text(
+                        child: Text(
+                          details.date.day.toString(),
+                          style: textStyle.copyWith(color: Colors.white),
+                        ),
+                      )
+                    else
+                      Text(
                         details.date.day.toString(),
                         style: textStyle,
+                      ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Wrap(
+                        spacing: 2,
+                        runSpacing: 2,
+                        children: uniqueMembers
+                            .map((member) => CircleAvatar(
+                                  radius: 8,
+                                  backgroundImage:
+                                      NetworkImage(member.thumbnail),
+                                ))
+                            .toList(),
                       ),
                     ),
                   ],
@@ -355,51 +387,16 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
             appointmentBuilder:
                 (BuildContext context, CalendarAppointmentDetails details) {
               final appointment = details.appointments.first;
-              final appointmentDate = DateTime(appointment.startTime.year,
-                  appointment.startTime.month, appointment.startTime.day);
 
-              if (!processedNicknames.containsKey(appointmentDate)) {
-                processedNicknames[appointmentDate] = {};
-              }
-
+              // 멤버 일정인지 확인
               final isMemberAppointment =
                   dataSource.isMemberAppointment(appointment);
 
-              if (isMemberAppointment) {
-                final uniqueMembers = <MemberAppointment>{};
-                for (var member in dataSource.memberAppointments) {
-                  if (member.appointments.any((appt) =>
-                      appt.startTime.year == appointment.startTime.year &&
-                      appt.startTime.month == appointment.startTime.month &&
-                      appt.startTime.day == appointment.startTime.day)) {
-                    if (!processedNicknames[appointmentDate]!
-                        .contains(member.nickname)) {
-                      uniqueMembers.add(member);
-                      processedNicknames[appointmentDate]!.add(member.nickname);
-                    }
-                  }
-                }
-
-                return Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: uniqueMembers.map((member) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(member.thumbnail),
-                            radius: 9.2,
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                );
-              } else {
+              // 멤버 일정이 아닌 경우에만 표시
+              if (!isMemberAppointment) {
                 return Container(
                   decoration: BoxDecoration(
-                    color: selectedCalendar.color,
+                    color: appointment.color,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Column(
@@ -418,6 +415,9 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                   ),
                 );
               }
+
+              // 멤버 일정인 경우 빈 컨테이너 반환
+              return Container();
             },
           );
         }),

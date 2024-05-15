@@ -4,7 +4,6 @@ import 'package:calendar/api/calendar_delete_service.dart';
 import 'package:calendar/api/comment_service.dart';
 import 'package:calendar/api/delete_event_service.dart';
 import 'package:calendar/api/event_creates_service.dart';
-import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/api/post_service.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
@@ -19,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'dart:math';
 
 class CalendarAppointment {
   final Appointment appointment;
@@ -65,7 +65,7 @@ class MemberAppointment {
         startTime: startAtSeoul,
         endTime: endAtSeoul,
         subject: event['title'],
-        color: Colors.grey, // 예시 색상, 실제 색상은 변경 가능
+        color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
       );
     }).toList();
 
@@ -287,6 +287,52 @@ class MeetingController extends GetxController {
     update();
   }
 
+  Future<void> getKakaoEvents() async {
+    String? token = await _loadToken();
+    final String apiUrl = "http://15.164.174.224:3000/kakao/get/social";
+    tz.initializeTimeZones(); // 시간대 데이터 초기화
+    var seoul = tz.getLocation('Asia/Seoul'); // 서울 시간대 객체 가져오기
+
+    try {
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
+        for (var event in data) {
+          final DateTime startTimeUtc = DateTime.parse(event['startAt']);
+          final DateTime endTimeUtc = DateTime.parse(event['endAt']);
+          final startTimeSeoul = tz.TZDateTime.from(startTimeUtc, seoul);
+          final endTimeSeoul = tz.TZDateTime.from(endTimeUtc, seoul);
+
+          addCalendarAppointment(
+            Appointment(
+              startTime: startTimeSeoul,
+              endTime: endTimeSeoul,
+              subject: event['title'] ?? 'KaKao',
+              color: const Color.fromARGB(249, 249, 224, 0),
+              isAllDay: false,
+            ),
+            'usercalendarId',
+            event['socialEventId'],
+            true,
+            authController.user?.useremail,
+            authController.user?.nickname,
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrnkGghQpkEKOXPtDt1jMo5qFoCHkBbUe9Ew&usqp=CAU',
+          );
+        }
+        update();
+      } else {
+        print('Failed to load member appointments: ${response.body}');
+      }
+    } catch (e) {
+      print('Error fetching member appointments: $e');
+    }
+  }
+
   void syncSocialEvents(List<dynamic> jsonData) {
     tz.initializeTimeZones(); // 시간대 데이터 초기화
     var seoul = tz.getLocation('Asia/Seoul'); // 서울 시간대 객체 가져오기
@@ -313,7 +359,7 @@ class MeetingController extends GetxController {
           startTime: startTimeSeoul,
           endTime: endTimeSeoul,
           subject: event.title ?? 'KaKao',
-          color: Colors.yellow,
+          color: const Color.fromARGB(249, 249, 224, 0),
           isAllDay: false,
         ),
         event.userCalendarId,
@@ -353,6 +399,17 @@ class MeetingController extends GetxController {
             appointment.appointment.startTime.month == date.month &&
             appointment.appointment.startTime.year == date.year)
         .toList();
+  }
+
+  List<MemberAppointment> getMemberAppointmentsForCalendarAndDate(
+      DateTime date) {
+    return memberAppointments.where((memberAppointment) {
+      return memberAppointment.appointments.any((appointment) {
+        return appointment.startTime.day == date.day &&
+            appointment.startTime.month == date.month &&
+            appointment.startTime.year == date.year;
+      });
+    }).toList();
   }
 
   // 특정 캘린더 ID와 일치하는 일정을 모두 삭제하는 메서드
@@ -415,120 +472,217 @@ class MeetingController extends GetxController {
     update(); // UI 갱신을 위해 GetX 상태를 업데이트합니다.
   }
 
+//////////////////////////////////////////일정 모달//////////////////////////////////////////////////////
+  ///
+
   void showAppointmentsModal(String calendarId, DateTime date) {
     var appointments = getAppointmentsForCalendarAndDate(calendarId, date);
+    var memberAppointments = getMemberAppointmentsForCalendarAndDate(date);
+
+    var resources = _getResources(memberAppointments);
+    var memberAppointmentsDataSource =
+        _getMemberCalendarDataSource(memberAppointments);
+
     showModalBottomSheet(
       context: Get.context!,
       isScrollControlled: true,
       useSafeArea: true,
       isDismissible: true,
       builder: (BuildContext context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              width: double.infinity,
-              child: Text(
-                DateFormat('M월 d일 EEEE', 'ko_KR').format(date),
-                style: const TextStyle(color: Colors.black, fontSize: 18),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            Expanded(
-              child: appointments.isEmpty
-                  ? const Center(
-                      child: Text(
-                        "일정이 없습니다",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  width: double.infinity,
+                  child: Text(
+                    DateFormat('M월 d일 EEEE', 'ko_KR').format(date),
+                    style: const TextStyle(color: Colors.black, fontSize: 18),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                if (memberAppointments.isNotEmpty)
+                  Container(
+                    height: 80.0 + resources.length * 80.0,
+                    child: SfCalendar(
+                      view: CalendarView.timelineDay,
+                      headerHeight: 0,
+                      initialDisplayDate: date,
+                      timeSlotViewSettings: TimeSlotViewSettings(
+                        timeInterval: const Duration(hours: 1),
+                        timeIntervalWidth: 50,
+                        timelineAppointmentHeight: 50,
+                        timeFormat: 'HH:mm',
+                        timeTextStyle: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        timeRulerSize: 30,
+                        dateFormat: '',
+                        dayFormat: '',
+                        allDayPanelColor: Colors.grey[200],
                       ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 8),
-                      child: ListView.builder(
-                        itemCount: appointments.length,
-                        itemBuilder: (context, index) {
-                          var appointment = appointments[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: InkWell(
-                              onTap: () {
-                                // 이벤트 상세 페이지로 네비게이션
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EventDetailPage(
-                                      eventTitle:
-                                          appointment.appointment.subject,
-                                      startTime:
-                                          appointment.appointment.startTime,
-                                      endTime: appointment.appointment.endTime,
-                                      isNotified:
-                                          false, // 예시 값, 실제 모델에 따라 수정 필요
-                                      calendarColor:
-                                          appointment.appointment.color,
-                                      userProfileImageUrl:
-                                          appointment.authorThumbnail ?? '',
-                                      groupEventId: appointment.groupEventId,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Row(
-                                children: <Widget>[
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        DateFormat('a h:mm', 'ko_KR').format(
-                                            appointment.appointment.startTime),
-                                        style: const TextStyle(fontSize: 14),
+                      dataSource: _MemberAppointmentDataSource(
+                          memberAppointmentsDataSource, resources),
+                      resourceViewSettings: ResourceViewSettings(
+                        visibleResourceCount: resources.length,
+                        size: 60,
+                        displayNameTextStyle: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                Expanded(
+                  child: appointments.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "일정이 없습니다",
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 8),
+                          child: ListView.builder(
+                            itemCount: appointments.length,
+                            itemBuilder: (context, index) {
+                              var appointment = appointments[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4),
+                                child: InkWell(
+                                  onTap: () {
+                                    // 이벤트 상세 페이지로 네비게이션
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EventDetailPage(
+                                          eventTitle:
+                                              appointment.appointment.subject,
+                                          startTime:
+                                              appointment.appointment.startTime,
+                                          endTime:
+                                              appointment.appointment.endTime,
+                                          isNotified:
+                                              false, // 예시 값, 실제 모델에 따라 수정 필요
+                                          calendarColor:
+                                              appointment.appointment.color,
+                                          userProfileImageUrl:
+                                              appointment.authorThumbnail ?? '',
+                                          groupEventId:
+                                              appointment.groupEventId,
+                                        ),
                                       ),
-                                      Text(
-                                        DateFormat('a h:mm', 'ko_KR').format(
-                                            appointment.appointment.endTime),
-                                        style: const TextStyle(fontSize: 14),
+                                    );
+                                  },
+                                  child: Row(
+                                    children: <Widget>[
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            DateFormat('a h:mm', 'ko_KR')
+                                                .format(appointment
+                                                    .appointment.startTime),
+                                            style:
+                                                const TextStyle(fontSize: 14),
+                                          ),
+                                          Text(
+                                            DateFormat('a h:mm', 'ko_KR')
+                                                .format(appointment
+                                                    .appointment.endTime),
+                                            style:
+                                                const TextStyle(fontSize: 14),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        height: 30,
+                                        width: 10,
+                                        decoration: BoxDecoration(
+                                          color: appointment.appointment.color,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          appointment.appointment.subject,
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                            appointment.authorThumbnail ?? ''),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    height: 30,
-                                    width: 10,
-                                    decoration: BoxDecoration(
-                                      color: appointment.appointment.color,
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      appointment.appointment.subject,
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        appointment.authorThumbnail ??
-                                            '' // 유저 프로필 이미지 URL
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-            ),
-          ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
+}
+
+class _MemberAppointmentDataSource extends CalendarDataSource {
+  _MemberAppointmentDataSource(
+      List<Appointment> source, List<CalendarResource> resources) {
+    appointments = source;
+    this.resources = resources;
+  }
+}
+
+List<Appointment> _getMemberCalendarDataSource(
+    List<MemberAppointment> memberAppointments) {
+  List<Appointment> appointments = <Appointment>[];
+  for (var member in memberAppointments) {
+    for (var appointment in member.appointments) {
+      appointments.add(Appointment(
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
+        subject:
+            '${DateFormat('HH:mm').format(appointment.startTime)} - ${DateFormat('HH:mm').format(appointment.endTime)}',
+        color: appointment.color,
+        resourceIds: [member.useremail],
+      ));
+    }
+  }
+  return appointments;
+}
+
+List<CalendarResource> _getResources(
+    List<MemberAppointment> memberAppointments) {
+  List<CalendarResource> resources = <CalendarResource>[];
+  for (var member in memberAppointments) {
+    resources.add(CalendarResource(
+      id: member.useremail,
+      displayName: member.nickname,
+      image: NetworkImage(member.thumbnail),
+      color: Colors
+          .primaries[Random().nextInt(Colors.primaries.length)], // 임의의 색상 지정
+    ));
+  }
+  return resources;
 }
