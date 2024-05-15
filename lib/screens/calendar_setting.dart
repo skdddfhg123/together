@@ -1,8 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:uuid/uuid.dart';
 
 class CalendarSettingsPage extends StatelessWidget {
   final String calendarId;
@@ -55,9 +55,9 @@ class CalendarSettingsPage extends StatelessWidget {
         child: Column(
           children: [
             // Display the list of members
-            Text('멤버 리스트',
+            const Text('멤버 리스트',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Obx(() {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -65,11 +65,13 @@ class CalendarSettingsPage extends StatelessWidget {
                   return Column(
                     children: [
                       CircleAvatar(
-                        backgroundImage: NetworkImage(member.thumbnail),
+                        backgroundImage:
+                            CachedNetworkImageProvider(member.thumbnail),
                         radius: 30,
                       ),
-                      SizedBox(height: 5),
-                      Text(member.nickname, style: TextStyle(fontSize: 14)),
+                      const SizedBox(height: 5),
+                      Text(member.nickname,
+                          style: const TextStyle(fontSize: 14)),
                     ],
                   );
                 }).toList(),

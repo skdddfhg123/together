@@ -73,7 +73,11 @@ class _CreateFeedPageState extends State<CreateFeedPage> {
       }
       setState(() {
         _selectedImages = newImages;
-        _selectedImageIndex = 0; // 첫 번째 이미지를 대표 이미지로 설정
+        if (_selectedImages.isNotEmpty) {
+          _selectedImageIndex = 0; // 첫 번째 이미지를 대표 이미지로 설정
+        } else {
+          _selectedImageIndex = -1; // 선택된 이미지가 없을 때 인덱스 초기화
+        }
       });
     }
   }
@@ -119,8 +123,11 @@ class _CreateFeedPageState extends State<CreateFeedPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: _selectedImageIndex != -1
-                    ? Image.file(_selectedImages[_selectedImageIndex],
-                        fit: BoxFit.cover) // 선택된 이미지로 변경
+                    ? Image.file(
+                        _selectedImages[_selectedImageIndex],
+                        fit: BoxFit
+                            .contain, // BoxFit.cover에서 BoxFit.contain으로 변경
+                      )
                     : const Icon(Icons.add_a_photo,
                         size: 48, color: Colors.white70),
               ),

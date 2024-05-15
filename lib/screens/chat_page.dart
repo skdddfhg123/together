@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
 import 'package:calendar/models/message.dart';
@@ -128,7 +129,8 @@ class _ChatPageState extends State<ChatPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 CircleAvatar(
-                                  backgroundImage: NetworkImage(thumbnailUrl),
+                                  backgroundImage:
+                                      CachedNetworkImageProvider(thumbnailUrl),
                                   radius: 15,
                                 ),
                                 const SizedBox(width: 8),

@@ -1,5 +1,6 @@
 // dialog_service.dart
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/api/event_creates_service.dart';
 import 'package:calendar/api/kakao_auth_service.dart';
 import 'package:calendar/controllers/auth_controller.dart';
@@ -33,15 +34,19 @@ class DialogService {
       authController.user!.useremail
     ]; // 자신의 이메일을 포함
 
-    void _updateDateTime(bool isStartTime, DateTime updatedDateTime) {
-      if (isStartTime) {
-        _selectedStartTime = updatedDateTime;
-      } else {
-        _selectedEndTime = updatedDateTime;
-      }
+    void _updateDateTime(
+        bool isStartTime, DateTime updatedDateTime, StateSetter setState) {
+      setState(() {
+        if (isStartTime) {
+          _selectedStartTime = updatedDateTime;
+        } else {
+          _selectedEndTime = updatedDateTime;
+        }
+      });
     }
 
-    Future<void> _pickDateTime(BuildContext context, bool isStartTime) async {
+    Future<void> _pickDateTime(
+        BuildContext context, bool isStartTime, StateSetter setState) async {
       final DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: isStartTime ? _selectedStartTime : _selectedEndTime,
@@ -64,7 +69,7 @@ class DialogService {
             pickedTime.hour,
             pickedTime.minute,
           );
-          _updateDateTime(isStartTime, updatedDateTime);
+          _updateDateTime(isStartTime, updatedDateTime, setState);
         }
       }
     }
@@ -110,8 +115,8 @@ class DialogService {
                               title: Row(
                                 children: [
                                   CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage(member.thumbnail ?? ''),
+                                    backgroundImage: CachedNetworkImageProvider(
+                                        member.thumbnail ?? ''),
                                     radius: 18,
                                   ),
                                   const SizedBox(width: 8),
@@ -121,15 +126,14 @@ class DialogService {
                               value:
                                   selectedAttendees.contains(member.useremail),
                               onChanged: (bool? value) {
-                                if (value == true) {
-                                  selectedAttendees.add(member.useremail);
-                                } else {
-                                  selectedAttendees.remove(member.useremail);
-                                }
-                                // 내부 다이얼로그 상태 업데이트
-                                setState(() {});
-                                // 부모 다이얼로그 상태 업데이트
-                                parentSetState(() {});
+                                setState(() {
+                                  if (value == true) {
+                                    selectedAttendees.add(member.useremail);
+                                  } else {
+                                    selectedAttendees.remove(member.useremail);
+                                  }
+                                });
+                                parentSetState(() {}); // 부모 다이얼로그 상태 업데이트
                               },
                             );
                           },
@@ -189,7 +193,7 @@ class DialogService {
                         subtitle: Text(
                             DateFormat('yyyy년 M월 dd일 (E)     a H:mm', 'ko_KR')
                                 .format(_selectedStartTime)),
-                        onTap: () => _pickDateTime(context, true),
+                        onTap: () => _pickDateTime(context, true, setState),
                       ),
                       ListTile(
                         leading: Icon(Icons.timer_off_outlined, color: color),
@@ -197,7 +201,7 @@ class DialogService {
                         subtitle: Text(
                             DateFormat('yyyy년 M월 dd일 (E)     a H:mm', 'ko_KR')
                                 .format(_selectedEndTime)),
-                        onTap: () => _pickDateTime(context, false),
+                        onTap: () => _pickDateTime(context, false, setState),
                       ),
                       const SizedBox(height: 16),
                       ListTile(
@@ -222,8 +226,9 @@ class DialogService {
                                     return Row(
                                       children: [
                                         CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              attendee.thumbnail ?? ''),
+                                          backgroundImage:
+                                              CachedNetworkImageProvider(
+                                                  attendee.thumbnail ?? ''),
                                           radius: 12,
                                         ),
                                         const SizedBox(width: 8),

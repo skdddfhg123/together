@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
@@ -139,9 +140,9 @@ class _AllCalendarState extends State<AllCalendar> {
                           ),
                         ],
                       ),
-                      Text(
-                        '모든 캘린더 (${userCalendarController.calendars.length})',
-                        style: const TextStyle(
+                      const Text(
+                        '모든 캘린더',
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: Color.fromARGB(255, 114, 113, 113),
@@ -167,6 +168,13 @@ class _AllCalendarState extends State<AllCalendar> {
             headerHeight: 0, // 헤더 높이를 0으로 설정하여 헤더를 숨깁니다.
             onTap: (CalendarTapDetails details) {
               DateTime tappedDate = details.date!;
+
+              if (tappedDate != null) {
+                final EventSelectionController eventController =
+                    Get.find<EventSelectionController>();
+                eventController.selectedDate.value =
+                    tappedDate; // 선택한 날짜를 컨트롤러에 업데이트
+              }
 
               if (eventSelectionController.lastTappedDate.value == tappedDate) {
                 eventSelectionController.lastTappedDate.value = null; // 상태 초기화
@@ -417,7 +425,8 @@ class _AllCalendarState extends State<AllCalendar> {
           ),
         ),
         CircleAvatar(
-          backgroundImage: NetworkImage(appointment.authorThumbnail ?? ''),
+          backgroundImage:
+              CachedNetworkImageProvider(appointment.authorThumbnail ?? ''),
         ),
       ],
     );

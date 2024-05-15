@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/screens/calendar_setting.dart';
 import 'package:calendar/screens/myprofile_page.dart';
 import 'package:calendar/widget/calendar_utils.dart';
@@ -60,6 +61,7 @@ class _MainPageState extends State<MainPage> {
       // '작성' 탭
       final EventSelectionController eventController =
           Get.find<EventSelectionController>();
+
       if (eventController.selectedDate.value != null) {
         final selectedDate = eventController.selectedDate.value!;
 
@@ -68,9 +70,8 @@ class _MainPageState extends State<MainPage> {
               Get.find<UserCalendarController>();
           final selectedCalendar = calendarController.calendars.firstWhere(
             (cal) => cal.calendarId == calendarId,
+            orElse: () => null!,
           );
-
-          print(selectedCalendar.title);
 
           if (selectedCalendar != null) {
             DialogService.showAddAppointmentDialog(
@@ -81,17 +82,19 @@ class _MainPageState extends State<MainPage> {
               selectedCalendar.title,
             );
           } else {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text("선택된 캘린더가 없습니다.")));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("선택된 캘린더가 없습니다.")),
+            );
           }
         });
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("일정을 선택 하세요")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("일정을 선택 하세요")),
+        );
       }
     } else {
       setState(() {
-        _selectedIndex = index; // 다른 탭을 선택했을 때만 인덱스 변경
+        _selectedIndex = index; // 다른 탭 선택 시 인덱스 변경
       });
     }
   }
@@ -161,7 +164,7 @@ class _MainPageState extends State<MainPage> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8.0),
                                     image: DecorationImage(
-                                      image: NetworkImage(
+                                      image: CachedNetworkImageProvider(
                                           calendar.coverImage ?? ''),
                                       fit: BoxFit.cover,
                                     ),
@@ -199,9 +202,9 @@ class _MainPageState extends State<MainPage> {
                                                   const SizedBox(height: 10),
                                                   CircleAvatar(
                                                     backgroundImage:
-                                                        NetworkImage(attendee
-                                                                .thumbnail ??
-                                                            ''),
+                                                        CachedNetworkImageProvider(
+                                                            attendee.thumbnail ??
+                                                                ''),
                                                     radius: 12,
                                                   ),
                                                   Text(

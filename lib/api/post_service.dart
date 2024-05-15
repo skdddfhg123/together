@@ -100,7 +100,8 @@ class FeedService {
 
   Future<List<FeedWithId>> loadFeedsForGroup(String groupeventId) async {
     String? token = await _loadToken();
-    var url = Uri.parse('http://15.164.174.224:3000/feed/get/$groupeventId');
+    var url = Uri.parse(
+        'http://15.164.174.224:3000/feed/get/groupevent/$groupeventId');
 
     try {
       var response = await http.get(url, headers: {

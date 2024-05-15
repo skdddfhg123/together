@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
@@ -42,7 +43,7 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   currentAccountPicture: CircleAvatar(
-                    backgroundImage: NetworkImage(
+                    backgroundImage: CachedNetworkImageProvider(
                         authController.user?.thumbnail ??
                             'https://via.placeholder.com/150'),
                   ),

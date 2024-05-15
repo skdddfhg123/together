@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
@@ -24,7 +25,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     nameController.text = authController.user?.nickname ?? '';
     dobController.text = ''; // 예시 데이터
     String serverImageUrl = authController.user?.thumbnail ?? '';
-    currentThumbnail = NetworkImage(serverImageUrl);
+    currentThumbnail = CachedNetworkImageProvider(serverImageUrl);
   }
 
   @override
@@ -141,7 +142,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 onTap: () {
                   Navigator.pop(context);
                   setState(() {
-                    currentThumbnail = const NetworkImage(
+                    currentThumbnail = const CachedNetworkImageProvider(
                         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s"); // 사진 삭제 처리
                   });
                 },

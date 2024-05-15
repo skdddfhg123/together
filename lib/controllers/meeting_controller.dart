@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:calendar/api/calendar_delete_service.dart';
 import 'package:calendar/api/comment_service.dart';
@@ -461,10 +462,16 @@ class MeetingController extends GetxController {
   }
 
   List<CalendarAppointment> getAllAppointments() {
-    // 현재 사용자가 생성한 일정만 필터링
-    return calendarAppointments.toList();
-    // .where((appointment) => appointment.authorEmail == currentUserEmail)
-    // .toList();
+    String? userEmail = authController.user?.useremail;
+
+    if (userEmail == null) {
+      return [];
+    }
+
+    return calendarAppointments.where((appointment) {
+      return appointment.isSocial ||
+          appointment.members.any((member) => member.useremail == userEmail);
+    }).toList();
   }
 
   List<CalendarAppointment> getAppointmentsForCalendarAndDate(
@@ -554,6 +561,12 @@ class MeetingController extends GetxController {
     DateTime startOfDay = DateTime(date.year, date.month, date.day, 0, 0, 0);
     DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
+    String? userEmail = authController.user?.useremail;
+
+    if (userEmail == null) {
+      return splitAppointments; // Return an empty list if the user email is not available
+    }
+
     for (var appointment in calendarAppointments) {
       DateTime start = appointment.appointment.startTime;
       DateTime end = appointment.appointment.endTime;
@@ -562,7 +575,12 @@ class MeetingController extends GetxController {
       if ((start.isBefore(endOfDay.add(Duration(seconds: 1))) &&
               end.isAfter(startOfDay.subtract(Duration(seconds: 1)))) &&
           !(start.isAtSameMomentAs(end) && start.isBefore(startOfDay))) {
-        splitAppointments.add(appointment);
+        // Filter appointments to include only those where the current user's email is in the members list and isSocial is false
+        if (appointment.isSocial ||
+            appointment.members
+                .any((member) => member.useremail == userEmail)) {
+          splitAppointments.add(appointment);
+        }
       }
     }
 
@@ -739,8 +757,10 @@ class MeetingController extends GetxController {
                                         ),
                                       ),
                                       CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                            appointment.authorThumbnail ?? ''),
+                                        backgroundImage:
+                                            CachedNetworkImageProvider(
+                                                appointment.authorThumbnail ??
+                                                    ''),
                                       ),
                                     ],
                                   ),
@@ -791,7 +811,7 @@ List<CalendarResource> _getResources(
     resources.add(CalendarResource(
       id: member.useremail,
       displayName: member.nickname,
-      image: NetworkImage(member.thumbnail),
+      image: CachedNetworkImageProvider(member.thumbnail),
       color: member.appointments.first.color, // 임의의 색상 지정
     ));
   }

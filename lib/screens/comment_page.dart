@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/models/comment.dart';
 import 'package:flutter/material.dart';
@@ -89,39 +90,56 @@ class _CommentsPageState extends State<CommentsPage> {
                   itemCount: comments.length,
                   itemBuilder: (context, index) {
                     var comment = comments[index].comment;
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(comment.thumbnail ??
-                            'https://via.placeholder.com/150'),
-                      ),
-                      title: Row(
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 15),
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          CircleAvatar(
+                            backgroundImage: CachedNetworkImageProvider(
+                                comment.thumbnail ??
+                                    'https://via.placeholder.com/150'),
+                            radius: 20,
+                          ),
+                          const SizedBox(width: 10),
                           Expanded(
-                            flex: 1,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  comment.nickname,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                Row(
+                                  children: [
+                                    Text(
+                                      comment.nickname,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      timeAgoSinceDate(comment.createdAt),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    // const Spacer(),
+                                    // _buildPopupMenu(comment), // 트레일링 팝업 메뉴 추가
+                                  ],
                                 ),
+                                const SizedBox(height: 5),
                                 Text(
-                                  timeAgoSinceDate(comment.createdAt),
-                                  style: TextStyle(
-                                      color: Colors.grey[600], fontSize: 12),
+                                  comment.content,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          Expanded(
-                            flex: 3,
-                            child: Text(comment.content),
-                          ),
                         ],
                       ),
-                      trailing: _buildPopupMenu(comment),
                     );
                   },
                 );

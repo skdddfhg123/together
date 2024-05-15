@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
@@ -341,8 +342,8 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                         children: uniqueMembers
                             .map((member) => CircleAvatar(
                                   radius: 8,
-                                  backgroundImage:
-                                      NetworkImage(member.thumbnail),
+                                  backgroundImage: CachedNetworkImageProvider(
+                                      member.thumbnail),
                                 ))
                             .toList(),
                       ),

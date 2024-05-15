@@ -76,7 +76,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: CircleAvatar(
-          backgroundImage: NetworkImage(widget.userProfileImageUrl),
+          backgroundImage:
+              CachedNetworkImageProvider(widget.userProfileImageUrl),
         ),
         actions: <Widget>[
           PopupMenuButton<String>(
@@ -219,8 +220,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           return Column(
                             children: [
                               CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(member.thumbnail ?? ''),
+                                backgroundImage: CachedNetworkImageProvider(
+                                    member.thumbnail ?? ''),
                                 radius: 20,
                               ),
                               Text(member.nickname),
@@ -273,7 +274,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                   children: [
                                     CircleAvatar(
                                       backgroundImage:
-                                          NetworkImage(feed.thumbnail),
+                                          CachedNetworkImageProvider(
+                                              feed.thumbnail),
                                       radius: 20,
                                     ),
                                     const SizedBox(width: 10),
@@ -365,39 +367,40 @@ class _EventDetailPageState extends State<EventDetailPage> {
                             const SizedBox(height: 10),
                             if (feed.imageSrcs.isNotEmpty)
                               Container(
-                                height: 200,
+                                height: 300,
+                                width: double.infinity,
                                 child: PageView.builder(
                                   itemCount: feed.imageSrcs.length,
-                                  onPageChanged: (int page) {
-                                    setState(() {
-                                      currentPage = page;
-                                    });
-                                  },
                                   itemBuilder: (_, imageIndex) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        feed.imageSrcs[imageIndex],
-                                        fit: BoxFit.cover,
-                                        loadingBuilder: (BuildContext context,
-                                            Widget child,
-                                            ImageChunkEvent? loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child;
-                                          }
-                                          return Center(
-                                            child: CircularProgressIndicator(
-                                              value: loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      loadingProgress
-                                                          .expectedTotalBytes!
-                                                  : null,
-                                            ),
-                                          );
-                                        },
+                                    return AspectRatio(
+                                      aspectRatio: 1, // 이미지를 정사각형으로 설정
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          feed.imageSrcs[imageIndex],
+                                          fit: BoxFit
+                                              .cover, // 이미지를 꽉 채우기 위해 BoxFit.cover 사용
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent?
+                                                  loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                    : null,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
                                     );
                                   },
@@ -430,13 +433,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                     );
                                   },
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.bookmark_add_outlined,
-                                      color: Colors.black),
-                                  onPressed: () {
-                                    // 북마크 기능 구현
-                                  },
-                                ),
+                                // IconButton(
+                                //   icon: const Icon(Icons.bookmark_add_outlined,
+                                //       color: Colors.black),
+                                //   onPressed: () {
+                                //     // 북마크 기능 구현
+                                //   },
+                                // ),
                               ],
                             ),
                             Row(

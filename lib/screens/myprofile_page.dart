@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/controllers/auth_controller.dart';
 import 'package:calendar/screens/edit_profile_page.dart';
 import 'package:calendar/widget/calendar_utils.dart';
@@ -74,8 +75,9 @@ class MyProfile extends StatelessWidget {
             padding: const EdgeInsets.only(top: 20),
             child: CircleAvatar(
               radius: 60,
-              backgroundImage: NetworkImage(authController.user?.thumbnail ??
-                  'https://via.placeholder.com/150'),
+              backgroundImage: CachedNetworkImageProvider(
+                  authController.user?.thumbnail ??
+                      'https://via.placeholder.com/150'),
               backgroundColor: Colors.transparent,
             ),
           ),

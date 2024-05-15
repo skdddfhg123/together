@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -42,31 +43,89 @@ class SignupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Sign Up")),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
+      body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+            Container(
+              height: 400,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: CachedNetworkImageProvider(
+                      'https://dgbdqbfy0cgn6.cloudfront.net/toogether.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            TextField(
-              controller: nicknameController,
-              decoration: const InputDecoration(labelText: 'Nickname'),
-            ),
-            ElevatedButton(
-              onPressed: () => registerUser(context),
-              child: const Text('Register'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: emailController,
+                    decoration: const InputDecoration(
+                      labelText: '이메일',
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: '비밀번호',
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: nicknameController,
+                    decoration: const InputDecoration(
+                      labelText: '닉네임',
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => registerUser(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 50, vertical: 15),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    child: const Text('회원 가입'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      '돌아가기',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
