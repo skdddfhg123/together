@@ -29,9 +29,10 @@ module.exports = {
       },
       colors: {
         custom: {
-          main: '#0086FF',
+          main: '#0120c9',
           light: '#badfff',
           line: '#F2F2F2',
+          yellow: '#FDDE55',
         },
       },
     },

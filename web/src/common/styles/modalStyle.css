@@ -8,28 +8,26 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   opacity: 0; 
   transition: opacity 0.2s, transform 0.2s;
-  transform: translateX(-50%); 
+  transform: translateY(-50%); 
 }
 
 .userModal.open {
   opacity: 1; 
   z-index: 1000;
-  transform: translateX(-50%) translateY(-10px); 
+  transform: translateX(-30%) translateY(-20%); 
   pointer-events: auto;
 }
 
 .emojiModal {
-  
   display: flex;
   flex-direction: column;
-  
   
   width: 20rem;      
   height: 20rem;
 
   position: fixed; 
-  top: 70%;         
-  left: 68.5%;       
+  top: 81%;         
+  left: 64.5%;       
   transform: translate(-50%, -50%);
   z-index: 1000;    
   background: white; 
@@ -95,7 +93,7 @@
 
 .feedModal {
   height: 80vh;
-  width: 150vh;
+  width: 140lvh;
   padding: 0;
   top: 50%;
   left: 50%;
@@ -109,6 +107,36 @@
 }
 
 .feedOverlay {
+  background-color: rgba(0, 0, 0, 0.35);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1050;
+}
+
+
+.thumbnailModal { 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  height: 80vh;
+  width: 100vh;
+  padding: 2rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  overflow: hidden;
+  position: fixed; 
+  border-radius: 5px;
+
+  box-shadow: 0 10px 12px rgba(0,0,0,0.5); 
+}
+
+.thumbnailOverlay {
   background-color: rgba(0, 0, 0, 0.35);
   position: fixed;
   top: 0;

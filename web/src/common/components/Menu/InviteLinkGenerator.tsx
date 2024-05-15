@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelectedCalendarStore } from '@store/index';
 import useToggle from '@hooks/useToggle';
+import sendToast from '@hooks/sendToast';
 
 export default function InviteLinkGenerator() {
   const { isOn, toggle } = useToggle(false);
@@ -8,25 +9,25 @@ export default function InviteLinkGenerator() {
   const { selectedCalendar } = useSelectedCalendarStore();
 
   const handleGenerateLink = () => {
-    if (selectedCalendar === 'All') return alert('그룹 캘린더를 선택해주세요.');
+    if (selectedCalendar === 'All')
+      return sendToast('default', '멤버를 초대할 그룹 캘린더를 선택해주세요.');
+
     const link = `${window.location.origin}/invite?invite=${selectedCalendar.calendarId}`;
     setInviteLink(link);
     toggle();
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(inviteLink).then(
-      () => {
-        alert('링크가 복사되었습니다.');
-      },
-      () => {
-        alert('복사 실패. 다시 시도해주세요.');
-      },
-    );
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      sendToast('success', '복사 성공 !');
+    } catch (error) {
+      sendToast('warning', '복사에 실패했습니다.');
+    }
   };
 
   const handleKakaoShare = () => {
-    if (selectedCalendar === 'All') return alert('그룹 캘린더를 선택해주세요.');
+    if (selectedCalendar === 'All') return sendToast('warning', '그룹 캘린더를 선택해주세요.');
     const link = `${window.location.origin}/invite?invite=${selectedCalendar.calendarId}`;
 
     if (window.Kakao) {

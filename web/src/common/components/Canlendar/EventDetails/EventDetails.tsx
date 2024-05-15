@@ -7,6 +7,7 @@ import * as USER from '@services/userAPI';
 import { Calendar, GroupEvent } from '@type/index';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 import useToggle from '@hooks/useToggle';
+import sendToast from '@hooks/sendToast';
 
 import ViewEvent from '@components/Canlendar/EventDetails/ViewEvent';
 import ModifyEvent from '@components/Canlendar/EventDetails/ModifyEvent';
@@ -51,7 +52,10 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
 
   // *********************? 최초 Render
   useEffect(() => {
-    if (!isOn) return alert('수정을 먼저 완료해주세요.');
+    if (!isOn) {
+      sendToast('warning', '수정을 먼저 완료해주세요.');
+      return;
+    }
     const fetchEventInfo = async () => {
       if (eventId) await CALENDAR.getGroupOneEvent(eventId);
     };

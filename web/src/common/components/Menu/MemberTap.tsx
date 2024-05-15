@@ -15,18 +15,22 @@ export default function memberTap({ selectedCalendar, onClose }: memberTapProps)
     <div className="h-full">
       <header className="FLEX-verA rMenu-header">
         <h2>Member</h2>
-        <button className="BTN" onClick={onClose}>
-          Close
+        <button
+          onClick={onClose}
+          className="absolute top-0 right-0 mr-2 text-3xl text-black hover:text-gray-600"
+          aria-label="Close"
+        >
+          &times;
         </button>
       </header>
-      <main className="FLEX-horizC h-full">
+      <main className="FLEX-horizC h-full p-4 ">
         {selectedCalendar !== 'All' && selectedCalendar.attendees && (
           <div className="FLEX-horiz justify-center w-full h-full space-y-2 border rounded">
             {selectedCalendar.attendees.map((attendee, index) => (
               <div key={index} className="FLEX-ver items-center m-2 space-x-4">
                 <img
-                  className="w-24 h-24 object-cover transition-all duration-300 ease-in-out                  
-                  hover:object-contain hover:w-48 hover:h-48 hover:rounded-none"
+                  className="w-20 h-20 object-cover rounded-full transition-all duration-300 ease-in-out                  
+                  hover:object-contain hover:w-40 hover:h-40 hover:rounded-none"
                   src={attendee.thumbnail || default_user}
                   alt={attendee.nickname}
                 />

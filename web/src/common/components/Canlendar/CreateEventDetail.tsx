@@ -22,10 +22,10 @@ import PeopleIcon from '@mui/icons-material/People';
 import PaletteIcon from '@mui/icons-material/Palette';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import 'tailwindcss/tailwind.css';
 
 import * as REDIS from '@services/redisAPI';
 import * as CALENDAR from '@services/calendarAPI';
+import sendToast from '@hooks/sendToast';
 
 import { useMemberEventListState, useUserInfoStore } from '@store/index';
 
@@ -122,12 +122,12 @@ export default function DetailModal({
   const submitNewDetailEvent = useCallback(async () => {
     const title = titleRef.current?.value.trim();
 
-    if (!title) return alert('일정 제목이 비어있습니다.');
-    if (!userInfo) return alert('유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
+    if (!title) return sendToast('default', '일정 제목이 비어있습니다.');
+    if (!userInfo) return sendToast('default', '유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
     if (selectedCalendar === 'All') {
       resetForm();
       onClose();
-      return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
+      return sendToast('default', '일정을 등록할 그룹 캘린더를 선택해주세요.');
     }
 
     const startAt = formatISO(parseISO(`${startDate}T${startTime}`), {
@@ -147,7 +147,7 @@ export default function DetailModal({
     const res = await CALENDAR.createGroupSimpleEvent(eventData);
     if (res) {
       await CALENDAR.getGroupAllEvents(selectedCalendar);
-      await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정 등록` });
+      await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정을 등록` });
     }
     resetForm();
     onClose();
@@ -164,7 +164,7 @@ export default function DetailModal({
     resetForm,
   ]);
 
-  //*****************? 컴포넌트 초기화
+  // Component initialization
   useEffect(() => {
     if (isOpen) {
       resetForm();
@@ -305,15 +305,10 @@ export default function DetailModal({
           />
           <div className="flex items-center space-x-4">
             <PeopleIcon style={{ color: color }} />
-            <DialogContent
-              style={{ overflow: 'auto', maxHeight: '50vh', backgroundColor: 'transparent' }}
-            >
+            <div className="overflow-auto max-h-50vh bg-transparent">
               <FormGroup>
                 {MemberEventList.map((member) => (
-                  <div
-                    key={member.useremail}
-                    style={{ display: 'flex', alignItems: 'center', margin: '10px 0' }}
-                  >
+                  <div key={member.useremail} className="flex items-center my-2">
                     <Checkbox
                       checked={selectedMembers.includes(member.useremail)}
                       onChange={() => handleMemberChange(member.useremail)}
@@ -328,7 +323,7 @@ export default function DetailModal({
                   </div>
                 ))}
               </FormGroup>
-            </DialogContent>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <PaletteIcon style={{ color: color }} />
@@ -337,7 +332,6 @@ export default function DetailModal({
                 value={color}
                 onChange={(e) => setColor(e.target.value as string)}
                 inputProps={{
-                  disableUnderline: true,
                   style: { borderBottom: 'none', color: '#1E1E1E' },
                 }}
                 style={{ backgroundColor: 'transparent' }}
@@ -382,12 +376,11 @@ export default function DetailModal({
         </div>
       </DialogContent>
       <DialogActions className="flex justify-between border-t p-4" style={{ borderColor: color }}>
-        <Button onClick={onClose} color="primary" className="mr-2" style={{ color: color }}>
+        <Button onClick={onClose} className="mr-2" style={{ color: color }}>
           취소
         </Button>
         <Button
           onClick={submitNewDetailEvent}
-          color="primary"
           variant="contained"
           style={{ backgroundColor: color, color: 'white' }}
         >

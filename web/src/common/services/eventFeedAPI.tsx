@@ -1,6 +1,7 @@
 import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 
+import sendToast from '@hooks/sendToast';
 import * as API from '@utils/api';
 import { ImageFile, reqEventFeed, EventFeed, reqComment } from '@type/index';
 import { useEventFeedListStore } from '@store/index';
@@ -24,7 +25,7 @@ export async function getAllFeedInEvent(groupEventId: UUID) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`FEED - getAllFeedInEvent 실패 :`, data); //debug//
-      alert('전체 피드를 가져오지 못했습니다.');
+      sendToast('warning', '전체 피드를 가져오지 못했습니다.');
     }
   }
 }
@@ -43,7 +44,7 @@ export async function getOneFeed(feedId: UUID) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`FEED - getOneFeed 실패 :`, data); //debug//
-      alert('피드를 가져오지 못했습니다.');
+      sendToast('warning', '피드를 가져오지 못했습니다.');
     }
   }
 }
@@ -84,7 +85,7 @@ export async function createEventFeed({
       },
     ]);
 
-    alert('피드가 등록되었습니다.');
+    sendToast('success', '피드가 등록되었습니다.');
 
     return true;
   } catch (e) {
@@ -93,7 +94,7 @@ export async function createEventFeed({
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`FEED - createEventFeed 실패 :`, data); //debug//
-      alert('피드 등록에 실패했습니다.');
+      sendToast('warning', '피드 등록에 실패했습니다.');
     }
   }
 }
@@ -114,7 +115,7 @@ export async function updateEventFeed({
     });
     if (!res) throw new Error(`FEED - updateEventFeed 실패 (DB 피드 수정 실패)`);
     console.log(`FEED - updateEventFeed 성공 :`, res); //debug//
-    alert('피드를 수정했습니다.');
+    sendToast('success', '피드를 수정했습니다.');
 
     return true;
   } catch (e) {
@@ -123,7 +124,7 @@ export async function updateEventFeed({
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`FEED - updateEventFeed 실패 :`, data); //debug//
-      alert('피드 수정에 실패했습니다.');
+      sendToast('warning', '피드 수정에 실패했습니다.');
     }
   }
 }
@@ -133,7 +134,7 @@ export async function removeEventFeed({ feedId }: EventFeed) {
     const { data: res } = await API.patch(`/feed/create/${feedId}`);
     if (!res) throw new Error(`FEED - removeEventFeed 실패 (DB 피드 삭제 실패)`);
     console.log(`FEED - removeEventFeed 성공 :`, res); //debug//
-    alert('피드를 삭제했습니다.');
+    sendToast('error', '피드를 삭제했습니다.');
 
     return true;
   } catch (e) {
@@ -142,7 +143,7 @@ export async function removeEventFeed({ feedId }: EventFeed) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`FEED - removeEventFeed 실패 :`, data); //debug//
-      alert('피드 삭제에 실패했습니다.');
+      sendToast('warning', '피드 삭제에 실패했습니다.');
     }
   }
 }
@@ -154,7 +155,7 @@ export async function createFeedComment({ feedId, content }: reqComment) {
     const res = await API.post(`/feed/comment/create/${feedId}`, { content });
     if (!res) throw new Error('COMMENT - createFeedComment 실패 : (DB 댓글 등록 실패)');
     console.log(`COMMENT - createFeedComment 성공 :`, res); //debug//
-    alert('댓글이 등록되었습니다.');
+    sendToast('success', '댓글이 등록되었습니다.');
 
     return true;
   } catch (e) {
@@ -163,7 +164,7 @@ export async function createFeedComment({ feedId, content }: reqComment) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`COMMENT - createFeedComment 실패 :`, data); //debug//
-      alert('댓글 등록에 실패했습니다.');
+      sendToast('warning', '댓글 등록에 실패했습니다.');
     }
   }
 }
@@ -181,7 +182,7 @@ export async function getFeedComment(feedId: UUID) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`COMMENT - getFeedComment 실패 :`, data); //debug//
-      alert('댓글 불러오기에 실패했습니다.');
+      sendToast('warning', '댓글 불러오기에 실패했습니다.');
     }
   }
 }

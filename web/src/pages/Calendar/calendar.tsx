@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { UUID } from 'crypto';
+import 'react-toastify/dist/ReactToastify.css';
 import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
+import { UUID } from 'crypto';
 
 import { hexToRgba } from '@hooks/useHexToRgba';
 
@@ -20,6 +21,7 @@ import CreateEventModal from '@components/Canlendar/CreateEventSimple';
 import EventDetails from '@components/Canlendar/EventDetails/EventDetails';
 import GroupMemberEvent from '@components/Canlendar/GroupMemberEvent';
 import '@styles/calendar.css';
+import sendToast from '@hooks/sendToast';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -64,7 +66,8 @@ export default React.memo(function CalendarPage({
   // *****************? 더블 클릭으로 이벤트 등록 Modal 띄움
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
     if (selectedCalendar === 'All') {
-      return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
+      sendToast('default', ' 그룹 캘린더를 선택해주세요.');
+      return;
     }
     const rect = e.currentTarget.getBoundingClientRect();
     setModalPosition({ x: rect.left, y: rect.top });
@@ -72,7 +75,6 @@ export default React.memo(function CalendarPage({
     if (selectedDay && isSameDay(day, selectedDay)) {
       setEventModalOn(!eventModalOn);
     } else {
-      console.log(`선택한 날짜`, day);
       setSelectedDay(day);
       setEventModalOn(false);
     }
@@ -81,8 +83,6 @@ export default React.memo(function CalendarPage({
   const handleDetails = useCallback(
     (eventId: UUID, e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
-      console.log(`누른 이벤트`, eventId);
-      console.log(`보고있는 이벤트`, groupEventId);
       if (!groupEventId || eventId !== groupEventId) {
         setGroupEventId(eventId);
         setDetailsOn(true);

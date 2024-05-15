@@ -1,5 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import sendToast from '@hooks/sendToast';
 import { getCookie } from '@utils/cookie';
+import { navigateToSignin } from './navigation';
 
 export type ErrorResponse = {
   message: string;
@@ -31,8 +33,10 @@ axiosInstance.interceptors.request.use(
     const token = getCookie('accessToken');
     // const token = sessionStorage.getItem('accessToken');
     if (!token) {
-      alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
-      window.location.href = `/signin`;
+      sendToast('warning', '로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
+      sessionStorage.clear();
+      navigateToSignin();
+      throw new Error('로그인 토큰 만료');
     }
     config.headers.Authorization = `Bearer ${token}`;
     return config;
@@ -49,18 +53,21 @@ axiosInstance.interceptors.response.use(
       if (error.config?.data) {
         const data = JSON.parse(error.config.data);
         console.log(`data`, data);
+
         if (data.kakaoAccessToken === null) {
           return console.log(`카카오 에러 핸들링`); //debug//
         }
+
         if ('useremail' in data && 'password' in data) {
-          console.log(`errer`, error);
           const err = error.response.data as ErrorResponse;
-          alert(err.message);
+          console.log(`errer`, err);
+          sendToast('warning', `${err.message}`);
           return;
         }
       }
-      window.alert('인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
-      window.location.href = `/signin`;
+      sessionStorage.clear();
+      sendToast('warning', '인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
+      navigateToSignin();
     }
   },
 );

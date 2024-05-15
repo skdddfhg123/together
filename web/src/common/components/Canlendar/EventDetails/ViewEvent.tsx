@@ -128,10 +128,6 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
     <>
       <div className="h-fit space-y-3 pb-2 rounded">
         <nav className="FLEX-verB p-2">
-          <button className="p-1 hover:bg-custom-light rounded" onClick={onClose}>
-            닫기
-          </button>
-
           <div className="space-x-2">
             <button
               className="BTN hover:bg-custom-light rounded"
@@ -159,6 +155,9 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
               삭제
             </button>
           </div>
+          <button className="text-3xl rounded" onClick={onClose}>
+            &times;
+          </button>
         </nav>
         <header className="FLEX-horizC justify-en">
           {eventInfo &&

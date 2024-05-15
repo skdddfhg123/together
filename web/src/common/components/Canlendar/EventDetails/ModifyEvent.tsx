@@ -3,6 +3,7 @@ import { HexColorPicker } from 'react-colorful';
 import { UUID } from 'crypto';
 import debounce from 'lodash.debounce';
 
+import sendToast from '@hooks/sendToast';
 import { GroupEvent, Member } from '@type/index';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 
@@ -66,7 +67,7 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
     (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!eventId) return alert('변경할 일정을 찾지 못했습니다.');
+      if (!eventId) return sendToast('default', '변경할 일정을 찾지 못했습니다.');
       const formData: GroupEvent = {
         groupEventId: eventId,
         title: titleRef.current?.value || groupEventInfo?.title || '제목',
@@ -111,11 +112,11 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
   return (
     <form className="h-full" onSubmit={handleSubmit}>
       <nav className="FLEX-verB my-1 mx-2">
-        <button type="button" className="p-2 hover:bg-custom-light rounded" onClick={setView}>
-          취소
-        </button>
         <button type="submit" className="p-2 hover:bg-custom-light rounded">
           수정 완료
+        </button>
+        <button className="text-3xl rounded" onClick={onClose}>
+          &times;
         </button>
       </nav>
       <header key="event-form">

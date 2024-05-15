@@ -8,13 +8,13 @@
 }
 
 /* ************************* header ************************* */
-#calHeader {
-  /* height: 5rem; */
-  height: 15vh;
 
+#calHeader {
+  height: 15vh;
+  
   display: flex;
   align-items: center;
-
+  
   border-bottom: 1px solid rgb(242, 242, 242);
 }
 
@@ -24,32 +24,46 @@
 
 #calHeader-leftSidebar  {
   width: 2.5rem;
-
+  
   margin-top: 0.5rem;
   margin-left: 1rem;
   cursor:pointer;
 }
 
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  height: 100%;
+  width: 35vh;
+}
+
 #calendarLogo {
-  color:#0086FF;
-  text-shadow: -1px 0 darkblue, 0 1px darkblue, 1px 0 darkblue, 0 -1px darkblue;
+  width: 85%;
+  cursor: pointer;
+}
+
+.logo-bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+
+  width: 100%;
+  padding-top: 0.5rem;
 }
 
 #calHeader-title {
-  padding-top: 0.5rem;
-  
-  font-size: larger;
-  font-weight: 700;
+  font-size: medium;
+  font-weight: 600;
 }
 
-.calHeader-button {  
-  height: 2rem;
-  width: 4rem;
-  margin-top: 0.7rem;
-  margin-left: 2rem;
-
+.month-controller {  
   display: flex;
-  justify-content: space-around;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 
   border: 1px solid lightgray;
@@ -60,15 +74,15 @@
 }
 
 #prevMonth-button {
-  height: 2rem;
-  width: 4rem;
+  height: 1.5rem;
+  width: 2rem;
 
   border-radius: 4px 0 0 4px;
 }
 
 #nextMonth-button{
-  height: 2rem;
-  width: 4rem;
+  height: 1.5rem;
+  width: 2rem;
 
   border-radius: 0 5px 5px 0;
 }
@@ -84,13 +98,6 @@
   margin-left: auto;
   /* margin-top: 0.5rem; */
   margin-right: 0.5rem;
-}
-
-#sync-button {
-  width: 2rem;
-  height: 2.2rem;
-  margin-right: 1rem;
-  cursor: pointer;
 }
 
 /* ****** 가로모드 ****** * /
@@ -113,7 +120,28 @@
 } */
 /*************************/
 
-#sync-button:hover {
-  border-radius: 33%;
-  background-color: #badfff;
+/* ****** 토스트 CSS ****** */
+
+.memberAlert {
+  width: 40rem;
+  text-align: center;
+  font-size: 1.2rem;
+  color: lightgray;
 }
+
+.calendarAlert {
+  width: 30rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+/* ! 시연용  토스트 !
+.memberAlert {
+  font-family: 'Jua', sans-serif;
+  width: 65rem;
+  height: 6rem;
+  text-align: center;
+  font-size: 2rem;
+  color: lightgray;
+} */

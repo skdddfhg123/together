@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
+import sendToast from '@hooks/sendToast';
 import * as FEED from '@services/eventFeedAPI';
 
 import { Comment, EventFeed } from '@type/index';
@@ -25,6 +26,19 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
     onClose();
   }, [onClose]);
 
+  const fetchCommntList = useCallback(async () => {
+    const feedId = feedInfo?.feedId;
+    if (!feedId) return sendToast('error', '피드 정보를 가져오지 못했습니다.');
+    const comments = await FEED.getFeedComment(feedId);
+    setCommentList(comments);
+  }, [feedInfo]);
+
+  useEffect(() => {
+    if (isOpen && feedInfo) {
+      fetchCommntList();
+    }
+  }, [isOpen, fetchCommntList]);
+
   const submitNewComment = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -38,7 +52,7 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
         fetchCommntList();
       }
     },
-    [feedInfo],
+    [feedInfo, fetchCommntList],
   );
 
   function formatDate(Feeddate: string) {
@@ -47,20 +61,6 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
     return format(date, 'yy년 M월 d일, H시 m분', { locale: ko });
   }
 
-  const fetchCommntList = useCallback(async () => {
-    const feedId = feedInfo?.feedId;
-    if (!feedId) return alert('피드 정보를 가져오지 못했습니다.');
-    const comments = await FEED.getFeedComment(feedId);
-    setCommentList(comments);
-  }, [feedInfo]);
-
-  useEffect(() => {
-    if (isOpen && feedInfo) {
-      fetchCommntList();
-      // FEED.getOneFeed(feedInfo?.feedId);
-    }
-  }, [isOpen, fetchCommntList]);
-
   return (
     <Modal
       className="feedModal"
@@ -68,6 +68,13 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
       isOpen={isOpen}
       onRequestClose={handleClose}
     >
+      <button
+        onClick={onClose}
+        className="absolute top-0 right-0 mr-2 text-3xl text-black hover:text-gray-600"
+        aria-label="Close"
+      >
+        &times;
+      </button>
       {feedInfo ? (
         <div className="FLEX-ver h-full">
           <FeedImgCarousel ImageList={feedInfo.images} />
@@ -136,13 +143,6 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
       ) : (
         <p>Loading feed details...</p>
       )}
-      <button
-        onClick={onClose}
-        className="absolute top-0 right-2 text-xl text-black hover:text-gray-600"
-        aria-label="Close"
-      >
-        &times;
-      </button>
     </Modal>
   );
 }

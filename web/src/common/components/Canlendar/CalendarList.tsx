@@ -23,6 +23,10 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   const { groupEventList } = useGroupEventListStore();
   const { setSelectedCalendar } = useSelectedCalendarStore();
 
+  useEffect(() => {
+    CALENDAR.getMyAllCalendar();
+  }, []);
+
   const ChangeCalendar = (calendar: Calendar | 'All') => {
     if (calendar) {
       setSelectedCalendar(calendar);
@@ -68,9 +72,16 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
       className={`SCROLL-hide FLEX-horizC h-fit ${isOpen ? 'w-full' : 'w-0'}`}
       id={isOpen ? 'SLIDEin-left' : 'SLIDEout-left'}
     >
+      <button
+        onClick={onClose}
+        className="absolute top-3 right-2 text-3xl text-black hover:text-gray-600"
+        aria-label="Close"
+      >
+        &times;
+      </button>
       <ul className={`h-fit w-full`}>
         <h2
-          className="p-4 hover:text-custom-main hover:cursor-pointer"
+          className="p-4 w-2/3 hover:text-custom-main hover:cursor-pointer"
           onClick={() => {
             ChangeCalendar('All');
             USER.firstRender();

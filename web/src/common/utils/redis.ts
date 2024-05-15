@@ -15,7 +15,7 @@ interface Data {
 }
 
 async function get(endpoint: string): Promise<AxiosResponse> {
-  console.log(`%c Redis GET 요청 ${Redis_Url + endpoint}`, 'color: #B0C460;');
+  console.log(`%cRedis GET 요청 ${Redis_Url + endpoint}`, 'color: #B0C460;');
 
   return axiosInstance.get(endpoint);
 }

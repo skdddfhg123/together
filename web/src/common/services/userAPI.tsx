@@ -1,4 +1,6 @@
 import { AxiosError } from 'axios';
+
+import sendToast from '@hooks/sendToast';
 import * as API from '@utils/api';
 import * as REDIS from '@services/redisAPI';
 import { Cookie, setCookie, deleteCookie } from '@utils/cookie';
@@ -33,13 +35,14 @@ export async function firstRender() {
   } catch (e) {
     const err = e as AxiosError;
     console.log(`err`, err);
+
     if (err.response?.status === 400) {
       console.error('USER - firstRender 실패 : ', err.response);
-      alert('토큰 정보가 일치하지 않습니다');
+      sendToast('error', '토큰 정보가 일치하지 않습니다');
     } else if (err.response?.data) {
       const data = err.response.data as API.ErrorResponse;
       console.error('USER - firstRender 실패 2 : ', data); //debug//
-      alert(data.message);
+      sendToast('warning', data.message);
     } else {
       console.error('USER - firstRender 실패 3 : ', err);
     }
@@ -64,7 +67,7 @@ export async function signUp(formData: SignUpForm) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error('회원가입 에러', data); //debug//
-      alert(data.message);
+      sendToast('error', data.message);
     }
   }
 }
@@ -120,7 +123,7 @@ export async function logIn(formData: SignInForm) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error('로그인 에러', data); //debug//
-      alert(data.message);
+      sendToast('warning', data.message);
     }
   }
 }
@@ -129,7 +132,7 @@ export async function logIn(formData: SignInForm) {
 export async function logOut() {
   sessionStorage.clear();
   deleteCookie('accessToken');
-  alert('로그아웃 되었습니다.');
+  sendToast('error', '로그아웃 되었습니다.');
 }
 
 export async function joinCalendar(calendarId: string) {
@@ -137,7 +140,7 @@ export async function joinCalendar(calendarId: string) {
     const { data: res } = await API.patch(`/calendar/participate/${calendarId}`);
     if (!res) throw new Error('USER - joinCalendar (DB에서 그룹 캘린터 가입 실패)');
     console.log(`USER - joinCalendar 성공`, res); //debug//
-    alert(`캘린더 가입에 성공했습니다.`);
+    sendToast('success', `캘린더 가입에 성공했습니다.`);
 
     return true;
   } catch (e) {
@@ -145,11 +148,11 @@ export async function joinCalendar(calendarId: string) {
 
     if (err.response?.status === 400) {
       console.error(err.response);
-      alert('토큰 정보가 일치하지 않습니다. 다시 로그인해주세요.');
+      sendToast('warning', '토큰 정보가 일치하지 않습니다. 다시 로그인해주세요.');
     } else {
       const data = err.response?.data as API.ErrorResponse;
       console.error('그룹 캘린더 가입 에러', data); //debug//
-      alert(data?.message);
+      sendToast('warning', data?.message);
     }
   }
 }
@@ -162,11 +165,9 @@ export async function updateThumbnail(thumbnailFormData: FormData) {
 
     const currentUserInfo = useUserInfoStore.getState().userInfo;
     if (currentUserInfo)
-      await useUserInfoStore
-        .getState()
-        .setUserInfo({ ...currentUserInfo, thumbnail: res.thumbnail });
+      useUserInfoStore.getState().setUserInfo({ ...currentUserInfo, thumbnail: res.thumbnail });
 
-    alert(`프로필이 수정되었습니다.`);
+    sendToast('success', `프로필이 수정되었습니다.`);
 
     return true;
   } catch (e) {
@@ -175,7 +176,7 @@ export async function updateThumbnail(thumbnailFormData: FormData) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error('USER - updateThumbnail 실패', data); //debug//
-      alert(data.message);
+      sendToast('warning', data.message);
     }
   }
 }

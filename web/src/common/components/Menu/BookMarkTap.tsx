@@ -11,8 +11,12 @@ export default function BookMarkTap({ onClose }: BookmarpProps) {
     <>
       <header className="rMenu-header">
         <h2>Bookmark</h2>
-        <button className="BTN" onClick={onClose}>
-          Close
+        <button
+          onClick={onClose}
+          className="absolute top-1 right-1 text-3xl text-black hover:text-gray-600"
+          aria-label="Close"
+        >
+          &times;
         </button>
       </header>
     </>

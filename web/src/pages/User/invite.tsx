@@ -3,12 +3,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 
-import SignUp from '@components/User/SignUp';
-import SignIn from '@components/User/SignIn';
+import sendToast from '@hooks/sendToast';
 import useToggle from '@hooks/useToggle';
-
 import * as USER from '@services/userAPI';
 import { SignUpForm, SignInForm } from '@type/index';
+
+import SignUp from '@components/User/SignUp';
+import SignIn from '@components/User/SignIn';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -24,14 +25,14 @@ export default function InvitePage() {
     const res = await USER.logIn(formData);
     if (!res) return;
     if (inviteCode) await USER.joinCalendar(inviteCode);
-    alert('로그인 성공');
+    sendToast('success', '로그인 성공');
     navigate('/main');
   };
 
   const handleSingUp = async (formData: SignUpForm) => {
     const res = await USER.signUp(formData);
     if (!res) return;
-    alert('정상적으로 가입되었습니다! ');
+    sendToast('success', '정상적으로 가입되었습니다! ');
     toggle();
   };
 

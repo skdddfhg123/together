@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Modal from 'react-modal';
 import { UUID } from 'crypto';
 
+import sendToast from '@hooks/sendToast';
 import * as FEED from '@services/eventFeedAPI';
 import { ImageFile, reqEventFeed } from '@type/index';
 import CreateFeedImageList from '@components/Feed/CreateFeed/CreateFeedImgList';
@@ -26,13 +27,9 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
   const submitNewFeed = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!groupEventId) {
-      alert('피드를 등록할 일정을 못찾았습니다. 다시 선택해주세요.');
-      onClose();
-      return;
-    }
+    if (!groupEventId) return sendToast('default', '피드를 등록할 일정을 다시 선택해주세요.');
     const content = contentRef.current?.value;
-    if (!content) return alert('내용을 입력해주세요.');
+    if (!content) return sendToast('default', '내용을 입력해주세요.');
 
     const feedData: reqEventFeed = {
       groupEventId: groupEventId,
@@ -48,7 +45,7 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
 
   const handleImageChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (images.length >= 5) return alert('이미지는 최대 5장까지 선택 가능합니다.');
+      if (images.length >= 5) return sendToast('default', '이미지는 최대 5장까지 선택 가능합니다.');
 
       if (event.target.files && event.target.files.length > 0) {
         const fileArray = Array.from(event.target.files).slice(0, 5 - images.length);
@@ -81,6 +78,13 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
       isOpen={isOpen}
       onRequestClose={handleClose}
     >
+      <button
+        onClick={onClose}
+        className="absolute top-0 right-0 mr-2 text-3xl text-black hover:text-gray-600"
+        aria-label="Close"
+      >
+        &times;
+      </button>
       <form
         className="FLEX-horizC w-full h-full"
         onClick={(e) => e.stopPropagation()}

@@ -5,11 +5,10 @@
     "@typescript-eslint"
   ],
   "extends": [
-    "react-app",
-    "react-app/jest",
-    "plugin:@typescript-eslint/recommended",
+    "prettier",
     "plugin:react/recommended",
-    "plugin:prettier/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
   ],
   "parserOptions": {
     "ecmaVersion": "latest",

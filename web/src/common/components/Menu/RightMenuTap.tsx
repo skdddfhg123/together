@@ -1,12 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Tooltip } from 'react-tooltip';
 
+import { Calendar } from '@type/index';
 import { useSelectedCalendarStore } from '@store/index';
 
 import BookMarkTap from '@components/Menu/BookMarkTap';
 import ChatTap from '@components/Menu/Chat/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
 import CalendarSetTap from '@components/Menu/CalenderSetTap';
+import SyncSocialEvent from '@components/Menu/SyncSocialEvent';
 
 import optionImg from '@assets/r-optrion.png';
 import chatImg from '@assets/r-chat.png';
@@ -18,6 +20,7 @@ type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 export default React.memo(function RightMenuTap() {
   const { selectedCalendar } = useSelectedCalendarStore();
   const [activeTap, setActiveTap] = useState<TapName | null>(null);
+  const prevSelectedCalendarRef = useRef<Calendar | 'All' | null>(null);
 
   const toggleTap = useCallback(
     (tap: TapName) => {
@@ -31,8 +34,15 @@ export default React.memo(function RightMenuTap() {
     [activeTap],
   );
 
+  useEffect(() => {
+    if (prevSelectedCalendarRef.current && prevSelectedCalendarRef.current !== selectedCalendar) {
+      setActiveTap(null);
+    }
+    prevSelectedCalendarRef.current = selectedCalendar;
+  }, [selectedCalendar, setActiveTap]);
+
   return (
-    <div className="FLEX-verC h-full border-l">
+    <div className="FLEX-ver h-full border-l">
       <div className="FLEX-horiz space-y-3">
         <button
           {...(selectedCalendar === 'All' ? { 'data-tooltip-id': 'tool-tip' } : {})}
@@ -40,7 +50,7 @@ export default React.memo(function RightMenuTap() {
           className={`
                     FLEX-verC items-center h-16 w-16 hover:bg-custom-light rounded
                     ${
-                      activeTap === 'bookmark' ? 'bg-custom-main rounded' : ''
+                      activeTap === 'bookmark' ? 'bg-custom-yellow rounded' : ''
                     } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
           onClick={() => toggleTap('bookmark')}
         >
@@ -52,7 +62,7 @@ export default React.memo(function RightMenuTap() {
           className={`
                     FLEX-verC items-center h-16 w-16 hover:bg-custom-light rounded
                     ${
-                      activeTap === 'chat' ? 'bg-custom-main rounded' : ''
+                      activeTap === 'chat' ? 'bg-custom-yellow rounded' : ''
                     } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
           onClick={() => toggleTap('chat')}
         >
@@ -63,7 +73,7 @@ export default React.memo(function RightMenuTap() {
           disabled={selectedCalendar === 'All'}
           className={`FLEX-verC items-center h-16 w-16 hover:bg-custom-light rounded
           ${
-            activeTap === 'member' ? 'bg-custom-main rounded' : ''
+            activeTap === 'member' ? 'bg-custom-yellow rounded' : ''
           } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
           onClick={() => {
             if (selectedCalendar !== 'All') {
@@ -78,7 +88,7 @@ export default React.memo(function RightMenuTap() {
           disabled={selectedCalendar === 'All'}
           className={`FLEX-verC items-center h-16 w-16 hover:bg-custom-light rounded
           ${
-            activeTap === 'calendarSet' ? 'bg-custom-main rounded' : ''
+            activeTap === 'calendarSet' ? 'bg-custom-yellow rounded' : ''
           } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
           onClick={() => {
             if (selectedCalendar !== 'All') {
@@ -88,6 +98,9 @@ export default React.memo(function RightMenuTap() {
         >
           <img className="w-12 mx-auto" src={optionImg} alt="캘린더 설정" />
         </button>
+        <div className="flex-grow flex items-end pb-12">
+          <SyncSocialEvent />
+        </div>
       </div>
       <section
         className={`FLEX-horiz overflow-hidden transition-all duration-300 ${activeTap ? 'w-96 border-l' : 'w-0'}`}

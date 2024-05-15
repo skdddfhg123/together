@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
 import { ImFilePicture } from 'react-icons/im';
 
+import sendToast from '@hooks/sendToast';
 import * as CHAT from '@services/ChatAndEmojiAPI';
 import { Calendar } from '@type/index';
 
@@ -12,17 +13,16 @@ interface TabEmojiUploadProps {
 
 export default function TabEmojiUpload({ selectedCalendar, onClose }: TabEmojiUploadProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState(''); // 파일 이름을 저장할 상태
+  const [fileName, setFileName] = useState('');
   const [emojiName, setEmojiName] = useState('::');
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [isNameValid, setIsNameValid] = useState<boolean | null>(null);
-  const [isValid, setIsValid] = useState(true); // 유효성 검사 결과 상태
+  const [isValid, setIsValid] = useState(true);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const emojiNameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 커서를 콜론 사이에 위치시킵니다.
     const input = emojiNameInputRef.current;
     if (input) {
       input.focus();
@@ -33,10 +33,10 @@ export default function TabEmojiUpload({ selectedCalendar, onClose }: TabEmojiUp
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     setFile(file);
-    setFileName(file ? file.name : ''); // 파일 이름 설정
+    setFileName(file ? file.name : '');
 
     if (file) {
-      setFileName(file.name); // 파일 이름 저장
+      setFileName(file.name);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
@@ -44,14 +44,14 @@ export default function TabEmojiUpload({ selectedCalendar, onClose }: TabEmojiUp
       reader.readAsDataURL(file);
     } else {
       setPreviewUrl('');
-      setFileName(''); // 파일이 없을 때 파일 이름 초기화
+      setFileName('');
     }
   };
 
   const handleEmojiNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
 
-    const modifiedValue = newValue.replace(/:/g, ''); // 모든 콜론을 제거
+    const modifiedValue = newValue.replace(/:/g, '');
     const isValid = /^[a-z_-]+$/.test(modifiedValue);
 
     setEmojiName(`:${modifiedValue}:`);
@@ -66,9 +66,9 @@ export default function TabEmojiUpload({ selectedCalendar, onClose }: TabEmojiUp
   };
 
   const handleUpload = async () => {
-    if (!file) return alert('파일을 선택해 주세요.');
+    if (!file) return sendToast('default', '파일을 선택해 주세요.');
     if (!selectedCalendar || selectedCalendar === 'All')
-      return alert('그룹 캘린더를 선택해주세요.');
+      return sendToast('default', '그룹 캘린더를 선택해주세요.');
 
     const formData = new FormData();
     formData.append('emojiFile', file);
@@ -78,7 +78,6 @@ export default function TabEmojiUpload({ selectedCalendar, onClose }: TabEmojiUp
     onClose();
   };
 
-  // 사용자 지정 버튼을 사용하여 파일을 선택할 수 있도록 합니다.
   const triggerFileSelect = () => fileInputRef.current?.click();
 
   return (

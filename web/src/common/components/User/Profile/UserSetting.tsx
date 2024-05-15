@@ -8,6 +8,7 @@ import { useUserInfoStore } from '@store/index';
 import UpdateThumbnail from '@components/User/Profile/UpdateThumbnail';
 import defaultUserImg from '@assets/default_user.png';
 import '@styles/modalStyle.css';
+import sendToast from '@hooks/sendToast';
 
 export default React.memo(function UserModal() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default React.memo(function UserModal() {
 
   const { userInfo } = useUserInfoStore();
   const [modalOpen, setModalOpen] = useState(false);
+  const [thumbnail, setThumbnail] = useState(defaultUserImg);
 
   const handleToggle = () => {
     setModalOpen(!modalOpen);
@@ -27,20 +29,29 @@ export default React.memo(function UserModal() {
 
   const handleLogOut = async () => {
     await USER.logOut();
-    window.location.replace(`/signin`);
+    window.history.pushState(null, document.title, window.location.href);
+    window.addEventListener('popstate', () => {
+      window.history.pushState(null, document.title, window.location.href);
+    });
+    navigate(`/signin`);
     setModalOpen(false);
+    sendToast('error', '로그아웃 되었습니다.');
   };
 
   useEffect(() => {
-    console.log(`썸네일 변경됨`);
+    if (userInfo?.thumbnail) {
+      setThumbnail(userInfo.thumbnail);
+    } else {
+      setThumbnail(defaultUserImg);
+    }
   }, [userInfo]);
 
   return (
     <div className="relative inline-block">
       <img
-        key={userInfo?.thumbnail}
-        className="w-16 h-16 object-contain p-1 border rounded-full cursor-pointer"
-        src={userInfo?.thumbnail ? userInfo.thumbnail : defaultUserImg}
+        key={thumbnail}
+        className="w-24 h-24 object-contain p-1 border rounded-full cursor-pointer"
+        src={thumbnail}
         onClick={handleToggle}
         alt="user-button"
       />

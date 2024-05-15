@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import { format, parseISO } from 'date-fns';
 
 import useToggle from '@hooks/useToggle';
+import sendToast from '@hooks/sendToast';
 import { useWebSocket } from '@utils/webSocket';
 import { getCookie } from '@utils/cookie';
 import * as CHAT from '@services/ChatAndEmojiAPI';
@@ -32,7 +33,6 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
   const [EmojiList, setEmojiList] = useState<Emoji[]>([]);
   const msgRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLLIElement>(null);
-  const prevSelectedCalendarRef = useRef<Calendar | 'All' | null>(null);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -41,6 +41,11 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
     setImagePreview(emojiSrc);
     setSelectEmoji(emojiSrc);
     closeModal();
+  };
+
+  const cancelEmoji = () => {
+    setSelectEmoji('');
+    setImagePreview('');
   };
 
   //********************? Chatting Socket
@@ -73,7 +78,10 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
       });
     };
 
-    if (selectedCalendar === 'All') return alert('캘린더를 선택해주세요.');
+    if (selectedCalendar === 'All') {
+      sendToast('default', '채팅을 연결할 그룹 캘린더를 선택해주세요.');
+      return;
+    }
     socket?.emit('enterChatRoom', selectedCalendar.calendarId);
 
     socket?.on('getMessage', messageListener);
@@ -81,7 +89,7 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
     return () => {
       socket?.off('getMessage', messageListener);
     };
-  }, [socket]);
+  }, [socket, selectedCalendar]);
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -133,7 +141,10 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
   // **********************? 이모지 받아오기
   const fetchGroupEmoji = useCallback(async () => {
     try {
-      if (selectedCalendar === 'All') return alert('캘린더를 선택해주세요.');
+      if (selectedCalendar === 'All') {
+        sendToast('default', '채팅을 연결할 그룹 캘린더를 선택해주세요.');
+        return;
+      }
       const res = await CHAT.fetchEmojiList(selectedCalendar.calendarId);
       setEmojiList(res);
     } catch (error) {
@@ -145,16 +156,15 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
     fetchGroupEmoji();
   }, [selectedCalendar, fetchGroupEmoji]);
 
-  useEffect(() => {
-    if (prevSelectedCalendarRef.current && prevSelectedCalendarRef.current !== selectedCalendar) {
-      onClose();
-      setMessages([]);
-    }
-    prevSelectedCalendarRef.current = selectedCalendar;
-  }, [selectedCalendar, onClose]);
-
   return (
-    <div className="relative-height">
+    <div>
+      <button
+        onClick={onClose}
+        className="absolute top-1 right-1 text-3xl text-black hover:text-gray-600"
+        aria-label="Close"
+      >
+        &times;
+      </button>
       {groupedMessages && Object.keys(groupedMessages).length > 0 ? (
         <ul className="overflow-container">
           {Object.keys(groupedMessages).map((date) => (
@@ -182,7 +192,13 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
                           <div className="content-container">
                             <div className={`message-content ${isCurrentUser ? 'right' : 'left'}`}>
                               {msg.message}
-                              {msg.image && <img className="message-image" src={msg.image} />}
+                              {msg.image && (
+                                <img
+                                  className="message-image"
+                                  src={msg.image}
+                                  alt="메세지 이미지"
+                                />
+                              )}
                             </div>
                             <p className="message-bubble"></p>
                           </div>
@@ -195,7 +211,13 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
                           <div className="content-container">
                             <p className="message-bubble"></p>
                             <div className={`message-content ${isCurrentUser ? 'right' : 'left'}`}>
-                              {msg.image && <img className="message-image" src={msg.image} />}
+                              {msg.image && (
+                                <img
+                                  className="message-image"
+                                  src={msg.image}
+                                  alt="메세지 이미지"
+                                />
+                              )}
                               {msg.message}
                             </div>
                           </div>
@@ -214,14 +236,16 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
           <li ref={messagesEndRef} />
         </ul>
       ) : (
-        <div className="no-messages">채팅 기록이 없습니다</div>
+        <>
+          <div className="overflow-container">채팅 기록이 없습니다</div>
+        </>
       )}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
         contentLabel="이모지 선택"
-        className="emoji-modal"
-        overlayClassName="emoji-overlay"
+        className="emojiModal"
+        overlayClassName="emojiOverlay"
       >
         <div className="emoji-container">
           {EmojiList.map((emoji) => (
@@ -234,18 +258,22 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
             />
           ))}
         </div>
-        <div className="button-container">
-          <button className="button-style" onClick={closeModal}>
+        <div className="FLEX-verC space-x-4 mt-2">
+          <button className="BTN rounded hover:bg-custom-light" onClick={closeModal}>
             닫기
           </button>
-          <button className="button-style" onClick={toggle}>
+          <button className="BTN rounded hover:bg-custom-light" onClick={toggle}>
             이모지 만들기
           </button>
         </div>
       </Modal>
       <form onSubmit={sendMessage} className="form-container">
         {imagePreview && (
-          <div className="image-preview">
+          <div
+            className="image-preview transition-all duration-300 ease-in-out
+            hover:object-contain hover:w-48 hover:h-48"
+            onClick={cancelEmoji}
+          >
             <img className="preview-image" src={imagePreview} alt="Preview" />
           </div>
         )}

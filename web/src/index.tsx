@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import { ToastContainer } from 'react-toastify';
 import ReactDOM from 'react-dom/client';
 import Modal from 'react-modal';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -24,6 +25,30 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
+    <ToastContainer
+      containerId="calendarAlert"
+      className="calendarAlert"
+      position="top-center"
+      limit={5}
+      pauseOnHover={false}
+      closeButton={true}
+      autoClose={3000}
+      theme="colored"
+      stacked
+      hideProgressBar
+    />
+    <ToastContainer
+      containerId="memberAlert"
+      className="memberAlert"
+      position="bottom-right"
+      limit={5}
+      pauseOnHover={false}
+      closeButton={true}
+      autoClose={5000}
+      theme="colored"
+      stacked
+      hideProgressBar
+    />
     {/* <QueryProvider> */}
     {/* <Suspense fallback={<Loading />}> */}
     <RouterProvider router={router} />

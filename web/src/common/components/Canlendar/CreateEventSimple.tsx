@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import * as CALENDAR from '@services/calendarAPI';
 import * as REDIS from '@services/redisAPI';
 import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
+import sendToast from '@hooks/sendToast';
 
 import { Calendar, reqEvent } from '@type/index';
 import { useUserInfoStore } from '@store/index';
@@ -25,19 +26,19 @@ interface EventModalProps {
 }
 
 const colors = [
-  { code: '#90CAF9', name: '딥 스카이 블루' }, // 더 연한 파란색
-  { code: '#A5D6A7', name: '에메랄드 그린' }, // 더 연한 녹색
-  { code: '#80DEEA', name: '모던 사이언' }, // 더 연한 시안색
-  { code: '#FFE082', name: '앰버 옐로우' }, // 더 연한 황금색
-  { code: '#EEEEEE', name: '그레이' }, // 더 연한 회색
-  { code: '#FFCCBC', name: '코랄 핑크' }, // 더 연한 코랄색
-  { code: '#F8BBD0', name: '프렌치 로즈' }, // 더 연한 분홍색
-  { code: '#D1C4E9', name: '소프트 바이올렛' }, // 더 연한 보라색
-  { code: '#FFCDD2', name: '애플 레드' }, // 더 연한 빨간색
-  { code: '#9FA8DA', name: '인디고 블루' }, // 더 연한 인디고색
+  { code: '#90CAF9', name: '딥 스카이 블루' },
+  { code: '#A5D6A7', name: '에메랄드 그린' },
+  { code: '#80DEEA', name: '모던 사이언' },
+  { code: '#FFE082', name: '앰버 옐로우' },
+  { code: '#EEEEEE', name: '그레이' },
+  { code: '#FFCCBC', name: '코랄 핑크' },
+  { code: '#F8BBD0', name: '프렌치 로즈' },
+  { code: '#D1C4E9', name: '소프트 바이올렛' },
+  { code: '#FFCDD2', name: '애플 레드' },
+  { code: '#9FA8DA', name: '인디고 블루' },
 ];
 
-const initialColor = colors.find((color) => color.code === '#1E90FF') || colors[0];
+const initialColor = colors.find((color) => color.code === '#90CAF9') || colors[0];
 
 export default React.memo(function CreateEventSimple({
   selectedCalendar,
@@ -79,12 +80,12 @@ export default React.memo(function CreateEventSimple({
 
       const title = titleRef.current?.value.trim();
 
-      if (!title) return alert('일정 제목이 비어있습니다.');
-      if (!selectedDay) return alert('선택된 날이 없습니다.');
-      if (!userInfo) return alert('유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
+      if (!title) return sendToast('default', '일정 제목이 비어있습니다.');
+      if (!userInfo) return sendToast('default', '유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
+      if (!selectedDay) return sendToast('default', '선택된 날이 없습니다.');
       if (selectedCalendar === 'All') {
         onClose();
-        return alert('일정을 등록할 그룹 캘린더를 선택해주세요.');
+        return sendToast('default', '일정을 등록할 그룹 캘린더를 선택해주세요.');
       }
 
       const eventData: reqEvent = {
@@ -99,7 +100,7 @@ export default React.memo(function CreateEventSimple({
       const res = await CALENDAR.createGroupSimpleEvent(eventData);
       if (res) {
         await CALENDAR.getGroupAllEvents(selectedCalendar);
-        await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정 등록` });
+        await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정을 등록` });
       }
       setTitle('');
       onClose();
@@ -139,21 +140,23 @@ export default React.memo(function CreateEventSimple({
             <IconButton style={{ color: color.code }} onClick={handleDetailOpen}>
               <MoreVertIcon />
             </IconButton>
-            <ColorPicker visible={showColorPicker}>
-              {colors.map((colorOption) => (
-                <ColorOption key={colorOption.code} color={colorOption.code}>
-                  <ColorSwatch color={colorOption.code} />
-                  <ColorName color={colorOption.code}>{colorOption.name}</ColorName>
-                  <ColorRadio
-                    type="radio"
-                    name="color"
-                    value={colorOption.code}
-                    checked={color.code === colorOption.code}
-                    onChange={() => handleColorSelect(colorOption)}
-                  />
-                </ColorOption>
-              ))}
-            </ColorPicker>
+            {showColorPicker && (
+              <ColorPicker>
+                {colors.map((colorOption) => (
+                  <ColorOption key={colorOption.code} color={colorOption.code}>
+                    <ColorSwatch color={colorOption.code} />
+                    <ColorName color={colorOption.code}>{colorOption.name}</ColorName>
+                    <ColorRadio
+                      type="radio"
+                      name="color"
+                      value={colorOption.code}
+                      checked={color.code === colorOption.code}
+                      onChange={() => handleColorSelect(colorOption)}
+                    />
+                  </ColorOption>
+                ))}
+              </ColorPicker>
+            )}
           </div>
         </form>
       </Modal>
@@ -185,8 +188,8 @@ const Input = styled.input<{ color: string }>`
   }
 `;
 
-const ColorPicker = styled.div<{ visible: boolean }>`
-  display: ${(props) => (props.visible ? 'block' : 'none')};
+const ColorPicker = styled.div`
+  display: block;
   position: absolute;
   top: 40px;
   left: 0;

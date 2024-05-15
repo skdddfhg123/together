@@ -5,9 +5,15 @@
 /*?font-import : hahmlet */
 @import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@100..900&display=swap');
 
+/*?font-import : Dongle*/
+@import url('https://fonts.googleapis.com/css2?family=Dongle&display=swap');
+
+/*?font-import : Jua*/
+@import url('https://fonts.googleapis.com/css2?family=Dongle&family=Jua&display=swap');
+
 body {
   margin: 0;
-  font-family: 'Hahmlet', 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Hahmlet', 'Jua', 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
