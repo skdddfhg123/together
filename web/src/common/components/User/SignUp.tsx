@@ -65,11 +65,9 @@ export default function SignUp({ onSubmit }: SignUpProps) {
   };
 
   return (
-    <form className="FLEX-horizC h-5/6" ref={formRef}>
-      <fieldset className="FLEX-horizC h-5/6">
-        <label className="w-full mb-2" htmlFor="email">
-          EMAIL
-        </label>
+    <form className="flex flex-col justify-between w-160 h-128" ref={formRef}>
+      <fieldset className="FLEX-horiz text-xl">
+        <label htmlFor="email">EMAIL</label>
         <input
           className={`SIGN-input ${emailValid ? '' : 'border-red-500 focus:border-red-500'}`}
           id="useremail"
@@ -83,9 +81,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           required
         />
         <div className="FLEX-verC h-10">{emailValid ? '' : '유효하지 않은 이메일 형식입니다.'}</div>
-        <label className="w-full mb-2" htmlFor="nickname">
-          NICKNAME
-        </label>
+        <label htmlFor="nickname">NICKNAME</label>
         <input
           className={`SIGN-input ${nicknameValid ? '' : 'border-red-500 focus:border-red-500'}`}
           id="nickname"
@@ -99,9 +95,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           required
         />
         <div className="FLEX-verC h-10">{nicknameValid ? '' : '10글자 이하로 입력해주세요.'}</div>
-        <label className="w-full mb-2" htmlFor="password">
-          PASSWORD
-        </label>
+        <label htmlFor="password">PASSWORD</label>
         <input
           className={`SIGN-input ${passwordValid ? '' : 'border-red-500 focus:border-red-500'}`}
           id="password"
@@ -113,9 +107,7 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           required
         />
         <div className="FLEX-verC h-10">{passwordValid ? '' : '4글자 이상 입력해주세요.'}</div>
-        <label className="w-full mb-2" htmlFor="confirmPassword">
-          CONFIRM PASSWORD
-        </label>
+        <label htmlFor="confirmPassword">CONFIRM PASSWORD</label>
         <input
           className={`SIGN-input ${passwordsMatch ? '' : 'border-red-500 focus:border-red-500'}`}
           id="confirmPassword"
@@ -130,7 +122,13 @@ export default function SignUp({ onSubmit }: SignUpProps) {
           {passwordsMatch ? '' : '비밀번호가 서로 일치하지 않습니다.'}
         </div>
       </fieldset>
-      <button onClick={handleSubmit}>회원가입</button>
+      <button
+        className="BTN w-40 mx-auto rounded-2xl text-2xl
+        ANIMATION hover:bg-custom-light hover:scale-150"
+        onClick={handleSubmit}
+      >
+        회원가입
+      </button>
     </form>
   );
 }

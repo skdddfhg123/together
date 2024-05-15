@@ -4,10 +4,9 @@ import { Tooltip } from 'react-tooltip';
 import { Calendar } from '@type/index';
 import { useSelectedCalendarStore } from '@store/index';
 
-import BookMarkTap from '@components/Menu/BookMarkTap';
 import ChatTap from '@components/Menu/Chat/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
-import CalendarSetTap from '@components/Menu/CalenderSetTap';
+import CalendarSetTap from '@components/Menu/CalendarSet/CalenderSetTap';
 import SyncSocialEvent from '@components/Menu/SyncSocialEvent';
 
 import optionImg from '@assets/r-optrion.png';

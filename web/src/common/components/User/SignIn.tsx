@@ -33,11 +33,9 @@ export default function SignIn({ onSubmit }: SignInProps) {
     formRef.current?.reset();
   };
   return (
-    <form className="FLEX-horizC h-5/6" ref={formRef}>
-      <fieldset className="FLEX-horizC h-5/6">
-        <label className="w-full mb-2" htmlFor="email">
-          EMAIL
-        </label>
+    <form className="flex flex-col justify-between w-160 h-128" ref={formRef}>
+      <fieldset className="FLEX-horiz text-xl">
+        <label htmlFor="email">EMAIL</label>
         <input
           className="SIGN-input mb-10"
           id="email"
@@ -47,9 +45,7 @@ export default function SignIn({ onSubmit }: SignInProps) {
           autoComplete="off"
           required
         />
-        <label className="w-full mb-2 " htmlFor="password">
-          PASSWORD
-        </label>
+        <label htmlFor="password">PASSWORD</label>
         <input
           className="SIGN-input mb-10"
           id="password"
@@ -59,7 +55,13 @@ export default function SignIn({ onSubmit }: SignInProps) {
           required
         />
       </fieldset>
-      <button onClick={handleSubmit}>로그인</button>
+      <button
+        className="BTN w-40 mx-auto rounded-2xl text-2xl
+        ANIMATION hover:bg-custom-light hover:scale-150"
+        onClick={handleSubmit}
+      >
+        로그인
+      </button>
     </form>
   );
 }

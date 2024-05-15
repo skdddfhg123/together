@@ -9,6 +9,8 @@ import { SignUpForm, SignInForm } from '@type/index';
 import SignUp from '@components/User/SignUp';
 import SignIn from '@components/User/SignIn';
 
+import logoImg from '@assets/toogether_noBG.png';
+
 export default function LogInPage() {
   const navigate = useNavigate();
   const { isOn, toggle } = useToggle(false);
@@ -28,14 +30,23 @@ export default function LogInPage() {
   };
 
   return (
-    <div className="FLEX-horizC h-full w-3/5 mx-auto">
-      <h1 className="my-20 text-6xl text-custom-main text-shadow-blue">Tooghter</h1>
-      <section>
-        <button id="singin" onClick={toggle}>
+    <div className="FLEX-horiz h-lvh w-3/5 mx-auto">
+      {logoImg ? (
+        <img className="my-10" src={logoImg} alt="Main Logo" />
+      ) : (
+        <h1 className="my-20 text-6xl text-custom-main text-shadow-blue">Tooghter</h1>
+      )}
+      <section className="flex flex-col items-center h-full space-y-4">
+        <button
+          id="singin"
+          className="BTN w-40 mx-auto rounded-2xl text-2xl hover:scale-150
+            ANIMATION hover:bg-custom-main hover:text-white"
+          onClick={toggle}
+        >
           {isOn ? '로그인으로' : '회원가입으로'}
         </button>
+        {isOn ? <SignUp onSubmit={submitSignUp} /> : <SignIn onSubmit={submitSignIn} />}
       </section>
-      {isOn ? <SignUp onSubmit={submitSignUp} /> : <SignIn onSubmit={submitSignIn} />}
     </div>
   );
 }

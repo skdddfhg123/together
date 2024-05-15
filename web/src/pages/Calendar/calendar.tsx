@@ -5,6 +5,7 @@ import { toZonedTime } from 'date-fns-tz';
 import { UUID } from 'crypto';
 
 import { hexToRgba } from '@hooks/useHexToRgba';
+import sendToast from '@hooks/useToast';
 
 import { AllEvent } from '@type/index';
 import {
@@ -21,7 +22,8 @@ import CreateEventModal from '@components/Canlendar/CreateEventSimple';
 import EventDetails from '@components/Canlendar/EventDetails/EventDetails';
 import GroupMemberEvent from '@components/Canlendar/GroupMemberEvent';
 import '@styles/calendar.css';
-import sendToast from '@hooks/useToast';
+
+import kakaoImg from '@assets/KakaoTalk.png';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -163,7 +165,7 @@ export default React.memo(function CalendarPage({
             }`}
             key={existingEvents.length}
           >
-            {event.social}
+            {event.social === 'kakao' && <img id="kakaoImg" src={kakaoImg} alt="Kakao Event" />}
           </li>,
         );
         eventMap.set(eventDate, existingEvents);
@@ -224,11 +226,13 @@ export default React.memo(function CalendarPage({
           <div className="dayBox">
             <span className="day">{day.getDate()}</span>
             <span className="GroupMember-Box">
-              <GroupMemberEvent
-                selectedCalendar={selectedCalendar}
-                MemberEventList={MemberEventList}
-                localDayKey={localDayKey}
-              />
+              {selectedCalendar !== 'All' && (
+                <GroupMemberEvent
+                  selectedCalendar={selectedCalendar}
+                  MemberEventList={MemberEventList}
+                  localDayKey={localDayKey}
+                />
+              )}
             </span>
           </div>
           <ul className="SCROLL-hide" id="event-box">
