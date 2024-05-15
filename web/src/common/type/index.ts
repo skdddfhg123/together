@@ -46,6 +46,7 @@ export type Calendar = {
   bannerImage?: ImageFile;
   type: string; // Color
   attendees: Member[]; // 객체
+  createdAt: string;
 };
 
 // ************************** 이벤트 (일정)

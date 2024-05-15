@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as EMOJI from '@services/ChatAndEmojiAPI';
 import { Calendar, Emoji } from '@type/index';
 
-import EmojiDetailModal from '@components/Menu/Chat/CreateEmoji/EmojiDetailModal';
+import EmojiDetailModal from '@components/Menu/Emoji/EmojiDetailModal';
 
 interface TabEmojiListProps {
   selectedCalendar: Calendar | 'All';

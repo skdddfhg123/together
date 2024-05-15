@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as KAKAO from '@services/KakaoAPI';
 import * as CALENDAR from '@services/calendarAPI';
 import * as REDIS from '@services/redisAPI';

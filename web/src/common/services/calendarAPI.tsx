@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 import { format } from 'date-fns';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as API from '@utils/api';
 
 import {
@@ -27,8 +27,12 @@ export async function getMyAllCalendar() {
 
   try {
     const { data: res } = await API.get(`/calendar/get_calendar/v2`);
-    if (!res) throw new Error('CALENDAR - getAllCalendar (db 조회 실패)');
-    console.log('CALENDAR - getAllCalendar 성공 :', res); //debug//
+    if (!res) throw new Error('CALENDAR - getMyAllCalendar (db 조회 실패)');
+    console.log('CALENDAR - getMyAllCalendar 성공 :', res); //debug//
+
+    res.sort((a: Calendar, b: Calendar) => {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
 
     useCalendarListStore.getState().setCalendarList(res);
     res.forEach((data: Calendar, idx: number) => {
@@ -43,7 +47,7 @@ export async function getMyAllCalendar() {
 
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - getAllCalendar 실패 :`, data); //debug//
+      console.error(`CALENDAR - getMyAllCalendar 실패 :`, data); //debug//
       sendToast('warning', data.message);
     }
   }

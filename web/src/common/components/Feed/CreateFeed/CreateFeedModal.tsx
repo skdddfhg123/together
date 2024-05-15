@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Modal from 'react-modal';
 import { UUID } from 'crypto';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as FEED from '@services/eventFeedAPI';
 import { ImageFile, reqEventFeed } from '@type/index';
 import CreateFeedImageList from '@components/Feed/CreateFeed/CreateFeedImgList';

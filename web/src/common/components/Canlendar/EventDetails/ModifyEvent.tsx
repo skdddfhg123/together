@@ -3,7 +3,7 @@ import { HexColorPicker } from 'react-colorful';
 import { UUID } from 'crypto';
 import debounce from 'lodash.debounce';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import { GroupEvent, Member } from '@type/index';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 

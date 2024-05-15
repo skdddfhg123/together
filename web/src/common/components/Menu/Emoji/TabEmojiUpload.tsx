@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
 import { ImFilePicture } from 'react-icons/im';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as CHAT from '@services/ChatAndEmojiAPI';
 import { Calendar } from '@type/index';
 
@@ -118,7 +118,9 @@ export default function TabEmojiUpload({ selectedCalendar, onClose }: TabEmojiUp
                 className="hidden"
               />
               <button
-                className="px-4 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 transition duration-150 ease-in-out font-bold"
+                className="px-4 py-2 border border-gray-300 text-gray-700 bg-white 
+                hover:bg-gray-50 rounded-md shadow-sm focus:outline-none font-bold
+                ANI-short focus:ring-2 focus:ring-offset-2 focus:ring-blue-300"
                 onClick={triggerFileSelect}
               >
                 이미지 업로드
@@ -158,13 +160,15 @@ export default function TabEmojiUpload({ selectedCalendar, onClose }: TabEmojiUp
         </div>
         <div className="flex justify-end mt-12">
           <button
-            className="font-bold px-7 py-1 border ml-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 transition duration-150 ease-in-out"
+            className="font-bold px-7 py-1 border ml-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md shadow-sm 
+            ANI-short focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300"
             onClick={onClose}
           >
             취소
           </button>
           <button
-            className={`font-bold px-7 py-1 border ml-2 border-gray-300 text-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 transition duration-150 ease-in-out ${
+            className={`font-bold px-7 py-1 border ml-2 border-gray-300 text-gray-700 rounded-md shadow-sm 
+            ANI-short focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300 ${
               fileName && emojiName
                 ? 'bg-custom-light hover:bg-custom-main text-black hover:text-white'
                 : 'bg-gray-300 hover:bg-gray-400 cursor-not-allowed'

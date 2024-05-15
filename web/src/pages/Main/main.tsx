@@ -18,18 +18,25 @@ import logoImg from '@assets/toogether_noBG.png';
 import menuImg from '@assets/calendar_menu.webp';
 
 import '@styles/main.css';
+import FeedPage from '@pages/Feed/feed';
 
 const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_ALERT_SOCKET_PORT}`;
 
 export default function MainPage() {
   const navigate = useNavigate();
   const { isOn, toggle } = useToggle(false);
+  const [toggleFeed, setToggleFeed] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   const RendarUserAndCalendar = useCallback(async () => {
     const res = await USER.firstRender();
     if (!res) navigate('/signin');
   }, [navigate]);
+
+  const switchingFeedAndCalendar = useCallback(() => {
+    if (toggleFeed) setToggleFeed(false);
+    else setToggleFeed(true);
+  }, [toggleFeed]);
 
   const prevCalendar = (): void => {
     setCurrentMonth(
@@ -93,13 +100,24 @@ export default function MainPage() {
       <main id="mainSection">
         <aside
           id={`${isOn ? 'SLIDEin-left' : 'SLIDEout-left'}`}
-          className={`FLEX-horiz h-full transition-all duration-300 ${isOn ? 'w-128' : 'w-0'}`}
+          className={`FLEX-horiz h-full ANIMATION ${isOn ? 'w-114' : 'w-0'}`}
         >
           {isOn && <CalendarList isOpen={isOn} onClose={toggle} />}
         </aside>
-        <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
+        {toggleFeed ? (
+          <FeedPage
+            isPrevMonth
+            isNextMonth
+            currentMonth={currentMonth}
+            onClose={switchingFeedAndCalendar}
+          />
+        ) : (
+          <>
+            <Calendar isPrevMonth isNextMonth currentMonth={currentMonth} />
+          </>
+        )}
         <aside id="right-sideBar">
-          <RightMenuTap />
+          <RightMenuTap switchMain={switchingFeedAndCalendar} />
         </aside>
       </main>
     </>

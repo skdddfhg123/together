@@ -6,28 +6,28 @@
   align-items: center;
 }
 
-table {
+#Table {
   width: 100%;
   height: 100%;
 
   border-collapse: collapse;
 }
 
-thead {
+#Thead {
   height: 3rem;
 
   line-height: 3rem;
 }
 
 
-tr {
+#Tr {
   height: calc(100% / 5);
 
   display: flex;
   justify-content: space-around;
 }
 
-td {
+#Td {
   width: calc(100% / 7);
   height: 100%;
   

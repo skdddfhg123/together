@@ -41,11 +41,11 @@ export default React.memo(function FeedImgCarousel({ ImageList }: FeedImgCarouse
           data-tooltip-place="bottom-start"
           className={`
           absolute top-1/2 -translate-y-1/2 left-4 z-10 p-2 
-          bg-gray-100 text-gray-500
+          rounded-full text-xl font-black bg-gray-100 text-gray-500
           ${
             currIndex === 0
               ? 'cursor-not-allowed'
-              : 'hover:scale-150 hover:text-custom-main transition duration-300 ease-in-out'
+              : 'ANIMATION hover:scale-150 hover:text-custom-main'
           }`}
           onClick={() => handleSwipe(-1)}
         >
@@ -58,12 +58,12 @@ export default React.memo(function FeedImgCarousel({ ImageList }: FeedImgCarouse
           data-tooltip-place="bottom-end"
           className={`
           absolute top-1/2 -translate-y-1/2 right-4 z-10 p-2 
-          bg-gray-100 text-gray-500
+          rounded-full text-xl font-black bg-gray-100 text-gray-500
           
           ${
             currIndex + 1 === ImageList?.length
               ? 'cursor-not-allowed'
-              : 'hover:scale-150 hover:text-custom-main transition duration-300 ease-in-out'
+              : 'ANIMATION hover:scale-150 hover:text-custom-main'
           }`}
           onClick={() => handleSwipe(1)}
         >

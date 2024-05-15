@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import Cropper, { ReactCropperElement } from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as USER from '@services/userAPI';
 import * as CALENDAR from '@services/calendarAPI';
 import { Image, UserInfo } from '@type/index';

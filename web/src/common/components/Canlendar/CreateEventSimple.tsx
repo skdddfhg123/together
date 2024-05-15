@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import * as CALENDAR from '@services/calendarAPI';
 import * as REDIS from '@services/redisAPI';
 import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 
 import { Calendar, reqEvent } from '@type/index';
 import { useUserInfoStore } from '@store/index';

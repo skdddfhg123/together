@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as API from '@utils/api';
 import * as REDIS from '@services/redisAPI';
 import { Cookie, setCookie, deleteCookie } from '@utils/cookie';
@@ -45,6 +45,7 @@ export async function firstRender() {
       sendToast('warning', data.message);
     } else {
       console.error('USER - firstRender 실패 3 : ', err);
+      sendToast('error', '서버가 닫혀있습니다.');
     }
   }
 }

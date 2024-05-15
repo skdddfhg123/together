@@ -21,7 +21,7 @@ import CreateEventModal from '@components/Canlendar/CreateEventSimple';
 import EventDetails from '@components/Canlendar/EventDetails/EventDetails';
 import GroupMemberEvent from '@components/Canlendar/GroupMemberEvent';
 import '@styles/calendar.css';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -194,7 +194,7 @@ export default React.memo(function CalendarPage({
 
       if (day.getMonth() < currentMonth.getMonth()) {
         return (
-          <td key={i} className="prevMonthDay">
+          <td id="Td" key={i} className="prevMonthDay">
             <div>{isPrevMonth ? day.getDate() : ''}</div>
             <ul className="SCROLL-hide" id="event-box">
               {eventElements}
@@ -204,7 +204,7 @@ export default React.memo(function CalendarPage({
       }
       if (day.getMonth() > currentMonth.getMonth()) {
         return (
-          <td key={i} className="nextMonthDay">
+          <td id="Td" key={i} className="nextMonthDay">
             <div>{isNextMonth ? day.getDate() : ''}</div>
             <ul className="SCROLL-hide" id="event-box">
               {eventElements}
@@ -220,7 +220,7 @@ export default React.memo(function CalendarPage({
       if (selectedDay && isSameDay(day, selectedDay)) dayClasses += ' choiceDay';
 
       return (
-        <td key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
+        <td id="Td" key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
           <div className="dayBox">
             <span className="day">{day.getDate()}</span>
             <span className="GroupMember-Box">
@@ -261,9 +261,9 @@ export default React.memo(function CalendarPage({
 
   return (
     <div className="calendar">
-      <table>
-        <thead>
-          <tr>
+      <table id="Table">
+        <thead id="Thead">
+          <tr id="Tr">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
               <th className={`Day= day-${idx}`} key={day}>
                 {day}
@@ -273,7 +273,9 @@ export default React.memo(function CalendarPage({
         </thead>
         <tbody>
           {calendarRows.map((row: JSX.Element[], i: number) => (
-            <tr key={i}>{row}</tr>
+            <tr id="Tr" key={i}>
+              {row}
+            </tr>
           ))}
         </tbody>
       </table>

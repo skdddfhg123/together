@@ -1,9 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { Routes } from './types';
 
-import Main from '@pages/main/main';
+import Main from '@pages/Main/main';
 import LogIn from '@pages/User/logIn';
-import Test from '@pages/main/test';
+import Test from '@pages/Main/test';
 import UserInfo from '@pages/User/userInfo';
 import ConnectionPage from '@pages/User/connection';
 import CreateGroupPage from '@pages/Calendar/createGroup';

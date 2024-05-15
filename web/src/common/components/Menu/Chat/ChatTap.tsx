@@ -3,14 +3,14 @@ import Modal from 'react-modal';
 import { format, parseISO } from 'date-fns';
 
 import useToggle from '@hooks/useToggle';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import { useWebSocket } from '@utils/webSocket';
 import { getCookie } from '@utils/cookie';
 import * as CHAT from '@services/ChatAndEmojiAPI';
 import { useUserInfoStore } from '@store/index';
 import { Calendar, ChatList, Emoji, Image, Message } from '@type/index';
 
-import CreateEmojiModal from '@components/Menu/Chat/CreateEmoji/CreateEmojiModal';
+import CreateEmojiModal from '@components/Menu/Emoji/CreateEmojiModal';
 
 import default_user from '@assets/default_user.png';
 import '@styles/modalStyle.css';
@@ -270,8 +270,7 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
       <form onSubmit={sendMessage} className="form-container">
         {imagePreview && (
           <div
-            className="image-preview transition-all duration-300 ease-in-out
-            hover:object-contain hover:w-48 hover:h-48"
+            className="image-preview ANIMATION hover:object-contain hover:w-48 hover:h-48"
             onClick={cancelEmoji}
           >
             <img className="preview-image" src={imagePreview} alt="Preview" />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelectedCalendarStore } from '@store/index';
 import useToggle from '@hooks/useToggle';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 
 export default function InviteLinkGenerator() {
   const { isOn, toggle } = useToggle(false);

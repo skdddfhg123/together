@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 
 type method = 'error' | 'warning' | 'success' | 'default';
 
-export default function sendToast(method: method, message: string) {
+export default function useToast(method: method, message: string) {
   const toastMessage = <div style={{ fontFamily: 'Jua' }}>{message}</div>;
 
   if (method === 'error') {

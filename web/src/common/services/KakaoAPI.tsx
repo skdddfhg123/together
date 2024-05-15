@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as API from '@utils/api';
 import { Cookie, setCookie, getCookie, deleteCookie } from '@utils/cookie';
 

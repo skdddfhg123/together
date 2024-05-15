@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useToggle from '@hooks/useToggle';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as USER from '@services/userAPI';
 import { SignUpForm, SignInForm } from '@type/index';
 

@@ -1,5 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import { getCookie } from '@utils/cookie';
 import { navigateToSignin } from './navigation';
 

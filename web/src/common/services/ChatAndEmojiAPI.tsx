@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as API from '@utils/api';
 import { reqEmoji } from '@type/index';
 

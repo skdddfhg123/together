@@ -7,7 +7,7 @@ import * as USER from '@services/userAPI';
 import { Calendar, GroupEvent } from '@type/index';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 import useToggle from '@hooks/useToggle';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 
 import ViewEvent from '@components/Canlendar/EventDetails/ViewEvent';
 import ModifyEvent from '@components/Canlendar/EventDetails/ModifyEvent';

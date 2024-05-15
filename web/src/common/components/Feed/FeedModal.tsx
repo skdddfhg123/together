@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as FEED from '@services/eventFeedAPI';
 
 import { Comment, EventFeed } from '@type/index';

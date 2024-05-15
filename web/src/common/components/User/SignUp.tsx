@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 
 interface SignUpProps {
   onSubmit: (formData: SignUpForm) => void;

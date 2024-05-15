@@ -17,7 +17,11 @@ import feedImg from '@assets/r-feed.png';
 
 type TapName = 'bookmark' | 'chat' | 'member' | 'calendarSet';
 
-export default React.memo(function RightMenuTap() {
+interface RightMenuTapProps {
+  switchMain: () => void;
+}
+
+export default React.memo(function RightMenuTap({ switchMain }: RightMenuTapProps) {
   const { selectedCalendar } = useSelectedCalendarStore();
   const [activeTap, setActiveTap] = useState<TapName | null>(null);
   const prevSelectedCalendarRef = useRef<Calendar | 'All' | null>(null);
@@ -52,7 +56,7 @@ export default React.memo(function RightMenuTap() {
                     ${
                       activeTap === 'bookmark' ? 'bg-custom-yellow rounded' : ''
                     } ${selectedCalendar === 'All' ? 'hover:bg-red-300 cursor-not-allowed' : ''} py-4`}
-          onClick={() => toggleTap('bookmark')}
+          onClick={switchMain}
         >
           <img className="w-12" src={feedImg} alt="피드 전체" />
         </button>
@@ -103,11 +107,11 @@ export default React.memo(function RightMenuTap() {
         </div>
       </div>
       <section
-        className={`FLEX-horiz overflow-hidden transition-all duration-300 ${activeTap ? 'w-96 border-l' : 'w-0'}`}
+        className={`FLEX-horiz ANIMATION overflow-hidden ${activeTap ? 'w-96 border-l' : 'w-0'}`}
       >
-        <div id={`${activeTap === 'bookmark' ? 'SLIDEin-right' : 'SLIDEout-right'}`}>
-          {activeTap === 'bookmark' && <BookMarkTap onClose={() => setActiveTap(null)} />}
-        </div>
+        {/* <div id={`${activeTap === 'bookmark' ? 'SLIDEin-right' : 'SLIDEout-right'}`}>
+          {activeTap === 'bookmark' && <BookMarkTap onClose={switchMain} />}
+        </div> */}
         <div id={activeTap === 'chat' ? 'SLIDEchatIn-right' : 'SLIDEchatOut-right'}>
           {activeTap === 'chat' && (
             <ChatTap selectedCalendar={selectedCalendar} onClose={() => setActiveTap(null)} />

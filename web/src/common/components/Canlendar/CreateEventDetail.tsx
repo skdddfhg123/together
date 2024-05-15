@@ -25,7 +25,7 @@ import styled from '@emotion/styled';
 
 import * as REDIS from '@services/redisAPI';
 import * as CALENDAR from '@services/calendarAPI';
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 
 import { useMemberEventListState, useUserInfoStore } from '@store/index';
 
@@ -106,6 +106,9 @@ export default function DetailModal({
     setStartTime('00:00');
     setEndTime('23:30');
     setSelectedMembers([]);
+    if (titleRef.current) {
+      titleRef.current.value = '';
+    }
   }, [selectedDay]);
 
   const handleMemberChange = (email: string) => {
@@ -151,18 +154,7 @@ export default function DetailModal({
     }
     resetForm();
     onClose();
-  }, [
-    color,
-    onClose,
-    selectedCalendar,
-    selectedMembers,
-    startDate,
-    startTime,
-    endDate,
-    endTime,
-    userInfo,
-    resetForm,
-  ]);
+  }, [resetForm, userInfo]);
 
   // Component initialization
   useEffect(() => {
@@ -172,7 +164,7 @@ export default function DetailModal({
         if (member.useremail === userInfo?.useremail) setSelectedMembers([member.useremail]);
       });
     }
-  }, [isOpen, selectedDay, resetForm, MemberEventList, userInfo?.useremail, title]);
+  }, [isOpen, MemberEventList, resetForm, userInfo]);
 
   useEffect(() => {
     if (selectedDay) {

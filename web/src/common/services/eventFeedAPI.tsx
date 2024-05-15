@@ -1,13 +1,31 @@
 import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 
-import sendToast from '@hooks/sendToast';
+import sendToast from '@hooks/useToast';
 import * as API from '@utils/api';
 import { ImageFile, reqEventFeed, EventFeed, reqComment } from '@type/index';
 import { useEventFeedListStore } from '@store/index';
 
 interface FeedImage {
   imageSrc: string;
+}
+
+export async function getAllFeedInCalnedar(calendarId: UUID) {
+  try {
+    const { data: res } = await API.get(`/feed/get/calendar/${calendarId}`);
+    if (!res) throw new Error('FEED - getAllFeedInCalendar : ( DB 캘린더 피드 불러오기 실패)');
+    console.log(`FEED - getAllFeedInCalendar 성공`, res);
+
+    return res;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as API.ErrorResponse;
+      console.error(`FEED - getAllFeedInEvent 실패 :`, data); //debug//
+      sendToast('warning', '전체 피드를 가져오지 못했습니다.');
+    }
+  }
 }
 
 export async function getAllFeedInEvent(groupEventId: UUID) {
@@ -18,7 +36,7 @@ export async function getAllFeedInEvent(groupEventId: UUID) {
 
     useEventFeedListStore.getState().setEventFeedList(res);
 
-    return true;
+    return res;
   } catch (e) {
     const err = e as AxiosError;
 

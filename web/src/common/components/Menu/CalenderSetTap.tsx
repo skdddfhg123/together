@@ -5,7 +5,7 @@ import * as USER from '@services/userAPI';
 
 import { useSelectedCalendarStore } from '@store/index';
 
-import CreateEmojiModal from '@components/Menu/Chat/CreateEmoji/CreateEmojiModal';
+import CreateEmojiModal from '@components/Menu/Emoji/CreateEmojiModal';
 import useToggle from '@hooks/useToggle';
 
 interface CalenderTapProps {

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 
 import { useSelectedCalendarStore } from '@store/index';
-import TabEmojiUpload from '@components/Menu/Chat/CreateEmoji/TabEmojiUpload';
-import TabEmojiList from '@components/Menu/Chat/CreateEmoji/TabEmojiList';
+import TabEmojiUpload from '@components/Menu/Emoji/TabEmojiUpload';
+import TabEmojiList from '@components/Menu/Emoji/TabEmojiList';
 
 interface CreateEmojiProps {
   isOpen: boolean;
