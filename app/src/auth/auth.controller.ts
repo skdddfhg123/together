@@ -35,7 +35,8 @@ export class AuthController {
       return {
         useremail: user.useremail,
         nickname: user.nickname,
-        userCalendarId: userCalendar.userCalendarId
+        userCalendarId: userCalendar.userCalendarId,
+        isFirst: user.isFrist,
       };
     } catch (e) {
       throw e;
@@ -167,5 +168,23 @@ export class AuthController {
     @UploadedFile() file: Express.Multer.File
   ): Promise<UserUpdateDto> {
     return await this.userService.updateThumbnail(payload, file);
+  }
+
+  @ApiBody({
+    description: 'Check User is First',
+  })
+  @ApiResponse({ status: 200, description: 'true or false' })
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('tutorial')
+  async checkProceedTutorial(@getPayload() payload: PayloadResponse): Promise<boolean> {
+    let isFirst = true;
+
+    if(!payload.isFirst)
+      isFirst = false;
+    // else
+    //   await this.userService.tutorialComplete(payload.useremail);
+
+    return isFirst;
   }
 }

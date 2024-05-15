@@ -89,4 +89,17 @@ export class UserService {
         }
         return user;
     }
+
+    async tutorialComplete(userEmail: string): Promise<string> {
+        
+        try {
+            await this.userRepository.update({useremail: userEmail}, {isFrist: false});
+    
+            return "user has proceeded the tutorial";
+        }
+        catch(err) {
+            console.log(err);
+            throw new InternalServerErrorException('user tutorial status update failed');
+        }
+    }
 }

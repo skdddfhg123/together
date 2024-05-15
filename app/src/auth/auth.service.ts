@@ -56,6 +56,7 @@ export class AuthService {
                 nickname: user.nickname,
                 useremail: user.useremail,
                 userCalendarId: userCalendar?.userCalendarId,
+                isFirst: user.isFrist,
             };
 
             const accessToken = this.jwtService.sign(payload, { expiresIn: '3d' });
@@ -98,6 +99,7 @@ export class AuthService {
                 nickname: user.nickname,
                 useremail: user.useremail,
                 userCalendarId: userCalendar?.userCalendarId,
+                isFirst: user.isFrist,
             };
 
             const accessToken = this.jwtService.sign(payload, { expiresIn: '3d' });
@@ -111,6 +113,7 @@ export class AuthService {
                 "nickname": user.nickname,
                 "useremail": user.useremail,
                 "userCalendarId": userCalendar.userCalendarId,
+                "isFirst": user.isFrist,
             };
 
         } catch (error) {

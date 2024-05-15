@@ -9,4 +9,7 @@ export class PayloadResponse {
 
     @ApiProperty()
     userCalendarId: string;
+
+    @ApiProperty()
+    isFirst: boolean;
 }
