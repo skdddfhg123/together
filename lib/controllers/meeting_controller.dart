@@ -55,19 +55,40 @@ class MemberAppointment {
 
   // JSON에서 MemberAppointment 객체로 변환
   factory MemberAppointment.fromJson(Map<String, dynamic> json) {
-    List<Appointment> appointments = (json['allevents'] as List).map((event) {
+    List<Appointment> appointments = [];
+    Color memberColor =
+        Colors.primaries[Random().nextInt(Colors.primaries.length)];
+
+    for (var event in json['allevents']) {
       DateTime startAtUtc = DateTime.parse(event['startAt']);
       DateTime endAtUtc = DateTime.parse(event['endAt']);
       DateTime startAtSeoul = startAtUtc.add(Duration(hours: 9));
       DateTime endAtSeoul = endAtUtc.add(Duration(hours: 9));
 
-      return Appointment(
-        startTime: startAtSeoul,
-        endTime: endAtSeoul,
-        subject: event['title'],
-        color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
-      );
-    }).toList();
+      DateTime currentStart = startAtSeoul;
+      while (currentStart.isBefore(endAtSeoul)) {
+        DateTime endOfDay = DateTime(
+          currentStart.year,
+          currentStart.month,
+          currentStart.day,
+          23,
+          59,
+          59,
+        );
+
+        DateTime currentEnd =
+            endAtSeoul.isBefore(endOfDay) ? endAtSeoul : endOfDay;
+
+        appointments.add(Appointment(
+          startTime: currentStart,
+          endTime: currentEnd,
+          subject: event['title'],
+          color: memberColor,
+        ));
+
+        currentStart = currentEnd.add(Duration(seconds: 1));
+      }
+    }
 
     return MemberAppointment(
       thumbnail: json['thumbnail'] ??
@@ -440,11 +461,10 @@ class MeetingController extends GetxController {
         await loadMemberAppointmentsForCalendar(calendarId);
         update(); // UI 갱신
         Get.back(); // 현재 페이지 닫기
-        Get.snackbar(
-            'Success', 'Event and related feeds deleted successfully.');
+        Get.snackbar('일정 삭제', '해당 일정에 관련된 피드가 함께 삭제 되었습니다.');
       }
     } else {
-      Get.snackbar('Error', 'Failed to delete event from server.',
+      Get.snackbar('삭제 실패', '잠시 후 다시 시도 해주세요.',
           snackPosition: SnackPosition.BOTTOM);
     }
   }
@@ -459,10 +479,9 @@ class MeetingController extends GetxController {
           .removeWhere((appointment) => appointment.calendarId == calendarId);
       update(); // UI 갱신
       Get.back(); // 현재 페이지 닫기
-      Get.snackbar(
-          'Success', 'Calendar and its appointments deleted successfully.');
+      Get.snackbar('캘린더 삭제 성공', '캘린더와 해당 캘린더의 일정이 모두 삭제 되었습니다.');
     } else {
-      Get.snackbar('Error', 'Failed to delete calendar and its appointments.');
+      Get.snackbar('캘린더 삭제 실패', '캘린더 삭제에 실패 했습니다, 잠시 후 다시 시도해주세요.');
     }
   }
 
@@ -473,10 +492,51 @@ class MeetingController extends GetxController {
   }
 
 //////////////////////////////////////////일정 모달//////////////////////////////////////////////////////
-  ///
+
+  List<CalendarAppointment> getAppointmentsForDateSplit(DateTime date) {
+    List<CalendarAppointment> splitAppointments = [];
+    DateTime startOfDay = DateTime(date.year, date.month, date.day, 0, 0, 0);
+    DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
+
+    for (var appointment in calendarAppointments) {
+      DateTime start = appointment.appointment.startTime;
+      DateTime end = appointment.appointment.endTime;
+
+      // Ensure that appointments starting and ending on the same day are handled correctly
+      if ((start.isBefore(endOfDay.add(Duration(seconds: 1))) &&
+              end.isAfter(startOfDay.subtract(Duration(seconds: 1)))) &&
+          !(start.isAtSameMomentAs(end) && start.isBefore(startOfDay))) {
+        splitAppointments.add(appointment);
+      }
+    }
+
+    return splitAppointments;
+  }
+
+  List<CalendarAppointment> getAppointmentsForCalendarAndDateSplit(
+      String calendarId, DateTime date) {
+    List<CalendarAppointment> splitAppointments = [];
+    DateTime startOfDay = DateTime(date.year, date.month, date.day, 0, 0, 0);
+    DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
+
+    for (var appointment
+        in calendarAppointments.where((a) => a.calendarId == calendarId)) {
+      DateTime start = appointment.appointment.startTime;
+      DateTime end = appointment.appointment.endTime;
+
+      // Ensure that appointments starting and ending on the same day are handled correctly
+      if ((start.isBefore(endOfDay.add(Duration(seconds: 1))) &&
+              end.isAfter(startOfDay.subtract(Duration(seconds: 1)))) &&
+          !(start.isAtSameMomentAs(end) && start.isBefore(startOfDay))) {
+        splitAppointments.add(appointment);
+      }
+    }
+
+    return splitAppointments;
+  }
 
   void showAppointmentsModal(String calendarId, DateTime date) {
-    var appointments = getAppointmentsForCalendarAndDate(calendarId, date);
+    var appointments = getAppointmentsForCalendarAndDateSplit(calendarId, date);
     var memberAppointments = getMemberAppointmentsForCalendarAndDate(date);
 
     var resources = _getResources(memberAppointments);
@@ -515,7 +575,7 @@ class MeetingController extends GetxController {
                       timeSlotViewSettings: TimeSlotViewSettings(
                         timeInterval: const Duration(hours: 1),
                         timeIntervalWidth: 50,
-                        timelineAppointmentHeight: 50,
+                        timelineAppointmentHeight: 60,
                         timeFormat: 'HH:mm',
                         timeTextStyle: const TextStyle(
                           fontSize: 12,
@@ -559,7 +619,6 @@ class MeetingController extends GetxController {
                                     const EdgeInsets.symmetric(vertical: 4),
                                 child: InkWell(
                                   onTap: () {
-                                    // 이벤트 상세 페이지로 네비게이션
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -662,8 +721,7 @@ List<Appointment> _getMemberCalendarDataSource(
       appointments.add(Appointment(
         startTime: appointment.startTime,
         endTime: appointment.endTime,
-        subject:
-            '${DateFormat('HH:mm').format(appointment.startTime)} - ${DateFormat('HH:mm').format(appointment.endTime)}',
+        subject: '${member.nickname}님의 일정',
         color: appointment.color,
         resourceIds: [member.useremail],
       ));
@@ -680,8 +738,7 @@ List<CalendarResource> _getResources(
       id: member.useremail,
       displayName: member.nickname,
       image: NetworkImage(member.thumbnail),
-      color: Colors
-          .primaries[Random().nextInt(Colors.primaries.length)], // 임의의 색상 지정
+      color: member.appointments.first.color, // 임의의 색상 지정
     ));
   }
   return resources;

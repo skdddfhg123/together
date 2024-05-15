@@ -18,8 +18,8 @@ class LoginPage extends StatelessWidget {
       Get.offAllNamed('/home'); // 로그인 성공 후 홈 페이지로 이동
     } else {
       Get.snackbar(
-        'Login Failed',
-        'Please check your credentials',
+        '로그인 실패',
+        'Email 혹은 Password 를 다시 확인해주세요.',
         snackPosition: SnackPosition.BOTTOM,
       );
     }

@@ -302,9 +302,12 @@ class _AllCalendarState extends State<AllCalendar> {
     );
   }
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  ///
+
   void showAppointmentsModal(BuildContext context,
       MeetingController meetingController, DateTime date) {
-    var appointments = meetingController.getAppointmentsForDate(date);
+    var appointments = meetingController.getAppointmentsForDateSplit(date);
     final AuthController authController = Get.find<AuthController>();
 
     showModalBottomSheet(

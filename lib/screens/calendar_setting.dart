@@ -101,6 +101,38 @@ class CalendarSettingsPage extends StatelessWidget {
                 // Navigate to cover image page
               },
             ),
+            ListTile(
+              title: const Text('캘린더 삭제', style: TextStyle(fontSize: 16)),
+              trailing: const Icon(Icons.delete_forever_sharp),
+              onTap: () async {
+                bool confirmDelete = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("캘린더 삭제"),
+                          content: const Text(
+                              "캘린더를 삭제 하면 캘린더의 일정이 모두 다 삭제 됩니다. 삭제 하시겠습니까?"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("취소"),
+                              onPressed: () => Navigator.of(context).pop(false),
+                            ),
+                            TextButton(
+                              child: const Text("삭제"),
+                              onPressed: () => Navigator.of(context).pop(true),
+                            ),
+                          ],
+                        );
+                      },
+                    ) ??
+                    false;
+
+                if (confirmDelete) {
+                  await meetingController
+                      .deleteCalendarAndAppointments(calendarId);
+                }
+              },
+            ),
           ],
         ),
       ),

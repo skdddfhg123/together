@@ -25,29 +25,39 @@ class DialogService {
     DateTime _selectedEndTime = selectedDate.add(Duration(hours: 1));
     final MeetingController meetingController = Get.find<MeetingController>();
 
-    void _updateTime(bool isStartTime, DateTime updatedTime) {
+    void _updateDateTime(bool isStartTime, DateTime updatedDateTime) {
       if (isStartTime) {
-        _selectedStartTime = updatedTime;
+        _selectedStartTime = updatedDateTime;
       } else {
-        _selectedEndTime = updatedTime;
+        _selectedEndTime = updatedDateTime;
       }
     }
 
     Future<void> _pickDateTime(BuildContext context, bool isStartTime) async {
-      final TimeOfDay? pickedTime = await showTimePicker(
+      final DateTime? pickedDate = await showDatePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(
-            isStartTime ? _selectedStartTime : _selectedEndTime),
+        initialDate: isStartTime ? _selectedStartTime : _selectedEndTime,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100),
       );
-      if (pickedTime != null) {
-        final updatedDateTime = DateTime(
-          _selectedStartTime.year,
-          _selectedStartTime.month,
-          _selectedStartTime.day,
-          pickedTime.hour,
-          pickedTime.minute,
+
+      if (pickedDate != null) {
+        final TimeOfDay? pickedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.fromDateTime(
+              isStartTime ? _selectedStartTime : _selectedEndTime),
         );
-        _updateTime(isStartTime, updatedDateTime);
+
+        if (pickedTime != null) {
+          final updatedDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          _updateDateTime(isStartTime, updatedDateTime);
+        }
       }
     }
 
@@ -60,8 +70,8 @@ class DialogService {
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Container(
-            width: MediaQuery.of(context).size.width * 1.5, // 다이얼로그 너비 설정
-            height: MediaQuery.of(context).size.height * 1.5, // 다이얼로그 높이 설정
+            width: MediaQuery.of(context).size.width * 0.8, // 다이얼로그 너비 설정
+            height: MediaQuery.of(context).size.height * 0.5, // 다이얼로그 높이 설정
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -142,7 +152,7 @@ class DialogService {
                               authController.user?.thumbnail);
                           Navigator.pop(context);
                         } else {
-                          Get.snackbar("Error", "Failed to create event");
+                          Get.snackbar("일정 등록 실패", "잠시 후 다시 시도 해주세요.");
                         }
                       },
                     ),

@@ -32,7 +32,7 @@ class Calendar {
       color: _parseColor(json['type']),
       attendees: List<String>.from(json['attendees']),
       coverImage: json['coverImage'] ??
-          'https://cdn.pixabay.com/photo/2017/06/10/06/39/calender-2389150_1280.png',
+          'https://dgbdqbfy0cgn6.cloudfront.net/toogether.png',
       bannerImage: json['bannerImage'],
       calendarId: json['calendarId'],
       registeredAt: DateTime.parse(json['registeredAt']),

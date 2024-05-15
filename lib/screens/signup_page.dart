@@ -34,7 +34,7 @@ class SignupPage extends StatelessWidget {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to register')),
+        const SnackBar(content: Text('회원 가입 실패, 다시 시도해주세요')),
       );
     }
   }
