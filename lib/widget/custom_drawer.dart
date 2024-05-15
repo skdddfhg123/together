@@ -21,7 +21,6 @@ class CustomDrawer extends StatelessWidget {
     final calendarController = Get.find<UserCalendarController>();
     final authController = Get.find<AuthController>();
     final calendarApiService = Get.find<CalendarApiService>();
-    final meetingController = Get.find<MeetingController>();
     return Drawer(
       child: Column(
         children: [
@@ -47,8 +46,8 @@ class CustomDrawer extends StatelessWidget {
                         authController.user?.thumbnail ??
                             'https://via.placeholder.com/150'),
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[200],
+                  decoration: const BoxDecoration(
+                    color: Color.fromARGB(228, 177, 218, 251),
                   ),
                 ),
                 Row(

@@ -51,6 +51,7 @@ dependencies:
   share_plus: ^9.0.0
   month_year_picker: ^0.3.0+1
   syncfusion_localizations: ^25.1.41
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

@@ -97,7 +97,7 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 168, 200, 226),
+          backgroundColor: const Color.fromRGBO(253, 252, 255, 1),
           leadingWidth: 30, // leadingWidth 조정
           title: Row(
             children: [
