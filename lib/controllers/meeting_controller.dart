@@ -55,14 +55,19 @@ class MemberAppointment {
 
   // JSON에서 MemberAppointment 객체로 변환
   factory MemberAppointment.fromJson(Map<String, dynamic> json) {
-    List<Appointment> appointments = (json['allevents'] as List)
-        .map((event) => Appointment(
-              startTime: DateTime.parse(event['startAt']),
-              endTime: DateTime.parse(event['endAt']),
-              subject: event['title'],
-              color: Colors.grey, // 예시 색상, 실제 색상은 변경 가능
-            ))
-        .toList();
+    List<Appointment> appointments = (json['allevents'] as List).map((event) {
+      DateTime startAtUtc = DateTime.parse(event['startAt']);
+      DateTime endAtUtc = DateTime.parse(event['endAt']);
+      DateTime startAtSeoul = startAtUtc.add(Duration(hours: 9));
+      DateTime endAtSeoul = endAtUtc.add(Duration(hours: 9));
+
+      return Appointment(
+        startTime: startAtSeoul,
+        endTime: endAtSeoul,
+        subject: event['title'],
+        color: Colors.grey, // 예시 색상, 실제 색상은 변경 가능
+      );
+    }).toList();
 
     return MemberAppointment(
       thumbnail: json['thumbnail'] ??

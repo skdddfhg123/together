@@ -23,6 +23,11 @@ class CalendarEventService {
     Color color,
   ) async {
     var url = Uri.parse(baseUrl + 'create/${calendarId}'); // URL 구성
+
+    // startAt과 endAt을 UTC 시간으로 변환
+    DateTime startAtUtc = startAt.subtract(Duration(hours: 9));
+    DateTime endAtUtc = endAt.subtract(Duration(hours: 9));
+
     var response = await http.post(url,
         headers: {
           'Content-Type': 'application/json',
@@ -31,8 +36,8 @@ class CalendarEventService {
         body: jsonEncode({
           'title': title,
           'color': colorToHex(color),
-          'startAt': startAt.toIso8601String(),
-          'endAt': endAt.toIso8601String(),
+          'startAt': startAtUtc.toIso8601String(),
+          'endAt': endAtUtc.toIso8601String(),
           'member': [authController.user?.useremail],
         }));
 

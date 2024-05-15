@@ -75,17 +75,25 @@ class CalendarApiService {
       List<dynamic> appointmentData = json.decode(response.body);
 
       for (var data in appointmentData) {
+        DateTime startAtUtc = DateTime.parse(data['startAt']);
+        DateTime endAtUtc = DateTime.parse(data['endAt']);
+        DateTime startAtSeoul = startAtUtc.add(Duration(hours: 9));
+        DateTime endAtSeoul = endAtUtc.add(Duration(hours: 9));
+
+        print(startAtSeoul);
+
         Appointment newAppointment = Appointment(
-          startTime: DateTime.parse(data['startAt']),
-          endTime: DateTime.parse(data['endAt']),
+          startTime: startAtSeoul,
+          endTime: endAtSeoul,
           subject: data['title'],
           color: calendar.color,
         );
-        // 서버 응답에서 groupeventId 추출
+
+        // 서버 응답에서 groupEventId 추출
         String groupEventId = data['groupEventId'];
         var author = data['author'];
 
-        // 일정과 groupeventId를 meetingController에 추가
+        // 일정과 groupEventId를 meetingController에 추가
         meetingController.addCalendarAppointment(
             newAppointment,
             calendar.calendarId,
