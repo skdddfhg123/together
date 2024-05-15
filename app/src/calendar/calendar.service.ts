@@ -153,6 +153,7 @@ export class CalendarService {
                     title: calendar.title,
                     coverImg: calendar.coverImage,
                     type: calendar.type,
+                    createdAt: calendar.registeredAt,
                     attendees: attendeesInfo.map(usercalendar => ({
                         nickname: usercalendar.user.nickname,
                         useremail: usercalendar.user.useremail,

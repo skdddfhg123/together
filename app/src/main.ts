@@ -8,11 +8,11 @@ import { SocketIoAdapter } from './webSocket/adapter/socketIoAdapter';
 import { EventModule } from './webSocket/event.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: 'http://localhost:3005', // Allow only your React app to make requests
-    methods: 'GET,POST,PUT,DELETE,OPTIONS,PATCH', // Optionally specify which methods are allowed
-    allowedHeaders: 'Content-Type,Authorization', // Optionally specify allowed headers
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: ['http://localhost:3005', 'http://15.164.174.224:3005', 'http://localhost:3000', 'http://localhost:5005', 'http://localhost:5000', 'http://172.20.176.1:3000', "http://192.168.1.98:3000"],
+      credentials: true,
+    }
   });
 
   app.useGlobalPipes(new ValidationPipe({

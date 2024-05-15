@@ -8,7 +8,7 @@ import { RedisService } from './redis/redis.service';
 
 @WebSocketGateway(5000, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: ['http://localhost:3005', 'http://15.164.174.224:3005', 'http://localhost:3000', 'http://localhost:5005', 'http://localhost:5000'],
         credentials: true, // 웹 소켓 연결 시 자격 증명(쿠키 등)포함 허용 옵션
     },
 })

@@ -17,10 +17,10 @@ import { EmojiNameDto } from "./dtos/emoji.name.dto";
 @ApiTags("emoji")
 @Controller('emoji')
 export class EmojiController {
-    
+
     constructor(
-       private emojiService: EmojiService,
-    ) {}
+        private emojiService: EmojiService,
+    ) { }
 
     /*
     @Post('confirmName')
@@ -40,18 +40,18 @@ export class EmojiController {
     */
 
 
-    
 
-   // 그룹 이모지 등록 
-   @Post('create/:calendarId')
-   //@ApiBearerAuth('JWT-auth')               
-   @ApiOperation({ summary: '이모지 업로드' }) 
-   @ApiResponse({ status: 201, description: 'Feed created successfully' }) 
-   @ApiResponse({ status: 403, description: 'Forbidden' })        
-   @ApiResponse({ status: 409, description: 'Conflict' })          
-   //@ApiBody({ type: CreateEmojiDTO })       
-   @ApiBody({
-    schema: {
+
+    // 그룹 이모지 등록 
+    @Post('create/:calendarId')
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: '이모지 업로드' })
+    @ApiResponse({ status: 201, description: 'Feed created successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 409, description: 'Conflict' })
+    @ApiBody({ type: CreateEmojiDTO })
+    @ApiBody({
+        schema: {
             type: 'object',
             properties: {
                 emojiName: { type: 'string' },
@@ -63,17 +63,17 @@ export class EmojiController {
             }
         }
     })
-   @ApiConsumes('multipart/form-data', 'application/json') 
-   //@UseGuards(JwtAuthGuard)                 
-   @UseInterceptors(FileInterceptor('emojiFile')) 
-   async createEmoji(
-     @Param('calendarId') calendarId: string,
-     @Body() createEmojiDTO: CreateEmojiDTO,
-     @getPayload() payload: PayloadResponse,
-     @UploadedFile() emojiFile: Express.Multer.File
-   ): Promise<Emoji> { 
-     return await this.emojiService.createEmoji(createEmojiDTO, payload, calendarId, emojiFile);
-   }
+    @ApiConsumes('multipart/form-data', 'application/json')
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor('emojiFile'))
+    async createEmoji(
+        @Param('calendarId') calendarId: string,
+        @Body() createEmojiDTO: CreateEmojiDTO,
+        @getPayload() payload: PayloadResponse,
+        @UploadedFile() emojiFile: Express.Multer.File
+    ): Promise<Emoji> {
+        return await this.emojiService.createEmoji(createEmojiDTO, payload, calendarId, emojiFile);
+    }
 
 
 
@@ -89,13 +89,13 @@ export class EmojiController {
     @ApiResponse({ status: 403, description: 'You do not have permission to remove this emoji' })
     @ApiResponse({ status: 404, description: 'Emoji not found' })
     @ApiResponse({ status: 500, description: 'Error removing emoji' })
-    //@ApiBearerAuth('JWT-auth')
-    //@UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
     async removeEmoji(
 
         @getPayload() payload: PayloadResponse,
         @Param('emojiId') emojiId: string
-    
+
     ): Promise<Emoji> {
         return await this.emojiService.removeGroupEmoji(payload, emojiId);
     }
@@ -111,7 +111,7 @@ export class EmojiController {
 
         @Param('emojiId') emojiId: string,
 
-    ): Promise<ReadEmojiDTO>{
+    ): Promise<ReadEmojiDTO> {
         return await this.emojiService.getEmojiDetail(emojiId);
     }
 
@@ -122,13 +122,13 @@ export class EmojiController {
     @ApiOperation({ summary: 'calendar에 등록된 그룹 이모지 목록 가져오기' })
     @ApiResponse({ status: 200, description: 'Get Emojis successfully' })
     @ApiResponse({ status: 500, description: 'Failed to fetch emojis for group event ID' })
-    //@ApiBearerAuth('JWT-auth')
-    //@UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
     async getAllGroupEvent(
 
         @Param('calendarId') calendarId: string,
 
-    ): Promise<ReadEmojiDTO[]>{
+    ): Promise<ReadEmojiDTO[]> {
         return await this.emojiService.getAllEmojisInGroupCalendar(calendarId);
     }
 
@@ -142,11 +142,11 @@ export class EmojiController {
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard)
     async attatchEmojiInFeed(
-      @getPayload() payload: PayloadResponse,
-      @Param('feedId') feedId: string,
-      @Param('emojiId') emojiId: string,
-    ):Promise<EmojiInFeed>  { 
-         return await this.emojiService.attatchEmojiInFeed(payload, feedId, emojiId);
+        @getPayload() payload: PayloadResponse,
+        @Param('feedId') feedId: string,
+        @Param('emojiId') emojiId: string,
+    ): Promise<EmojiInFeed> {
+        return await this.emojiService.attatchEmojiInFeed(payload, feedId, emojiId);
     }
 
 
@@ -157,13 +157,13 @@ export class EmojiController {
     @ApiResponse({ status: 403, description: 'You do not have permission to remove this feed' })
     @ApiResponse({ status: 404, description: 'Feed not found' })
     @ApiResponse({ status: 500, description: 'Error removing feed' })
-    //@ApiBearerAuth('JWT-auth')
-    //@UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT-auth')
+    @UseGuards(JwtAuthGuard)
     async removeEmojiInFeed(
 
         @getPayload() payload: PayloadResponse,
         @Param('feedEmojiId') emojiInFeedId: string
-    
+
     ): Promise<EmojiInFeed> {
         return await this.emojiService.removeEmojiInFeed(payload, emojiInFeedId);
     }
@@ -182,7 +182,7 @@ export class EmojiController {
 
         @Param('feedId') feedId: string,
 
-    ): Promise<ReadEmojiDTO[]>{
+    ): Promise<ReadEmojiDTO[]> {
         return await this.emojiService.getAllEmojisInFeed(feedId);
     }
 
@@ -192,13 +192,13 @@ export class EmojiController {
 
 
 
-  /* ============================================ */
+    /* ============================================ */
 
-  // 그룹 이모지 댓글에 올리기
+    // 그룹 이모지 댓글에 올리기
 
-  // 그룹 이모지 댓글에서 삭제하기
+    // 그룹 이모지 댓글에서 삭제하기
 
-  // 특정 댓글에 있는 그룹 이모지 보기
+    // 특정 댓글에 있는 그룹 이모지 보기
 
 
 

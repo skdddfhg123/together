@@ -11,6 +11,7 @@ import { ReadEmojiDTO } from "./dtos/emoji.detail.dto";
 import { EmojiInFeed } from "src/db/emoji_feed/entities/emoji.feed.entity";
 import { Feed } from "src/feed/entities/feed.entity";
 import { UtilsService } from "src/utils/utils.service";
+import { ReadEmojiFeedDTO } from "./dtos/emoji.detail.feed.dto";
 
 
 @Injectable()
@@ -48,6 +49,11 @@ export class EmojiService {
             }
             if (!calendar.attendees.includes(payload.userCalendarId)) {
                 throw new ForbiddenException('You do not have permission to add an event to this calendar');
+            }
+
+            const name = await this.emojiRepository.findOneBy({ emojiName: body.emojiName })
+            if (name) {
+                throw new ConflictException('Emoji Name already exist')
             }
 
             const emoji = new Emoji();

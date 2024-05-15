@@ -110,6 +110,7 @@ export class AuthService {
                 refreshToken,
                 "nickname": user.nickname,
                 "useremail": user.useremail,
+                "thumbnail": user.thumbnail,
                 "userCalendarId": userCalendar.userCalendarId,
             };
 
@@ -189,7 +190,7 @@ export class AuthService {
 
             const today = new Date();
             const fortyFiveDaysAgo = new Date(today.setDate(today.getDate() - 45));
-            const fortyFiveDaysLater = new Date(today.setDate(today.getDate() + 45));
+            const fortyFiveDaysLater = new Date(today.setDate(today.getDate() + 90));
 
             console.log(userWithCalendar.userCalendarId);
 
@@ -404,7 +405,11 @@ export class AuthService {
                     "user.useremail",
                     "user.nickname",
                     "user.thumbnail",
-                    "userCalendar.groupCalendars"
+                    "userCalendar.groupCalendars",
+                    "socialEvent.social",
+                    "socialEvent.title", // 필요한 필드를 추가
+                    "socialEvent.startAt", // 필요한 필드를 추가
+                    "socialEvent.endAt"
                 ])
                 .where("userCalendar.userCalendarId IN (:...ids)", { ids: calendar.attendees })
                 .getMany();
@@ -416,9 +421,11 @@ export class AuthService {
             console.log(`GetAllEventByCalendarId\n\n[calendar]\n${JSON.stringify(calendar)}\n[userCalendars]\n${JSON.stringify(userCalendars)}`);
 
             const results = await Promise.all(userCalendars.map(async userCalendar => {
+                console.log(`${JSON.stringify(userCalendar.socialEvents)}`);
+
                 const socialEvents = Array.isArray(userCalendar.socialEvents) ? userCalendar.socialEvents.map(se => ({
-                    title: se.title,
-                    social: se.social,
+                    title: se.social,
+                    // social: se.social,
                     startAt: se.startAt,
                     endAt: se.endAt
                 })) : [];
@@ -463,6 +470,7 @@ export class AuthService {
                 return {
                     useremail: userCalendar.user.useremail,
                     nickname: userCalendar.user.nickname,
+                    thumbnail: userCalendar.user.thumbnail,
                     allevents: [...allGroupEvents, ...socialEvents]
                 };
             }));

@@ -82,21 +82,21 @@ export class FeedController {
         });
     }
 
-    //그룹 캘린더에서 피드 일괄 출력
-    @Get('get/calendar/:calendarId')
-    @ApiConsumes('multipart/form-data', 'application/json')
-    @ApiOperation({ summary: 'group calendar의 전체 피드 가져오기' })
-    @ApiResponse({ status: 200, description: 'Get Feeds successfully' })
-    @ApiResponse({ status: 500, description: 'Failed to fetch feeds for group event ID' })
-    @ApiBearerAuth('JWT-auth')
-    @UseGuards(JwtAuthGuard)
-    async getAllFeedInCalendar(
+    // //그룹 캘린더에서 피드 일괄 출력
+    // @Get('get/calendar/:calendarId')
+    // @ApiConsumes('multipart/form-data', 'application/json')
+    // @ApiOperation({ summary: 'group calendar의 전체 피드 가져오기' })
+    // @ApiResponse({ status: 200, description: 'Get Feeds successfully' })
+    // @ApiResponse({ status: 500, description: 'Failed to fetch feeds for group event ID' })
+    // @ApiBearerAuth('JWT-auth')
+    // @UseGuards(JwtAuthGuard)
+    // async getAllFeedInCalendar(
 
-        @Param('calendarId') calendarId: string,
+    //     @Param('calendarId') calendarId: string,
 
-    ): Promise<ReadFeedDTO[]> {
-        return await this.feedService.getAllFeedInCalendar(calendarId);
-    }
+    // ): Promise<ReadFeedDTO[]> {
+    //     return await this.feedService.getAllFeedInCalendar(calendarId);
+    // }
 
 
     //그룹 이벤트에서 피드 일괄 출력

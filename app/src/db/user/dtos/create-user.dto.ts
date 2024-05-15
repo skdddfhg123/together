@@ -15,8 +15,8 @@ export class CreateUserDTO {
         example: 'testNick',
     })
     @IsString()
-    @MinLength(4)
-    @MaxLength(20)
+    // @MinLength(4)
+    // @MaxLength(20)
     nickname: string;
 
     @ApiProperty({

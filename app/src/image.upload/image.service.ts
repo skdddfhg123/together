@@ -31,7 +31,7 @@ export class ImageService {
     // const imageName = this.utilsService.getUUID();
     const ext = file.originalname.split('.').pop();
 
-    const imageUrl = await this.awsService.imageUploadToS3(
+    const imageUrl = await this.awsService.imageUploadToS3Unchache(
       `profiles/${imageName}.${ext}`,
       file,
       ext,
@@ -71,10 +71,10 @@ export class ImageService {
 
 
   // 피드 
-  async feedImageUpload(file: Express.Multer.File, imageName: string): Promise<string>{
+  async feedImageUpload(file: Express.Multer.File, imageName: string): Promise<string> {
     // const imageName = this.utilsService.getUUID();
     const ext = file.originalname.split('.').pop();
-  
+
     const imageUrl = await this.awsService.imageUploadToS3(
       `feeds/${imageName}.${ext}`,
       file,
