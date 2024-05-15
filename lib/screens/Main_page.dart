@@ -60,29 +60,31 @@ class _MainPageState extends State<MainPage> {
       // '작성' 탭
       final EventSelectionController eventController =
           Get.find<EventSelectionController>();
-      if (eventController.selectedCalendarId.value != null &&
-          eventController.selectedDate.value != null) {
-        final calendarId = eventController.selectedCalendarId.value!;
+      if (eventController.selectedDate.value != null) {
         final selectedDate = eventController.selectedDate.value!;
-        final UserCalendarController calendarController =
-            Get.find<UserCalendarController>();
-        final selectedCalendar = calendarController.calendars.firstWhere(
-          (cal) => cal.calendarId == calendarId,
-        );
 
-        print(selectedCalendar.title);
-
-        if (selectedCalendar != null) {
-          DialogService.showAddAppointmentDialog(
-            context,
-            selectedDate,
-            selectedCalendar.color,
-            calendarId,
+        _showCalendarSelectionDialog(context, (calendarId) {
+          final UserCalendarController calendarController =
+              Get.find<UserCalendarController>();
+          final selectedCalendar = calendarController.calendars.firstWhere(
+            (cal) => cal.calendarId == calendarId,
           );
-        } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text("선택된 캘린더가 없습니다.")));
-        }
+
+          print(selectedCalendar.title);
+
+          if (selectedCalendar != null) {
+            DialogService.showAddAppointmentDialog(
+              context,
+              selectedDate,
+              selectedCalendar.color,
+              calendarId,
+              selectedCalendar.title,
+            );
+          } else {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(const SnackBar(content: Text("선택된 캘린더가 없습니다.")));
+          }
+        });
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("일정을 선택 하세요")));
@@ -102,6 +104,138 @@ class _MainPageState extends State<MainPage> {
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
       ),
+    );
+  }
+
+  void _showCalendarSelectionDialog(
+      BuildContext context, Function(String) onCalendarSelected) {
+    final UserCalendarController calendarController =
+        Get.find<UserCalendarController>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            height: MediaQuery.of(context).size.height * 0.7,
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '캘린더 선택',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: calendarController.calendars.length,
+                    itemBuilder: (context, index) {
+                      var calendar = calendarController.calendars[index];
+                      return InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onCalendarSelected(calendar.calendarId);
+                        },
+                        child: Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          elevation: 4,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    image: DecorationImage(
+                                      image: NetworkImage(
+                                          calendar.coverImage ?? ''),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        calendar.title,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      SizedBox(
+                                        height:
+                                            50, // Increased height for the list of attendees
+                                        child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: calendar.attendees.length,
+                                          itemBuilder:
+                                              (context, attendeeIndex) {
+                                            var attendee = calendar
+                                                .attendees[attendeeIndex];
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 8.0),
+                                              child: Column(
+                                                children: [
+                                                  const SizedBox(height: 10),
+                                                  CircleAvatar(
+                                                    backgroundImage:
+                                                        NetworkImage(attendee
+                                                                .thumbnail ??
+                                                            ''),
+                                                    radius: 12,
+                                                  ),
+                                                  Text(
+                                                    attendee.nickname,
+                                                    style: const TextStyle(
+                                                        fontSize: 10),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -11,7 +11,7 @@ class EventDetailPage extends StatefulWidget {
   final String eventTitle;
   final DateTime startTime;
   final DateTime endTime;
-  final bool isNotified;
+
   final Color calendarColor;
   final String userProfileImageUrl;
   final String groupEventId;
@@ -21,7 +21,6 @@ class EventDetailPage extends StatefulWidget {
     required this.eventTitle,
     required this.startTime,
     required this.endTime,
-    required this.isNotified,
     required this.calendarColor,
     required this.userProfileImageUrl,
     required this.groupEventId,
@@ -201,16 +200,36 @@ class _EventDetailPageState extends State<EventDetailPage> {
             child: Row(
               children: [
                 Icon(
-                  Icons.alarm_sharp,
+                  Icons.group,
                   color: widget.calendarColor,
                   size: 32,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  widget.isNotified ? "Disabled" : "알림 없음",
-                  style: const TextStyle(
-                    fontSize: 20,
-                  ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Obx(() {
+                    List<Member> members = meetingController
+                        .getMembersForGroupEvent(widget.groupEventId);
+                    if (members.isEmpty) {
+                      return const Text("소셜 일정입니다.");
+                    } else {
+                      return Wrap(
+                        spacing: 16.0,
+                        runSpacing: 4.0,
+                        children: members.map((member) {
+                          return Column(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage:
+                                    NetworkImage(member.thumbnail ?? ''),
+                                radius: 20,
+                              ),
+                              Text(member.nickname),
+                            ],
+                          );
+                        }).toList(),
+                      );
+                    }
+                  }),
                 ),
               ],
             ),

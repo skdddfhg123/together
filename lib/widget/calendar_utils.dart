@@ -19,11 +19,19 @@ class DialogService {
     DateTime selectedDate,
     Color color,
     String calendarId,
+    String title,
   ) {
     final TextEditingController _subjectController = TextEditingController();
     DateTime _selectedStartTime = selectedDate;
     DateTime _selectedEndTime = selectedDate.add(Duration(hours: 1));
     final MeetingController meetingController = Get.find<MeetingController>();
+    final UserCalendarController calendarController =
+        Get.find<UserCalendarController>();
+    final AuthController authController = Get.find<AuthController>();
+
+    List<String> selectedAttendees = [
+      authController.user!.useremail
+    ]; // 자신의 이메일을 포함
 
     void _updateDateTime(bool isStartTime, DateTime updatedDateTime) {
       if (isStartTime) {
@@ -61,106 +69,238 @@ class DialogService {
       }
     }
 
+    void _showAttendeeSelectionDialog(StateSetter parentSetState) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Dialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '참여자 선택',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: calendarController.calendars
+                              .firstWhere((cal) => cal.calendarId == calendarId)
+                              .attendees
+                              .length,
+                          itemBuilder: (context, index) {
+                            var member = calendarController.calendars
+                                .firstWhere(
+                                    (cal) => cal.calendarId == calendarId)
+                                .attendees[index];
+                            return CheckboxListTile(
+                              title: Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(member.thumbnail ?? ''),
+                                    radius: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(member.nickname),
+                                ],
+                              ),
+                              value:
+                                  selectedAttendees.contains(member.useremail),
+                              onChanged: (bool? value) {
+                                if (value == true) {
+                                  selectedAttendees.add(member.useremail);
+                                } else {
+                                  selectedAttendees.remove(member.useremail);
+                                }
+                                // 내부 다이얼로그 상태 업데이트
+                                setState(() {});
+                                // 부모 다이얼로그 상태 업데이트
+                                parentSetState(() {});
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      ElevatedButton(
+                        child: const Text('완료'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      );
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8, // 다이얼로그 너비 설정
-            height: MediaQuery.of(context).size.height * 0.5, // 다이얼로그 높이 설정
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const Text(
-                  '일정 추가하기',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _subjectController,
-                  decoration: const InputDecoration(
-                    labelText: "타이틀",
-                    border: OutlineInputBorder(),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Dialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.8,
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      const Text(
+                        '일정 추가하기',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _subjectController,
+                        decoration: const InputDecoration(
+                          labelText: "제목",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ListTile(
+                        leading: Icon(Icons.timer_outlined, color: color),
+                        title: const Text("시작 날짜 및 시간"),
+                        subtitle: Text(
+                            DateFormat('yyyy년 M월 dd일 (E)     a H:mm', 'ko_KR')
+                                .format(_selectedStartTime)),
+                        onTap: () => _pickDateTime(context, true),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.timer_off_outlined, color: color),
+                        title: const Text("종료 날짜 및 시간"),
+                        subtitle: Text(
+                            DateFormat('yyyy년 M월 dd일 (E)     a H:mm', 'ko_KR')
+                                .format(_selectedEndTime)),
+                        onTap: () => _pickDateTime(context, false),
+                      ),
+                      const SizedBox(height: 16),
+                      ListTile(
+                        leading: Icon(Icons.calendar_today, color: color),
+                        title: const Text("선택된 캘린더"),
+                        subtitle: Text(title),
+                      ),
+                      const SizedBox(height: 16),
+                      ListTile(
+                        leading: Icon(Icons.group, color: color),
+                        title: const Text("멤버 선택"),
+                        subtitle: selectedAttendees.isEmpty
+                            ? const Text("참여할 멤버를 선택하세요")
+                            : Column(
+                                children: selectedAttendees.map((email) {
+                                  var attendee = calendarController.calendars
+                                      .expand((cal) => cal.attendees)
+                                      .firstWhere(
+                                          (member) => member.useremail == email,
+                                          orElse: () => null!);
+                                  if (attendee != null) {
+                                    return Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              attendee.thumbnail ?? ''),
+                                          radius: 12,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(attendee.nickname),
+                                      ],
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                }).toList(),
+                              ),
+                        onTap: () => _showAttendeeSelectionDialog(setState),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          TextButton(
+                            child: const Text('취소'),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            child: const Text('추가'),
+                            onPressed: () async {
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              String? token = prefs.getString('token');
+
+                              // 백엔드에 일정 추가 요청
+                              var result =
+                                  await CalendarEventService().createEvent(
+                                _subjectController.text,
+                                _selectedStartTime,
+                                _selectedEndTime,
+                                calendarId,
+                                token!,
+                                color,
+                                [...selectedAttendees],
+                              );
+
+                              if (result['isCreated']) {
+                                String groupEventId = result['groupEventId'];
+                                Appointment newAppointment = Appointment(
+                                  startTime: _selectedStartTime,
+                                  endTime: _selectedEndTime,
+                                  subject: _subjectController.text,
+                                  color: color,
+                                  id: calendarId.toString(),
+                                );
+                                meetingController.addCalendarAppointment(
+                                  newAppointment,
+                                  calendarId,
+                                  groupEventId,
+                                  false,
+                                  authController.user?.useremail,
+                                  authController.user?.nickname,
+                                  authController.user?.thumbnail,
+                                  [...selectedAttendees],
+                                  [],
+                                );
+                                Navigator.pop(context);
+                              } else {
+                                Get.snackbar("일정 등록 실패", "잠시 후 다시 시도 해주세요.");
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(Icons.timer),
-                  title: const Text("시작 시간"),
-                  subtitle: Text(DateFormat('yyyy-MM-dd HH:mm')
-                      .format(_selectedStartTime)),
-                  onTap: () => _pickDateTime(context, true),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.timer_off),
-                  title: const Text("종료 시간"),
-                  subtitle: Text(
-                      DateFormat('yyyy-MM-dd HH:mm').format(_selectedEndTime)),
-                  onTap: () => _pickDateTime(context, false),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    TextButton(
-                      child: const Text('Cancel'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      child: const Text('Add'),
-                      onPressed: () async {
-                        SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        String? token = prefs.getString('token');
-                        final AuthController authController =
-                            Get.find<AuthController>();
-
-                        // 백엔드에 일정 추가 요청
-                        var result = await CalendarEventService().createEvent(
-                          _subjectController.text,
-                          _selectedStartTime,
-                          _selectedEndTime,
-                          calendarId,
-                          token!,
-                          color,
-                        );
-
-                        if (result['isCreated']) {
-                          String groupEventId = result['groupEventId'];
-                          Appointment newAppointment = Appointment(
-                            startTime: _selectedStartTime,
-                            endTime: _selectedEndTime,
-                            subject: _subjectController.text,
-                            color: color,
-                            id: calendarId.toString(),
-                          );
-                          meetingController.addCalendarAppointment(
-                              newAppointment,
-                              calendarId,
-                              groupEventId,
-                              false,
-                              authController.user?.useremail,
-                              authController.user?.nickname,
-                              authController.user?.thumbnail);
-                          Navigator.pop(context);
-                        } else {
-                          Get.snackbar("일정 등록 실패", "잠시 후 다시 시도 해주세요.");
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );

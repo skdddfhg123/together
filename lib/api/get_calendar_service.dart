@@ -38,14 +38,22 @@ class CalendarApiService {
     }
     try {
       final response = await http.get(
-        Uri.parse("$apiUrl/get_calendar"),
+        Uri.parse("$apiUrl/get_calendar/v2"),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        List<Calendar> calendars = (json.decode(response.body) as List)
-            .map((data) => Calendar.fromJson(data))
-            .toList();
+        print(response.body);
+        // 만약 response.body가 문자열 형식의 리스트로 되어 있다면 다시 파싱
+        List<dynamic> jsonData = json.decode(response.body);
+        if (jsonData is List<String>) {
+          jsonData = jsonData.map((e) => json.decode(e)).toList();
+        }
+
+        // 이후 데이터 파싱
+        List<Calendar> calendars =
+            jsonData.map((data) => Calendar.fromJson(data)).toList();
+
         meetingController.calendarAppointments.clear();
         // 각 캘린더에 대한 일정 정보도 함께 로드
         for (var calendar in calendars) {
@@ -80,7 +88,11 @@ class CalendarApiService {
         DateTime startAtSeoul = startAtUtc.add(Duration(hours: 9));
         DateTime endAtSeoul = endAtUtc.add(Duration(hours: 9));
 
-        print(startAtSeoul);
+        // 멤버 정보 추출
+        List<Member> members =
+            (data['member'] as List<dynamic>).map((memberData) {
+          return Member.fromJson(memberData);
+        }).toList();
 
         Appointment newAppointment = Appointment(
           startTime: startAtSeoul,
@@ -95,14 +107,17 @@ class CalendarApiService {
 
         // 일정과 groupEventId를 meetingController에 추가
         meetingController.addCalendarAppointment(
-            newAppointment,
-            calendar.calendarId,
-            groupEventId,
-            false,
-            author['useremail'],
-            author['nickname'],
-            author['thumbnail'] ??
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s');
+          newAppointment,
+          calendar.calendarId,
+          groupEventId,
+          false,
+          author['useremail'],
+          author['nickname'],
+          author['thumbnail'] ??
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s',
+          [],
+          members,
+        );
       }
       meetingController.update(); // 일정 추가 후 UI 업데이트
     } else {
@@ -128,6 +143,7 @@ class CalendarApiService {
 
     // 기존 데이터를 비우기
     meetingController.memberAppointments.clear();
+    print(calendarId);
 
     try {
       final response = await http.get(

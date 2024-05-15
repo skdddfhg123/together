@@ -28,6 +28,7 @@ class CalendarAppointment {
   final String authorEmail;
   final String authorNickname;
   final String? authorThumbnail;
+  final List<Member> members;
 
   CalendarAppointment({
     required this.appointment,
@@ -37,7 +38,28 @@ class CalendarAppointment {
     required this.authorEmail,
     required this.authorNickname,
     this.authorThumbnail,
+    this.members = const [],
   });
+}
+
+class Member {
+  final String useremail;
+  final String? thumbnail;
+  final String nickname;
+
+  Member({
+    required this.useremail,
+    this.thumbnail,
+    required this.nickname,
+  });
+
+  factory Member.fromJson(Map<String, dynamic> json) {
+    return Member(
+      useremail: json['useremail'],
+      thumbnail: json['thumbnail'],
+      nickname: json['nickname'],
+    );
+  }
 }
 
 class MemberAppointment {
@@ -188,6 +210,32 @@ class MeetingController extends GetxController {
   }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+  List<Member> getMembersForGroupEvent(String groupEventId) {
+    try {
+      var appointment = calendarAppointments.firstWhere(
+        (appointment) => appointment.groupEventId == groupEventId,
+        orElse: () => CalendarAppointment(
+          appointment: Appointment(
+            startTime: DateTime.now(),
+            endTime: DateTime.now(),
+            subject: '',
+            color: Colors.transparent,
+          ),
+          calendarId: '',
+          groupEventId: '',
+          isSocial: false,
+          authorEmail: '',
+          authorNickname: '',
+          authorThumbnail: '',
+          members: [],
+        ),
+      );
+      return appointment.members;
+    } catch (e) {
+      print('Error retrieving members for groupEventId $groupEventId: $e');
+      return [];
+    }
+  }
 
 ///////////////////////////////////////피드 부분 /////////////////////////////////////////
   final FeedService feedService = FeedService();
@@ -294,15 +342,19 @@ class MeetingController extends GetxController {
     String? useremail,
     String? nickname,
     String? thumbnail,
+    List<String?> members,
+    List<Member> memberinfo,
   ) {
     var newCalendarAppointment = CalendarAppointment(
-        appointment: appointment,
-        calendarId: calendarId,
-        groupEventId: groupeventId,
-        isSocial: isSocial,
-        authorEmail: useremail!,
-        authorNickname: nickname!,
-        authorThumbnail: thumbnail);
+      appointment: appointment,
+      calendarId: calendarId,
+      groupEventId: groupeventId,
+      isSocial: isSocial,
+      authorEmail: useremail!,
+      authorNickname: nickname!,
+      authorThumbnail: thumbnail,
+      members: memberinfo,
+    );
     calendarAppointments.add(newCalendarAppointment);
     loadMemberAppointmentsForCalendar(calendarId);
     update();
@@ -343,6 +395,8 @@ class MeetingController extends GetxController {
             authController.user?.useremail,
             authController.user?.nickname,
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrnkGghQpkEKOXPtDt1jMo5qFoCHkBbUe9Ew&usqp=CAU',
+            [],
+            [],
           );
         }
         update();
@@ -389,6 +443,8 @@ class MeetingController extends GetxController {
         authController.user?.useremail,
         authController.user?.nickname,
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrnkGghQpkEKOXPtDt1jMo5qFoCHkBbUe9Ew&usqp=CAU',
+        [],
+        [],
       );
     }
   }
@@ -629,8 +685,6 @@ class MeetingController extends GetxController {
                                               appointment.appointment.startTime,
                                           endTime:
                                               appointment.appointment.endTime,
-                                          isNotified:
-                                              false, // 예시 값, 실제 모델에 따라 수정 필요
                                           calendarColor:
                                               appointment.appointment.color,
                                           userProfileImageUrl:

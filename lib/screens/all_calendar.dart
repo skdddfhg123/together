@@ -112,7 +112,7 @@ class _AllCalendarState extends State<AllCalendar> {
                               Text(
                                 appBarTitle,
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   foreground: Paint()
                                     ..style = PaintingStyle.stroke
@@ -123,7 +123,7 @@ class _AllCalendarState extends State<AllCalendar> {
                               Text(
                                 appBarTitle,
                                 style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
@@ -142,7 +142,7 @@ class _AllCalendarState extends State<AllCalendar> {
                       Text(
                         '모든 캘린더 (${userCalendarController.calendars.length})',
                         style: const TextStyle(
-                          fontSize: 10,
+                          fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: Color.fromARGB(255, 114, 113, 113),
                         ),
@@ -357,8 +357,6 @@ class _AllCalendarState extends State<AllCalendar> {
                                       startTime:
                                           appointment.appointment.startTime,
                                       endTime: appointment.appointment.endTime,
-                                      isNotified:
-                                          false, // Update based on your model
                                       calendarColor:
                                           appointment.appointment.color,
                                       userProfileImageUrl:

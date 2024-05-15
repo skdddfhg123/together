@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
+class Attendee {
+  final String nickname;
+  final String useremail;
+  final String? thumbnail;
+
+  Attendee({
+    required this.nickname,
+    required this.useremail,
+    this.thumbnail,
+  });
+
+  factory Attendee.fromJson(Map<String, dynamic> json) {
+    return Attendee(
+      nickname: json['nickname'],
+      useremail: json['useremail'],
+      thumbnail: json['thumbnail'],
+    );
+  }
+}
+
 class Calendar {
   final String title;
-  final List<String> attendees;
+  final List<Attendee> attendees;
   final String? coverImage;
   final String? bannerImage;
   final String calendarId;
-  final DateTime registeredAt;
-  final DateTime updatedAt;
-  final DateTime? deletedAt;
   final Color color;
-  List<Appointment> appointment;
 
   Calendar({
     required this.title,
@@ -19,33 +35,36 @@ class Calendar {
     this.coverImage,
     this.bannerImage,
     required this.calendarId,
-    required this.registeredAt,
-    required this.updatedAt,
-    this.deletedAt,
-    this.appointment = const [],
     this.color = Colors.blue,
   });
 
   factory Calendar.fromJson(Map<String, dynamic> json) {
+    List<Attendee> attendeeList = (json['attendees'] as List)
+        .map((attendeeJson) => Attendee.fromJson(attendeeJson))
+        .toList();
+
     return Calendar(
       title: json['title'],
-      color: _parseColor(json['type']),
-      attendees: List<String>.from(json['attendees']),
-      coverImage: json['coverImage'] ??
+      color: _parseColor(json['type'] ?? '#000000'),
+      attendees: attendeeList,
+      coverImage: json['coverImg'] ??
           'https://dgbdqbfy0cgn6.cloudfront.net/toogether.png',
-      bannerImage: json['bannerImage'],
+      bannerImage: json['bannerImage'] ??
+          'https://dgbdqbfy0cgn6.cloudfront.net/toogether_small.png',
       calendarId: json['calendarId'],
-      registeredAt: DateTime.parse(json['registeredAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
-      deletedAt:
-          json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
     );
   }
+
   static Color _parseColor(String hexColor) {
     hexColor = hexColor.toUpperCase().replaceAll('#', '');
     if (hexColor.length == 6) {
-      hexColor = 'FF' + hexColor; // 색상 코드에 투명도 값이 없다면 FF를 추가
+      hexColor = 'FF' + hexColor; // Add FF for opacity if not present
     }
-    return Color(int.parse(hexColor, radix: 16));
+    try {
+      return Color(int.parse(hexColor, radix: 16));
+    } catch (e) {
+      // Return a default color (e.g., blue) if the color code is invalid
+      return Colors.blue;
+    }
   }
 }

@@ -21,6 +21,7 @@ class CalendarEventService {
     String calendarId,
     String token,
     Color color,
+    List<String?> member,
   ) async {
     var url = Uri.parse(baseUrl + 'create/${calendarId}'); // URL 구성
 
@@ -38,7 +39,7 @@ class CalendarEventService {
           'color': colorToHex(color),
           'startAt': startAtUtc.toIso8601String(),
           'endAt': endAtUtc.toIso8601String(),
-          'member': [authController.user?.useremail],
+          'member': member,
         }));
 
     if (response.statusCode == 201) {
