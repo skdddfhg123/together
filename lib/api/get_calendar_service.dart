@@ -85,8 +85,8 @@ class CalendarApiService {
       for (var data in appointmentData) {
         DateTime startAtUtc = DateTime.parse(data['startAt']);
         DateTime endAtUtc = DateTime.parse(data['endAt']);
-        DateTime startAtSeoul = startAtUtc.add(Duration(hours: 9));
-        DateTime endAtSeoul = endAtUtc.add(Duration(hours: 9));
+        DateTime startAtSeoul = startAtUtc.toLocal();
+        DateTime endAtSeoul = endAtUtc.toLocal();
 
         // 멤버 정보 추출
         List<Member> members =

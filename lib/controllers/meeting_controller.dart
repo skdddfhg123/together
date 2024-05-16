@@ -85,8 +85,8 @@ class MemberAppointment {
     for (var event in json['allevents']) {
       DateTime startAtUtc = DateTime.parse(event['startAt']);
       DateTime endAtUtc = DateTime.parse(event['endAt']);
-      DateTime startAtSeoul = startAtUtc.add(Duration(hours: 9));
-      DateTime endAtSeoul = endAtUtc.add(Duration(hours: 9));
+      DateTime startAtSeoul = startAtUtc.toLocal();
+      DateTime endAtSeoul = endAtUtc.toLocal();
 
       DateTime currentStart = startAtSeoul;
       while (currentStart.isBefore(endAtSeoul)) {
@@ -810,7 +810,7 @@ List<CalendarResource> _getResources(
     resources.add(CalendarResource(
       id: member.useremail,
       displayName: member.nickname,
-      image: CachedNetworkImageProvider(member.thumbnail),
+      image: NetworkImage(member.thumbnail),
       color: member.appointments.first.color, // 임의의 색상 지정
     ));
   }

@@ -342,8 +342,8 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                         children: uniqueMembers
                             .map((member) => CircleAvatar(
                                   radius: 6,
-                                  backgroundImage: CachedNetworkImageProvider(
-                                      member.thumbnail),
+                                  backgroundImage:
+                                      NetworkImage(member.thumbnail),
                                 ))
                             .toList(),
                       ),

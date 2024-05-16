@@ -49,17 +49,16 @@ class _ChatPageState extends State<ChatPage> {
 
   String formatDateTime(String isoString) {
     DateTime utcTime = DateTime.parse(isoString);
-    DateTime kstTime = utcTime.add(const Duration(hours: 9)); // UTC 시간에 9시간을 추가
+    DateTime kstTime = utcTime.toLocal(); // UTC 시간에 9시간을 추가
     return DateFormat('a hh:mm', 'ko').format(kstTime); // 한국어 로케일로 날짜 형식 지정
   }
 
   bool _isNewDay(int index) {
     if (index == 0) return true; // 첫 번째 메시지는 항상 새로운 날짜
-    DateTime currentMessageTime = DateTime.parse(messages[index].registerdAt)
-        .add(const Duration(hours: 9));
+    DateTime currentMessageTime =
+        DateTime.parse(messages[index].registerdAt).toLocal();
     DateTime previousMessageTime =
-        DateTime.parse(messages[index - 1].registerdAt)
-            .add(const Duration(hours: 9));
+        DateTime.parse(messages[index - 1].registerdAt).toLocal();
 
     return currentMessageTime.day != previousMessageTime.day ||
         currentMessageTime.month != previousMessageTime.month ||
@@ -111,9 +110,11 @@ class _ChatPageState extends State<ChatPage> {
                       Center(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(DateFormat('yyyy년 MM월dd일 (EEE)', 'ko')
-                              .format(DateTime.parse(message.registerdAt)
-                                  .add(const Duration(hours: 9)))),
+                          child: Text(
+                            DateFormat('yyyy년 MM월dd일 (EEE)', 'ko').format(
+                              DateTime.parse(message.registerdAt).toLocal(),
+                            ),
+                          ),
                         ),
                       ),
                     Padding(
