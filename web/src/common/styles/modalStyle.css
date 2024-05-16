@@ -145,3 +145,27 @@
   height: 100%;
   z-index: 1050;
 }
+
+.bannerUpdateModal {
+  height: 80vh;
+  width: 130vh;
+  padding: 0;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  overflow: hidden;
+  position: fixed;
+  border-radius: 5px;
+
+  box-shadow: 0 10px 12px rgba(0,0,0,0.5); 
+}
+
+.bannerUpdateOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  zIndex: 1050;
+}

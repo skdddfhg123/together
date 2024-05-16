@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { HexColorPicker } from 'react-colorful';
+import { format } from 'date-fns';
 import { UUID } from 'crypto';
 import debounce from 'lodash.debounce';
 
@@ -25,24 +26,17 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
   const [color, setColor] = useState<string>(groupEventInfo?.color || '#ffffff00');
   const [pinned, setPinned] = useState<boolean>(groupEventInfo?.pinned || false);
   const titleRef = useRef<HTMLInputElement>(null);
-  const startAtRef = useRef<HTMLInputElement>(null);
-  const endAtRef = useRef<HTMLInputElement>(null);
+  const [startAt, setStartAt] = useState<string>(
+    groupEventInfo?.startAt ? formatToLocalDatetime(groupEventInfo.startAt) : '',
+  );
+  const [endAt, setEndAt] = useState<string>(
+    groupEventInfo?.endAt ? formatToLocalDatetime(groupEventInfo.endAt) : '',
+  );
 
-  // *********************? 함수
-
-  useEffect(() => {
-    if (selectedCalendar && selectedCalendar !== 'All') {
-      setCalendarMember(selectedCalendar.attendees);
-    } else {
-      setCalendarMember([]);
-    }
-  }, [selectedCalendar]);
-
-  useEffect(() => {
-    if (groupEventInfo && groupEventInfo.member) {
-      setSelectedMember(groupEventInfo.member.map((email) => email));
-    }
-  }, [groupEventInfo]);
+  function formatToLocalDatetime(eventDate: string) {
+    const date = new Date(eventDate);
+    return format(date, "yyyy-MM-dd'T'HH:mm");
+  }
 
   const debouncedSetColor = useCallback(
     debounce((newColor: string) => {
@@ -68,11 +62,13 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
       e.preventDefault();
 
       if (!eventId) return sendToast('default', '변경할 일정을 찾지 못했습니다.');
+      if (!titleRef.current?.value) return sendToast('warning', '일정 제목을 입력해주세요.');
+
       const formData: GroupEvent = {
         groupEventId: eventId,
-        title: titleRef.current?.value || groupEventInfo?.title || '제목',
-        startAt: startAtRef.current?.value || groupEventInfo?.startAt || '시작 날짜',
-        endAt: endAtRef.current?.value || groupEventInfo?.endAt || '종료 날짜',
+        title: titleRef.current.value,
+        startAt: startAt,
+        endAt: endAt,
         pinned: pinned,
         color: color,
         member: selectedMember,
@@ -86,27 +82,35 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
     },
     [
       eventId,
+      titleRef,
+      startAt,
+      endAt,
+      pinned,
       color,
       selectedMember,
-      pinned,
-      onClose,
       onSubmit,
-      groupEventInfo,
-      setView,
       setIsLoaded,
+      setView,
+      onClose,
     ],
   );
 
-  // *********************? 렌더링 함수
+  useEffect(() => {
+    if (selectedCalendar && selectedCalendar !== 'All') {
+      setCalendarMember(selectedCalendar.attendees);
+    } else {
+      setCalendarMember([]);
+    }
+  }, [selectedCalendar]);
+
+  useEffect(() => {
+    if (groupEventInfo && groupEventInfo.member) {
+      setSelectedMember(groupEventInfo.member.map((email) => email));
+    }
+  }, [groupEventInfo]);
 
   useEffect(() => {
     return () => debouncedSetColor.cancel();
-  }, [debouncedSetColor]);
-
-  useEffect(() => {
-    return () => {
-      debouncedSetColor.cancel();
-    };
   }, [debouncedSetColor]);
 
   return (
@@ -131,14 +135,18 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
         </h2>
       </header>
       <main>
-        <section key="date-section" className="FLEX-verA h-20 items-center mx-auto mb-10">
-          <span className="FLEX-horizC py-2 border-b">
-            Start
-            <input type="date" ref={startAtRef} defaultValue={groupEventInfo?.startAt} />
+        <section key="date-section" className="FLEX-horizC space-y-2 px-2 text-lg">
+          <span className="FLEX-ver w-full">
+            <p className="w-14 border-r mr-1">Start</p>
+            <input
+              type="datetime-local"
+              value={startAt}
+              onChange={(e) => setStartAt(e.target.value)}
+            />
           </span>
-          <span className="FLEX-horizC py-2 border-b ">
-            End
-            <input type="date" ref={endAtRef} defaultValue={groupEventInfo?.endAt} />
+          <span className="FLEX-ver w-full">
+            <p className="w-14 border-r mr-1">End</p>
+            <input type="datetime-local" value={endAt} onChange={(e) => setEndAt(e.target.value)} />
           </span>
         </section>
         <section key="member-section" className="FLEX-horizC my-6">

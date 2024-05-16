@@ -45,14 +45,15 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
   // *********************? 함수
   const closeFeedCreateModal = useCallback(() => setFeedCreate(false), []);
 
-  const displayDate = (dateString?: string) => {
-    if (!dateString) return { year: '', monthDay: '' };
-
-    const date = parseISO(dateString);
-    const year = format(date, 'yyyy');
-    const monthDay = format(date, 'MM-dd');
-    return { year, monthDay };
-  };
+  function displayDate(date: string | undefined) {
+    if (!date) return { year: '', monthDay: '', time: '' };
+    const parsedDate = new Date(date);
+    return {
+      year: format(parsedDate, 'yyyy'),
+      monthDay: format(parsedDate, 'MM월 dd일'),
+      time: format(parsedDate, 'HH시:mm분'),
+    };
+  }
 
   const renderAuthorOrGroupTitle = ({
     eventInfo,
@@ -168,11 +169,13 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
             <div className="FLEX-horizC">
               <div>{displayDate(eventInfo?.startAt).year}</div>
               <h2>{displayDate(eventInfo?.startAt).monthDay}</h2>
+              <div>{displayDate(eventInfo?.startAt).time}</div>
             </div>
             <h1 className="text-custom-main">{'>'}</h1>
             <div className="FLEX-horizC">
               <div>{displayDate(eventInfo?.endAt).year}</div>
               <h2>{displayDate(eventInfo?.endAt).monthDay}</h2>
+              <div>{displayDate(eventInfo?.endAt).time}</div>
             </div>
           </section>
           <section key="member-section" className="FLEX-horizC items-center space-y-2">

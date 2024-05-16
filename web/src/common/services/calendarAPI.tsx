@@ -76,6 +76,24 @@ export async function createGroupCalendar({ title, type }: CreateCalendarForm) {
   }
 }
 
+export async function updateGroupBanner(calendarId: UUID, bannerFormData: FormData) {
+  try {
+    const res = await API.post(`banner/upload/web/${calendarId}`, bannerFormData);
+    if (!res) throw new Error('CALENDAR - updateGroupBanner (DB 배너 업데이트 실패)');
+    console.log(`CALENDAR - createGroupCalendar 성공 :`, res);
+
+    return true;
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as API.ErrorResponse;
+      console.error(`CALENDAR - updateGroupBanner 실패 :`, data); //debug//
+      sendToast('warning', data.message);
+    }
+  }
+}
+
 export async function removeGroupCalendar(groupCalendar: Calendar | 'All') {
   if (groupCalendar === 'All') return sendToast('default', '그룹 캘린더를 선택해주세요.');
   try {

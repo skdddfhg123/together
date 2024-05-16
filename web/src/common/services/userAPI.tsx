@@ -164,9 +164,9 @@ export async function updateThumbnail(thumbnailFormData: FormData) {
     if (!res) throw new Error('USER - joinCalendar (DB에서 그룹 캘린터 가입 실패)');
     console.log(`USER - updateThumbnail 성공`, res); //debug//
 
-    const currentUserInfo = useUserInfoStore.getState().userInfo;
-    if (currentUserInfo)
-      useUserInfoStore.getState().setUserInfo({ ...currentUserInfo, thumbnail: res.thumbnail });
+    // const currentUserInfo = useUserInfoStore.getState().userInfo;
+    // if (currentUserInfo)
+    //   useUserInfoStore.getState().setUserInfo({ ...currentUserInfo, thumbnail: res.thumbnail });
 
     sendToast('success', `프로필이 수정되었습니다.`);
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Modal from 'react-modal';
-import { formatISO } from 'date-fns';
+import { formatISO, set } from 'date-fns';
 import LabelIcon from '@mui/icons-material/Label';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
@@ -88,13 +88,16 @@ export default React.memo(function CreateEventSimple({
         return sendToast('default', '일정을 등록할 그룹 캘린더를 선택해주세요.');
       }
 
+      const startAtDate = set(selectedDay, { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 });
+      const endAtDate = set(selectedDay, { hours: 23, minutes: 30, seconds: 0, milliseconds: 0 });
+
       const eventData: reqEvent = {
         groupCalendarId: selectedCalendar.calendarId,
         title: title,
         color: color.code,
         member: null,
-        startAt: formatISO(selectedDay, { representation: 'complete' }),
-        endAt: formatISO(selectedDay, { representation: 'complete' }),
+        startAt: formatISO(startAtDate, { representation: 'complete' }),
+        endAt: formatISO(endAtDate, { representation: 'complete' }),
       };
 
       const res = await CALENDAR.createGroupSimpleEvent(eventData);

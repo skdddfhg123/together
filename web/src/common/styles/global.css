@@ -85,6 +85,10 @@ h2 {
   .ANI-short {
     @apply transition-all duration-300 ease-in-out
   }
+
+  .ANI-btn {
+    @apply ANIMATION hover:bg-custom-main hover:text-white hover:scale-150
+  }
 }
 
 @layer components {

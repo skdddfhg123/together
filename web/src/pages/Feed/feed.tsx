@@ -1,17 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { UUID } from 'crypto';
 
 import useToggle from '@hooks/useToggle';
 import * as FEED from '@services/eventFeedAPI';
-import { Calendar, EventFeed } from '@type/index';
+import { EventFeed } from '@type/index';
 
 import * as CALENDAR from '@services/calendarAPI';
 
-import MiniCalendar from '@components/Feed/miniCalendar';
+import MiniCalendar from '@components/Feed/MiniCalendar';
 import FeedModal from '@components/Feed/FeedModal';
-import { useCalendarListStore, useSelectedCalendarStore } from '@store/index';
+import { useSelectedCalendarStore } from '@store/index';
 
-import defaultCover from '@assets/default_cover.png';
 import useToast from '@hooks/useToast';
 
 interface FeedPageProps {
@@ -27,13 +25,11 @@ export default function FeedPage({
   currentMonth,
   onClose,
 }: FeedPageProps) {
-  const { calendarList } = useCalendarListStore();
-
   const { isOn, toggle } = useToggle(false);
 
   const [feedList, setFeedList] = useState<EventFeed[]>([]);
   const [selectedFeedInfo, setSelectedFeedInfo] = useState<EventFeed | null>(null);
-  const { selectedCalendar, setSelectedCalendar } = useSelectedCalendarStore();
+  const { selectedCalendar } = useSelectedCalendarStore();
 
   //************ 피드 모달
   const openFeedModal = useCallback((feedInfo: EventFeed | null) => {
@@ -115,26 +111,30 @@ export default function FeedPage({
           >
             {selectedCalendar !== 'All' && selectedCalendar.title}의 피드
           </h1>
-          <div id="mainFeed" className="FLEX-horiz SCROLL-hide h-200 mx-auto ">
-            <ul className="grid grid-cols-3 p-0.5">
-              {feedList.map((feed: EventFeed, idx) => (
-                <li
-                  key={idx}
-                  className="hover:HOVERING flex justify-center items-center  m-0.5 border rounded"
-                >
-                  {feed.thumbnail && feed.images[0] ? (
-                    <img
-                      className="w-80 h-80 object-cover "
-                      src={feed.images[0].imageSrc}
-                      alt={`Feed ${idx}`}
-                      onClick={() => openFeedModal(feed)}
-                    />
-                  ) : (
-                    <span>No Thumbnail</span>
-                  )}
-                </li>
-              ))}
-            </ul>
+          <div id="mainFeed" className="FLEX-horiz SCROLL-hide h-200 mx-auto">
+            {feedList.length > 0 ? (
+              <ul className="grid grid-cols-3 p-0.5 w-full">
+                {feedList.map((feed: EventFeed, idx: number) => (
+                  <li
+                    key={idx}
+                    className="hover:HOVERING flex justify-center items-center m-0.5 border rounded"
+                  >
+                    {feed.images && (
+                      <img
+                        className="w-80 h-80 object-cover"
+                        src={feed.images[0].imageSrc}
+                        alt={`Feed ${idx}`}
+                        onClick={() => openFeedModal(feed)}
+                      />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="FLEX-horizC w-full h-full">
+                <div className="text-3xl">등록된 피드가 없습니다.</div>
+              </div>
+            )}
           </div>
         </main>
         <FeedModal feedInfo={selectedFeedInfo} isOpen={isOn} onClose={closeFeedModal} />

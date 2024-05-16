@@ -7,7 +7,7 @@ import sendToast from '@hooks/useToast';
 import * as USER from '@services/userAPI';
 import * as CALENDAR from '@services/calendarAPI';
 import { Image, UserInfo } from '@type/index';
-import { useCalendarListStore } from '@store/index';
+import { useCalendarListStore, useUserInfoStore } from '@store/index';
 
 const defaultSrc =
   'https://raw.githubusercontent.com/roadmanfong/react-cropper/master/example/img/child.jpg';
@@ -19,6 +19,7 @@ interface UpdateThumbnailProps {
 }
 
 export default function UpdateThumbnail({ userInfo, isOpen, onClose }: UpdateThumbnailProps) {
+  const { setUserInfo } = useUserInfoStore();
   const [image, setImage] = useState<Image>(defaultSrc);
   const [cropData, setCropData] = useState<File | null>(null);
   const cropperRef = createRef<ReactCropperElement>();
@@ -41,36 +42,28 @@ export default function UpdateThumbnail({ userInfo, isOpen, onClose }: UpdateThu
   const getCropData = () => {
     if (cropperRef.current?.cropper) {
       const canvas = cropperRef.current.cropper.getCroppedCanvas();
-      const width = canvas.width;
-      const height = canvas.height;
 
-      // 새 캔버스 생성
-      const circleCanvas = document.createElement('canvas');
-      circleCanvas.width = width;
-      circleCanvas.height = height;
-      const ctx = circleCanvas.getContext('2d');
-
-      if (!ctx) return;
-
-      // 원형 경로 생성
-      ctx.beginPath();
-      ctx.arc(width / 2, height / 2, width / 2, 0, 2 * Math.PI, false);
-      ctx.closePath();
-      ctx.clip();
-
-      // 원형 크롭 이미지 그리기
-      ctx.drawImage(canvas, 0, 0, width, height);
-
-      // Blob으로 변환하고 File 객체 생성
-      circleCanvas.toBlob((blob) => {
+      canvas.toBlob((blob) => {
         if (blob) {
-          const timestamp = new Date().getTime();
-          const randomNumber = Math.random().toString().slice(2, 8);
-          const fileName = `${userInfo?.useremail}-${timestamp}-${randomNumber}.png`;
-          const croppedFile = new File([blob], `${fileName}.png`, {
+          const fileName = `${userInfo?.useremail}.png`;
+          const croppedFile = new File([blob], fileName, {
             type: 'image/png',
           });
           setCropData(croppedFile);
+
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (reader.result) {
+              setUserInfo({
+                nickname: userInfo?.nickname || 'user',
+                useremail: userInfo?.useremail || 'email',
+                birthDay: userInfo?.birthDay || null,
+                phone: userInfo?.phone || null,
+                thumbnail: reader.result as string,
+              });
+            }
+          };
+          reader.readAsDataURL(blob);
         }
       }, 'image/png');
     }
@@ -134,12 +127,12 @@ export default function UpdateThumbnail({ userInfo, isOpen, onClose }: UpdateThu
             </header>
             <Cropper
               style={{ height: 400, width: '100%' }}
+              className="cropper-circle"
               ref={cropperRef}
               aspectRatio={1}
               preview=".img-preview"
               src={image}
               viewMode={2}
-              // zoomTo={0.5}
               minCropBoxHeight={10}
               minCropBoxWidth={10}
               background={false}
@@ -157,15 +150,6 @@ export default function UpdateThumbnail({ userInfo, isOpen, onClose }: UpdateThu
         <button className="BTN mt-20 hover:bg-custom-light rounded text-2xl" onClick={getCropData}>
           프로필 수정하기
         </button>
-        {/* <div className="box" style={{ width: '50%', float: 'right', height: '300px' }}>
-          <h1>
-            <span>Crop</span>
-            <button style={{ float: 'right' }} onClick={getCropData}>
-              Crop Image
-            </button>
-          </h1>
-          <img className="w-1/2" src={cropData} alt="cropped" />
-        </div> */}
         <br style={{ clear: 'both' }} />
       </div>
     </Modal>
