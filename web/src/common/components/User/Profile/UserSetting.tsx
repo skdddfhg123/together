@@ -8,7 +8,6 @@ import { useUserInfoStore } from '@store/index';
 import UpdateThumbnail from '@components/User/Profile/UpdateThumbnail';
 import defaultUserImg from '@assets/default_user.png';
 import '@styles/modalStyle.css';
-import sendToast from '@hooks/useToast';
 
 export default React.memo(function UserModal() {
   const navigate = useNavigate();
@@ -35,7 +34,6 @@ export default React.memo(function UserModal() {
     });
     navigate(`/signin`);
     setModalOpen(false);
-    sendToast('error', '로그아웃 되었습니다.');
   };
 
   useEffect(() => {

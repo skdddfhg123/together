@@ -306,7 +306,6 @@ export default React.memo(function CalendarPage({
         onClose={toggleDeatilsModal}
         memberEventList={MemberEventList}
       />
-      ;
     </div>
   );
 });

@@ -29,7 +29,7 @@ export default function MainPage() {
   const { isOn, toggle } = useToggle(false);
   const { userInfo } = useUserInfoStore();
   const [toggleFeed, setToggleFeed] = useState<boolean>(false);
-  const [tutorial, setTutorial] = useState<boolean>(true);
+  const [tutorial, setTutorial] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   const closeTutorial = () => {
@@ -71,7 +71,7 @@ export default function MainPage() {
 
   useEffect(() => {
     console.log(`튜토리얼 여부`, userInfo?.isFirst);
-    if (userInfo?.isFirst) {
+    if (userInfo?.isFirst === true) {
       welcomeTutorial();
     } else {
       return;
@@ -141,7 +141,7 @@ export default function MainPage() {
         <aside id="right-sideBar">
           <RightMenuTap switchMain={switchingFeedAndCalendar} />
         </aside>
-        <Tutorial isOpen={tutorial} onClose={closeTutorial} />
+        {tutorial && <Tutorial isOpen={tutorial} onClose={closeTutorial} />}
       </main>
     </>
   );

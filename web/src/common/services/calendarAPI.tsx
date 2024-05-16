@@ -159,7 +159,6 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
     });
 
     useMemberEventListByDateState.getState().setAllEventList(MemberEventList);
-    console.log(`CALENDAR - 동민님 리팩토링 멤버들 이벤트 :`, MemberEventList);
 
     return true;
   } catch (e) {
