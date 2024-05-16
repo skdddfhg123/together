@@ -9,8 +9,8 @@ import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 import useToggle from '@hooks/useToggle';
 import sendToast from '@hooks/useToast';
 
-import ViewEvent from '@components/Canlendar/EventDetails/ViewEvent';
-import ModifyEvent from '@components/Canlendar/EventDetails/ModifyEvent';
+import ViewEvent from '@components/Event/ViewEvent/ViewEvent';
+import ModifyEvent from '@components/Event/ModifyEvent';
 
 interface EventDetailsProps {
   isOpen: boolean;

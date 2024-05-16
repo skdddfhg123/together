@@ -6,7 +6,7 @@ import { EventFeed } from '@type/index';
 
 import * as CALENDAR from '@services/calendarAPI';
 
-import MiniCalendar from '@components/Feed/MiniCalendar';
+import MiniCalendar from '@components/Canlendar/MiniCalendar';
 import FeedModal from '@components/Feed/FeedModal';
 import { useSelectedCalendarStore } from '@store/index';
 

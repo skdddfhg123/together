@@ -81,7 +81,7 @@ interface MemberEventListState {
   setAllEventList: (memberAndEvent: MemberWithEvent[]) => void;
 }
 
-export const useMemberEventListState = create<MemberEventListState>((set) => ({
+export const useMemberEventListByDateState = create<MemberEventListState>((set) => ({
   MemberEventList: [],
   setAllEventList: (memberAndEvent) => set({ MemberEventList: memberAndEvent }),
 }));

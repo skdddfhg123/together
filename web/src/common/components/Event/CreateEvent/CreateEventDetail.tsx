@@ -23,14 +23,14 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
+import sendToast from '@hooks/useToast';
 import * as REDIS from '@services/redisAPI';
 import * as CALENDAR from '@services/calendarAPI';
-import sendToast from '@hooks/useToast';
 
-import { useMemberEventListState, useUserInfoStore } from '@store/index';
+import { Calendar, MemberWithEvent, reqEvent } from '@type/index';
+import { useMemberEventListByDateState, useUserInfoStore } from '@store/index';
 
 import default_user from '@assets/default_user.png';
-import { Calendar, reqEvent } from '@type/index';
 
 const selectStyles = css`
   &::before,
@@ -88,7 +88,7 @@ export default function DetailModal({
   title,
   setColor,
 }: ModalComponentProps) {
-  const { MemberEventList } = useMemberEventListState();
+  const { MemberEventList } = useMemberEventListByDateState();
   const { userInfo } = useUserInfoStore();
 
   const titleRef = useRef<HTMLInputElement>(null);
@@ -160,7 +160,7 @@ export default function DetailModal({
   useEffect(() => {
     if (isOpen) {
       resetForm();
-      MemberEventList.forEach((member) => {
+      MemberEventList.forEach((member: MemberWithEvent) => {
         if (member.useremail === userInfo?.useremail) setSelectedMembers([member.useremail]);
       });
     }
@@ -182,7 +182,7 @@ export default function DetailModal({
   }, [allDay]);
 
   useEffect(() => {
-    MemberEventList.forEach((member) => {
+    MemberEventList.forEach((member: MemberWithEvent) => {
       if (member.useremail === userInfo?.useremail) setSelectedMembers([member.useremail]);
     });
   }, [MemberEventList, userInfo?.useremail]);
@@ -299,7 +299,7 @@ export default function DetailModal({
             <PeopleIcon style={{ color: color }} />
             <div className="overflow-auto max-h-50vh bg-transparent">
               <FormGroup>
-                {MemberEventList.map((member) => (
+                {MemberEventList.map((member: MemberWithEvent) => (
                   <div key={member.useremail} className="flex items-center my-2">
                     <Checkbox
                       checked={selectedMembers.includes(member.useremail)}

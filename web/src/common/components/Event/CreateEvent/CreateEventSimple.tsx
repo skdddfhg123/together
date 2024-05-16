@@ -14,7 +14,7 @@ import sendToast from '@hooks/useToast';
 import { Calendar, reqEvent } from '@type/index';
 import { useUserInfoStore } from '@store/index';
 
-import DetailModal from '@components/Canlendar/CreateEventDetail';
+import DetailModal from '@components/Event/CreateEvent/CreateEventDetail';
 import '@styles/modalStyle.css';
 
 interface EventModalProps {

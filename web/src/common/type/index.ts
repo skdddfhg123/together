@@ -80,6 +80,7 @@ export interface reqEvent extends DefaultEvent {
 export interface GroupingMemberEvent {
   [key: string]: DefaultEvent[];
 }
+
 export interface AllEvent extends DefaultEvent {
   id: UUID;
   type?: string; // 그룹 캘린더에 지정된 색

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import 'react-toastify/dist/ReactToastify.css';
 import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import { UUID } from 'crypto';
@@ -14,13 +13,14 @@ import {
   useSocialEventListStore,
   useGroupEventListStore,
   useAllEventListStore,
-  useMemberEventListState,
+  useMemberEventListByDateState,
 } from '@store/index';
 import * as CALENDAR from '@services/calendarAPI';
 
-import CreateEventModal from '@components/Canlendar/CreateEventSimple';
-import EventDetails from '@components/Canlendar/EventDetails/EventDetails';
-import GroupMemberEvent from '@components/Canlendar/GroupMemberEvent';
+import CreateEventModal from '@components/Event/CreateEvent/CreateEventSimple';
+import EventDetails from '@components/Event/ViewEvent/EventDetails';
+import GroupMemberEvent from '@components/Event/ViewEvent/GroupMemberEvent';
+import EventDetailsWithMemberModal from '@components/Event/ViewEvent/DetailWithMemberModal/EventDetailsModal';
 import '@styles/calendar.css';
 
 import kakaoImg from '@assets/KakaoTalk.png';
@@ -31,7 +31,6 @@ type CalendarProps = {
   currentMonth: Date;
 };
 
-// TODO 일정 그릴 때, 그룹 캘린더 별로 구분할 수 있도록 색 지정해서 그릴 필요 있음.
 export default React.memo(function CalendarPage({
   isPrevMonth,
   isNextMonth,
@@ -43,12 +42,18 @@ export default React.memo(function CalendarPage({
   const { socialEventList } = useSocialEventListStore();
   const { AllEventList } = useAllEventListStore();
   const { groupEventList } = useGroupEventListStore();
-  const { MemberEventList } = useMemberEventListState();
+  const { MemberEventList } = useMemberEventListByDateState();
+
+  const [memberModalOn, setMemberModalOn] = useState<boolean>(false);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   // *****************? 자식컴포넌트 전달을 위한 callback 최적화
+  const toggleDeatilsModal = useCallback(() => {
+    memberModalOn ? setMemberModalOn(false) : setMemberModalOn(false);
+  }, []);
+
   const eventModalClose = useCallback(() => {
     setEventModalOn(false);
   }, []);
@@ -65,8 +70,13 @@ export default React.memo(function CalendarPage({
   const [detailsOn, setDetailsOn] = useState<boolean>(false);
   const [groupEventId, setGroupEventId] = useState<UUID | null>(null);
 
-  // *****************? 더블 클릭으로 이벤트 등록 Modal 띄움
+  // *****************? 연속 클릭으로 이벤트 등록 Modal 띄움
+  const handleClick = () => {
+    setMemberModalOn(true);
+  };
+
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
+    console.log(`선택된 날짜`, day);
     if (selectedCalendar === 'All') {
       sendToast('default', ' 그룹 캘린더를 선택해주세요.');
       return;
@@ -225,7 +235,7 @@ export default React.memo(function CalendarPage({
         <td id="Td" key={i} className={`${dayClasses}`} onClick={(e) => handleDayClick(day, e)}>
           <div className="dayBox">
             <span className="day">{day.getDate()}</span>
-            <span className="GroupMember-Box">
+            <span className="GroupMember-Box" onClick={handleClick}>
               {selectedCalendar !== 'All' && (
                 <GroupMemberEvent
                   selectedCalendar={selectedCalendar}
@@ -291,6 +301,12 @@ export default React.memo(function CalendarPage({
         position={modalPosition}
       />
       <EventDetails isOpen={detailsOn} eventId={groupEventId} onClose={detailsClose} />
+      <EventDetailsWithMemberModal
+        isOpen={memberModalOn}
+        onClose={toggleDeatilsModal}
+        memberEventList={MemberEventList}
+      />
+      ;
     </div>
   );
 });

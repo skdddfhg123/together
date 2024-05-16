@@ -3,6 +3,7 @@ import { UUID } from 'crypto';
 import { format } from 'date-fns';
 
 import sendToast from '@hooks/useToast';
+import { convertUtcToKst, getDatesInRange } from '@hooks/useDateTranslate';
 import * as API from '@utils/api';
 
 import {
@@ -17,7 +18,7 @@ import {
   useCalendarListStore,
   useGroupEventInfoStore,
   useGroupEventListStore,
-  useMemberEventListState,
+  useMemberEventListByDateState,
   useSelectedCalendarStore,
   useUserInfoStore,
 } from '@store/index';
@@ -129,12 +130,24 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
 
     const MemberEventList = res.map((member: MemberWithEvent) => {
       const GroupedEvents: GroupingMemberEvent = {};
+
       member.allevents?.forEach((event) => {
-        const formattedStartAt = format(new Date(event.startAt), 'yyyy-MM-dd');
-        if (!GroupedEvents[formattedStartAt]) {
-          GroupedEvents[formattedStartAt] = [];
-        }
-        GroupedEvents[formattedStartAt].push(event);
+        const startAt = convertUtcToKst(new Date(event.startAt));
+        const endAt = convertUtcToKst(new Date(event.endAt));
+
+        const eventDates = getDatesInRange(startAt, endAt);
+
+        eventDates.forEach((date) => {
+          const formattedDate = format(date, 'yyyy-MM-dd');
+          if (!GroupedEvents[formattedDate]) {
+            GroupedEvents[formattedDate] = [];
+          }
+          GroupedEvents[formattedDate].push({
+            title: event.title,
+            startAt: event.startAt,
+            endAt: event.endAt,
+          });
+        });
       });
 
       return {
@@ -145,7 +158,8 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
       };
     });
 
-    useMemberEventListState.getState().setAllEventList(MemberEventList);
+    useMemberEventListByDateState.getState().setAllEventList(MemberEventList);
+    console.log(`CALENDAR - 동민님 리팩토링 멤버들 이벤트 :`, MemberEventList);
 
     return true;
   } catch (e) {
