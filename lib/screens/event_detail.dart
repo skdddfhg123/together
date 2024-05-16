@@ -211,6 +211,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     List<Member> members = meetingController
                         .getMembersForGroupEvent(widget.groupEventId);
                     if (members.isEmpty) {
+                      print(members.length);
                       return const Text("소셜 일정입니다.");
                     } else {
                       return Wrap(
