@@ -196,7 +196,7 @@ class _AllCalendarState extends State<AllCalendar> {
                 color: Colors.transparent,
                 width: 0,
               ),
-            ), // 선택한 날짜의 테두리를 없앱니다.
+            ),
             monthCellBuilder: (BuildContext context, MonthCellDetails details) {
               TextStyle textStyle = const TextStyle(
                   color: Colors.black,

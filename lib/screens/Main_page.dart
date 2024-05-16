@@ -1,5 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:calendar/controllers/feed_controller.dart';
 import 'package:calendar/screens/calendar_setting.dart';
+import 'package:calendar/screens/error_page.dart';
+import 'package:calendar/screens/feed_page.dart';
+
 import 'package:calendar/screens/myprofile_page.dart';
 import 'package:calendar/widget/calendar_utils.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
@@ -29,10 +33,10 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _pages = [
       AllCalendar(onCalendarChanged: _changePage),
-      const MemoPage(),
+      FeedPage(calendarId: calendarId),
       const MemoPage(),
       const NotificationPage(),
-      CalendarSettingsPage(calendarId: calendarId),
+      const MyProfile(), // 처음 설정 페이지는 MyProfile로 설정
     ];
   }
 
@@ -46,17 +50,30 @@ class _MainPageState extends State<MainPage> {
       if (newCalendarId == 'all_calendar') {
         _pages[0] = AllCalendar(onCalendarChanged: _changePage);
         _pages[4] = const MyProfile(); // "설정" 탭을 MyProfilePage로 변경
+        _pages[1] = const ErrorPage();
       } else {
         _pages[0] = CalendarDetailView(
             calendarId: newCalendarId, onCalendarChanged: _changePage);
         _pages[4] = CalendarSettingsPage(
             calendarId: calendarId); // 해당 calendarId의 설정 페이지로 이동
       }
+
+      // FeedPage에 calendarId 설정 (newCalendarId가 'all_calendar'가 아닐 때만)
+      if (newCalendarId != 'all_calendar') {
+        _pages[1] = FeedPage(calendarId: calendarId);
+      }
+
       _selectedIndex = 0; // 일정 탭으로 돌아가기
     });
   }
 
   void _onItemTapped(int index) {
+    if (index == 1) {
+      // '피드' 탭
+      final feedController = Get.find<FeedController>();
+      feedController.fetchFeeds(calendarId);
+    }
+
     if (index == 2) {
       // '작성' 탭
       final EventSelectionController eventController =

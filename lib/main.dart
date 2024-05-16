@@ -1,8 +1,10 @@
 import 'package:calendar/api/calendar_create_service.dart';
 import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/api/kakao_auth_service.dart';
+import 'package:calendar/api/post_service.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
+import 'package:calendar/controllers/feed_controller.dart';
 import 'package:calendar/models/fonts.dart';
 import 'package:calendar/screens/Main_page.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,7 @@ void main() async {
   Get.put(AuthController());
   Get.put(MeetingController()); // MeetingController를 먼저 등록합니다.
   Get.put(CalendarApiService()); // CalendarApiService를 이후에 등록합니다.
+  Get.put(FeedController(feedService: FeedService()));
   Get.put(CalendarCreateApiService());
   Get.put(KakaoAuthService());
   Get.put(EventSelectionController());

@@ -79,6 +79,7 @@ flutter:
   assets:
     - assets/images/kakao.png
     - assets/images/kakao_logout.png
+    - assets/images/error.gif
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -341,7 +341,7 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                         runSpacing: 2,
                         children: uniqueMembers
                             .map((member) => CircleAvatar(
-                                  radius: 8,
+                                  radius: 6,
                                   backgroundImage: CachedNetworkImageProvider(
                                       member.thumbnail),
                                 ))
@@ -365,21 +365,24 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                 return Container(
                   decoration: BoxDecoration(
                     color: appointment.color,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          appointment.subject,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            overflow: TextOverflow.ellipsis,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(2, 5, 0, 0),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            appointment.subject,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              overflow: TextOverflow.clip,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               }

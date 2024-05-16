@@ -15,12 +15,12 @@ class CustomBottomNavBar extends StatelessWidget {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today),
+          icon: Icon(Icons.calendar_month_outlined),
           label: '일정',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.note),
-          label: '메모',
+          icon: Icon(Icons.feed),
+          label: '피드',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.add_box),
@@ -36,7 +36,7 @@ class CustomBottomNavBar extends StatelessWidget {
         ),
       ],
       currentIndex: selectedIndex,
-      selectedItemColor: Colors.amber[800], // 선택된 아이템의 색상
+      selectedItemColor: Colors.blue, // 선택된 아이템의 색상
       unselectedItemColor: Colors.grey, // 선택되지 않은 아이템의 색상
       onTap: onItemTapped,
       type: BottomNavigationBarType.fixed, // 고정된 타입

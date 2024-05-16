@@ -656,7 +656,6 @@ class MeetingController extends GetxController {
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
                         ),
-                        timeRulerSize: 30,
                         dateFormat: '',
                         dayFormat: '',
                         allDayPanelColor: Colors.grey[200],

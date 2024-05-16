@@ -124,4 +124,31 @@ class FeedService {
       return [];
     }
   }
+
+  Future<List<FeedWithId>> loadFeedsForCalendar(String calendarId) async {
+    String? token = await _loadToken();
+    var url =
+        Uri.parse('http://15.164.174.224:3000/feed/get/calendar/$calendarId');
+
+    try {
+      var response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      });
+      if (response.statusCode == 200) {
+        print('피드로드하기 성공');
+        List<dynamic> feedsJson = json.decode(response.body);
+        return feedsJson
+            .map((json) => FeedWithId.fromJson(json, calendarId))
+            .toList();
+      } else {
+        print(
+            'Failed to load feeds for calendar $calendarId, status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error loading feeds for calendar $calendarId: $e');
+      return [];
+    }
+  }
 }

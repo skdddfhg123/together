@@ -373,33 +373,18 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                   itemCount: feed.imageSrcs.length,
                                   itemBuilder: (_, imageIndex) {
                                     return AspectRatio(
-                                      aspectRatio: 1, // 이미지를 정사각형으로 설정
+                                      aspectRatio: 1,
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(8),
-                                        child: Image.network(
-                                          feed.imageSrcs[imageIndex],
-                                          fit: BoxFit
-                                              .cover, // 이미지를 꽉 채우기 위해 BoxFit.cover 사용
-                                          loadingBuilder: (BuildContext context,
-                                              Widget child,
-                                              ImageChunkEvent?
-                                                  loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes!
-                                                    : null,
-                                              ),
-                                            );
-                                          },
+                                        child: CachedNetworkImage(
+                                          imageUrl: feed.imageSrcs[imageIndex],
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
                                         ),
                                       ),
                                     );
@@ -433,13 +418,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                     );
                                   },
                                 ),
-                                // IconButton(
-                                //   icon: const Icon(Icons.bookmark_add_outlined,
-                                //       color: Colors.black),
-                                //   onPressed: () {
-                                //     // 북마크 기능 구현
-                                //   },
-                                // ),
                               ],
                             ),
                             Row(
