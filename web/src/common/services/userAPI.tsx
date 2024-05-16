@@ -181,3 +181,16 @@ export async function updateThumbnail(thumbnailFormData: FormData) {
     }
   }
 }
+
+export async function tutorial() {
+  try {
+    await API.get(`/auth/tutorial`);
+  } catch (e) {
+    const err = e as AxiosError;
+
+    if (err.response) {
+      const data = err.response.data as API.ErrorResponse;
+      console.error('USER - tutorial 값 갱신 실패', data); //debug//
+    }
+  }
+}

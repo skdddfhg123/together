@@ -13,20 +13,33 @@ import Calendar from '@pages/Calendar/calendar';
 import CalendarList from '@components/Canlendar/CalendarList';
 import UserModal from '@components/User/Profile/UserSetting';
 import RightMenuTap from '@components/Menu/RightMenuTap';
+import Tutorial from '@components/User/Tutorial';
 
 import logoImg from '@assets/toogether_noBG.png';
 import menuImg from '@assets/calendar_menu.webp';
 
 import '@styles/main.css';
 import FeedPage from '@pages/Feed/feed';
+import { useUserInfoStore } from '@store/index';
 
 const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_ALERT_SOCKET_PORT}`;
 
 export default function MainPage() {
   const navigate = useNavigate();
   const { isOn, toggle } = useToggle(false);
+  const { userInfo } = useUserInfoStore();
   const [toggleFeed, setToggleFeed] = useState<boolean>(false);
+  const [tutorial, setTutorial] = useState<boolean>(true);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+
+  const closeTutorial = () => {
+    setTutorial(false);
+  };
+
+  const welcomeTutorial = async () => {
+    await USER.tutorial();
+    setTutorial(true);
+  };
 
   const RendarUserAndCalendar = useCallback(async () => {
     const res = await USER.firstRender();
@@ -55,6 +68,15 @@ export default function MainPage() {
     CALENDAR.getMyAllCalendar();
     RendarUserAndCalendar();
   }, [RendarUserAndCalendar]);
+
+  useEffect(() => {
+    console.log(`튜토리얼 여부`, userInfo?.isFirst);
+    if (userInfo?.isFirst) {
+      welcomeTutorial();
+    } else {
+      return;
+    }
+  }, [userInfo, RendarUserAndCalendar]);
 
   // *****************? 실시간 알림을 위한 소켓 연결
   useEffect(() => {
@@ -119,6 +141,7 @@ export default function MainPage() {
         <aside id="right-sideBar">
           <RightMenuTap switchMain={switchingFeedAndCalendar} />
         </aside>
+        <Tutorial isOpen={tutorial} onClose={closeTutorial} />
       </main>
     </>
   );

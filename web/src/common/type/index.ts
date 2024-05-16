@@ -18,6 +18,7 @@ export type UserInfo = {
   birthDay: string | null;
   phone: string | null;
   thumbnail: Image | null;
+  isFirst: boolean;
   // userCalendarId: UserCalendarListInfo;
   // kakaoId?: number;    //TODO setting 객체로 받을 듯?
   // kakaoRefresh?: number;

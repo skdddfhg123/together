@@ -29,6 +29,7 @@ export default function SyncSocialEvent() {
     // ***************TODO 구글 및 outlook API 등록 필요
     const kakaoRes = await KAKAO.GetEvents();
     if (!kakaoRes) return;
+
     // const googleRes = await GOOGLE.GetEvents();
     // if (!googleRes) return;
     // const outlookRes = await OUTLOOK.GetEvents();
@@ -36,7 +37,7 @@ export default function SyncSocialEvent() {
 
     sendToast('success', '동기화가 완료되었습니다.');
     await CALENDAR.getMyAllCalendar();
-    await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정을 등록` });
+    await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: '일정을 등록' });
   }, [selectedCalendar, canInvoke]);
 
   return (

@@ -55,7 +55,8 @@ axiosInstance.interceptors.response.use(
         console.log(`data`, data);
 
         if (data.kakaoAccessToken === null) {
-          return console.log(`카카오 에러 핸들링`); //debug//
+          console.log(`카카오 에러 핸들링`); //debug//
+          return error;
         }
 
         if ('useremail' in data && 'password' in data) {

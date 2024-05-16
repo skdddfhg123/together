@@ -163,9 +163,8 @@ async function GetEvents() {
   } catch (error) {
     const err = error as AxiosError;
     console.error(`KAKAO - GetEvents 실패 :`, err); //debug//
-
-    if (err.response?.status === 401) console.log(`카카오톡 `, err);
-    return sendToast('default', '카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
+    sendToast('default', '카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
+    // if (err.response?.status === 401) console.log(`카카오톡 `, err);
   }
 }
 

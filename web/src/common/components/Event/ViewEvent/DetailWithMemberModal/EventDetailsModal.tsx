@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { Tooltip } from 'react-tooltip';
 
+import { useSelectedDayStore } from '@store/index';
 import { MemberWithEvent } from '@type/index';
 
 import MemberTimeline from '@components/Event/ViewEvent/DetailWithMemberModal/MemberTimeLine';
-import { useSelectedDayStore } from '@store/index';
+import '@styles/modalStyle.css';
 
 import default_user from '@assets/default_user.png';
 

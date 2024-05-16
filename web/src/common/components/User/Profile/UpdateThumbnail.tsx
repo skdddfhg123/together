@@ -59,6 +59,7 @@ export default function UpdateThumbnail({ userInfo, isOpen, onClose }: UpdateThu
                 useremail: userInfo?.useremail || 'email',
                 birthDay: userInfo?.birthDay || null,
                 phone: userInfo?.phone || null,
+                isFirst: false,
                 thumbnail: reader.result as string,
               });
             }
