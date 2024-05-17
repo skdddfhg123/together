@@ -64,10 +64,10 @@ export default function MainPage() {
   };
 
   // *****************? 최초 렌더링
-  useEffect(() => {
-    CALENDAR.getMyAllCalendar();
-    RendarUserAndCalendar();
-  }, [RendarUserAndCalendar]);
+  // useEffect(() => {
+  //   CALENDAR.getMyAllCalendar();
+  //   RendarUserAndCalendar();
+  // }, [RendarUserAndCalendar]);
 
   useEffect(() => {
     console.log(`튜토리얼 여부`, userInfo?.isFirst);

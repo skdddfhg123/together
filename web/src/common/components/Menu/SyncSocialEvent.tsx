@@ -1,34 +1,37 @@
 import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import sendToast from '@hooks/useToast';
 import * as KAKAO from '@services/KakaoAPI';
 import * as CALENDAR from '@services/calendarAPI';
 import * as REDIS from '@services/redisAPI';
+import * as USER from '@services/userAPI';
 import { useSelectedCalendarStore } from '@store/index';
 
 import syncImg from '@assets/sync.png';
 
 export default function SyncSocialEvent() {
+  const navigate = useNavigate();
   const { selectedCalendar } = useSelectedCalendarStore();
   const [canInvoke, setCanInvoke] = useState(true);
 
   const getSocialEvents = useCallback(async () => {
-    if (!canInvoke) {
-      sendToast('error', '동기화는 3분에 1번만 가능합니다');
-      return;
-    }
+    // if (!canInvoke) {
+    //   sendToast('error', '동기화는 3분에 1번만 가능합니다');
+    //   return;
+    // }
 
-    setCanInvoke(false);
-    setTimeout(
-      () => {
-        setCanInvoke(true);
-      },
-      3 * 60 * 1000,
-    );
+    // setCanInvoke(false);
+    // setTimeout(
+    //   () => {
+    //     setCanInvoke(true);
+    //   },
+    //   3 * 60 * 1000,
+    // );
 
     // ***************TODO 구글 및 outlook API 등록 필요
-    const kakaoRes = await KAKAO.GetEvents();
-    if (!kakaoRes) return;
+    // const kakaoRes = await KAKAO.GetEvents();
+    // if (!kakaoRes) return;
 
     // const googleRes = await GOOGLE.GetEvents();
     // if (!googleRes) return;
@@ -37,7 +40,10 @@ export default function SyncSocialEvent() {
 
     sendToast('success', '동기화가 완료되었습니다.');
     await CALENDAR.getMyAllCalendar();
-    await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: '일정을 등록' });
+    const res = await USER.firstRender();
+    if (!res) navigate('/signin');
+
+    await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: '동기화' });
   }, [selectedCalendar, canInvoke]);
 
   return (
