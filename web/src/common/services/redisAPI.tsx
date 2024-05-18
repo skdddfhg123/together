@@ -13,50 +13,41 @@ interface RedisPublish {
 }
 
 export async function MessagePost({ selectedCalendar, method }: RedisPublish) {
-  try {
-    const userInfo = useUserInfoStore.getState().userInfo;
-    if (selectedCalendar === 'All') {
-      const CalendarList = useCalendarListStore.getState().calendarList;
+  const userInfo = useUserInfoStore.getState().userInfo;
+  const CalendarList = useCalendarListStore.getState().calendarList;
+  const memberSet = new Set<Member>();
 
-      for (const calendar of CalendarList) {
-        const calendarTitle = calendar.title;
-        const memberList: Member[] = calendar.attendees;
-
-        for (const member of memberList) {
-          if (userInfo?.useremail === member.useremail) return;
-          const message = `
-          <div style="font-family: 'Jua', sans-serif;">
-            <span style="font-size: 1.5rem; color: #F9E897;">[ ${calendarTitle} ]</span><br />
-            <span style="font-size: 1.8rem; color: #7AFF79;">${member.nickname}</span>님이 
-            <span style="font-size: 1.8rem; color: #F1B2DC;">${method}</span>하셨습니다.
-          </div>`;
-          const res = await redisAxios.post('/publish', {
-            channel: member.useremail,
-            message,
-          });
-          if (!res) throw new Error('Redis 메세지 전송 실패');
-          console.log(`Redis 메세지 전송 성공 :`, res);
-        }
+  for (const calendar of CalendarList) {
+    for (const member of calendar.attendees) {
+      if (
+        !Array.from(memberSet).some(
+          (existingMember) => existingMember.useremail === member.useremail,
+        )
+      ) {
+        memberSet.add(member);
       }
-    } else {
-      const calendarTitle = selectedCalendar.title;
-      const memberList: Member[] = selectedCalendar.attendees;
+    }
+  }
 
-      for (const member of memberList) {
-        if (userInfo?.useremail === member.useremail) return;
-        const message = `
+  const memberList = Array.from(memberSet).filter(
+    (member) => member.useremail !== userInfo?.useremail,
+  );
+
+  try {
+    for (const member of memberList) {
+      const message = `
         <div style="font-family: 'Jua', sans-serif;">
-          <span style="font-size: 1.5rem; color: #F9E897;">[ ${calendarTitle} ]</span> 
-          <span style="font-size: 1.8rem; color: #7AFF79;">${member.nickname}</span>님이 
+          <span style="font-size: 1.8rem; color: #7AFF79;">${userInfo?.nickname}</span>님이 
           <span style="font-size: 1.8rem; color: #F1B2DC;">${method}</span>하셨습니다.
         </div>`;
-        const res = await redisAxios.post('/publish', {
-          channel: member.useremail,
-          message,
-        });
-        if (!res) throw new Error('Redis 메세지 전송 실패');
-        console.log(`Redis 메세지 전송 성공 :`, res);
-      }
+
+      const res = await redisAxios.post('/publish', {
+        channel: member.useremail,
+        message,
+      });
+
+      if (!res) throw new Error('Redis 메세지 전송 실패');
+      console.log(`Redis 메세지 전송 성공 :`, res);
     }
 
     return true;

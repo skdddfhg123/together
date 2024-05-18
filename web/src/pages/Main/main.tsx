@@ -20,14 +20,16 @@ import menuImg from '@assets/calendar_menu.webp';
 
 import '@styles/main.css';
 import FeedPage from '@pages/Feed/feed';
-import { useUserInfoStore } from '@store/index';
+import { useSelectedCalendarStore, useUserInfoStore } from '@store/index';
 
 const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_ALERT_SOCKET_PORT}`;
 
 export default function MainPage() {
   const navigate = useNavigate();
-  const { isOn, toggle } = useToggle(false);
   const { userInfo } = useUserInfoStore();
+  const { selectedCalendar } = useSelectedCalendarStore();
+
+  const { isOn, toggle } = useToggle(false);
   const [toggleFeed, setToggleFeed] = useState<boolean>(false);
   const [tutorial, setTutorial] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -83,11 +85,18 @@ export default function MainPage() {
     const socket = io(Redis_Url);
     console.log(`Redis Socket Connected`); //debug//
 
-    socket.on('redisMessage', ({ message }) => {
+    socket.on('redisMessage', async ({ message }) => {
       const cleanMessage = DOMPurify.sanitize(message);
       toast.info(<div dangerouslySetInnerHTML={{ __html: cleanMessage }} />, {
         containerId: 'memberAlert',
       });
+
+      const nowCalendar = useSelectedCalendarStore.getState().selectedCalendar;
+      if (nowCalendar === 'All') return;
+
+      //********? 실시간 동기화
+      await CALENDAR.getGroupAllEvents(nowCalendar);
+      await CALENDAR.getMemberAndMemberEvents(nowCalendar.calendarId);
     });
 
     return () => {

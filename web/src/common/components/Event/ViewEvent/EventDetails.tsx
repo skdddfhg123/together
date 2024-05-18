@@ -3,6 +3,7 @@ import { UUID } from 'crypto';
 
 import * as CALENDAR from '@services/calendarAPI';
 import * as USER from '@services/userAPI';
+import * as REDIS from '@services/redisAPI';
 
 import { Calendar, GroupEvent } from '@type/index';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
@@ -40,6 +41,7 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
     async (groupEventId: UUID | null) => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
       await CALENDAR.removeGroupEvent(groupEventId);
+      await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정을 삭제` });
       handleRender();
     },
     [handleRender],
@@ -47,6 +49,7 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
 
   const submitModifyEvent = async (formData: GroupEvent) => {
     await CALENDAR.updateGroupEvent(formData);
+    await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정을 수정` });
     handleRender();
   };
 
