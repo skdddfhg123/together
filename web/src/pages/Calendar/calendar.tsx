@@ -7,7 +7,7 @@ import { UUID } from 'crypto';
 import { hexToRgba } from '@hooks/useHexToRgba';
 import useToast from '@hooks/useToast';
 
-import { AllEvent } from '@type/index';
+import { AllEvent, GroupEvent } from '@type/index';
 import {
   useSelectedDayStore,
   useSelectedCalendarStore,
@@ -54,7 +54,7 @@ export default React.memo(function CalendarPage({
 
   // *****************? 자식컴포넌트 전달을 위한 callback 최적화
   const toggleDeatilsModal = useCallback(() => {
-    memberModalOn ? setMemberModalOn(false) : setMemberModalOn(false);
+    setMemberModalOn((prev) => !prev);
   }, []);
 
   const eventModalClose = useCallback(() => {
@@ -139,12 +139,20 @@ export default React.memo(function CalendarPage({
   const buildCalendarTag = (calendarDays: Date[]) => {
     const eventMap = new Map<string, JSX.Element[]>();
 
+    // 날짜 범위의 모든 날짜에 이벤트 추가하는 함수
+    const addEventToDateRange = (startAt: Date, endAt: Date, eventElement: JSX.Element) => {
+      for (let day = startAt; day <= endAt; day = addDays(day, 1)) {
+        const eventDate = format(day, 'yyyy-MM-dd');
+        const existingEvents = eventMap.get(eventDate) || [];
+        existingEvents.push(eventElement);
+        eventMap.set(eventDate, existingEvents);
+      }
+    };
+
     // ************* 그룹 이벤트 생성 or All 이벤트 생성
     if (selectedCalendar === 'All') {
       AllEventList.forEach((event) => {
-        const eventDate = format(event.startAt, 'yyyy-MM-dd');
-        const existingEvents = eventMap.get(eventDate) || [];
-        existingEvents.push(
+        const eventElement = (
           <li
             onMouseEnter={(e) => e.stopPropagation()}
             onMouseLeave={(e) => e.stopPropagation()}
@@ -156,34 +164,32 @@ export default React.memo(function CalendarPage({
             key={event.id}
           >
             {event.title || 'No Title'}
-          </li>,
+          </li>
         );
-        eventMap.set(eventDate, existingEvents);
+        addEventToDateRange(event.startAt, event.endAt, eventElement);
       });
 
       // ************* 소셜 이벤트 생성
+      const socialImgMap = {
+        kakao: kakaoImg,
+        google: googleImg,
+        outlook: outlookImg,
+      };
+
+      const socialClassMap = {
+        kakao: 'tooltip-kakao',
+        google: 'tooltip-google',
+        outlook: 'tooltip-outlook',
+      };
+
       socialEventList.forEach((event: AllEvent) => {
-        const eventDate = format(event.startAt, 'yyyy-MM-dd');
-        const existingEvents = eventMap.get(eventDate) || [];
-
-        const socialImgMap = {
-          kakao: kakaoImg,
-          google: googleImg,
-          outlook: outlookImg,
-        };
-
-        const socialClassMap = {
-          kakao: 'tooltip-kakao',
-          google: 'tooltip-google',
-          outlook: 'tooltip-outlook',
-        };
         const tooltipId = `tooltip-${event.id}`;
-        existingEvents.push(
+        const eventElement = (
           <li
             data-tooltip-id={tooltipId}
             className="tooltip-container"
             id={`${event.social}-event`}
-            key={existingEvents.length}
+            key={tooltipId}
           >
             <img id="socialImg" src={socialImgMap[event.social]} alt={`${event.social} Event`} />
             <Tooltip id={tooltipId} className={socialClassMap[event.social]}>
@@ -197,20 +203,14 @@ export default React.memo(function CalendarPage({
                   {format(event.startAt, 'HH:mm')} ~ {format(event.endAt, 'HH:mm')}{' '}
                 </span>
               </div>
-              {/* <div>{format(event.startAt, 'yyyy:MM:dd:HH:mm')}</div>
-    <div>{format(event.endAt, 'yyyy:MM:dd:HH:mm')}</div>
-    <div>{event.startAt.toString()}</div>
-    <div>{event.endAt.toString()}</div> */}
             </Tooltip>
-          </li>,
+          </li>
         );
-        eventMap.set(eventDate, existingEvents);
+        addEventToDateRange(event.startAt, event.endAt, eventElement);
       });
     } else {
-      groupEventList.forEach((event) => {
-        const eventDate = format(event.startAt, 'yyyy-MM-dd');
-        const existingEvents = eventMap.get(eventDate) || [];
-        existingEvents.push(
+      groupEventList.forEach((event: GroupEvent) => {
+        const eventElement = (
           <li
             onMouseEnter={(e) => e.stopPropagation()}
             onMouseLeave={(e) => e.stopPropagation()}
@@ -220,9 +220,9 @@ export default React.memo(function CalendarPage({
             key={event.groupEventId}
           >
             {event.title || 'No Title'}
-          </li>,
+          </li>
         );
-        eventMap.set(eventDate, existingEvents);
+        addEventToDateRange(event.startAt, event.endAt, eventElement);
       });
     }
 
