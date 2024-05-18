@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as EMOJI from '@services/ChatAndEmojiAPI';
 import { Calendar, Emoji } from '@type/index';
 
@@ -22,7 +22,7 @@ export default function TabEmojiList({ selectedCalendar }: TabEmojiListProps) {
   useEffect(() => {
     const fetchEmojis = async () => {
       try {
-        if (selectedCalendar === 'All') return sendToast('default', '그룹 캘린더를 선택해주세요.');
+        if (selectedCalendar === 'All') return useToast('default', '그룹 캘린더를 선택해주세요.');
         const res = await EMOJI.fetchEmojiList(selectedCalendar.calendarId);
         if (!res) throw new Error(`그룹 이모지 받아오기 실패`, res);
         setEmojis(
@@ -70,7 +70,7 @@ export default function TabEmojiList({ selectedCalendar }: TabEmojiListProps) {
           emojiId={selectedEmoji.emojiId}
           emoji={selectedEmoji.emojiUrl}
           emojiName={selectedEmoji.emojiName}
-          uploadDate={selectedEmoji.createdAt}
+          uploadDate={selectedEmoji.createdAt.toISOString()}
         />
       )}
     </div>

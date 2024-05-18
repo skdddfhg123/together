@@ -92,7 +92,7 @@ td.today:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: large;
+  font-size: x-large;
 }
 
 .GroupMember-Box {
@@ -112,17 +112,23 @@ th.day-6, .day-6 .day { /* 토요일 */
 }
 
 .today .day {
-  border-radius: 5px;
-
-  /* background-color: #0086FF; */
-  color: #0086FF;
-  font-size:x-large;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: x-large;
   font-weight: bold;
+  
+  color: white;
+  background-color: #0120c9;
+  border-radius: 100%;
+}
+
+.today.choiceDay .day {
+  font-size: x-large;
 }
 
 .choiceDay .day {
-  font-size: x-large;
-  font-weight: bold;
+  font-size: xx-large;
+  font-weight: semi-bold;
 }
 
 .choiceDay {
@@ -131,12 +137,64 @@ th.day-6, .day-6 .day { /* 토요일 */
 }
 
 
-.kakao-event {
+#kakao-event {
   height: 2rem;
   background: #F7E600;
   border-radius: 3px;
 }
 
-#kakaoImg {
+#google-event {
+  height: 2rem;
+  background:rgb(230, 239, 255);
+  border-radius: 3px;
+
+  box-shadow: 0 0 0 0.5px #0086FF inset;
+}
+
+#outlook-event {
+  height: 2rem;
+  background:rgb(230, 239, 255);
+  border-radius: 3px;
+
+  box-shadow: 0 0 0 0.5px #0086FF inset;
+}
+
+#socialImg {
   width: 2rem;
+}
+
+.tooltip-container .tooltip-kakao {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+
+  background-color: rgb(247, 230, 0);
+  color: rgb(58,29,29);
+  border-radius: 3px;
+}
+
+.tooltip-container .tooltip-google {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+
+  background-color: rgb(230, 239, 255);
+  color: rgb(066, 133, 244);
+  border-radius: 3px;
+}
+
+.tooltip-container .tooltip-outlook {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+
+  background-color: rgb(230, 239, 255);
+  color: rgb(066, 133, 244);
+  border-radius: 3px;
 }

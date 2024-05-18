@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as API from '@utils/api';
 import * as REDIS from '@services/redisAPI';
 import { Cookie, setCookie, deleteCookie } from '@utils/cookie';
@@ -8,7 +8,12 @@ import { Cookie, setCookie, deleteCookie } from '@utils/cookie';
 import { AllEvent, SignInForm, SignUpForm } from '@type/index';
 import {
   useAllEventListStore,
+  useCalendarListStore,
+  useEventFeedListStore,
+  useGroupEventInfoStore,
+  useGroupEventListStore,
   useSelectedCalendarStore,
+  useSelectedDayStore,
   useSocialEventListStore,
   useUserInfoStore,
 } from '@store/index';
@@ -23,10 +28,15 @@ export async function firstRender() {
     useSelectedCalendarStore.getState().setSelectedCalendar('All');
 
     REDIS.Connect(res.user.useremail);
-    const AllEvents: AllEvent[] = res.events.filter((event: AllEvent) => event.group !== undefined);
-    const SocialEvents: AllEvent[] = res.events.filter(
-      (event: AllEvent) => event.social !== undefined,
-    );
+
+    const events: AllEvent[] = res.events.map((event: AllEvent) => ({
+      ...event,
+      startAt: new Date(event.startAt),
+      endAt: new Date(event.endAt),
+    }));
+
+    const AllEvents: AllEvent[] = events.filter((event: AllEvent) => event.group !== undefined);
+    const SocialEvents: AllEvent[] = events.filter((event: AllEvent) => event.social !== undefined);
 
     useSocialEventListStore.getState().setSocialEventList(SocialEvents);
     useAllEventListStore.getState().setAllEventList(AllEvents);
@@ -38,14 +48,14 @@ export async function firstRender() {
 
     if (err.response?.status === 400) {
       console.error('USER - firstRender 실패 : ', err.response);
-      sendToast('error', '토큰 정보가 일치하지 않습니다');
+      useToast('error', '토큰 정보가 일치하지 않습니다');
     } else if (err.response?.data) {
       const data = err.response.data as API.ErrorResponse;
       console.error('USER - firstRender 실패 2 : ', data); //debug//
-      sendToast('warning', data.message);
+      useToast('warning', data.message);
     } else {
       console.error('USER - firstRender 실패 3 : ', err);
-      sendToast('error', '서버가 닫혀있습니다.');
+      useToast('error', '서버가 닫혀있습니다.');
     }
   }
 }
@@ -68,7 +78,7 @@ export async function signUp(formData: SignUpForm) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error('회원가입 에러', data); //debug//
-      sendToast('error', data.message);
+      useToast('error', data.message);
     }
   }
 }
@@ -124,16 +134,24 @@ export async function logIn(formData: SignInForm) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error('로그인 에러', data); //debug//
-      sendToast('warning', data.message);
+      useToast('warning', data.message);
     }
   }
 }
 
 // TODO 구체화 필요
 export async function logOut() {
+  useUserInfoStore.getState().reset();
+  useCalendarListStore.getState().reset();
+  useSelectedCalendarStore.getState().reset();
+  useSelectedDayStore.getState().reset();
+  useGroupEventListStore.getState().reset();
+  useSocialEventListStore.getState().reset();
+  useAllEventListStore.getState().reset();
+  useEventFeedListStore.getState().reset();
   sessionStorage.clear();
   deleteCookie('accessToken');
-  sendToast('error', '로그아웃 되었습니다.');
+  useToast('error', '로그아웃 되었습니다.');
 }
 
 export async function joinCalendar(calendarId: string) {
@@ -141,7 +159,7 @@ export async function joinCalendar(calendarId: string) {
     const { data: res } = await API.patch(`/calendar/participate/${calendarId}`);
     if (!res) throw new Error('USER - joinCalendar (DB에서 그룹 캘린터 가입 실패)');
     console.log(`USER - joinCalendar 성공`, res); //debug//
-    sendToast('success', `캘린더 가입에 성공했습니다.`);
+    useToast('success', `캘린더 가입에 성공했습니다.`);
 
     return true;
   } catch (e) {
@@ -149,11 +167,11 @@ export async function joinCalendar(calendarId: string) {
 
     if (err.response?.status === 400) {
       console.error(err.response);
-      sendToast('warning', '토큰 정보가 일치하지 않습니다. 다시 로그인해주세요.');
+      useToast('warning', '토큰 정보가 일치하지 않습니다. 다시 로그인해주세요.');
     } else {
       const data = err.response?.data as API.ErrorResponse;
       console.error('그룹 캘린더 가입 에러', data); //debug//
-      sendToast('warning', data?.message);
+      useToast('warning', data?.message);
     }
   }
 }
@@ -168,7 +186,7 @@ export async function updateThumbnail(thumbnailFormData: FormData) {
     // if (currentUserInfo)
     //   useUserInfoStore.getState().setUserInfo({ ...currentUserInfo, thumbnail: res.thumbnail });
 
-    sendToast('success', `프로필이 수정되었습니다.`);
+    useToast('success', `프로필이 수정되었습니다.`);
 
     return true;
   } catch (e) {
@@ -177,7 +195,7 @@ export async function updateThumbnail(thumbnailFormData: FormData) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error('USER - updateThumbnail 실패', data); //debug//
-      sendToast('warning', data.message);
+      useToast('warning', data.message);
     }
   }
 }

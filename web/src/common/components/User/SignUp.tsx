@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 
 interface SignUpProps {
   onSubmit: (formData: SignUpForm) => void;
@@ -47,11 +47,11 @@ export default function SignUp({ onSubmit }: SignUpProps) {
     const confirmPassword = confirmPasswordRef.current?.value;
 
     if (!useremail || !nickname || !password || !confirmPassword) {
-      return sendToast('error', '폼을 모두 채워주세요.');
+      return useToast('error', '폼을 모두 채워주세요.');
     }
 
     if (!emailValid || !nicknameValid || !passwordValid || !passwordsMatch) {
-      return sendToast('error', '양식에 맞춰 다시 작성해주세요.');
+      return useToast('error', '양식에 맞춰 다시 작성해주세요.');
     }
 
     const formData = {

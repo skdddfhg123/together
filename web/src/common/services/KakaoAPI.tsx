@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as API from '@utils/api';
 import { Cookie, setCookie, getCookie, deleteCookie } from '@utils/cookie';
 
@@ -13,18 +13,19 @@ async function LogIn() {
   try {
     const { data: res } = window.Kakao.Auth.authorize({
       redirectUri: process.env.REACT_APP_REDIRECT_URI,
-      prompt: 'select_account',
+      // prompt: 'select_account',
+      scope: 'profile_nickname, account_email, talk_calendar, talk_calendar_task, talk_message',
     });
     if (!res) throw new Error('kakao API - 로그인 실패');
 
     console.log(`KAKAO - LogIn 성공 :`, res); //debug//
-    sendToast('success', '카카오톡 로그인 성공');
+    useToast('success', '카카오톡 로그인 성공');
 
     return true;
   } catch (err) {
     const e = err as AxiosError<KakaoErrorResponse>;
     console.log(`KAKAO - LogIn 실패:`, e); //debug//
-    sendToast('error', '카카오톡 로그인 연동에 실패했습니다.');
+    useToast('error', '카카오톡 로그인 연동에 실패했습니다.');
   }
 }
 
@@ -85,7 +86,7 @@ async function LogOut() {
     const res = window.Kakao.Auth.logout();
     if (!res) throw new Error('kakao API - 연동 해제 및 로그아웃 실패');
     console.log(`KAKAO - Logout 성공 : `, res.id); //debug//
-    sendToast('success', '카카오톡 연동 해제 성공');
+    useToast('success', '카카오톡 연동 해제 성공');
 
     deleteCookie(`kakaoToken`);
 
@@ -95,7 +96,7 @@ async function LogOut() {
     console.log(`KAKAO - Logout 실패 :`, e); //debug//
 
     if (e?.code === -401) {
-      sendToast('default', '로그인 정보가 없습니다.');
+      useToast('default', '로그인 정보가 없습니다.');
     }
   }
 }
@@ -110,7 +111,7 @@ async function GetInfo() {
     if (!res) throw new Error('kakao API - 유저 정보 받아오기 실패');
     console.log(`KAKAO.getInfo - 성공 : `, res); // debug//
 
-    sendToast('success', `카카오 유저 정보를 받아왔습니다.`);
+    useToast('success', `카카오 유저 정보를 받아왔습니다.`);
 
     return true;
   } catch (err) {
@@ -118,9 +119,9 @@ async function GetInfo() {
     console.error('KAKAO.getInfo - 실패 :', e); //debug//
 
     if (e.response?.status === 401) {
-      sendToast('default', `로그인을 먼저 해주세요.`);
+      useToast('default', `로그인을 먼저 해주세요.`);
     } else {
-      sendToast('error', `카카오톡 유저 정보를 받아오지 못했습니다.`);
+      useToast('error', `카카오톡 유저 정보를 받아오지 못했습니다.`);
     }
   }
 }
@@ -157,13 +158,13 @@ async function GetEvents() {
       if (!res) throw new Error('KAKAO - GetEvents (카카오 일정 DB 저장 실패)');
 
       console.log(`Kakao API - 토큰이 이미 존재합니다.`); //debug//
-
+      console.log(`카카오톡 일정`, res);
       return res;
     }
   } catch (error) {
     const err = error as AxiosError;
     console.error(`KAKAO - GetEvents 실패 :`, err); //debug//
-    sendToast('default', '카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
+    useToast('default', '카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
     // if (err.response?.status === 401) console.log(`카카오톡 `, err);
   }
 }

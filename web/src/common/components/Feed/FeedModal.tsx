@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as FEED from '@services/eventFeedAPI';
 
 import { Comment, EventFeed } from '@type/index';
@@ -28,7 +28,7 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
 
   const fetchCommntList = useCallback(async () => {
     const feedId = feedInfo?.feedId;
-    if (!feedId) return sendToast('error', '피드 정보를 가져오지 못했습니다.');
+    if (!feedId) return useToast('error', '피드 정보를 가져오지 못했습니다.');
     const comments = await FEED.getFeedComment(feedId);
     setCommentList(comments);
   }, [feedInfo]);
@@ -93,7 +93,9 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
               <div className="overflow-auto scroll-y-auto mx-auto text-left text-xl h-2/3 w-full">
                 {feedInfo.content}
               </div>
-              <div className="w-full text-left text-gray-400">{formatDate(feedInfo.createdAt)}</div>
+              <div className="w-full text-left text-gray-400">
+                {formatDate(feedInfo.createdAt.toISOString())}
+              </div>
             </section>
             <section className="flex flex-col h-3/5 p-2">
               <div className="overflow-y-auto flex-1">
@@ -114,7 +116,7 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
                           <p className="flex-1">{cmt.content}</p>
                         </div>
                         <div className="text-sm text-gray-400 mt-1 pl-16">
-                          {formatDate(cmt.createdAt)}
+                          {formatDate(cmt.createdAt.toISOString())}
                         </div>
                       </li>
                     ))}

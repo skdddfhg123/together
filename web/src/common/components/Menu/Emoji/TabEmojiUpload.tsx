@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
 import { ImFilePicture } from 'react-icons/im';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as CHAT from '@services/ChatAndEmojiAPI';
 import { Calendar } from '@type/index';
 
@@ -66,9 +66,9 @@ export default function TabEmojiUpload({ selectedCalendar, onClose }: TabEmojiUp
   };
 
   const handleUpload = async () => {
-    if (!file) return sendToast('default', '파일을 선택해 주세요.');
+    if (!file) return useToast('default', '파일을 선택해 주세요.');
     if (!selectedCalendar || selectedCalendar === 'All')
-      return sendToast('default', '그룹 캘린더를 선택해주세요.');
+      return useToast('default', '그룹 캘린더를 선택해주세요.');
 
     const formData = new FormData();
     formData.append('emojiFile', file);

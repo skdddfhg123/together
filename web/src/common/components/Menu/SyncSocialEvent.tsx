@@ -1,23 +1,24 @@
 import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as KAKAO from '@services/KakaoAPI';
 import * as CALENDAR from '@services/calendarAPI';
 import * as REDIS from '@services/redisAPI';
 import * as USER from '@services/userAPI';
-import { useSelectedCalendarStore } from '@store/index';
+import * as GOOGLE from '@services/googleAPI';
+import { useSelectedCalendarStore, useSocialEventListStore } from '@store/index';
 
 import syncImg from '@assets/sync.png';
+import { AllEvent, GoogleEvent } from '@type/index';
 
 export default function SyncSocialEvent() {
-  const navigate = useNavigate();
   const { selectedCalendar } = useSelectedCalendarStore();
+  const { setSocialEventList } = useSocialEventListStore();
   const [canInvoke, setCanInvoke] = useState(true);
 
   const getSocialEvents = useCallback(async () => {
     // if (!canInvoke) {
-    //   sendToast('error', '동기화는 3분에 1번만 가능합니다');
+    //   useToast('error', '동기화는 3분에 1번만 가능합니다');
     //   return;
     // }
 
@@ -29,21 +30,44 @@ export default function SyncSocialEvent() {
     //   3 * 60 * 1000,
     // );
 
-    // ***************TODO 구글 및 outlook API 등록 필요
-    // const kakaoRes = await KAKAO.GetEvents();
-    // if (!kakaoRes) return;
+    try {
+      let socialEvents: AllEvent[] = [];
 
-    // const googleRes = await GOOGLE.GetEvents();
-    // if (!googleRes) return;
-    // const outlookRes = await OUTLOOK.GetEvents();
-    // if (!outlookRes) return;
+      const kakaoRes = await KAKAO.GetEvents();
+      if (kakaoRes && kakaoRes.resultArray) {
+        const kakaoEvents = kakaoRes.resultArray.map((event: KakaoEvent) => ({
+          // id: event.socialEventId,
+          startAt: event.startAt,
+          endAt: event.endAt,
+          social: event.social,
+          title: event.title,
+        }));
+        socialEvents = [...socialEvents, ...kakaoEvents];
+      }
 
-    sendToast('success', '동기화가 완료되었습니다.');
-    await CALENDAR.getMyAllCalendar();
-    const res = await USER.firstRender();
-    if (!res) navigate('/signin');
+      const googleRes = await GOOGLE.getEvents();
+      console.log(`구글 이벤트`, googleRes);
+      if (googleRes && googleRes.data) {
+        const googleEvents = googleRes.data
+          .filter((event: GoogleEvent) => event !== null)
+          .map((event: GoogleEvent) => ({
+            // id: event.socialEventId,
+            startAt: event.startAt,
+            endAt: event.endAt,
+            social: 'google',
+            title: event.title,
+          }));
+        socialEvents = [...socialEvents, ...googleEvents];
+      }
 
-    await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: '동기화' });
+      useToast('success', '동기화가 완료되었습니다.');
+      setSocialEventList(socialEvents);
+
+      await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: '동기화' });
+    } catch (error) {
+      useToast('error', '동기화 중 오류가 발생했습니다.');
+      console.error(error);
+    }
   }, [selectedCalendar, canInvoke]);
 
   return (

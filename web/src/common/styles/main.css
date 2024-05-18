@@ -119,21 +119,21 @@
 
 /* ****** 토스트 CSS ****** */
 
-.memberAlert {
+/* .memberAlert {
   width: 40rem;
   text-align: center;
   font-size: 1.2rem;
   color: lightgray;
-}
+} */
 
 .calendarAlert {
-  width: 30rem;
+  width: 40rem;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 500;
 }
 
-/* ! 시연용  토스트 !
+/* ! 시연용  토스트 ! */
 .memberAlert {
   font-family: 'Jua', sans-serif;
   width: 65rem;
@@ -141,4 +141,4 @@
   text-align: center;
   font-size: 2rem;
   color: lightgray;
-} */
+}

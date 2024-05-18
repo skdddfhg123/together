@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Modal from 'react-modal';
-import { formatISO, set } from 'date-fns';
+import { set } from 'date-fns';
 import LabelIcon from '@mui/icons-material/Label';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import * as CALENDAR from '@services/calendarAPI';
 import * as REDIS from '@services/redisAPI';
 import useUpdateModalStyle from '@hooks/useUpdateModalStyle';
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 
 import { Calendar, reqEvent } from '@type/index';
 import { useUserInfoStore } from '@store/index';
@@ -80,12 +80,12 @@ export default React.memo(function CreateEventSimple({
 
       const title = titleRef.current?.value.trim();
 
-      if (!title) return sendToast('default', '일정 제목이 비어있습니다.');
-      if (!userInfo) return sendToast('default', '유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
-      if (!selectedDay) return sendToast('default', '선택된 날이 없습니다.');
+      if (!title) return useToast('default', '일정 제목이 비어있습니다.');
+      if (!userInfo) return useToast('default', '유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
+      if (!selectedDay) return useToast('default', '선택된 날이 없습니다.');
       if (selectedCalendar === 'All') {
         onClose();
-        return sendToast('default', '일정을 등록할 그룹 캘린더를 선택해주세요.');
+        return useToast('default', '일정을 등록할 그룹 캘린더를 선택해주세요.');
       }
 
       const startAtDate = set(selectedDay, { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 });
@@ -96,8 +96,8 @@ export default React.memo(function CreateEventSimple({
         title: title,
         color: color.code,
         member: null,
-        startAt: formatISO(startAtDate, { representation: 'complete' }),
-        endAt: formatISO(endAtDate, { representation: 'complete' }),
+        startAt: startAtDate,
+        endAt: endAtDate,
       };
 
       const res = await CALENDAR.createGroupSimpleEvent(eventData);
@@ -167,7 +167,6 @@ export default React.memo(function CreateEventSimple({
         isOpen={detailOpen}
         onClose={handleDetailClose}
         selectedCalendar={selectedCalendar}
-        selectedDay={selectedDay}
         color={color.code}
         colors={colors}
         title={title}

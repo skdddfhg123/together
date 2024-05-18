@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Tooltip } from 'react-tooltip';
 import { isSameDay, startOfMonth, endOfMonth, addDays, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import { UUID } from 'crypto';
 
 import { hexToRgba } from '@hooks/useHexToRgba';
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 
 import { AllEvent } from '@type/index';
 import {
@@ -24,6 +25,8 @@ import EventDetailsWithMemberModal from '@components/Event/ViewEvent/DetailWithM
 import '@styles/calendar.css';
 
 import kakaoImg from '@assets/KakaoTalk.png';
+import googleImg from '@assets/google_calendar.png';
+import outlookImg from '@assets/Outlook_circle.png';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -76,17 +79,17 @@ export default React.memo(function CalendarPage({
   };
 
   const handleDayClick = (day: Date, e: React.MouseEvent<HTMLTableCellElement>): void => {
-    console.log(`선택된 날짜`, day);
-    if (selectedCalendar === 'All') {
-      sendToast('default', ' 그룹 캘린더를 선택해주세요.');
-      return;
-    }
     const rect = e.currentTarget.getBoundingClientRect();
     setModalPosition({ x: rect.left, y: rect.top });
 
     if (selectedDay && isSameDay(day, selectedDay)) {
+      if (selectedCalendar === 'All') {
+        useToast('default', `일정을 등록하시려면 그룹 캘린더를 선택해주세요.`);
+        return;
+      }
       setEventModalOn(!eventModalOn);
     } else {
+      console.log(`고른 뒤, selectedDay에 저장될 날짜 :`, day);
       setSelectedDay(day);
       setEventModalOn(false);
     }
@@ -139,7 +142,7 @@ export default React.memo(function CalendarPage({
     // ************* 그룹 이벤트 생성 or All 이벤트 생성
     if (selectedCalendar === 'All') {
       AllEventList.forEach((event) => {
-        const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
+        const eventDate = format(event.startAt, 'yyyy-MM-dd');
         const existingEvents = eventMap.get(eventDate) || [];
         existingEvents.push(
           <li
@@ -160,29 +163,52 @@ export default React.memo(function CalendarPage({
 
       // ************* 소셜 이벤트 생성
       socialEventList.forEach((event: AllEvent) => {
-        const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
+        const eventDate = format(event.startAt, 'yyyy-MM-dd');
         const existingEvents = eventMap.get(eventDate) || [];
+
+        const socialImgMap = {
+          kakao: kakaoImg,
+          google: googleImg,
+          outlook: outlookImg,
+        };
+
+        const socialClassMap = {
+          kakao: 'tooltip-kakao',
+          google: 'tooltip-google',
+          outlook: 'tooltip-outlook',
+        };
+        const tooltipId = `tooltip-${event.id}`;
         existingEvents.push(
           <li
-            className={`${
-              event.social === 'kakao'
-                ? 'kakao-event'
-                : event.social === 'google'
-                  ? 'google-event'
-                  : event.social === 'discord'
-                    ? 'discord-event'
-                    : 'outlook-event'
-            }`}
+            data-tooltip-id={tooltipId}
+            className="tooltip-container"
+            id={`${event.social}-event`}
             key={existingEvents.length}
           >
-            {event.social === 'kakao' && <img id="kakaoImg" src={kakaoImg} alt="Kakao Event" />}
+            <img id="socialImg" src={socialImgMap[event.social]} alt={`${event.social} Event`} />
+            <Tooltip id={tooltipId} className={socialClassMap[event.social]}>
+              <img
+                className="w-36"
+                src={socialImgMap[event.social]}
+                alt={`${event.social} Event`}
+              />
+              <div>
+                <span className="text-5xl font-bold">
+                  {format(event.startAt, 'HH:mm')} ~ {format(event.endAt, 'HH:mm')}{' '}
+                </span>
+              </div>
+              {/* <div>{format(event.startAt, 'yyyy:MM:dd:HH:mm')}</div>
+    <div>{format(event.endAt, 'yyyy:MM:dd:HH:mm')}</div>
+    <div>{event.startAt.toString()}</div>
+    <div>{event.endAt.toString()}</div> */}
+            </Tooltip>
           </li>,
         );
         eventMap.set(eventDate, existingEvents);
       });
     } else {
       groupEventList.forEach((event) => {
-        const eventDate = format(new Date(event.startAt), 'yyyy-MM-dd');
+        const eventDate = format(event.startAt, 'yyyy-MM-dd');
         const existingEvents = eventMap.get(eventDate) || [];
         existingEvents.push(
           <li

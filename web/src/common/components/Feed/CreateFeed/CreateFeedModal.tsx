@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Modal from 'react-modal';
 import { UUID } from 'crypto';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as FEED from '@services/eventFeedAPI';
 import { ImageFile, reqEventFeed } from '@type/index';
 import CreateFeedImageList from '@components/Feed/CreateFeed/CreateFeedImgList';
@@ -27,9 +27,9 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
   const submitNewFeed = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!groupEventId) return sendToast('default', '피드를 등록할 일정을 다시 선택해주세요.');
+    if (!groupEventId) return useToast('default', '피드를 등록할 일정을 다시 선택해주세요.');
     const content = contentRef.current?.value;
-    if (!content) return sendToast('default', '내용을 입력해주세요.');
+    if (!content) return useToast('default', '내용을 입력해주세요.');
 
     const feedData: reqEventFeed = {
       groupEventId: groupEventId,
@@ -45,7 +45,7 @@ export default function CreateFeedModal({ groupEventId, isOpen, onClose }: Creat
 
   const handleImageChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (images.length >= 5) return sendToast('default', '이미지는 최대 5장까지 선택 가능합니다.');
+      if (images.length >= 5) return useToast('default', '이미지는 최대 5장까지 선택 가능합니다.');
 
       if (event.target.files && event.target.files.length > 0) {
         const fileArray = Array.from(event.target.files).slice(0, 5 - images.length);

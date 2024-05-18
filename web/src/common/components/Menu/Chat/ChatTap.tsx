@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import { format, parseISO } from 'date-fns';
 
 import useToggle from '@hooks/useToggle';
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import { useWebSocket } from '@utils/webSocket';
 import { getCookie } from '@utils/cookie';
 import * as CHAT from '@services/ChatAndEmojiAPI';
@@ -79,7 +79,7 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
     };
 
     if (selectedCalendar === 'All') {
-      sendToast('default', '채팅을 연결할 그룹 캘린더를 선택해주세요.');
+      useToast('default', '채팅을 연결할 그룹 캘린더를 선택해주세요.');
       return;
     }
     socket?.emit('enterChatRoom', selectedCalendar.calendarId);
@@ -142,7 +142,7 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
   const fetchGroupEmoji = useCallback(async () => {
     try {
       if (selectedCalendar === 'All') {
-        sendToast('default', '채팅을 연결할 그룹 캘린더를 선택해주세요.');
+        useToast('default', '채팅을 연결할 그룹 캘린더를 선택해주세요.');
         return;
       }
       const res = await CHAT.fetchEmojiList(selectedCalendar.calendarId);

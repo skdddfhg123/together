@@ -58,10 +58,10 @@ declare global {
 
   type KakaoEvent = {
     deactivatedAt: boolean;
-    endAt: string;
-    social: string;
-    socialEventId: string;
-    startAt: string;
+    endAt: Date;
+    social: 'kakao';
+    socialEventId: UUID;
+    startAt: Date;
     title: string | null;
     userCalendar: {
       userCalendarId: string;

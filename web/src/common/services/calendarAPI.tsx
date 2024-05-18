@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 import { format } from 'date-fns';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import { convertUtcToKst, getDatesInRange } from '@hooks/useDateTranslate';
 import * as API from '@utils/api';
 
@@ -49,7 +49,7 @@ export async function getMyAllCalendar() {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - getMyAllCalendar 실패 :`, data); //debug//
-      sendToast('warning', data.message);
+      useToast('warning', data.message);
     }
   }
 }
@@ -72,7 +72,7 @@ export async function createGroupCalendar({ title, type }: CreateCalendarForm) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - createGroupCalendar 실패 :`, data); //debug//
-      sendToast('warning', data.message);
+      useToast('warning', data.message);
     }
   }
 }
@@ -90,13 +90,13 @@ export async function updateGroupBanner(calendarId: UUID, bannerFormData: FormDa
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - updateGroupBanner 실패 :`, data); //debug//
-      sendToast('warning', data.message);
+      useToast('warning', data.message);
     }
   }
 }
 
 export async function removeGroupCalendar(groupCalendar: Calendar | 'All') {
-  if (groupCalendar === 'All') return sendToast('default', '그룹 캘린더를 선택해주세요.');
+  if (groupCalendar === 'All') return useToast('default', '그룹 캘린더를 선택해주세요.');
   try {
     const res = await API.patch(`/calendar/delete/${groupCalendar.calendarId}`);
     if (!res) throw new Error(`CALENDAR - removeGroupCalendar 실패 : ( DB 삭제 실패 )`);
@@ -105,7 +105,7 @@ export async function removeGroupCalendar(groupCalendar: Calendar | 'All') {
     useCalendarListStore.getState().setIsLoaded(false);
     useSelectedCalendarStore.getState().setSelectedCalendar('All');
 
-    sendToast('error', '그룹 캘린더가 삭제되었습니다.');
+    useToast('error', '그룹 캘린더가 삭제되었습니다.');
 
     return true;
   } catch (e) {
@@ -114,7 +114,7 @@ export async function removeGroupCalendar(groupCalendar: Calendar | 'All') {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - removeGroupCalendar 실패 :`, data); //debug//
-      sendToast('warning', '일정 삭제에 실패했습니다.');
+      useToast('warning', '일정 삭제에 실패했습니다.');
     }
   }
 }
@@ -132,8 +132,8 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
       const GroupedEvents: GroupingMemberEvent = {};
 
       member.allevents?.forEach((event) => {
-        const startAt = convertUtcToKst(new Date(event.startAt));
-        const endAt = convertUtcToKst(new Date(event.endAt));
+        const startAt = convertUtcToKst(event.startAt);
+        const endAt = convertUtcToKst(event.endAt);
 
         const eventDates = getDatesInRange(startAt, endAt);
 
@@ -144,8 +144,8 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
           }
           GroupedEvents[formattedDate].push({
             title: event.title,
-            startAt: event.startAt,
-            endAt: event.endAt,
+            startAt: startAt,
+            endAt: endAt,
           });
         });
       });
@@ -167,7 +167,7 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - getMemberAndMemberEvents 실패 :`, data); //debug//
-      sendToast('warning', data.message);
+      useToast('warning', data.message);
     }
   }
 }
@@ -180,7 +180,13 @@ export async function getGroupAllEvents(calendar: Calendar) {
     if (!res) throw new Error('CALENDAR - getGroupAllEvents (db 조회 실패)');
     console.log(`CALENDAR - getGroupAllEvents 성공 :`, res);
 
-    useGroupEventListStore.getState().setGroupEvents(res.groupCalendar.events);
+    const events = res.groupCalendar.events.map((event: GroupEvent) => ({
+      ...event,
+      startAt: new Date(event.startAt),
+      endAt: new Date(event.endAt),
+    }));
+
+    useGroupEventListStore.getState().setGroupEvents(events);
 
     const currentState = useSelectedCalendarStore.getState();
     if (currentState.selectedCalendar === 'All') return;
@@ -192,7 +198,7 @@ export async function getGroupAllEvents(calendar: Calendar) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - getGroupAllEvents 실패 :`, data); //debug//
-      sendToast('warning', data.message);
+      useToast('warning', data.message);
     }
   }
 }
@@ -212,7 +218,7 @@ export async function getGroupOneEvent(groupEventId: UUID) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - getGroupOneEvent 실패 :`, data); //debug//
-      sendToast('warning', '일정을 가져오지 못했습니다.');
+      useToast('warning', '일정을 가져오지 못했습니다.');
     }
   }
 }
@@ -235,7 +241,7 @@ export async function createGroupSimpleEvent({
     });
     if (!res) throw new Error('CALENDAR - createGroupEvent (DB 이벤트 생성 실패)');
     console.log(`CALENDAR - createGroupEvent 성공 :`, res);
-    sendToast('success', '일정을 등록했습니다.');
+    useToast('success', '일정을 등록했습니다.');
 
     return true;
   } catch (e) {
@@ -244,7 +250,7 @@ export async function createGroupSimpleEvent({
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - createGroupEvent 실패 :`, data); //debug//
-      sendToast('warning', '일정 등록에 실패했습니다.');
+      useToast('warning', '일정 등록에 실패했습니다.');
     }
   }
 }
@@ -272,7 +278,7 @@ export async function updateGroupEvent({
     if (!res) throw new Error(`CALENDAR - updateGroupEvent (DB 수정 반영 실패)`);
     console.log(`CALENDAR - updateGroupEvent 성공 :`, res);
     useGroupEventInfoStore.getState().setGroupEventInfo(res);
-    sendToast('success', '일정이 수정되었습니다.');
+    useToast('success', '일정이 수정되었습니다.');
 
     return true;
   } catch (e) {
@@ -281,19 +287,19 @@ export async function updateGroupEvent({
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - updateGroupEvent 실패 :`, data); //debug//
-      sendToast('warning', '일정 수정에 실패했습니다.');
+      useToast('warning', '일정 수정에 실패했습니다.');
     }
   }
 }
 
 export async function removeGroupEvent(groupEventId: UUID | null) {
-  if (!groupEventId) return sendToast('default', '삭제할 일정을 선택해주세요.');
+  if (!groupEventId) return useToast('default', '삭제할 일정을 선택해주세요.');
 
   try {
     const res = await API.patch(`/calendar/group/remove/${groupEventId}`);
     console.log(`CALENDAR - removeGroupEvent 성공 :`, res);
 
-    sendToast('error', '일정이 삭제되었습니다.');
+    useToast('error', '일정이 삭제되었습니다.');
 
     return true;
   } catch (e) {
@@ -302,7 +308,7 @@ export async function removeGroupEvent(groupEventId: UUID | null) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CALENDAR - removeGroupEvent 실패 :`, data); //debug//
-      sendToast('warning', '일정 삭제에 실패했습니다.');
+      useToast('warning', '일정 삭제에 실패했습니다.');
     }
   }
 }

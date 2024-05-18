@@ -39,8 +39,8 @@ export default React.memo(function MiniCalendar({
     setSelectedDay(day);
 
     const event = groupEventList.find((event) => {
-      const startAt = parseISO(event.startAt);
-      const endAt = parseISO(event.endAt);
+      const startAt = event.startAt;
+      const endAt = event.endAt;
       return isWithinInterval(day, { start: startAt, end: endAt });
     });
 
@@ -116,8 +116,8 @@ export default React.memo(function MiniCalendar({
       if (selectedDay && isSameDay(day, selectedDay)) dayClasses += ' MchoiceDay';
 
       const isEventDay = groupEventList.some((event) => {
-        const startAt = parseISO(event.startAt);
-        const endAt = parseISO(event.endAt);
+        const startAt = event.startAt;
+        const endAt = event.endAt;
         return isWithinInterval(day, { start: startAt, end: endAt });
       });
 

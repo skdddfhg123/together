@@ -1,6 +1,6 @@
 // ModalComponent.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { format, formatISO, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import {
   Dialog,
   DialogTitle,
@@ -23,65 +23,33 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as REDIS from '@services/redisAPI';
 import * as CALENDAR from '@services/calendarAPI';
 
 import { Calendar, MemberWithEvent, reqEvent } from '@type/index';
-import { useMemberEventListByDateState, useUserInfoStore } from '@store/index';
+import { useMemberEventListByDateState, useSelectedDayStore, useUserInfoStore } from '@store/index';
 
 import default_user from '@assets/default_user.png';
-
-const selectStyles = css`
-  &::before,
-  &::after {
-    border-bottom: none !important;
-  }
-  & .MuiSelect-icon {
-    display: none;
-  }
-  & .MuiSelect-select {
-    padding: 8px;
-    background-color: transparent;
-  }
-`;
-
-const menuItemStyles = css`
-  display: flex;
-  justify-content: center;
-  color: #1e1e1e;
-  &:hover {
-    background-color: #e0e0e0;
-  }
-`;
-
-const StyledSelect = styled(Select)`
-  ${selectStyles}
-`;
-
-const StyledMenuItem = styled(MenuItem)`
-  ${menuItemStyles}
-`;
 
 interface ModalComponentProps {
   isOpen: boolean;
   onClose: () => void;
   selectedCalendar: Calendar | 'All';
-  selectedDay: Date | null;
   color: string;
   colors: { code: string; name: string }[];
   title: string;
   setColor: (color: string) => void;
 }
 
-const formatDate = (date: Date | null): string => {
-  return date ? format(date, 'yyyy-MM-dd') : '';
-};
+const timeOptions = Array.from({ length: 24 }, (_, i) => {
+  const hour = i < 10 ? `0${i}` : i;
+  return [`${hour}:00`, `${hour}:30`];
+}).flat();
 
-export default function DetailModal({
+export default React.memo(function DetailModal({
   isOpen,
   onClose,
-  selectedDay,
   selectedCalendar,
   color,
   colors,
@@ -90,21 +58,22 @@ export default function DetailModal({
 }: ModalComponentProps) {
   const { MemberEventList } = useMemberEventListByDateState();
   const { userInfo } = useUserInfoStore();
+  const { selectedDay } = useSelectedDayStore();
 
   const titleRef = useRef<HTMLInputElement>(null);
   const [allDay, setAllDay] = useState(true);
-  const [startDate, setStartDate] = useState<string>(formatDate(selectedDay));
-  const [endDate, setEndDate] = useState<string>(formatDate(selectedDay));
-  const [startTime, setStartTime] = useState<string>('00:00');
-  const [endTime, setEndTime] = useState<string>('23:30');
+  const [startDate, setStartDate] = useState<Date>(selectedDay || new Date());
+  const [endDate, setEndDate] = useState<Date>(selectedDay || new Date());
+  const [startTime, setStartTime] = useState<Date>(new Date());
+  const [endTime, setEndTime] = useState<Date>(new Date());
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const resetForm = useCallback(() => {
     setAllDay(true);
-    setStartDate(formatDate(selectedDay));
-    setEndDate(formatDate(selectedDay));
-    setStartTime('00:00');
-    setEndTime('23:30');
+    setStartDate(selectedDay || new Date());
+    setEndDate(selectedDay || new Date());
+    setStartTime(new Date());
+    setEndTime(new Date());
     setSelectedMembers([]);
     if (titleRef.current) {
       titleRef.current.value = '';
@@ -117,26 +86,23 @@ export default function DetailModal({
     );
   };
 
-  const timeOptions = Array.from({ length: 24 }, (_, i) => {
-    const hour = i < 10 ? `0${i}` : i;
-    return [`${hour}:00`, `${hour}:30`];
-  }).flat();
-
   const submitNewDetailEvent = useCallback(async () => {
     const title = titleRef.current?.value.trim();
 
-    if (!title) return sendToast('default', '일정 제목이 비어있습니다.');
-    if (!userInfo) return sendToast('default', '유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
+    if (!title) return useToast('default', '일정 제목이 비어있습니다.');
+    if (!userInfo) return useToast('default', '유저 정보를 찾을 수 없습니다. 새로고침해주세요.');
     if (selectedCalendar === 'All') {
       resetForm();
       onClose();
-      return sendToast('default', '일정을 등록할 그룹 캘린더를 선택해주세요.');
+      return useToast('default', '일정을 등록할 그룹 캘린더를 선택해주세요.');
     }
 
-    const startAt = formatISO(parseISO(`${startDate}T${startTime}`), {
-      representation: 'complete',
-    });
-    const endAt = formatISO(parseISO(`${endDate}T${endTime}`), { representation: 'complete' });
+    const startAt = new Date(startDate);
+    const endAt = new Date(endDate);
+    startAt.setHours(startTime.getHours());
+    startAt.setMinutes(startTime.getMinutes());
+    endAt.setHours(endTime.getHours());
+    endAt.setMinutes(endTime.getMinutes());
 
     const eventData: reqEvent = {
       groupCalendarId: selectedCalendar.calendarId,
@@ -154,9 +120,20 @@ export default function DetailModal({
     }
     resetForm();
     onClose();
-  }, [resetForm, userInfo]);
+  }, [
+    resetForm,
+    userInfo,
+    selectedCalendar,
+    color,
+    selectedMembers,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    onClose,
+  ]);
 
-  // Component initialization
+  //***********************? 컴포넌트 초기화
   useEffect(() => {
     if (isOpen) {
       resetForm();
@@ -168,18 +145,25 @@ export default function DetailModal({
 
   useEffect(() => {
     if (selectedDay) {
-      const formattedDate = formatDate(selectedDay);
-      setStartDate(formattedDate);
-      setEndDate(formattedDate);
+      setStartDate(new Date(selectedDay));
+      setEndDate(new Date(selectedDay));
     }
   }, [selectedDay]);
 
   useEffect(() => {
-    if (!allDay) {
-      setStartTime('00:00');
-      setEndTime('23:30');
+    if (allDay) {
+      setStartTime(new Date(startDate.setHours(0, 0, 0, 0)));
+      setEndTime(new Date(endDate.setHours(23, 30, 0, 0)));
+    } else {
+      const start = new Date(startDate);
+      start.setHours(14, 0, 0, 0);
+      setStartTime(start);
+
+      const end = new Date(endDate);
+      end.setHours(15, 0, 0, 0);
+      setEndTime(end);
     }
-  }, [allDay]);
+  }, [allDay, startDate, endDate]);
 
   useEffect(() => {
     MemberEventList.forEach((member: MemberWithEvent) => {
@@ -213,9 +197,10 @@ export default function DetailModal({
           <div className="flex items-center space-x-4">
             <AccessTimeIcon style={{ color: color }} />
             <TextField
+              className="FLEX-horizC h-12"
               type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              value={format(startDate, 'yyyy-MM-dd')}
+              onChange={(e) => setStartDate(parseISO(e.target.value))}
               InputProps={{
                 disableUnderline: true,
                 style: { borderBottom: 'none', color: '#1E1E1E' },
@@ -226,8 +211,8 @@ export default function DetailModal({
             {!allDay && (
               <FormControl variant="standard" fullWidth>
                 <StyledSelect
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value as string)}
+                  value={format(startTime, 'HH:mm')}
+                  onChange={(e) => setStartTime(parseISO(`1970-01-01T${e.target.value}`))}
                   displayEmpty
                   inputProps={{ 'aria-label': 'Without label' }}
                   style={{ color: '#1E1E1E' }}
@@ -248,9 +233,10 @@ export default function DetailModal({
               </FormControl>
             )}
             <TextField
+              className="FLEX-horizC h-12"
               type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              value={format(endDate, 'yyyy-MM-dd')}
+              onChange={(e) => setEndDate(parseISO(e.target.value))}
               InputProps={{
                 disableUnderline: true,
                 style: { borderBottom: 'none', color: '#1E1E1E' },
@@ -261,8 +247,8 @@ export default function DetailModal({
             {!allDay && (
               <FormControl variant="standard" fullWidth>
                 <StyledSelect
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value as string)}
+                  value={format(endTime, 'HH:mm')}
+                  onChange={(e) => setEndTime(parseISO(`1970-01-01T${e.target.value}`))}
                   displayEmpty
                   inputProps={{ 'aria-label': 'Without label' }}
                   style={{ color: '#1E1E1E' }}
@@ -381,4 +367,35 @@ export default function DetailModal({
       </DialogActions>
     </Dialog>
   );
-}
+});
+
+const selectStyles = css`
+  &::before,
+  &::after {
+    border-bottom: none !important;
+  }
+  & .MuiSelect-icon {
+    display: none;
+  }
+  & .MuiSelect-select {
+    padding: 8px;
+    background-color: transparent;
+  }
+`;
+
+const menuItemStyles = css`
+  display: flex;
+  justify-content: center;
+  color: #1e1e1e;
+  &:hover {
+    background-color: #e0e0e0;
+  }
+`;
+
+const StyledSelect = styled(Select)`
+  ${selectStyles}
+`;
+
+const StyledMenuItem = styled(MenuItem)`
+  ${menuItemStyles}
+`;

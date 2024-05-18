@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import Cropper, { ReactCropperElement } from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as USER from '@services/userAPI';
 import * as CALENDAR from '@services/calendarAPI';
 import { Image, UserInfo } from '@type/index';
@@ -71,7 +71,7 @@ export default function UpdateThumbnail({ userInfo, isOpen, onClose }: UpdateThu
   };
 
   const submitNewThumbnail = useCallback(async () => {
-    if (!cropData) return sendToast('default', '이미지가 없습니다.');
+    if (!cropData) return useToast('default', '이미지가 없습니다.');
 
     const thumbnailformData = new FormData();
     thumbnailformData.append('file', cropData);

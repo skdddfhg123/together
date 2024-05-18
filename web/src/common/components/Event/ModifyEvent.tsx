@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { HexColorPicker } from 'react-colorful';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { UUID } from 'crypto';
 import debounce from 'lodash.debounce';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import { GroupEvent, Member } from '@type/index';
 import { useGroupEventInfoStore, useSelectedCalendarStore } from '@store/index';
 
@@ -17,6 +17,11 @@ interface ModifyEventProps {
   onSubmit: (formData: GroupEvent) => void;
 }
 
+const timeOptions = Array.from({ length: 24 }, (_, hour) => [
+  `${hour.toString().padStart(2, '0')}:00`,
+  `${hour.toString().padStart(2, '0')}:30`,
+]).flat();
+
 export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: ModifyEventProps) {
   const { groupEventInfo, setIsLoaded } = useGroupEventInfoStore();
   const { selectedCalendar } = useSelectedCalendarStore();
@@ -26,17 +31,10 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
   const [color, setColor] = useState<string>(groupEventInfo?.color || '#ffffff00');
   const [pinned, setPinned] = useState<boolean>(groupEventInfo?.pinned || false);
   const titleRef = useRef<HTMLInputElement>(null);
-  const [startAt, setStartAt] = useState<string>(
-    groupEventInfo?.startAt ? formatToLocalDatetime(groupEventInfo.startAt) : '',
-  );
-  const [endAt, setEndAt] = useState<string>(
-    groupEventInfo?.endAt ? formatToLocalDatetime(groupEventInfo.endAt) : '',
-  );
-
-  function formatToLocalDatetime(eventDate: string) {
-    const date = new Date(eventDate);
-    return format(date, "yyyy-MM-dd'T'HH:mm");
-  }
+  const [startAt, setStartAt] = useState<Date>(groupEventInfo?.startAt || new Date());
+  const [endAt, setEndAt] = useState<Date>(groupEventInfo?.endAt || new Date());
+  const [showStartOptions, setShowStartOptions] = useState(false);
+  const [showEndOptions, setShowEndOptions] = useState(false);
 
   const debouncedSetColor = useCallback(
     debounce((newColor: string) => {
@@ -61,8 +59,8 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
     (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!eventId) return sendToast('default', '변경할 일정을 찾지 못했습니다.');
-      if (!titleRef.current?.value) return sendToast('warning', '일정 제목을 입력해주세요.');
+      if (!eventId) return useToast('default', '변경할 일정을 찾지 못했습니다.');
+      if (!titleRef.current?.value) return useToast('warning', '일정 제목을 입력해주세요.');
 
       const formData: GroupEvent = {
         groupEventId: eventId,
@@ -91,7 +89,6 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
       onSubmit,
       setIsLoaded,
       setView,
-      onClose,
     ],
   );
 
@@ -119,7 +116,14 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
         <button type="submit" className="p-2 hover:bg-custom-light rounded">
           수정 완료
         </button>
-        <button className="text-3xl rounded" onClick={onClose}>
+        <button
+          className="text-3xl rounded"
+          type="button"
+          onClick={() => {
+            onClose();
+            setView();
+          }}
+        >
           &times;
         </button>
       </nav>
@@ -130,23 +134,79 @@ export default function ModifyEvent({ eventId, setView, onClose, onSubmit }: Mod
             ref={titleRef}
             className="w-80 p-3 rounded text-center"
             style={{ backgroundColor: color }}
-            defaultValue={groupEventInfo?.title}
+            defaultValue={groupEventInfo?.title || 'no title'}
           />
         </h2>
       </header>
       <main>
-        <section key="date-section" className="FLEX-horizC space-y-2 px-2 text-lg">
-          <span className="FLEX-ver w-full">
-            <p className="w-14 border-r mr-1">Start</p>
+        <section key="date-section" className="FLEX-ver p-1 space-x-2">
+          <span className="FLEX-horizC w-full">
+            <p className="font-semibold border-b w-full text-center">Start</p>
             <input
-              type="datetime-local"
-              value={startAt}
-              onChange={(e) => setStartAt(e.target.value)}
+              className="appearance-none w-32"
+              type="date"
+              value={format(startAt, 'yyyy-MM-dd')}
+              onChange={(e) => setStartAt(parseISO(e.target.value))}
             />
+            <div className="relative">
+              <button
+                type="button"
+                className="w-24 p-1 mt-1 border rounded"
+                onClick={() => setShowStartOptions((prev) => !prev)}
+              >
+                {format(startAt, 'HH:mm')}
+              </button>
+              {showStartOptions && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border mt-1">
+                  {timeOptions.map((time) => (
+                    <li
+                      key={time}
+                      className="p-2 hover:bg-gray-200"
+                      onClick={() => {
+                        setStartAt(parseISO(`${format(startAt, 'yyyy-MM-dd')}T${time}`));
+                        setShowStartOptions(false);
+                      }}
+                    >
+                      {time}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </span>
-          <span className="FLEX-ver w-full">
-            <p className="w-14 border-r mr-1">End</p>
-            <input type="datetime-local" value={endAt} onChange={(e) => setEndAt(e.target.value)} />
+          <span className="FLEX-horizC w-full">
+            <p className="font-semibold border-b w-full text-center">End</p>
+            <input
+              className="appearance-none w-32"
+              type="date"
+              value={format(endAt, 'yyyy-MM-dd')}
+              onChange={(e) => setEndAt(parseISO(e.target.value))}
+            />
+            <div className="relative">
+              <button
+                type="button"
+                className="w-24 p-1 mt-1 border rounded"
+                onClick={() => setShowEndOptions((prev) => !prev)}
+              >
+                {format(endAt, 'HH:mm')}
+              </button>
+              {showEndOptions && (
+                <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-white border mt-1">
+                  {timeOptions.map((time) => (
+                    <li
+                      key={time}
+                      className="p-2 hover:bg-gray-200"
+                      onClick={() => {
+                        setEndAt(parseISO(`${format(endAt, 'yyyy-MM-dd')}T${time}`));
+                        setShowEndOptions(false);
+                      }}
+                    >
+                      {time}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </span>
         </section>
         <section key="member-section" className="FLEX-horizC my-6">

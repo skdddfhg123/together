@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as CALENDAR from '@services/calendarAPI';
 
 export default function CreateGroupPage() {
@@ -13,7 +13,7 @@ export default function CreateGroupPage() {
     e.preventDefault();
 
     const groupTitle = titleRef.current?.value;
-    if (!groupTitle) return sendToast('default', '생성할 그룹명을 입력해주세요.');
+    if (!groupTitle) return useToast('default', '생성할 그룹명을 입력해주세요.');
 
     const res = await CALENDAR.createGroupCalendar({
       title: groupTitle,
@@ -21,7 +21,7 @@ export default function CreateGroupPage() {
     });
     if (!res) throw new Error('그룹 캘린더 생성 실패');
 
-    sendToast('success', '그룹 캘린더가 생성되었습니다.');
+    useToast('success', '그룹 캘린더가 생성되었습니다.');
     navigate('/main');
   };
 

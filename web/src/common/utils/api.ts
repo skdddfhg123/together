@@ -1,5 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import { getCookie } from '@utils/cookie';
 import { navigateToSignin } from './navigation';
 
@@ -33,7 +33,7 @@ axiosInstance.interceptors.request.use(
     const token = getCookie('accessToken');
     // const token = sessionStorage.getItem('accessToken');
     if (!token) {
-      sendToast('warning', '로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
+      useToast('warning', '로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
       sessionStorage.clear();
       navigateToSignin();
       throw new Error('로그인 토큰 만료');
@@ -62,12 +62,12 @@ axiosInstance.interceptors.response.use(
         if ('useremail' in data && 'password' in data) {
           const err = error.response.data as ErrorResponse;
           console.log(`errer`, err);
-          sendToast('warning', `${err.message}`);
+          useToast('warning', `${err.message}`);
           return;
         }
       }
       sessionStorage.clear();
-      sendToast('warning', '인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
+      useToast('warning', '인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
       navigateToSignin();
     }
   },

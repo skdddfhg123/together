@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useToggle from '@hooks/useToggle';
-import sendToast from '@hooks/useToast';
+import useToast from '@hooks/useToast';
 import * as USER from '@services/userAPI';
 import { SignUpForm, SignInForm } from '@type/index';
 
@@ -18,14 +18,14 @@ export default function LogInPage() {
   const submitSignIn = async (formData: SignInForm) => {
     const res = await USER.logIn(formData);
     if (!res) return;
-    sendToast('success', '로그인 성공');
+    useToast('success', '로그인 성공');
     navigate('/main');
   };
 
   const submitSignUp = async (formData: SignUpForm) => {
     const res = await USER.signUp(formData);
     if (!res) return;
-    sendToast('success', '정상적으로 가입되었습니다! ');
+    useToast('success', '정상적으로 가입되었습니다! ');
     toggle();
   };
 

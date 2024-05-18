@@ -21,11 +21,11 @@ export default React.memo(function GroupMemberEvent({
       {MemberEventList.flatMap((member) => {
         if (!member.groupedEvent || !member.groupedEvent[localDayKey]) return [];
 
-        const eventsDetail = member.groupedEvent[localDayKey].map((event, idx) => (
-          <div key={event.title + idx} className="flex w-full">
+        const eventsDetail = member.groupedEvent[localDayKey].map((event) => (
+          <div key={event?.title} className="flex w-full">
             <div className="FLEX-ver w-full space-x-1">
-              <span className="min-w-36 text-xl">{event.title}</span>
-              <span className="text-lg">
+              {/* <span className="min-w-36 text-xl">{event.title}</span> */}
+              <span className="text-5xl font-bold mx-auto">
                 {`${format(new Date(event.startAt), 'HH:mm')} ~
                ${format(new Date(event.endAt), 'HH:mm')}`}
               </span>
@@ -57,20 +57,26 @@ export default React.memo(function GroupMemberEvent({
               src={member?.thumbnail ? member.thumbnail : default_user}
               alt={member?.nickname}
             />
-            <Tooltip id={tooltipId} data-tooltip-class-name="tooltip-box">
-              <div className="FLEX-horizC w-80">
+            <Tooltip
+              id={tooltipId}
+              style={{ padding: '1rem' }}
+              data-tooltip-class-name="tooltip-box"
+            >
+              <div className="FLEX-horizC">
                 {member && (
                   <>
                     <img
-                      className="w-24 mx-auto rounded-full mt-4"
+                      className="w-48 rounded-full mt-4"
                       src={member.thumbnail ? member.thumbnail : default_user}
                       alt="thumbnail"
                     />
-                    <span className="text-xl mb-4">{member.nickname}</span>
+                    <span className="text-3xl mb-4">
+                      {member.nickname} <span className="text-2xl">님의 개인일정</span>
+                    </span>
                   </>
                 )}
               </div>
-              <div className="border rounded">{eventsDetail}</div>
+              <div className="mx-auto">{eventsDetail}</div>
             </Tooltip>
           </span>
         );

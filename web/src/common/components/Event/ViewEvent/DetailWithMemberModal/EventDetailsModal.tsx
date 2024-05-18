@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { Tooltip } from 'react-tooltip';
+import { format } from 'date-fns';
 
 import { useSelectedDayStore } from '@store/index';
 import { MemberWithEvent } from '@type/index';
@@ -23,33 +24,24 @@ export default function EventDetailsWithMemberModal({
 }: EventDetailsModal) {
   const colors = ['#004080', '#0080ff', '#00bfff', '#40e0d0'];
   const { selectedDay } = useSelectedDayStore();
-  const defaultDate = selectedDay
-    ? new Date(selectedDay.getTime() + 9 * 60 * 60 * 1000)
-    : new Date();
-  const [selectedDate, setSelectedDate] = useState<string>(defaultDate.toISOString().slice(0, 10));
-  const formattedSelectedDate = new Date(selectedDate).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const [currentDay, setCurrentDay] = useState<Date>(selectedDay || new Date());
 
   const handlePrevDay = () => {
-    const prevDay = new Date(selectedDate);
+    const prevDay = new Date(currentDay);
     prevDay.setDate(prevDay.getDate() - 1);
-    setSelectedDate(prevDay.toISOString().slice(0, 10));
+    setCurrentDay(prevDay);
   };
 
   const handleNextDay = () => {
-    const nextDay = new Date(selectedDate);
+    const nextDay = new Date(currentDay);
     nextDay.setDate(nextDay.getDate() + 1);
-    setSelectedDate(nextDay.toISOString().slice(0, 10));
+    setCurrentDay(nextDay);
   };
 
   //****************? 초기화 함수
   useEffect(() => {
     if (selectedDay) {
-      const adjustedDate = new Date(selectedDay.getTime() + 9 * 60 * 60 * 1000);
-      setSelectedDate(adjustedDate.toISOString().slice(0, 10));
+      setCurrentDay(selectedDay);
     }
   }, [selectedDay]);
 
@@ -65,9 +57,7 @@ export default function EventDetailsWithMemberModal({
           <button className="ANI-btn p-1 text-2xl font-bold rounded-xl" onClick={handlePrevDay}>
             &lt; 이전
           </button>
-          <h1 className="text-center text-5xl font-bold">
-            {`< ${formattedSelectedDate} > 멤버 상세 일정`}
-          </h1>
+          <h1 className="text-center text-5xl font-bold">{`< ${format(currentDay, 'yy년 MM월 dd일')} > 멤버 상세 일정`}</h1>
           <button className="ANI-btn p-1 text-2xl font-bold rounded-xl" onClick={handleNextDay}>
             다음 &gt;
           </button>
@@ -115,7 +105,7 @@ export default function EventDetailsWithMemberModal({
                 <MemberTimeline
                   memberEvents={member}
                   color={colors[index % colors.length]}
-                  selectedDate={selectedDate}
+                  currentDay={currentDay}
                 />
                 <Tooltip id={`tooltip-user-${index}`} className="tooltip-box">
                   <div className="tooltip-content flex items-center p-3">

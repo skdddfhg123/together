@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { UUID } from 'crypto';
 
 import * as FEED from '@services/eventFeedAPI';
@@ -28,7 +28,7 @@ interface ViewEventProps {
 
 export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: ViewEventProps) {
   const eventInfo = useGroupEventInfoStore().groupEventInfo;
-  const calendarList = useCalendarListStore().calendarList;
+  const { calendarList } = useCalendarListStore();
   const { AllEventList } = useAllEventListStore();
   const { selectedCalendar } = useSelectedCalendarStore();
   const [feedCreate, setFeedCreate] = useState<boolean>(false);
@@ -44,16 +44,6 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
 
   // *********************? 함수
   const closeFeedCreateModal = useCallback(() => setFeedCreate(false), []);
-
-  function displayDate(date: string | undefined) {
-    if (!date) return { year: '', monthDay: '', time: '' };
-    const parsedDate = new Date(date);
-    return {
-      year: format(parsedDate, 'yyyy'),
-      monthDay: format(parsedDate, 'MM월 dd일'),
-      time: format(parsedDate, 'HH시:mm분'),
-    };
-  }
 
   const renderAuthorOrGroupTitle = ({
     eventInfo,
@@ -93,7 +83,7 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
             {matchingMember ? (
               <>
                 <img
-                  className="w-8 mr-2"
+                  className="max-w-8 max-h-8 rounded-full mr-2"
                   src={matchingMember.thumbnail || default_user}
                   alt={matchingMember.nickname}
                 />
@@ -165,18 +155,24 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
             renderAuthorOrGroupTitle({ eventInfo, calendarMember, AllEventList, selectedCalendar })}
         </header>
         <main className="space-y-4">
-          <section key="date-section" className="FLEX-verA items-center">
-            <div className="FLEX-horizC">
-              <div>{displayDate(eventInfo?.startAt).year}</div>
-              <h2>{displayDate(eventInfo?.startAt).monthDay}</h2>
-              <div>{displayDate(eventInfo?.startAt).time}</div>
-            </div>
+          <section key="date-section" className="FLEX-verA items-center my-5">
+            {eventInfo?.startAt && (
+              <div className="FLEX-horizC">
+                <div>{format(new Date(eventInfo.startAt), 'yyyy년 MM월 dd일')}</div>
+                <div className="text-2xl font-bold">
+                  {format(new Date(eventInfo.startAt), 'HH시 mm분')}
+                </div>
+              </div>
+            )}
             <h1 className="text-custom-main">{'>'}</h1>
-            <div className="FLEX-horizC">
-              <div>{displayDate(eventInfo?.endAt).year}</div>
-              <h2>{displayDate(eventInfo?.endAt).monthDay}</h2>
-              <div>{displayDate(eventInfo?.endAt).time}</div>
-            </div>
+            {eventInfo?.startAt && (
+              <div className="FLEX-horizC">
+                <div>{format(new Date(eventInfo.endAt), 'yyyy년 MM월 dd일')}</div>
+                <div className="text-2xl font-bold">
+                  {format(new Date(eventInfo.endAt), 'HH시 mm분')}
+                </div>
+              </div>
+            )}
           </section>
           <section key="member-section" className="FLEX-horizC items-center space-y-2">
             <EventMember
