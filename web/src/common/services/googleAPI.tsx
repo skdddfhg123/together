@@ -12,8 +12,7 @@ export async function getEvents() {
     return res;
   } catch (error) {
     const err = error as AxiosError;
-    console.error(`GOOGLE - getGoogleEvent 실패 :`, err); //debug//
+    console.error(`구글 일정 가져오기 실패`, err); //debug//
     useToast('default', '구글 캘린더 받아오기에 실패했습니다..');
-    // if (err.response?.status === 401) console.log(`카카오톡 `, err);
   }
 }

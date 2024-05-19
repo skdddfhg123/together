@@ -41,16 +41,10 @@ export async function getMyAllCalendar() {
     });
 
     useCalendarListStore.getState().setIsLoaded(true);
-
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - getMyAllCalendar 실패 :`, data); //debug//
-      useToast('warning', data.message);
-    }
+    console.error(`캘린더 목록 받아오기 에러`, err); //debug//
   }
 }
 
@@ -68,12 +62,7 @@ export async function createGroupCalendar({ title, type }: CreateCalendarForm) {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - createGroupCalendar 실패 :`, data); //debug//
-      useToast('warning', data.message);
-    }
+    console.error(`캘린더 생성하기 에러`, err); //debug//
   }
 }
 
@@ -86,12 +75,7 @@ export async function updateGroupBanner(calendarId: UUID, bannerFormData: FormDa
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - updateGroupBanner 실패 :`, data); //debug//
-      useToast('warning', data.message);
-    }
+    console.error(`캘린더 배너 업로드 에러`, err); //debug//
   }
 }
 
@@ -110,22 +94,17 @@ export async function removeGroupCalendar(groupCalendar: Calendar | 'All') {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - removeGroupCalendar 실패 :`, data); //debug//
-      useToast('warning', '일정 삭제에 실패했습니다.');
-    }
+    console.error(`캘린더 삭제 에러`, err); //debug//
   }
 }
 
 export async function getMemberAndMemberEvents(calendarId: UUID) {
   if (!calendarId)
-    return console.log(`CALENDAR - getMemberAndMemberEvents (캘린더 id 없음) : { ${calendarId} }`);
+    return console.log(`CALENDAR - getMemberAndMemberEvents 실패 (1) : { ${calendarId} }`);
 
   try {
     const { data: res } = await API.get(`/auth/all/getcalendar/v2/${calendarId}`);
-    if (!res) throw new Error('CALENDAR - getMemberAndMemberEvents (db 조회 실패)');
+    if (!res) throw new Error('CALENDAR - getMemberAndMemberEvents 실패 (2) : (db 조회 실패)');
     console.log(`CALENDAR - getMemberAndMemberEvents 성공 :`, res);
 
     const MemberEventList = res.map((member: MemberWithEvent) => {
@@ -163,12 +142,7 @@ export async function getMemberAndMemberEvents(calendarId: UUID) {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - getMemberAndMemberEvents 실패 :`, data); //debug//
-      useToast('warning', data.message);
-    }
+    console.error(`내 그룹멤버 전체일정 받아오기 에러`, err); //debug//
   }
 }
 
@@ -194,12 +168,7 @@ export async function getGroupAllEvents(calendar: Calendar) {
     return res.groupCalendar;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - getGroupAllEvents 실패 :`, data); //debug//
-      useToast('warning', data.message);
-    }
+    console.error(`그룹 캘린더 일정 받아오기 에러`, err); //debug//
   }
 }
 
@@ -214,12 +183,7 @@ export async function getGroupOneEvent(groupEventId: UUID) {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - getGroupOneEvent 실패 :`, data); //debug//
-      useToast('warning', '일정을 가져오지 못했습니다.');
-    }
+    console.error(`특정 그룹 이벤트 정보 가져오기 에러`, err); //debug//
   }
 }
 
@@ -246,12 +210,7 @@ export async function createGroupSimpleEvent({
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - createGroupEvent 실패 :`, data); //debug//
-      useToast('warning', '일정 등록에 실패했습니다.');
-    }
+    console.error(`일정 등록 에러`, err); //debug//
   }
 }
 
@@ -283,12 +242,7 @@ export async function updateGroupEvent({
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - updateGroupEvent 실패 :`, data); //debug//
-      useToast('warning', '일정 수정에 실패했습니다.');
-    }
+    console.error(`일정 수정 에러`, err); //debug//
   }
 }
 
@@ -304,11 +258,6 @@ export async function removeGroupEvent(groupEventId: UUID | null) {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CALENDAR - removeGroupEvent 실패 :`, data); //debug//
-      useToast('warning', '일정 삭제에 실패했습니다.');
-    }
+    console.error(`일정 삭제 에러`, err); //debug//
   }
 }

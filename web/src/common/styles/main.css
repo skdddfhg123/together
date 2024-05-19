@@ -92,13 +92,14 @@
 #right-menu {
   display: flex;
   align-items: center;
+
+  width: 12rem;
   margin-left: auto;
-  /* margin-top: 0.5rem; */
   margin-right: 0.5rem;
 }
 
 /* ****** 가로모드 ****** * /
-/* #right-menu {
+#right-menu {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -114,7 +115,7 @@
   cursor: pointer;
 
   margin-bottom: 0.5rem;
-} */
+}
 /*************************/
 
 /* ****** 토스트 CSS ****** */
@@ -127,7 +128,7 @@
 } */
 
 .calendarAlert {
-  width: 40rem;
+  width: 42rem;
   text-align: center;
   font-size: 2rem;
   font-weight: 500;

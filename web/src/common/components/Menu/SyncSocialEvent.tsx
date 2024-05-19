@@ -1,10 +1,11 @@
 import React, { useState, useCallback } from 'react';
+import { Tooltip } from 'react-tooltip';
 
 import useToast from '@hooks/useToast';
 import * as KAKAO from '@services/KakaoAPI';
-import * as CALENDAR from '@services/calendarAPI';
+// import * as CALENDAR from '@services/calendarAPI';
+// import * as USER from '@services/userAPI';
 import * as REDIS from '@services/redisAPI';
-import * as USER from '@services/userAPI';
 import * as GOOGLE from '@services/googleAPI';
 import { useSelectedCalendarStore, useSocialEventListStore } from '@store/index';
 
@@ -34,7 +35,7 @@ export default function SyncSocialEvent() {
       let socialEvents: AllEvent[] = [];
 
       const kakaoRes = await KAKAO.GetEvents();
-      if (kakaoRes && kakaoRes.resultArray) {
+      if (kakaoRes?.resultArray) {
         const kakaoEvents = kakaoRes.resultArray.map((event: KakaoEvent) => ({
           // id: event.socialEventId,
           startAt: event.startAt,
@@ -43,11 +44,10 @@ export default function SyncSocialEvent() {
           title: event.title,
         }));
         socialEvents = [...socialEvents, ...kakaoEvents];
-      }
+      } else return;
 
       const googleRes = await GOOGLE.getEvents();
-      console.log(`구글 이벤트`, googleRes);
-      if (googleRes && googleRes.data) {
+      if (googleRes?.data) {
         const googleEvents = googleRes.data
           .filter((event: GoogleEvent) => event !== null)
           .map((event: GoogleEvent) => ({
@@ -58,27 +58,33 @@ export default function SyncSocialEvent() {
             title: event.title,
           }));
         socialEvents = [...socialEvents, ...googleEvents];
-      }
+      } else return;
 
-      useToast('success', '동기화가 완료되었습니다.');
       setSocialEventList(socialEvents);
-
-      await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: '동기화' });
     } catch (error) {
       useToast('error', '동기화 중 오류가 발생했습니다.');
       console.error(error);
+      return;
     }
+
+    await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: '동기화' });
+    useToast('success', '동기화가 완료되었습니다.');
   }, [selectedCalendar, canInvoke]);
 
   return (
     <>
       <img
+        data-tooltip-id="tooltip-sync"
+        data-tooltip-place="left"
         className="w-14 h-14 mx-auto bg-custom-light rounded-3xl hover:cursor-pointer hover:bg-custom-yellow"
         id="sync-button"
         src={syncImg}
         alt="syncCalendar-button"
         onClick={getSocialEvents}
       />
+      <Tooltip id="tooltip-sync" style={{ padding: '1rem', fontSize: '3rem' }}>
+        <div>소셜 일정 동기화</div>
+      </Tooltip>
     </>
   );
 }

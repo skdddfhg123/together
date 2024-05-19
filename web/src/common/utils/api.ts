@@ -33,11 +33,29 @@ axiosInstance.interceptors.request.use(
     const token = getCookie('accessToken');
     // const token = sessionStorage.getItem('accessToken');
     if (!token) {
-      useToast('warning', '로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
       sessionStorage.clear();
       navigateToSignin();
-      throw new Error('로그인 토큰 만료');
+
+      const error: AxiosError = {
+        isAxiosError: true,
+        config: config,
+        response: {
+          status: 401,
+          data: {
+            error: 'token expired',
+          },
+          statusText: 'Unauthorized',
+          headers: {},
+          config: config,
+        },
+        name: 'AxiosError',
+        message: 'token expired',
+        toJSON: () => ({}),
+      };
+
+      return Promise.reject(error);
     }
+
     config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
@@ -45,33 +63,86 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   },
 );
-
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      if (error.config?.data) {
-        const data = JSON.parse(error.config.data);
-        console.log(`data`, data);
+  (e: AxiosError) => {
+    console.log(`응답 인터셉터 START:`, e);
 
-        if (data.kakaoAccessToken === null) {
-          console.log(`카카오 에러 핸들링`); //debug//
-          return error;
-        }
+    const err = e.response;
+    const res = err?.data as ErrorResponse;
 
-        if ('useremail' in data && 'password' in data) {
-          const err = error.response.data as ErrorResponse;
-          console.log(`errer`, err);
-          useToast('warning', `${err.message}`);
-          return;
-        }
+    if (err?.status) {
+      const errData = err.config.data ? JSON.parse(err.config.data) : {};
+
+      switch (err.status) {
+        case 401:
+          if (!errData.kakaoAccessToken) {
+            console.log(`응답 인터셉터 (2)-1: 카카오 에러`, res, 'errData', errData);
+            useToast('default', `카카오 동기화 에러 : ${res.message}`);
+          }
+          if ('useremail' in errData && 'password' in errData) {
+            console.log(`응답 인터셉터 - (2)-2: 로그인/회원가입 에러`, res, 'errData', errData);
+            useToast('warning', res.message);
+          }
+
+          break;
+
+        case 404:
+          console.log(`응답 인터셉터 (3)-1: API 경로 에러`, res, 'errData', errData);
+          useToast('warning', '잘못된 API 요청입니다.');
+          break;
+
+        default:
+          console.log(`응답 인터셉터: 기타 에러`, res, 'errData', errData);
+          break;
       }
-      sessionStorage.clear();
-      useToast('warning', '인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
-      navigateToSignin();
+
+      return;
     }
+
+    if (e.message === 'token expired') {
+      useToast('error', '로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+      return Promise.reject(e);
+    }
+
+    if (e.code === 'ERR_BAD_REQUEST' || e.code === 'ERR_NETWORK') {
+      useToast('error', '서버가 닫혀있습니다. 나중에 다시 시도해주세요.');
+      return Promise.reject(e);
+    }
+
+    return Promise.reject(e);
   },
 );
+
+// console.log(`응답 인터셉터 start `, error);
+
+// if (error.response?.status === 409) {
+//   const err = error.response.data as ErrorResponse;
+//   useToast('warning', err.message);
+// }
+
+// if (error.response?.status === 401) {
+//   if (error.config?.data) {
+//     const data = JSON.parse(error.config.data);
+//     console.log(`응답 인터셉터 - (2)`, data);
+
+//     if (data.kakaoAccessToken === null) {
+//       console.log(`응답 인터셉터 - (2)-1 : 카카오 에러`, data);
+//       return error;
+//     }
+
+//     if ('useremail' in data && 'password' in data) {
+//       const err = error.response.data as ErrorResponse;
+//       console.log(`응답 인터셉터 - (2)-2 : 로그인/회원가입 에러`, err);
+//       useToast('warning', err.message);
+//       return;
+//     }
+//   }
+//   console.log(`응답 인터셉터 end`, error);
+//   sessionStorage.clear();
+//   useToast('warning', '인증 정보가 유효하지 않습니다. 다시 로그인해 주세요.');
+//   navigateToSignin();
+// }
 
 // endpoint : Server_Url 뒤에 오는 path
 // ex) 로그인일 때, endpoint는 '/login'

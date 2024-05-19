@@ -7,7 +7,7 @@ import { useSelectedCalendarStore } from '@store/index';
 import ChatTap from '@components/Menu/Chat/ChatTap';
 import MemberTap from '@components/Menu/MemberTap';
 import CalendarSetTap from '@components/Menu/CalendarSet/CalenderSetTap';
-import SyncSocialEvent from '@components/Menu/SyncSocialEvent';
+// import SyncSocialEvent from '@components/Menu/SyncSocialEvent';
 
 import optionImg from '@assets/r-optrion.png';
 import chatImg from '@assets/r-chat.png';
@@ -101,9 +101,9 @@ export default React.memo(function RightMenuTap({ switchMain }: RightMenuTapProp
         >
           <img className="w-12 mx-auto" src={optionImg} alt="캘린더 설정" />
         </button>
-        <div className="flex-grow flex items-end pb-12">
+        {/* <div className="flex-grow flex items-end pb-12">
           <SyncSocialEvent />
-        </div>
+        </div> */}
       </div>
       <section
         className={`FLEX-horiz ANIMATION overflow-hidden ${activeTap ? 'w-96 border-l' : 'w-0'}`}

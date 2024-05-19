@@ -14,11 +14,8 @@ export async function fetchEmojiList(calendarId: UUID) {
     return res;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response;
-      console.log(`CHAT - fetchEmojiList 실패:`, data); //debug//
-    }
+    console.error(`그룹 이모지 가져오기 에러`, err); //debug//
+    useToast('warning', '그룹 이모지 목록을 가져오는데 실패했습니다.');
   }
 }
 
@@ -33,12 +30,8 @@ export async function uploadGroupEmoji({ calendarId, emojiFormData }: reqEmoji) 
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error(`CHAT - uploadGroupEmoji 실패 :`, data); //debug//
-      useToast('warning', '이모지 등록에 실패했습니다.');
-    }
+    console.error(`이모지 등록 실패`, err); //debug//
+    useToast('warning', '이모지 등록에 실패했습니다.');
   }
 }
 
@@ -56,7 +49,7 @@ export async function deleteGroupEmoji(emojiId: UUID) {
     if (err.response) {
       const data = err.response.data as API.ErrorResponse;
       console.error(`CHAT - deleteGroupEmoji 실패 :`, data); //debug//
-      useToast('warning', '이모지 삭제 실패했습니다.');
+      useToast('warning', '이모지 삭제에 실패했습니다.');
     }
   }
 }

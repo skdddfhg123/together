@@ -19,12 +19,12 @@ interface CalendarListProps {
 }
 
 export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
-  const { calendarList } = useCalendarListStore();
+  const { calendarList, isLoaded } = useCalendarListStore();
   const { groupEventList } = useGroupEventListStore();
   const { setSelectedCalendar } = useSelectedCalendarStore();
 
   useEffect(() => {
-    CALENDAR.getMyAllCalendar();
+    if (!isLoaded) CALENDAR.getMyAllCalendar();
   }, []);
 
   const ChangeCalendar = (calendar: Calendar | 'All') => {

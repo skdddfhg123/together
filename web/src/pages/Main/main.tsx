@@ -14,6 +14,7 @@ import CalendarList from '@components/Canlendar/CalendarList';
 import UserModal from '@components/User/Profile/UserSetting';
 import RightMenuTap from '@components/Menu/RightMenuTap';
 import Tutorial from '@components/User/Tutorial';
+import SyncSocialEvent from '@components/Menu/SyncSocialEvent';
 
 import logoImg from '@assets/toogether_noBG.png';
 import menuImg from '@assets/calendar_menu.webp';
@@ -27,7 +28,6 @@ const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_A
 export default function MainPage() {
   const navigate = useNavigate();
   const { userInfo } = useUserInfoStore();
-  const { selectedCalendar } = useSelectedCalendarStore();
 
   const { isOn, toggle } = useToggle(false);
   const [toggleFeed, setToggleFeed] = useState<boolean>(false);
@@ -72,7 +72,6 @@ export default function MainPage() {
   }, [RendarUserAndCalendar]);
 
   useEffect(() => {
-    console.log(`튜토리얼 여부`, userInfo?.isFirst);
     if (userInfo?.isFirst === true) {
       welcomeTutorial();
     } else {
@@ -125,6 +124,7 @@ export default function MainPage() {
           </div>
         </section>
         <div id="right-menu">
+          <SyncSocialEvent />
           <UserModal />
         </div>
       </header>

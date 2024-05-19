@@ -8,12 +8,7 @@ import { Cookie, setCookie, deleteCookie } from '@utils/cookie';
 import { AllEvent, SignInForm, SignUpForm } from '@type/index';
 import {
   useAllEventListStore,
-  useCalendarListStore,
-  useEventFeedListStore,
-  useGroupEventInfoStore,
-  useGroupEventListStore,
   useSelectedCalendarStore,
-  useSelectedDayStore,
   useSocialEventListStore,
   useUserInfoStore,
 } from '@store/index';
@@ -44,19 +39,7 @@ export async function firstRender() {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-    console.log(`err`, err);
-
-    if (err.response?.status === 400) {
-      console.error('USER - firstRender 실패 : ', err.response);
-      useToast('error', '토큰 정보가 일치하지 않습니다');
-    } else if (err.response?.data) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error('USER - firstRender 실패 2 : ', data); //debug//
-      useToast('warning', data.message);
-    } else {
-      console.error('USER - firstRender 실패 3 : ', err);
-      useToast('error', '서버가 닫혀있습니다.');
-    }
+    console.log(`최초 렌더링 에러 `, err); //debug//
   }
 }
 
@@ -130,26 +113,11 @@ export async function logIn(formData: SignInForm) {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error('로그인 에러', data); //debug//
-      useToast('warning', data.message);
-    }
+    console.log(`로그인 에러 핸들러`, err);
   }
 }
 
-// TODO 구체화 필요
 export async function logOut() {
-  useUserInfoStore.getState().reset();
-  useCalendarListStore.getState().reset();
-  useSelectedCalendarStore.getState().reset();
-  useSelectedDayStore.getState().reset();
-  useGroupEventListStore.getState().reset();
-  useSocialEventListStore.getState().reset();
-  useAllEventListStore.getState().reset();
-  useEventFeedListStore.getState().reset();
-  sessionStorage.clear();
   deleteCookie('accessToken');
   useToast('error', '로그아웃 되었습니다.');
 }
@@ -164,15 +132,8 @@ export async function joinCalendar(calendarId: string) {
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response?.status === 400) {
-      console.error(err.response);
-      useToast('warning', '토큰 정보가 일치하지 않습니다. 다시 로그인해주세요.');
-    } else {
-      const data = err.response?.data as API.ErrorResponse;
-      console.error('그룹 캘린더 가입 에러', data); //debug//
-      useToast('warning', data?.message);
-    }
+    console.log('캘린더 가입 에러', err); //debug//
+    useToast('warning', '캘린더 가입에 실패했습니다.');
   }
 }
 
@@ -182,21 +143,13 @@ export async function updateThumbnail(thumbnailFormData: FormData) {
     if (!res) throw new Error('USER - joinCalendar (DB에서 그룹 캘린터 가입 실패)');
     console.log(`USER - updateThumbnail 성공`, res); //debug//
 
-    // const currentUserInfo = useUserInfoStore.getState().userInfo;
-    // if (currentUserInfo)
-    //   useUserInfoStore.getState().setUserInfo({ ...currentUserInfo, thumbnail: res.thumbnail });
-
     useToast('success', `프로필이 수정되었습니다.`);
 
     return true;
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error('USER - updateThumbnail 실패', data); //debug//
-      useToast('warning', data.message);
-    }
+    console.error('USER - updateThumbnail 실패', err); //debug//
+    useToast('warning', '프로필 업데이트에 실패했습니다.');
   }
 }
 
@@ -205,10 +158,6 @@ export async function tutorial() {
     await API.get(`/auth/tutorial`);
   } catch (e) {
     const err = e as AxiosError;
-
-    if (err.response) {
-      const data = err.response.data as API.ErrorResponse;
-      console.error('USER - tutorial 값 갱신 실패', data); //debug//
-    }
+    console.error('USER - tutorial 값 갱신 실패', err); //debug//
   }
 }

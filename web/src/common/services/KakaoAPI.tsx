@@ -51,15 +51,12 @@ async function getToken() {
       headrOptions,
     );
     if (!getToken) throw new Error(`kakao API - 토큰 받아오기 실패`);
-    console.log(`KAKAO - getToken :`, getToken); //debug//
 
     const res = await API.post(`/kakao/save/token`, {
       kakaoAccessToken: getToken.access_token,
       kakaoRefreshToken: getToken.refresh_token,
     });
-
     if (!res) throw new Error('KAKAO - getToken (토큰 DB 저장 실패)');
-    console.log(`KAKAO - getToken ( post ) : `, res.status); //debug//
 
     window.Kakao.Auth.setAccessToken(getToken.access_token, true);
     const kakaoToken: Cookie = {
@@ -77,7 +74,7 @@ async function getToken() {
 
     return true;
   } catch (err) {
-    console.error(err); //debug//
+    console.error('카카오 토큰 받아오기 에러', err); //debug//
   }
 }
 
@@ -93,7 +90,7 @@ async function LogOut() {
     return true;
   } catch (err) {
     const e = err as KakaoErrorResponse;
-    console.log(`KAKAO - Logout 실패 :`, e); //debug//
+    console.log(`카카오톡 로그아웃 에러`, e); //debug//
 
     if (e?.code === -401) {
       useToast('default', '로그인 정보가 없습니다.');
@@ -116,7 +113,7 @@ async function GetInfo() {
     return true;
   } catch (err) {
     const e = err as AxiosError<KakaoErrorResponse>;
-    console.error('KAKAO.getInfo - 실패 :', e); //debug//
+    console.error('카카오 유저 정보 받아오기 에러', e); //debug//
 
     if (e.response?.status === 401) {
       useToast('default', `로그인을 먼저 해주세요.`);
@@ -158,14 +155,12 @@ async function GetEvents() {
       if (!res) throw new Error('KAKAO - GetEvents (카카오 일정 DB 저장 실패)');
 
       console.log(`Kakao API - 토큰이 이미 존재합니다.`); //debug//
-      console.log(`카카오톡 일정`, res);
       return res;
     }
   } catch (error) {
     const err = error as AxiosError;
-    console.error(`KAKAO - GetEvents 실패 :`, err); //debug//
+    console.error(`카카오 일정 가져오기 실패`, err); //debug//
     useToast('default', '카카오톡 로그인을 통해 유저 정보를 업데이트 해주세요.');
-    // if (err.response?.status === 401) console.log(`카카오톡 `, err);
   }
 }
 

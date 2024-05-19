@@ -26,7 +26,7 @@ import '@styles/calendar.css';
 
 import kakaoImg from '@assets/KakaoTalk.png';
 import googleImg from '@assets/google_calendar.png';
-import outlookImg from '@assets/Outlook_circle.png';
+import outlookImg from '@assets/outlook_circle.png';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -53,8 +53,8 @@ export default React.memo(function CalendarPage({
   today.setHours(0, 0, 0, 0);
 
   // *****************? 자식컴포넌트 전달을 위한 callback 최적화
-  const toggleDeatilsModal = useCallback(() => {
-    setMemberModalOn((prev) => !prev);
+  const timeLineClose = useCallback(() => {
+    setMemberModalOn(false);
   }, []);
 
   const eventModalClose = useCallback(() => {
@@ -89,7 +89,6 @@ export default React.memo(function CalendarPage({
       }
       setEventModalOn(!eventModalOn);
     } else {
-      console.log(`고른 뒤, selectedDay에 저장될 날짜 :`, day);
       setSelectedDay(day);
       setEventModalOn(false);
     }
@@ -182,8 +181,9 @@ export default React.memo(function CalendarPage({
         outlook: 'tooltip-outlook',
       };
 
-      socialEventList.forEach((event: AllEvent) => {
-        const tooltipId = `tooltip-${event.id}`;
+      socialEventList.forEach((event: AllEvent, idx: number) => {
+        const eventId = event.id || `fallback-${idx}`;
+        const tooltipId = `tooltip-${eventId}`;
         const eventElement = (
           <li
             data-tooltip-id={tooltipId}
@@ -329,7 +329,7 @@ export default React.memo(function CalendarPage({
       <EventDetails isOpen={detailsOn} eventId={groupEventId} onClose={detailsClose} />
       <EventDetailsWithMemberModal
         isOpen={memberModalOn}
-        onClose={toggleDeatilsModal}
+        onClose={timeLineClose}
         memberEventList={MemberEventList}
       />
     </div>

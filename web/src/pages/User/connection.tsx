@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-
 import { useMsal } from '@azure/msal-react';
 import { useGoogleLogin, googleLogout } from '@react-oauth/google';
 import { loginRequest } from '../../common/utils/authConfig';
@@ -8,6 +7,11 @@ import { loginRequest } from '../../common/utils/authConfig';
 import { Cookie, setCookie } from '@utils/cookie';
 import * as KAKAO from '@services/KakaoAPI';
 import * as GOOGLE from '@services/googleAPI';
+
+import kakao_box from '@assets/kakao_box.png';
+import google_calendar from '@assets/google_calendar.png';
+import outlook_circle from '@assets/outlook_circle.png';
+import '@styles/connection.css';
 
 export default function ConnectionPage() {
   const { instance, accounts } = useMsal();
@@ -76,19 +80,38 @@ export default function ConnectionPage() {
   };
 
   return (
-    <div className="FLEX-horizC">
-      <h1>동기화 관리 페이지</h1>
-      <button onClick={KAKAO.LogIn}>카카오톡 로그인</button>
-      {/* <button onClick={KAKAO.GetInfo}>카톡 유저 정보받기</button> */}
-      <button onClick={KAKAO.LogOut}>카카오톡 로그아웃</button>
+    <div className="FLEX-horizC h-200">
+      <h1 className="page-title">동기화 관리 페이지</h1>
+      <NavLink className="ANI-btn hover:scale-125 p-5 border rounded-2xl mb-5 text-2xl" to="/main">
+        메인으로 가기
+      </NavLink>
 
-      <button onClick={() => login()}>구글 로그인</button>
-      <button onClick={handleGoogleLogout}>구글 로그아웃</button>
+      <button className="button kakao-button" onClick={KAKAO.LogIn}>
+        <img className="w-6" src={kakao_box} />
+        <p className="mx-auto">카카오톡 로그인</p>
+      </button>
+      <button className="button kakao-button" onClick={KAKAO.LogOut}>
+        <img className="w-6" src={kakao_box} />
+        <p className="mx-auto">카카오톡 로그아웃</p>
+      </button>
 
-      <button onClick={handleMicrosoftLogin}>Microsoft 로그인</button>
-      <button onClick={handleMicrosoftLogout}>Microsoft 로그아웃</button>
+      <button className="button google-button" onClick={() => login()}>
+        <img className="w-6" src={google_calendar} />
+        <p className="mx-auto">구글 로그인</p>
+      </button>
+      <button className="button google-button" onClick={handleGoogleLogout}>
+        <img className="w-6" src={google_calendar} />
+        <p className="mx-auto">구글 로그아웃</p>
+      </button>
 
-      <NavLink to="/main">메인으로 가기</NavLink>
+      <button className="button microsoft-button" onClick={handleMicrosoftLogin}>
+        <img className="w-6" src={outlook_circle} />
+        <p className="mx-auto">Microsoft 로그인</p>
+      </button>
+      <button className="button microsoft-button" onClick={handleMicrosoftLogout}>
+        <img className="w-6" src={outlook_circle} />
+        <p className="mx-auto">Microsoft 로그아웃</p>
+      </button>
     </div>
   );
 }

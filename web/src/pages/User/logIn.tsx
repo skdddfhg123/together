@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useToggle from '@hooks/useToggle';
 import useToast from '@hooks/useToast';
 import * as USER from '@services/userAPI';
 import { SignUpForm, SignInForm } from '@type/index';
+import {
+  useAllEventListStore,
+  useCalendarListStore,
+  useEventFeedListStore,
+  useGroupEventListStore,
+  useSelectedCalendarStore,
+  useSelectedDayStore,
+  useSocialEventListStore,
+  useUserInfoStore,
+} from '@store/index';
 
 import SignUp from '@components/User/SignUp';
 import SignIn from '@components/User/SignIn';
@@ -28,6 +38,20 @@ export default function LogInPage() {
     useToast('success', '정상적으로 가입되었습니다! ');
     toggle();
   };
+
+  useEffect(() => {
+    useUserInfoStore.getState().reset();
+    useCalendarListStore.getState().reset();
+    useSelectedCalendarStore.getState().reset();
+    useSelectedDayStore.getState().reset();
+    useGroupEventListStore.getState().reset();
+    useSocialEventListStore.getState().reset();
+    useAllEventListStore.getState().reset();
+    useEventFeedListStore.getState().reset();
+
+    sessionStorage.clear();
+    localStorage.clear();
+  }, []);
 
   return (
     <div className="FLEX-horiz h-lvh w-3/5 mx-auto">
