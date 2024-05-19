@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import useToggle from '@hooks/useToggle';
 import * as USER from '@services/userAPI';
+import * as REDIS from '@services/redisAPI';
 import { useUserInfoStore } from '@store/index';
 
 import UpdateThumbnail from '@components/User/Profile/UpdateThumbnail';
@@ -28,6 +29,7 @@ export default React.memo(function UserModal() {
 
   const handleLogOut = async () => {
     await USER.logOut();
+    REDIS.Unconnect();
     window.history.pushState(null, document.title, window.location.href);
     window.addEventListener('popstate', () => {
       window.history.pushState(null, document.title, window.location.href);

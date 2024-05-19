@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import useToast from '@hooks/useToast';
 import useToggle from '@hooks/useToggle';
 import * as USER from '@services/userAPI';
+import * as REDIS from '@services/redisAPI';
 import { SignUpForm, SignInForm } from '@type/index';
 import {
   useAllEventListStore,
@@ -48,6 +49,8 @@ export default function InvitePage() {
   };
 
   useEffect(() => {
+    REDIS.Unconnect();
+
     useUserInfoStore.getState().reset();
     useCalendarListStore.getState().reset();
     useSelectedCalendarStore.getState().reset();

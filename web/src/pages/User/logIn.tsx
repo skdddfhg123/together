@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import useToggle from '@hooks/useToggle';
 import useToast from '@hooks/useToast';
+import * as REDIS from '@services/redisAPI';
 import * as USER from '@services/userAPI';
 import { SignUpForm, SignInForm } from '@type/index';
 import {
@@ -40,6 +41,8 @@ export default function LogInPage() {
   };
 
   useEffect(() => {
+    REDIS.Unconnect();
+
     useUserInfoStore.getState().reset();
     useCalendarListStore.getState().reset();
     useSelectedCalendarStore.getState().reset();

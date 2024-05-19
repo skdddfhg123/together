@@ -3,10 +3,6 @@ import * as redisAxios from '@utils/redis';
 import { Calendar, Member } from '@type/index';
 import { useCalendarListStore, useUserInfoStore } from '@store/index';
 
-interface RedisSubscribe {
-  channel: string; // 받는 사람 email
-}
-
 interface RedisPublish {
   selectedCalendar: Calendar | 'All';
   method: string;
@@ -57,9 +53,10 @@ export async function MessagePost({ selectedCalendar, method }: RedisPublish) {
   }
 }
 
-export async function Connect(useremail: string) {
+export async function Connect() {
+  const userInfo = useUserInfoStore.getState().userInfo;
   try {
-    const res = await redisAxios.get(`/subscribe/${useremail}`);
+    const res = await redisAxios.get(`/subscribe/${userInfo?.useremail}`);
     if (!res) throw new Error('Redis 구독 실패');
     console.log(`Redis 구독 성공 :`, res);
 
@@ -71,10 +68,11 @@ export async function Connect(useremail: string) {
   }
 }
 
-export async function Unconnect(channel: RedisSubscribe) {
+export async function Unconnect() {
+  const userInfo = useUserInfoStore.getState().userInfo;
   try {
-    const res = await redisAxios.get(`/unsubscribe/${channel}`);
-
+    const res = await redisAxios.get(`/unsubscribe/${userInfo?.useremail}`);
+    console.log(`Redis 구독 해제  :`, res);
     return true;
   } catch (e) {
     const err = e as AxiosError;

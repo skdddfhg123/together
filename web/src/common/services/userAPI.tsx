@@ -1,17 +1,49 @@
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 import useToast from '@hooks/useToast';
 import * as API from '@utils/api';
 import * as REDIS from '@services/redisAPI';
 import { Cookie, setCookie, deleteCookie } from '@utils/cookie';
 
-import { AllEvent, SignInForm, SignUpForm } from '@type/index';
+import { AllEvent, Calendar, SignInForm, SignUpForm } from '@type/index';
 import {
   useAllEventListStore,
   useSelectedCalendarStore,
   useSocialEventListStore,
   useUserInfoStore,
 } from '@store/index';
+
+// export async function firstRenderV1() {
+//   try {
+//     console.log(`%c 랜더링 시작 ...`, 'font-size: 20px; font-weight: 700; color: #badfff');
+//     const start = performance.now();
+//     const response = await API.get(`/calendar/get_calendar/v2`);
+//     const calendarList = response.data;
+//     const fetchCalendarEvents = async () => {
+//       for (const calendar of calendarList) {
+//         await API.get(`/calendar/group/get/v2/${calendar.calendarId}`);
+//         await API.get(`/auth/all/getcalendar/V2/${calendar.calendarId}`);
+//       }
+//     };
+//     await fetchCalendarEvents();
+//     const end = performance.now();
+//     console.log(
+//       `%c 랜더링 끝. 소요 시간: ${Math.round(end - start)}ms`,
+//       'font-size: 20px; font-weight: 700; color: #C62D42',
+//     );
+
+//     console.log(`%c 최적화 랜더링 시작 ...`, 'font-size: 20px; font-weight: 700; color: #efef7f');
+//     const start2 = performance.now();
+//     await API.get(`/auth/all/v2`);
+//     const end2 = performance.now();
+//     console.log(
+//       `%c 최적화 랜더링 끝. 소요 시간: ${Math.round(end2 - start2)}ms`,
+//       'font-size: 20px; font-weight: 700; color: #badfff',
+//     );
+//   } catch (error) {
+//     console.error('Error during firstRender:', error);
+//   }
+// }
 
 export async function firstRender() {
   try {
@@ -22,7 +54,7 @@ export async function firstRender() {
     useUserInfoStore.getState().setUserInfo(res.user);
     useSelectedCalendarStore.getState().setSelectedCalendar('All');
 
-    REDIS.Connect(res.user.useremail);
+    REDIS.Connect();
 
     const events: AllEvent[] = res.events.map((event: AllEvent) => ({
       ...event,

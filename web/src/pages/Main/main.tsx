@@ -28,6 +28,7 @@ const Redis_Url = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_A
 export default function MainPage() {
   const navigate = useNavigate();
   const { userInfo } = useUserInfoStore();
+  const { selectedCalendar } = useSelectedCalendarStore();
 
   const { isOn, toggle } = useToggle(false);
   const [toggleFeed, setToggleFeed] = useState<boolean>(false);
@@ -45,7 +46,7 @@ export default function MainPage() {
 
   const RendarUserAndCalendar = useCallback(async () => {
     const res = await USER.firstRender();
-    if (!res) navigate('/signin');
+    // if (!res) navigate('/signin');
   }, [navigate]);
 
   const switchingFeedAndCalendar = useCallback(() => {
@@ -90,12 +91,12 @@ export default function MainPage() {
         containerId: 'memberAlert',
       });
 
-      const nowCalendar = useSelectedCalendarStore.getState().selectedCalendar;
-      if (nowCalendar === 'All') return;
-
-      //********? 실시간 동기화
-      await CALENDAR.getGroupAllEvents(nowCalendar);
-      await CALENDAR.getMemberAndMemberEvents(nowCalendar.calendarId);
+      // if (selectedCalendar === 'All') {
+      //   return USER.firstRender();
+      // } else {
+      //   await CALENDAR.getGroupAllEvents(selectedCalendar);
+      //   await CALENDAR.getMemberAndMemberEvents(selectedCalendar.calendarId);
+      // }
     });
 
     return () => {

@@ -63,10 +63,6 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
     await CALENDAR.getMemberAndMemberEvents(calendar.calendarId);
   };
 
-  useEffect(() => {
-    onClose();
-  }, [groupEventList]);
-
   return (
     <section
       className={`SCROLL-hide FLEX-horizC h-fit ${isOpen ? 'w-full' : 'w-0'}`}

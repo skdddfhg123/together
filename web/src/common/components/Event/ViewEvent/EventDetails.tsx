@@ -27,7 +27,11 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
 
   // *********************? 함수
   const handleRender = async () => {
-    if (selectedCalendar === 'All') return await USER.firstRender();
+    if (selectedCalendar === 'All') {
+      await USER.firstRender();
+      onClose();
+      return;
+    }
     const res: Calendar = await CALENDAR.getGroupAllEvents(selectedCalendar);
     if (res) {
       //TODO bannerImage 업데이트 안됨
@@ -47,11 +51,11 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
     [handleRender],
   );
 
-  const submitModifyEvent = async (formData: GroupEvent) => {
+  const submitModifyEvent = useCallback(async (formData: GroupEvent) => {
     await CALENDAR.updateGroupEvent(formData);
     await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: `일정을 수정` });
     handleRender();
-  };
+  }, []);
 
   // *********************? 최초 Render
   useEffect(() => {
@@ -59,8 +63,8 @@ export default function EventDetails({ isOpen, eventId, onClose }: EventDetailsP
       useToast('warning', '수정을 먼저 완료해주세요.');
       return;
     }
-    const fetchEventInfo = async () => {
-      if (eventId) await CALENDAR.getGroupOneEvent(eventId);
+    const fetchEventInfo = () => {
+      if (eventId) CALENDAR.getGroupOneEvent(eventId);
     };
 
     if (eventId || !isLoaded) {
