@@ -75,9 +75,9 @@ class MyProfile extends StatelessWidget {
             padding: const EdgeInsets.only(top: 20),
             child: CircleAvatar(
               radius: 60,
-              backgroundImage: CachedNetworkImageProvider(
-                  authController.user?.thumbnail ??
-                      'https://via.placeholder.com/150'),
+              backgroundImage: CachedNetworkImageProvider(authController
+                      .user?.thumbnail ??
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s'),
               backgroundColor: Colors.transparent,
             ),
           ),

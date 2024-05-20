@@ -99,7 +99,8 @@ class _ChatPageState extends State<ChatPage> {
                 final member = meetingController.memberAppointments
                     .firstWhereOrNull(
                         (member) => member.useremail == message.email);
-                final thumbnailUrl = member?.thumbnail ?? '';
+                final thumbnailUrl = member?.thumbnail ??
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s';
 
                 return Column(
                   crossAxisAlignment: isMine

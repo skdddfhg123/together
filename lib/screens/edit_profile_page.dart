@@ -24,7 +24,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final authController = Get.find<AuthController>();
     nameController.text = authController.user?.nickname ?? '';
     dobController.text = ''; // 예시 데이터
-    String serverImageUrl = authController.user?.thumbnail ?? '';
+    String serverImageUrl = authController.user?.thumbnail ??
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s';
     currentThumbnail = CachedNetworkImageProvider(serverImageUrl);
   }
 

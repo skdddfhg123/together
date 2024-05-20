@@ -97,9 +97,9 @@ class _CommentsPageState extends State<CommentsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CircleAvatar(
-                            backgroundImage: CachedNetworkImageProvider(
-                                comment.thumbnail ??
-                                    'https://via.placeholder.com/150'),
+                            backgroundImage: CachedNetworkImageProvider(comment
+                                    .thumbnail ??
+                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s'),
                             radius: 20,
                           ),
                           const SizedBox(width: 10),

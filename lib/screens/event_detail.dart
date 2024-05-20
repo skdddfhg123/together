@@ -221,8 +221,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           return Column(
                             children: [
                               CircleAvatar(
-                                backgroundImage: CachedNetworkImageProvider(
-                                    member.thumbnail ?? ''),
+                                backgroundImage: CachedNetworkImageProvider(member
+                                        .thumbnail ??
+                                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s'),
                                 radius: 20,
                               ),
                               Text(member.nickname),

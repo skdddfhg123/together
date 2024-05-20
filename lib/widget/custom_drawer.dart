@@ -42,9 +42,9 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   currentAccountPicture: CircleAvatar(
-                    backgroundImage: CachedNetworkImageProvider(
-                        authController.user?.thumbnail ??
-                            'https://via.placeholder.com/150'),
+                    backgroundImage: CachedNetworkImageProvider(authController
+                            .user?.thumbnail ??
+                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s'),
                   ),
                   decoration: const BoxDecoration(
                     color: Color.fromARGB(228, 177, 218, 251),

@@ -8,7 +8,7 @@ import 'package:calendar/screens/myprofile_page.dart';
 import 'package:calendar/widget/calendar_utils.dart';
 import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/event_selection.dart';
-import 'package:calendar/screens/alarm.dart';
+import 'package:calendar/screens/emoji_page.dart';
 import 'package:calendar/screens/memo.dart';
 import 'package:calendar/widget/custom_bottom_navbar.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +35,7 @@ class _MainPageState extends State<MainPage> {
       AllCalendar(onCalendarChanged: _changePage),
       FeedPage(calendarId: calendarId),
       const MemoPage(),
-      const NotificationPage(),
+      ImageEditorScreen(title: '이모지 만들기', calendarId: calendarId),
       const MyProfile(), // 처음 설정 페이지는 MyProfile로 설정
     ];
   }
@@ -221,7 +221,7 @@ class _MainPageState extends State<MainPage> {
                                                     backgroundImage:
                                                         CachedNetworkImageProvider(
                                                             attendee.thumbnail ??
-                                                                ''),
+                                                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s'),
                                                     radius: 12,
                                                   ),
                                                   Text(

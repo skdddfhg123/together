@@ -116,7 +116,8 @@ class DialogService {
                                 children: [
                                   CircleAvatar(
                                     backgroundImage: CachedNetworkImageProvider(
-                                        member.thumbnail ?? ''),
+                                        member.thumbnail ??
+                                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s'),
                                     radius: 18,
                                   ),
                                   const SizedBox(width: 8),
@@ -227,8 +228,9 @@ class DialogService {
                                       children: [
                                         CircleAvatar(
                                           backgroundImage:
-                                              CachedNetworkImageProvider(
-                                                  attendee.thumbnail ?? ''),
+                                              CachedNetworkImageProvider(attendee
+                                                      .thumbnail ??
+                                                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s'),
                                           radius: 12,
                                         ),
                                         const SizedBox(width: 8),

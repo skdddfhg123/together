@@ -425,8 +425,9 @@ class _AllCalendarState extends State<AllCalendar> {
           ),
         ),
         CircleAvatar(
-          backgroundImage:
-              CachedNetworkImageProvider(appointment.authorThumbnail ?? ''),
+          backgroundImage: CachedNetworkImageProvider(appointment
+                  .authorThumbnail ??
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4yBIuo_Fy_zUopbWqlVpxfAVZKUQk-EUqmE0Fxt8sQ&s'),
         ),
       ],
     );
