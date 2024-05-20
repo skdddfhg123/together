@@ -50,4 +50,10 @@ export class UpdateGroupEventDTO {
     @IsOptional()
     @ApiPropertyOptional({ description: 'Attachment for the event', type: 'object' })
     attachment?: any;
+
+    @IsOptional()
+    startAt?: Date;
+
+    @IsOptional()
+    endAt?: Date;
 }

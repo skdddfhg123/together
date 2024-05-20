@@ -56,7 +56,7 @@ export class AuthService {
                 nickname: user.nickname,
                 useremail: user.useremail,
                 userCalendarId: userCalendar?.userCalendarId,
-                isFirst: user.isFrist,
+                isFirst: user.isFirst,
             };
 
             const accessToken = this.jwtService.sign(payload, { expiresIn: '3d' });
@@ -99,7 +99,7 @@ export class AuthService {
                 nickname: user.nickname,
                 useremail: user.useremail,
                 userCalendarId: userCalendar?.userCalendarId,
-                isFirst: user.isFrist,
+                isFirst: user.isFirst,
             };
 
             const accessToken = this.jwtService.sign(payload, { expiresIn: '3d' });
@@ -114,7 +114,7 @@ export class AuthService {
                 "useremail": user.useremail,
                 "thumbnail": user.thumbnail,
                 "userCalendarId": userCalendar.userCalendarId,
-                "isFirst": user.isFrist,
+                "isFirst": user.isFirst,
             };
 
         } catch (error) {
@@ -178,6 +178,7 @@ export class AuthService {
                     "user.phone",
                     "user.thumbnail",
                     "user.birthDay",
+                    "user.isFirst"
                 ])
                 .leftJoinAndSelect("user.userCalendarId", "userCalendar")
                 .leftJoinAndSelect("userCalendar.socialEvents", "socialEvents")  // 이 부분을 추가
@@ -208,7 +209,8 @@ export class AuthService {
                     useremail: userWithCalendar.useremail,
                     phone: userWithCalendar.phone,
                     thumbnail: userWithCalendar.thumbnail,
-                    birthDay: userWithCalendar.birthDay
+                    birthDay: userWithCalendar.birthDay,
+                    isFirst: userWithCalendar.isFirst,
                 },
                 events: [
                     ...calendars,

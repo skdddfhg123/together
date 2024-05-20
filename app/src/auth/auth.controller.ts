@@ -34,7 +34,7 @@ export class AuthController {
         useremail: user.useremail,
         nickname: user.nickname,
         userCalendarId: userCalendar.userCalendarId,
-        isFirst: user.isFrist,
+        isFirst: user.isFirst,
       };
     } catch (e) {
       throw e;
@@ -174,14 +174,7 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('tutorial')
-  async checkProceedTutorial(@getPayload() payload: PayloadResponse): Promise<boolean> {
-    let isFirst = true;
-
-    if(!payload.isFirst)
-      isFirst = false;
-    // else
-    //   await this.userService.tutorialComplete(payload.useremail);
-
-    return isFirst;
+  async checkProceedTutorial(@getPayload() payload: PayloadResponse): Promise<string> {
+    return await this.userService.tutorialComplete(payload.useremail);
   }
 }

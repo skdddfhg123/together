@@ -11,7 +11,7 @@ import { UserRefreshToken } from "src/db/tokens/entities/userRefreshToken.entity
 
 
 @Entity()
-@Unique(['useremail', 'nickname'])
+@Unique(['useremail'])
 export class User extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     userId: string;
@@ -52,8 +52,8 @@ export class User extends BaseEntity {
     @Column({ nullable: false, default: false })
     birthDayFlag: boolean;
 
-    @Column({default: true})
-    isFrist: boolean;
+    @Column({ default: true })
+    isFirst: boolean;
 
     @OneToOne(() => UserCalendar, userCalendar => userCalendar.user)
     @JoinColumn({ name: 'userCalendarId' })

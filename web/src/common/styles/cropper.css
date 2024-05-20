@@ -1,9 +1,0 @@
-.cropper-circle .cropper-view-box {
-  border-radius: 50%;
-}
-
-.cropper-circle .cropper-face,
-.cropper-circle .cropper-line,
-.cropper-circle .cropper-point {
-  border-radius: 50%;
-}

@@ -29,11 +29,6 @@ export class UserService {
             throw new ConflictException('Email already exists');
         }
 
-        const existingNickname = await this.userRepository.findOne({ where: { nickname: userDTO.nickname } });
-        if (existingNickname) {
-            throw new ConflictException('Nickname already exists');
-        }
-
         const user = new User();
         user.useremail = userDTO.useremail;
         user.nickname = userDTO.nickname;
@@ -91,13 +86,13 @@ export class UserService {
     }
 
     async tutorialComplete(userEmail: string): Promise<string> {
-        
+
         try {
-            await this.userRepository.update({useremail: userEmail}, {isFrist: false});
-    
+            await this.userRepository.update({ useremail: userEmail }, { isFirst: false });
+
             return "user has proceeded the tutorial";
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             throw new InternalServerErrorException('user tutorial status update failed');
         }

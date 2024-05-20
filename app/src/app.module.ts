@@ -21,6 +21,7 @@ import { EventModule } from './webSocket/event.module';
 import { UtilsModule } from './utils/utils.module';
 import { RedisGateway } from './webSocket/redis/redis.gateway';
 import { BannerModule } from './calendar/banner/banner.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -49,7 +50,7 @@ import { BannerModule } from './calendar/banner/banner.module';
     EventModule,
     BannerModule,
   ],
-  controllers: [RedisController],
+  controllers: [RedisController, AppController],
   providers: [RedisService, RedisGateway],
   exports: [RedisService],
 })
