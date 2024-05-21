@@ -33,7 +33,8 @@
   
   overflow: hidden;
   padding-bottom: 1.2rem;
-  border-top: 1px solid rgb(242, 242, 242);
+  /* border-top: 1px solid rgb(242, 242, 242); */
+  border-top: 1px solid rgb(222, 222, 222);
 }
 
 .prevMonthDay,
@@ -67,7 +68,6 @@ td.today:hover {
 }
 
 .group-event {
-  height: 2.25rem;
   font-size: x-large;
   font-weight:600;
   border-radius: 0.125rem;
@@ -79,7 +79,6 @@ td.today:hover {
 }
 
 .group-event:hover {
-  display: flex;
   align-items: center;
 
   box-shadow: 0 5px 5px -1px rgb(0, 0, 0, 0.5);
@@ -88,14 +87,12 @@ td.today:hover {
   white-space: normal;
   overflow: visible; 
   text-overflow: clip;
-  font-size: 1.1rem; 
 }
 
 .dayBox {
   height: 2.5rem;
   display: flex;
   align-items: center; 
-  justify-content: space-between; 
 }
 
 .day {
@@ -104,15 +101,22 @@ td.today:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+  
+  margin-right: 0.3rem;
   font-size: x-large;
 }
 
 .GroupMember-Box {
   display: flex;
+  width: 80%;
 }
 
-.GroupMember-Box > * + * {
-  margin-left: 0.3rem;
+.GroupMember-Box * {
+  margin-right: 0.3rem;
+}
+
+.GroupMember-Box *:last-child {
+  margin-right: 0;
 }
 
 th.day-0, .day-0 .day { /* 일요일 */
@@ -150,13 +154,11 @@ th.day-6, .day-6 .day { /* 토요일 */
 
 
 #kakao-event {
-  height: 2.4rem;
   background: #F7E600;
   border-radius: 3px;
 }
 
 #google-event {
-  height: 2.4rem;
   background:rgb(230, 239, 255);
   border-radius: 3px;
 
@@ -164,7 +166,7 @@ th.day-6, .day-6 .day { /* 토요일 */
 }
 
 #outlook-event {
-  height: 2.4rem;
+
   background:rgb(230, 239, 255);
   border-radius: 3px;
 
@@ -172,7 +174,7 @@ th.day-6, .day-6 .day { /* 토요일 */
 }
 
 #socialImg {
-  height: 2.4rem;
+  height: 2rem;
 }
 
 .social-title {
