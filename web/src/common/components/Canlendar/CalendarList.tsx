@@ -5,13 +5,10 @@ import * as CALENDAR from '@services/calendarAPI';
 import * as USER from '@services/userAPI';
 
 import { Calendar } from '@type/index';
-import {
-  useCalendarListStore,
-  useGroupEventListStore,
-  useSelectedCalendarStore,
-} from '@store/index';
+import { useCalendarListStore, useSelectedCalendarStore } from '@store/index';
 
 import defaultCover from '@assets/default_cover.png';
+import calendarImg from '@assets/calendar_img.jpg';
 
 interface CalendarListProps {
   isOpen: boolean;
@@ -20,7 +17,6 @@ interface CalendarListProps {
 
 export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
   const { calendarList, isLoaded } = useCalendarListStore();
-  const { groupEventList } = useGroupEventListStore();
   const { setSelectedCalendar } = useSelectedCalendarStore();
 
   useEffect(() => {
@@ -39,15 +35,11 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
     return calendarList.length > 0 ? (
       calendarList.map((calendar: Calendar, idx: number) => (
         <li
-          className={`w-full py-2 text-l cursor-pointer flex items-center`}
+          className={`w-full py-2 text-l cursor-pointer flex items-center ANI-right hover:scale-125`}
           onClick={() => ChangeCalendar(calendar)}
           key={idx}
         >
-          <img
-            className="m-2 w-36"
-            src={calendar.coverImage?.src || defaultCover}
-            alt="no Img"
-          ></img>
+          <img className="mx-2 w-32 rounded" src={calendar.coverImg || defaultCover} alt="no Img" />
           <div>
             <div className="text-lg">{`${calendar.title}\n`}</div>
             <div className="text-gray-400">{`[ ${calendar.attendees.length} 명 ]`}</div>
@@ -76,15 +68,24 @@ export default function CalendarList({ isOpen, onClose }: CalendarListProps) {
         &times;
       </button>
       <ul className={`h-fit w-full`}>
-        <h2
-          className="p-4 w-2/3 hover:text-custom-main hover:cursor-pointer"
-          onClick={() => {
-            ChangeCalendar('All');
-            USER.firstRender();
-          }}
+        <div
+          className={`w-full py-2 flex items-center text-l cursor-pointer ANI-right hover:scale-125`}
+          onClick={() => ChangeCalendar('All')}
         >
-          일정 모아보기
-        </h2>
+          <img
+            className="m-2 w-32 max-h-24 object-cover rounded-2xl"
+            src={calendarImg}
+            alt="no Img"
+          ></img>
+          <div>
+            <div
+              className="text-lg font-bold rounded
+            "
+            >
+              나의 모든 일정
+            </div>
+          </div>
+        </div>
         {renderCalendarList()}
       </ul>
       <Link className="p-4 text-xl text-gray-400 hover:text-custom-main" to={`/createGroup`}>

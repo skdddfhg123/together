@@ -43,8 +43,8 @@ export type CreateCalendarForm = {
 export type Calendar = {
   calendarId: UUID;
   title: string;
-  coverImage: ImageFile | null;
-  bannerImage?: ImageFile;
+  coverImg: Image | null;
+  bannerImg?: Image;
   type: string; // Color
   attendees: Member[]; // 객체
   createdAt: Date;

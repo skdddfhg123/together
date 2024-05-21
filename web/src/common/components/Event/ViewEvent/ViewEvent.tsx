@@ -140,7 +140,9 @@ export default function ViewEvent({ eventId, onClose, deleteEvent, setEdit }: Vi
               수정
             </button>
             <button
-              className="BTN hover:bg-custom-light rounded"
+              disabled={selectedCalendar === 'All'}
+              className={`BTN hover:bg-custom-light rounded 
+              ${selectedCalendar === 'All' ? 'text-gray-400 cursor-not-allowed' : ''}`}
               onClick={() => deleteEvent(eventId)}
             >
               삭제

@@ -72,11 +72,23 @@ td.today:hover {
   font-weight:600;
   border-radius: 0.125rem;
   transition: transform 150ms; 
+
+  white-space: nowrap;
+  overflow: hidden; 
+  text-overflow: ellipsis; 
 }
 
 .group-event:hover {
+  display: flex;
+  align-items: center;
+
   box-shadow: 0 5px 5px -1px rgb(0, 0, 0, 0.5);
   transform: translateY(-0.05rem);
+
+  white-space: normal;
+  overflow: visible; 
+  text-overflow: clip;
+  font-size: 1.1rem; 
 }
 
 .dayBox {
@@ -138,13 +150,13 @@ th.day-6, .day-6 .day { /* 토요일 */
 
 
 #kakao-event {
-  height: 2rem;
+  height: 2.4rem;
   background: #F7E600;
   border-radius: 3px;
 }
 
 #google-event {
-  height: 2rem;
+  height: 2.4rem;
   background:rgb(230, 239, 255);
   border-radius: 3px;
 
@@ -152,7 +164,7 @@ th.day-6, .day-6 .day { /* 토요일 */
 }
 
 #outlook-event {
-  height: 2rem;
+  height: 2.4rem;
   background:rgb(230, 239, 255);
   border-radius: 3px;
 
@@ -160,7 +172,20 @@ th.day-6, .day-6 .day { /* 토요일 */
 }
 
 #socialImg {
-  width: 2rem;
+  height: 2.4rem;
+}
+
+.social-title {
+  margin-left: 1rem;
+
+}
+
+.tooltip-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-weight: 600;
+  font-size: large;
 }
 
 .tooltip-container .tooltip-kakao {

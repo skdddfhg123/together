@@ -67,7 +67,7 @@ export default function SyncSocialEvent() {
       return;
     }
 
-    await REDIS.MessagePost({ selectedCalendar: selectedCalendar, method: '동기화' });
+    await REDIS.MessagePost({ method: '동기화' });
     useToast('success', '동기화가 완료되었습니다.');
   }, [selectedCalendar, canInvoke]);
 

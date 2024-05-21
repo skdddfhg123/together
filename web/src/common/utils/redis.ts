@@ -20,7 +20,7 @@ async function get(endpoint: string): Promise<AxiosResponse> {
   return axiosInstance.get(endpoint);
 }
 
-async function post(endpoint: string, data: Data | FormData): Promise<AxiosResponse> {
+async function post(endpoint: string, data: Data): Promise<AxiosResponse> {
   const bodydata = JSON.stringify(data);
 
   console.log(`%cPOST 요청: ${Redis_Url + endpoint}`, 'color: #B0C460;');

@@ -79,6 +79,14 @@ export async function updateGroupBanner(calendarId: UUID, bannerFormData: FormDa
   }
 }
 
+export async function getGroupBanner(calendarId: UUID) {
+  try {
+  } catch (e) {
+    const err = e as AxiosError;
+    console.error(`캘린더 배너 받아오기 실패`, err); //debug//
+  }
+}
+
 export async function removeGroupCalendar(groupCalendar: Calendar | 'All') {
   if (groupCalendar === 'All') return useToast('default', '그룹 캘린더를 선택해주세요.');
   try {

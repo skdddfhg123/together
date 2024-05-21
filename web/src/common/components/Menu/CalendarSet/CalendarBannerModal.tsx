@@ -7,6 +7,8 @@ import * as CALENDAR from '@services/calendarAPI';
 import { Calendar } from '@type/index';
 import useToast from '@hooks/useToast';
 
+import '@styles/modalStyle.css';
+
 interface CalendarBannerModalProps {
   selectedCalendar: Calendar | 'All';
   isOpen: boolean;

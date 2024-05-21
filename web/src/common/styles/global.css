@@ -83,7 +83,10 @@ h2 {
     @apply transition-all duration-300 ease-in-out
   }
   .ANI-short {
-    @apply transition-all duration-300 ease-in-out
+    @apply transition-all duration-150 ease-in-out
+  }
+  .ANI-right {
+    @apply transition-all duration-300 ease-in-out hover:translate-x-8
   }
 
   .ANI-btn {

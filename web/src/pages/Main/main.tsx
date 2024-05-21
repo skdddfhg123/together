@@ -18,6 +18,7 @@ import SyncSocialEvent from '@components/Menu/SyncSocialEvent';
 
 import logoImg from '@assets/toogether_noBG.png';
 import menuImg from '@assets/calendar_menu.webp';
+import defaultBanner from '@assets/default_banner.png';
 
 import '@styles/main.css';
 import FeedPage from '@pages/Feed/feed';
@@ -46,7 +47,7 @@ export default function MainPage() {
 
   const RendarUserAndCalendar = useCallback(async () => {
     const res = await USER.firstRender();
-    // if (!res) navigate('/signin');
+    if (!res) navigate('/signin');
   }, [navigate]);
 
   const switchingFeedAndCalendar = useCallback(() => {
@@ -85,18 +86,17 @@ export default function MainPage() {
     const socket = io(Redis_Url);
     console.log(`Redis Socket Connected`); //debug//
 
-    socket.on('redisMessage', async ({ message }) => {
-      const cleanMessage = DOMPurify.sanitize(message);
+    socket.on('redisMessage', async ({ channel, message }) => {
+      if (channel === userInfo?.useremail) return;
+      const parsedMessage = await JSON.parse(message);
+      const cleanMessage = DOMPurify.sanitize(parsedMessage.text);
       toast.info(<div dangerouslySetInnerHTML={{ __html: cleanMessage }} />, {
         containerId: 'memberAlert',
       });
+      console.log(`메세지 안 캘린더 id`, [parsedMessage, parsedMessage.calendarId]);
 
-      // if (selectedCalendar === 'All') {
-      //   return USER.firstRender();
-      // } else {
-      //   await CALENDAR.getGroupAllEvents(selectedCalendar);
-      //   await CALENDAR.getMemberAndMemberEvents(selectedCalendar.calendarId);
-      // }
+      await CALENDAR.getGroupAllEvents(parsedMessage.calendarId);
+      await CALENDAR.getMemberAndMemberEvents(parsedMessage.calendarId);
     });
 
     return () => {
@@ -124,6 +124,14 @@ export default function MainPage() {
             </nav>
           </div>
         </section>
+        <div id="banner">
+          <img
+            id="calendar-banner"
+            src={selectedCalendar !== 'All' ? selectedCalendar?.bannerImg : ''}
+            alt={selectedCalendar !== 'All' ? '캘린더 배너를 등록해주세요.' : ''}
+          />
+          <div>{selectedCalendar !== 'All' ? selectedCalendar.title : '내 전체 일정'}</div>
+        </div>
         <div id="right-menu">
           <SyncSocialEvent />
           <UserModal />

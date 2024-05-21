@@ -1,50 +1,73 @@
 import { AxiosError } from 'axios';
 import * as redisAxios from '@utils/redis';
-import { Calendar, Member } from '@type/index';
-import { useCalendarListStore, useUserInfoStore } from '@store/index';
+import { Member } from '@type/index';
+import { useCalendarListStore, useSelectedCalendarStore, useUserInfoStore } from '@store/index';
 
 interface RedisPublish {
-  selectedCalendar: Calendar | 'All';
   method: string;
 }
 
-export async function MessagePost({ selectedCalendar, method }: RedisPublish) {
+export async function MessagePost({ method }: RedisPublish) {
   const userInfo = useUserInfoStore.getState().userInfo;
-  const CalendarList = useCalendarListStore.getState().calendarList;
-  const memberSet = new Set<Member>();
-
-  for (const calendar of CalendarList) {
-    for (const member of calendar.attendees) {
-      if (
-        !Array.from(memberSet).some(
-          (existingMember) => existingMember.useremail === member.useremail,
-        )
-      ) {
-        memberSet.add(member);
-      }
-    }
-  }
-
-  const memberList = Array.from(memberSet).filter(
-    (member) => member.useremail !== userInfo?.useremail,
-  );
-
+  const nowCalendar = useSelectedCalendarStore.getState().selectedCalendar;
+  const calendarId = nowCalendar === 'All' ? 'All' : nowCalendar.calendarId;
   try {
-    for (const member of memberList) {
-      const message = `
+    const message = {
+      text: `
         <div style="font-family: 'Jua', sans-serif;">
           <span style="font-size: 1.8rem; color: #7AFF79;">${userInfo?.nickname}</span>님이 
           <span style="font-size: 1.8rem; color: #F1B2DC;">${method}</span>하셨습니다.
-        </div>`;
+        </div>`,
+      calendarId: calendarId,
+    };
 
-      const res = await redisAxios.post('/publish', {
-        channel: member.useremail,
-        message,
-      });
+    const res = await redisAxios.post('/publish', {
+      channel: userInfo?.useremail,
+      message: JSON.stringify(message),
+    });
 
-      if (!res) throw new Error('Redis 메세지 전송 실패');
-      console.log(`Redis 메세지 전송 성공 :`, res);
-    }
+    if (!res) throw new Error('Redis 메세지 전송 실패');
+    console.log(`Redis 메세지 전송 성공 :`, res);
+
+    // const CalendarList = useCalendarListStore.getState().calendarList;
+    // const nowCalendar = useSelectedCalendarStore.getState().selectedCalendar;
+    // const calendarId = nowCalendar === 'All' ? 'All' : nowCalendar.calendarId;
+
+    // const memberSet = new Set<Member>();
+
+    // for (const calendar of CalendarList) {
+    //   for (const member of calendar.attendees) {
+    //     if (
+    //       !Array.from(memberSet).some(
+    //         (existingMember) => existingMember.useremail === member.useremail,
+    //       )
+    //     ) {
+    //       memberSet.add(member);
+    //     }
+    //   }
+    // }
+
+    // const memberList = Array.from(memberSet).filter(
+    //   (member) => member.useremail !== userInfo?.useremail,
+    // );
+
+    //! 메세지에 캘린더ID 담기
+    // try {
+    //   for (const member of memberList) {
+    //     const message = `
+    //       <div style="font-family: 'Jua', sans-serif;">
+    //         <span style="font-size: 1.8rem; color: #7AFF79;">${userInfo?.nickname}</span>님이
+    //         <span style="font-size: 1.8rem; color: #F1B2DC;">${method}</span>하셨습니다.
+    //       </div>`;
+    //     console.log(`캘린더 왜 안나옴?`, calendarId);
+    //     const res = await redisAxios.post('/publish', {
+    //       channel: member.useremail,
+    //       message,
+    //     });
+
+    //     if (!res) throw new Error('Redis 메세지 전송 실패');
+    //     console.log(`Redis 메세지 전송 성공 :`, res);
+    //   }
 
     return true;
   } catch (e) {

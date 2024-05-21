@@ -30,7 +30,7 @@ export default function memberTap({ selectedCalendar, onClose }: memberTapProps)
               <div key={index} className="FLEX-ver items-center m-2 space-x-4">
                 <img
                   className="w-20 h-20 object-cover rounded-full 
-                  ANIMATION hover:object-contain hover:w-40 hover:h-40 hover:rounded-none"
+                  ANIMATION hover:object-contain hover:w-40 hover:h-40 hover:rounded-full"
                   src={attendee.thumbnail || default_user}
                   alt={attendee.nickname}
                 />

@@ -89,6 +89,29 @@
   background-color: #badfff;
 }
 
+/***** 배너 *****/
+#banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 85lvh;
+  height: 15lvh;
+  font-size: x-large;
+  font-weight: bold;
+}
+
+#calendar-banner {
+  max-width: 40rem;
+  min-height: 6.5rem;
+  max-height: 10vh;
+
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+}
+
 #right-menu {
   display: flex;
   align-items: center;
