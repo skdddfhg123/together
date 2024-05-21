@@ -40,21 +40,21 @@ export default function LogInPage() {
     toggle();
   };
 
-  useEffect(() => {
-    REDIS.Unconnect();
+  // useEffect(() => {
+  //   REDIS.Unconnect();
 
-    useUserInfoStore.getState().reset();
-    useCalendarListStore.getState().reset();
-    useSelectedCalendarStore.getState().reset();
-    useSelectedDayStore.getState().reset();
-    useGroupEventListStore.getState().reset();
-    useSocialEventListStore.getState().reset();
-    useAllEventListStore.getState().reset();
-    useEventFeedListStore.getState().reset();
+  //   useUserInfoStore.getState().reset();
+  //   useCalendarListStore.getState().reset();
+  //   useSelectedCalendarStore.getState().reset();
+  //   useSelectedDayStore.getState().reset();
+  //   useGroupEventListStore.getState().reset();
+  //   useSocialEventListStore.getState().reset();
+  //   useAllEventListStore.getState().reset();
+  //   useEventFeedListStore.getState().reset();
 
-    sessionStorage.clear();
-    localStorage.clear();
-  }, []);
+  //   sessionStorage.clear();
+  //   localStorage.clear();
+  // }, []);
 
   return (
     <div className="FLEX-horiz h-lvh w-3/5 mx-auto">

@@ -228,7 +228,12 @@ export default React.memo(function CalendarPage({
             <Tooltip
               id={`tooltip-${event.groupEventId || `fallback-${idx}`}`}
               className="group-event-tooltip"
-              style={{ padding: '1rem', backgroundColor: `${event.color}`, color: 'black' }}
+              style={{
+                padding: '1rem',
+                backgroundColor: `${event.color}`,
+                color: 'black',
+                zIndex: 1,
+              }}
             >
               <div className="event-details">
                 <div className="text-3xl text-center">{event.title || 'No Title'}</div>

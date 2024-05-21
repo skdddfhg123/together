@@ -94,7 +94,7 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
                 {feedInfo.content}
               </div>
               <div className="w-full text-left text-gray-400">
-                {formatDate(feedInfo.createdAt.toISOString())}
+                {formatDate(feedInfo.createdAt.toString())}
               </div>
             </section>
             <section className="flex flex-col h-3/5 p-2">
@@ -116,7 +116,7 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
                           <p className="flex-1">{cmt.content}</p>
                         </div>
                         <div className="text-sm text-gray-400 mt-1 pl-16">
-                          {formatDate(cmt.createdAt.toISOString())}
+                          {formatDate(cmt.createdAt.toString())}
                         </div>
                       </li>
                     ))}

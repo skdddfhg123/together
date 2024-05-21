@@ -93,10 +93,11 @@ export default function MainPage() {
       toast.info(<div dangerouslySetInnerHTML={{ __html: cleanMessage }} />, {
         containerId: 'memberAlert',
       });
-      console.log(`메세지 안 캘린더 id`, [parsedMessage, parsedMessage.calendarId]);
-
-      // await CALENDAR.getGroupAllEvents('666bccbc-5c57-4bd9-b44e-a22dfba3f349');
-      await CALENDAR.getMemberAndMemberEvents('666bccbc-5c57-4bd9-b44e-a22dfba3f349');
+      // console.log(`레디스 - 현재 내 캘린더`, selectedCalendar);
+      // if (selectedCalendar === 'All') return;
+      // await CALENDAR.getGroupAllEvents(selectedCalendar);
+      // await CALENDAR.getMemberAndMemberEvents(selectedCalendar.calendarId);
+      CALENDAR.getMemberAndMemberEvents('666bccbc-5c57-4bd9-b44e-a22dfba3f349');
     });
 
     return () => {
