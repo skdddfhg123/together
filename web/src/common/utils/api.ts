@@ -30,8 +30,8 @@ axiosInstance.interceptors.request.use(
       return config;
     }
 
-    const token = getCookie('accessToken');
-    // const token = sessionStorage.getItem('accessToken');
+    // const token = getCookie('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (!token) {
       sessionStorage.clear();
       navigateToSignin();
@@ -76,7 +76,7 @@ axiosInstance.interceptors.response.use(
 
       switch (err.status) {
         case 401:
-          if (!errData.kakaoAccessToken) {
+          if (errData.kakaoAccessToken === null) {
             console.log(`응답 인터셉터 (2)-1: 카카오 에러`, res, 'errData', errData);
             useToast('default', `카카오 동기화 에러 : ${res.message}`);
           }

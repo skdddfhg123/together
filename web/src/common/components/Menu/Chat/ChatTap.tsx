@@ -50,7 +50,8 @@ export default React.memo(function ChatTap({ selectedCalendar, onClose }: ChatTa
 
   //********************? Chatting Socket
   useEffect(() => {
-    const token = getCookie('accessToken');
+    // const token = getCookie('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (!token) {
       console.error('No access token found'); //debug//
       return;

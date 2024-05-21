@@ -139,7 +139,7 @@ export async function logIn(formData: SignInForm) {
     // };
 
     setCookie(accessToken);
-    // sessionStorage.setItem('accessToken', res.data.accessToken);
+    sessionStorage.setItem('accessToken', res.data.accessToken);
     // setCookie(refreshToken);
 
     return true;

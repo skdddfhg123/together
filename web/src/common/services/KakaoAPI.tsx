@@ -71,6 +71,7 @@ async function getToken() {
     };
 
     setCookie(kakaoToken);
+    sessionStorage.setItem('kakaoToken', getToken.access_token);
 
     return true;
   } catch (err) {
@@ -124,7 +125,8 @@ async function GetInfo() {
 }
 
 async function GetEvents() {
-  const kakaoToken = getCookie('kakaoToken');
+  // const kakaoToken = getCookie('kakaoToken');
+  const kakaoToken = sessionStorage.getItem('kakaoToken');
 
   try {
     if (!kakaoToken) {
@@ -146,6 +148,7 @@ async function GetEvents() {
         },
       };
       setCookie(kakaoToken);
+      sessionStorage.setItem('kakaoToken', res.accessTokenCheck);
 
       return res;
     } else {

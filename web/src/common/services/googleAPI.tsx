@@ -5,7 +5,8 @@ import { getCookie } from '@utils/cookie';
 
 export async function getEvents() {
   try {
-    const googleAccess = getCookie('googleAccessToken');
+    // const googleAccess = getCookie('googleAccessToken');
+    const googleAccess = sessionStorage.getItem('googleAccessToken');
     const res = await API.post(`/google/calendar`, { googleAccessToken: googleAccess });
     if (!res) throw new Error('GOOGLE - getGoogleEvent 실패 : ( DB 에러 )');
 

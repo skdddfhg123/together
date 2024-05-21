@@ -73,13 +73,13 @@ export default function MainPage() {
     RendarUserAndCalendar();
   }, [RendarUserAndCalendar]);
 
-  useEffect(() => {
-    if (userInfo?.isFirst === true) {
-      welcomeTutorial();
-    } else {
-      return;
-    }
-  }, [userInfo, RendarUserAndCalendar]);
+  // useEffect(() => {
+  //   if (userInfo?.isFirst === true) {
+  //     welcomeTutorial();
+  //   } else {
+  //     return;
+  //   }
+  // }, [userInfo, RendarUserAndCalendar]);
 
   // *****************? 실시간 알림을 위한 소켓 연결
   useEffect(() => {
@@ -95,8 +95,8 @@ export default function MainPage() {
       });
       console.log(`메세지 안 캘린더 id`, [parsedMessage, parsedMessage.calendarId]);
 
-      await CALENDAR.getGroupAllEvents(parsedMessage.calendarId);
-      await CALENDAR.getMemberAndMemberEvents(parsedMessage.calendarId);
+      // await CALENDAR.getGroupAllEvents('666bccbc-5c57-4bd9-b44e-a22dfba3f349');
+      await CALENDAR.getMemberAndMemberEvents('666bccbc-5c57-4bd9-b44e-a22dfba3f349');
     });
 
     return () => {

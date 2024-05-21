@@ -35,6 +35,7 @@ export default function ConnectionPage() {
         },
       };
       setCookie(googleAccessToken);
+      sessionStorage.setItem('googleAccessToken', res.access_token);
       await GOOGLE.getEvents();
     },
     onError: () => console.log('Login Failed'),
@@ -63,6 +64,7 @@ export default function ConnectionPage() {
         },
       };
       setCookie(microsoftAccessToken);
+      sessionStorage.setItem('microsoftAccessToken', accessToken);
 
       // await fetchMicrosoftEvents(accessToken);
     } catch (error) {

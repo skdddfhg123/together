@@ -7,7 +7,7 @@ export const msalConfig = {
     authority: `https://login.microsoftonline.com/b1b9b246-22b0-47ab-ab54-32487ccc176b`,
     // clientId: clientId,
     // authority: `https://login.microsoftonline.com/${tenantId}`,
-    redirectUri: 'http://localhost:3000/connection', // 리디렉션 URI
+    redirectUri: 'http://toogether.site:3005/connection', // 리디렉션 URI
   },
   cache: {
     cacheLocation: 'localStorage',
