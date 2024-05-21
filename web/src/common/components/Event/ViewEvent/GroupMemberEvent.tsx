@@ -23,9 +23,9 @@ export default React.memo(function GroupMemberEvent({
 
         const eventsDetail = member.groupedEvent[localDayKey].map((event) => (
           <div key={event?.title} className="flex w-full">
-            <div className="FLEX-ver w-full space-x-1">
+            <div>
               {/* <span className="min-w-36 text-xl">{event.title}</span> */}
-              <span className="text-5xl font-bold mx-auto">
+              <span className="text-4xl font-bold mx-auto">
                 {`${format(new Date(event.startAt), 'HH:mm')} ~
                ${format(new Date(event.endAt), 'HH:mm')}`}
               </span>
@@ -45,21 +45,20 @@ export default React.memo(function GroupMemberEvent({
 
         return (
           <span
+            className="w-7"
             key={tooltipId}
             data-tooltip-id={tooltipId}
             data-tooltip-place="bottom"
             data-tooltip-variant="dark"
-            // data-tooltip-variant="light"
-            // data-tooltip-variant="info"
           >
             <img
-              className="w-6 rounded-full"
+              className="w-7 rounded-full"
               src={member?.thumbnail ? member.thumbnail : default_user}
               alt={member?.nickname}
             />
             <Tooltip
               id={tooltipId}
-              style={{ padding: '1rem' }}
+              style={{ padding: '1rem', zIndex: 1050 }}
               data-tooltip-class-name="tooltip-box"
             >
               <div className="FLEX-horizC">

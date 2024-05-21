@@ -35,7 +35,7 @@ export default function ConnectionPage() {
         },
       };
       setCookie(googleAccessToken);
-      await GOOGLE.getEvents();
+      // await GOOGLE.getEvents();
     },
     onError: () => console.log('Login Failed'),
     scope: 'https://www.googleapis.com/auth/calendar.readonly',

@@ -125,12 +125,16 @@ export default function MainPage() {
           </div>
         </section>
         <div id="banner">
+          <div id="banner-title">
+            <span className="text-4xl">
+              {selectedCalendar !== 'All' ? selectedCalendar.title : '내 전체 일정'}
+            </span>
+            {selectedCalendar !== 'All' && <span>그룹 캘린더</span>}
+          </div>
           <img
             id="calendar-banner"
             src={selectedCalendar !== 'All' ? selectedCalendar?.bannerImg : ''}
-            alt={selectedCalendar !== 'All' ? '캘린더 배너를 등록해주세요.' : ''}
           />
-          <div>{selectedCalendar !== 'All' ? selectedCalendar.title : '내 전체 일정'}</div>
         </div>
         <div id="right-menu">
           <SyncSocialEvent />

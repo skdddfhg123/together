@@ -213,17 +213,31 @@ export default React.memo(function CalendarPage({
         addEventToDateRange(event.startAt, event.endAt, eventElement);
       });
     } else {
-      groupEventList.forEach((event: GroupEvent) => {
+      groupEventList.forEach((event: GroupEvent, idx: number) => {
         const eventElement = (
           <li
             onMouseEnter={(e) => e.stopPropagation()}
             onMouseLeave={(e) => e.stopPropagation()}
             onClick={(e) => event.groupEventId && handleDetails(event.groupEventId, e)}
-            className="group-event"
+            className="tooltip-container"
             style={{ backgroundColor: `${event.color}` }}
-            key={event.groupEventId}
+            key={event.groupEventId || `fallback-${idx}`}
+            data-tooltip-id={`tooltip-${event.groupEventId || `fallback-${idx}`}`}
           >
             {event.title || 'No Title'}
+            <Tooltip
+              id={`tooltip-${event.groupEventId || `fallback-${idx}`}`}
+              className="group-event-tooltip"
+              style={{ padding: '1rem', backgroundColor: `${event.color}`, color: 'black' }}
+            >
+              <div className="event-details">
+                <div className="text-3xl text-center">{event.title || 'No Title'}</div>
+                <span className="text-4xl font-bold">
+                  {format(new Date(event.startAt), 'HH:mm')} ~{' '}
+                  {format(new Date(event.endAt), 'HH:mm')}
+                </span>
+              </div>
+            </Tooltip>
           </li>
         );
         addEventToDateRange(event.startAt, event.endAt, eventElement);
@@ -300,8 +314,7 @@ export default React.memo(function CalendarPage({
     if (!selectedCalendar) return;
 
     if (selectedCalendar === 'All') return console.log('selectedCalendar - ALL (전체 일정 그리기)'); //debug//
-    const res = CALENDAR.getGroupAllEvents(selectedCalendar);
-    console.log(`getGroupAllEvent의 결과물`, res);
+    CALENDAR.getGroupAllEvents(selectedCalendar);
   }, [selectedCalendar]);
 
   return (
