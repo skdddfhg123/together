@@ -1,5 +1,5 @@
+import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,8 @@ import 'package:flutter/rendering.dart';
 import 'package:image/image.dart' as img;
 import 'dart:ui' as ui;
 import 'package:gif/gif.dart';
-import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart'; // 추가된 패키지
 
 class TextInfo {
   String text;
@@ -74,10 +75,98 @@ class _ImageEditorScreenState extends State<ImageEditorScreen>
     );
   }
 
+  SharedPreferences? prefs;
+
+  _ImageEditorScreenState() {
+    initializePrefs();
+  }
+
+  Future<void> initializePrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  Future<String?> _loadToken() async {
+    return prefs?.getString('token')?.trim();
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  Future<ui.Image> captureWidget(GlobalKey key) async {
+    RenderRepaintBoundary boundary =
+        key.currentContext?.findRenderObject() as RenderRepaintBoundary;
+    if (boundary == null) {
+      throw Exception('RepaintBoundary를 찾을 수 없습니다.');
+    }
+    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    return image;
+  }
+
+  Future<void> captureFrames(GlobalKey key, List<img.Image> frames,
+      int frameCount, Duration interval) async {
+    for (int i = 0; i < frameCount; i++) {
+      final ui.Image frame = await captureWidget(key);
+      final ByteData? byteData =
+          await frame.toByteData(format: ui.ImageByteFormat.png);
+      final Uint8List pngBytes = byteData!.buffer.asUint8List();
+      final img.Image capturedImage = img.decodeImage(pngBytes)!;
+      frames.add(capturedImage);
+      await Future.delayed(interval);
+    }
+  }
+
+  Future<Uint8List> generateGif(List<img.Image> frames,
+      {int delay = 100}) async {
+    final gifEncoder = img.GifEncoder();
+    for (var frame in frames) {
+      gifEncoder.addFrame(frame, duration: delay);
+    }
+    return Uint8List.fromList(gifEncoder.finish()!);
+  }
+
+  Future<void> createAndSaveGif() async {
+    // 로딩 다이얼로그 표시
+    showDialog(
+      context: context,
+      barrierDismissible: false, // 다이얼로그 외부 클릭으로 닫히지 않도록 설정
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    try {
+      List<img.Image> frames = [];
+      int frameCount = 10; // 프레임 수
+      Duration interval = Duration(milliseconds: 10); // 프레임 간격
+
+      await captureFrames(
+          _imageRepaintBoundaryKey, frames, frameCount, interval);
+
+      Uint8List gifBytes = await generateGif(frames);
+
+      await saveGif(gifBytes);
+    } finally {
+      // 로딩 다이얼로그 숨기기
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> saveGif(Uint8List gifBytes) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final path = '${directory.path}/animated.gif';
+    final file = File(path);
+
+    await file.writeAsBytes(gifBytes);
+
+    // SharedPreferences에 경로 저장
+    prefs?.setString('gif_path', path);
+
+    print('GIF 저장 성공: $path');
   }
 
   @override
@@ -94,6 +183,12 @@ class _ImageEditorScreenState extends State<ImageEditorScreen>
         children: [
           Expanded(child: _body()),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: createAndSaveGif,
+        backgroundColor: Colors.green,
+        tooltip: 'GIF 생성 및 저장',
+        child: const Icon(Icons.save),
       ),
     );
   }
@@ -127,9 +222,13 @@ class _ImageEditorScreenState extends State<ImageEditorScreen>
                     children: [
                       RepaintBoundary(
                         key: _imageRepaintBoundaryKey,
-                        child: _image(),
+                        child: Stack(
+                          children: [
+                            _image(),
+                            for (var textInfo in _texts) _buildText(textInfo),
+                          ],
+                        ),
                       ),
-                      for (var textInfo in _texts) _buildText(textInfo),
                     ],
                   ),
                 ),

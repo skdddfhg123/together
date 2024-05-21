@@ -24,7 +24,7 @@ class Attendee {
 class Calendar {
   final String title;
   final List<Attendee> attendees;
-  final String? coverImage;
+  final String coverImage;
   final String? bannerImage;
   final String calendarId;
   final Color color;
@@ -32,7 +32,7 @@ class Calendar {
   Calendar({
     required this.title,
     required this.attendees,
-    this.coverImage,
+    required this.coverImage,
     this.bannerImage,
     required this.calendarId,
     this.color = Colors.blue,

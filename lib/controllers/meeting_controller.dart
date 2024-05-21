@@ -210,6 +210,13 @@ class MeetingController extends GetxController {
     return prefs.getString('token')?.trim();
   }
 
+  void clearAppointmentsForCalendar(String calendarId) {
+    // 특정 calendarId에 해당하는 모든 약속을 삭제하는 로직을 여기에 구현
+    calendarAppointments
+        .removeWhere((appointment) => appointment.calendarId == calendarId);
+    update(); // UI 업데이트
+  }
+
 //////////////////////////////////////////////////////////////////////////////////////////
   List<Member> getMembersForGroupEvent(String groupEventId) {
     try {
@@ -357,7 +364,7 @@ class MeetingController extends GetxController {
       members: memberinfo,
     );
     calendarAppointments.add(newCalendarAppointment);
-    loadMemberAppointmentsForCalendar(calendarId);
+    // loadMemberAppointmentsForCalendar(calendarId);
     update();
   }
 
@@ -810,7 +817,7 @@ List<CalendarResource> _getResources(
     resources.add(CalendarResource(
       id: member.useremail,
       displayName: member.nickname,
-      image: NetworkImage(member.thumbnail),
+      image: CachedNetworkImageProvider(member.thumbnail),
       color: member.appointments.first.color, // 임의의 색상 지정
     ));
   }

@@ -75,6 +75,9 @@ class CalendarApiService {
   // 특정 캘린더에 대한 일정 정보 로드
   Future<void> loadAppointmentsForCalendar(Calendar calendar) async {
     String? token = await _loadToken();
+
+    meetingController.clearAppointmentsForCalendar(calendar.calendarId);
+
     var response = await http.get(
         Uri.parse("$apiUrl/group/get/v2/${calendar.calendarId}"),
         headers: {'Authorization': 'Bearer $token'});

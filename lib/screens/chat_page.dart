@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:calendar/api/get_calendar_service.dart';
 import 'package:calendar/controllers/auth_controller.dart';
+import 'package:calendar/controllers/calendar_controller.dart';
 import 'package:calendar/controllers/meeting_controller.dart';
+import 'package:calendar/models/calendar.dart';
 import 'package:calendar/models/message.dart';
 
 import 'package:flutter/material.dart';
@@ -12,8 +15,13 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 class ChatPage extends StatefulWidget {
   final String calendarId;
   final String calendartitle;
+  final Calendar calendar;
 
-  ChatPage({Key? key, required this.calendarId, required this.calendartitle})
+  ChatPage(
+      {Key? key,
+      required this.calendarId,
+      required this.calendartitle,
+      required this.calendar})
       : super(key: key);
 
   @override
@@ -27,6 +35,7 @@ class _ChatPageState extends State<ChatPage> {
   List<Message> messages = [];
   final AuthController authController = Get.find<AuthController>();
   final MeetingController meetingController = Get.find<MeetingController>();
+  final calendarController = Get.find<CalendarApiService>();
   bool isLoading = false;
   String? lastMessageDate;
 
@@ -78,6 +87,7 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             onPressed: () {
               Navigator.pop(context);
+              calendarController.loadAppointmentsForCalendar(widget.calendar);
               meetingController
                   .loadMemberAppointmentsForCalendar(widget.calendarId);
             },

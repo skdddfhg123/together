@@ -14,7 +14,7 @@ class ErrorPage extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            const Text('피드 모아보기는 "그룹 캘린더" 내의 기능입니다.'),
+            const Text('준비중인 기능입니다.'),
           ],
         ),
       ),

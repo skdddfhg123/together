@@ -44,6 +44,6 @@ class UserCalendarController extends GetxController {
     if (loadedCalendars != null) {
       calendars.assignAll(loadedCalendars);
     }
-    meetingController.getKakaoEvents();
+    // meetingController.getKakaoEvents();
   }
 }

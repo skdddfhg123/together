@@ -4,11 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:calendar/models/post.dart';
 import 'package:intl/intl.dart';
 
-class FeedDetailPage extends StatelessWidget {
+class FeedDetailPage extends StatefulWidget {
   final Feed feed;
   final String feedid;
 
   const FeedDetailPage({super.key, required this.feed, required this.feedid});
+
+  @override
+  _FeedDetailPageState createState() => _FeedDetailPageState();
+}
+
+class _FeedDetailPageState extends State<FeedDetailPage> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
 
   // 현재 시간으로부터 몇 시간 전인지를 계산하는 함수
   String timeAgoSinceDate(DateTime date) {
@@ -36,7 +44,7 @@ class FeedDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${dateFormat.format(feed.createdAt)}의 추억',
+          '${dateFormat.format(widget.feed.createdAt)}의 추억',
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -47,47 +55,76 @@ class FeedDetailPage extends StatelessWidget {
           children: [
             ListTile(
               leading: CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(feed.thumbnail),
+                backgroundImage:
+                    CachedNetworkImageProvider(widget.feed.thumbnail),
               ),
               title: Text(
-                feed.nickname,
+                widget.feed.nickname,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
               subtitle: Text(
-                timeAgoSinceDate(feed.createdAt),
+                timeAgoSinceDate(widget.feed.createdAt),
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
                 ),
               ),
             ),
-            if (feed.imageSrcs.isNotEmpty)
-              Container(
-                height: 300,
-                width: double.infinity,
-                child: PageView.builder(
-                  itemCount: feed.imageSrcs.length,
-                  itemBuilder: (_, imageIndex) {
-                    return AspectRatio(
-                      aspectRatio: 1, // 이미지를 정사각형으로 설정
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: CachedNetworkImage(
-                          imageUrl: feed.imageSrcs[imageIndex],
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
+            if (widget.feed.imageSrcs.isNotEmpty)
+              Column(
+                children: [
+                  Container(
+                    height: 300,
+                    width: double.infinity,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: widget.feed.imageSrcs.length,
+                      itemBuilder: (_, imageIndex) {
+                        return AspectRatio(
+                          aspectRatio: 1, // 이미지를 정사각형으로 설정
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.feed.imageSrcs[imageIndex],
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                            ),
                           ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                        );
+                      },
+                      onPageChanged: (int page) {
+                        setState(() {
+                          _currentPage = page;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        List.generate(widget.feed.imageSrcs.length, (index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentPage == index
+                              ? Colors.blueAccent
+                              : Colors.grey,
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    }),
+                  ),
+                ],
               ),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -109,9 +146,9 @@ class FeedDetailPage extends StatelessWidget {
                           topRight: Radius.circular(20.0),
                         ),
                         child: CommentsPage(
-                            feedId: feedid,
-                            nickname: feed.nickname,
-                            thumbnail: feed.thumbnail),
+                            feedId: widget.feedid,
+                            nickname: widget.feed.nickname,
+                            thumbnail: widget.feed.thumbnail),
                       ),
                     );
                   },
@@ -123,17 +160,21 @@ class FeedDetailPage extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    feed.nickname,
+                    widget.feed.nickname,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    feed.content,
-                    style: const TextStyle(
-                      fontSize: 14,
+                  Expanded(
+                    child: Text(
+                      widget.feed.content,
+                      style: const TextStyle(
+                        fontSize: 14,
+                      ),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
                     ),
                   ),
                 ],

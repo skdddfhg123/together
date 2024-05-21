@@ -160,6 +160,17 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                   ),
                 ),
               ),
+              if (selectedCalendar.coverImage != null &&
+                  selectedCalendar.coverImage.isNotEmpty)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Image.network(
+                      selectedCalendar.coverImage,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
             ],
           ),
           actions: [
@@ -169,8 +180,10 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatPage(
-                        calendarId: selectedCalendar.calendarId,
-                        calendartitle: selectedCalendar.title),
+                      calendarId: selectedCalendar.calendarId,
+                      calendartitle: selectedCalendar.title,
+                      calendar: selectedCalendar,
+                    ),
                   ),
                 );
               },
@@ -342,8 +355,8 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
                         children: uniqueMembers
                             .map((member) => CircleAvatar(
                                   radius: 6,
-                                  backgroundImage:
-                                      NetworkImage(member.thumbnail),
+                                  backgroundImage: CachedNetworkImageProvider(
+                                      member.thumbnail),
                                 ))
                             .toList(),
                       ),
@@ -388,7 +401,7 @@ class _CalendarDetailViewState extends State<CalendarDetailView> {
               }
 
               // 멤버 일정인 경우 빈 컨테이너 반환
-              return Container();
+              return const SizedBox.shrink();
             },
           );
         }),

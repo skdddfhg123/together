@@ -30,12 +30,14 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
+    calendarId = 'all_calendar';
     super.initState();
     _pages = [
       AllCalendar(onCalendarChanged: _changePage),
       FeedPage(calendarId: calendarId),
       const MemoPage(),
-      ImageEditorScreen(title: '이모지 만들기', calendarId: calendarId),
+      const ErrorPage(),
+      // ImageEditorScreen(title: '이모지 만들기', calendarId: calendarId),
       const MyProfile(), // 처음 설정 페이지는 MyProfile로 설정
     ];
   }

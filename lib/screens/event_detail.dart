@@ -11,7 +11,6 @@ class EventDetailPage extends StatefulWidget {
   final String eventTitle;
   final DateTime startTime;
   final DateTime endTime;
-
   final Color calendarColor;
   final String userProfileImageUrl;
   final String groupEventId;
@@ -32,7 +31,9 @@ class EventDetailPage extends StatefulWidget {
 
 class _EventDetailPageState extends State<EventDetailPage> {
   final authController = Get.find<AuthController>();
+  final PageController _pageController = PageController();
   int currentPage = 0;
+
   // 현재 시간으로부터 몇 시간 전인지를 계산하는 함수
   String timeAgoSinceDate(DateTime date) {
     final currentDate = DateTime.now();
@@ -58,7 +59,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
     super.initState();
     final MeetingController meetingController = Get.find<MeetingController>();
     meetingController.loadFeedsForEvent(widget.groupEventId);
-    print("???????????");
   }
 
   @override
@@ -211,8 +211,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     List<Member> members = meetingController
                         .getMembersForGroupEvent(widget.groupEventId);
                     if (members.isEmpty) {
-                      print(members.length);
-                      return const Text("소셜 일정입니다.");
+                      return const Text(" ");
                     } else {
                       return Wrap(
                         spacing: 16.0,
@@ -244,11 +243,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
           Expanded(
             child: Obx(
               () {
-                // groupEventId가 현재 페이지의 groupEventId와 일치하는 피드만 필터링
+                // groupEventId가 현재 페이지의 groupEventId와 일치하는 피드만 필터링 및 정렬
                 List<FeedWithId> filteredFeeds = meetingController.feeds
                     .where((feedWithId) =>
                         feedWithId.groupeventId == widget.groupEventId)
-                    .toList();
+                    .toList()
+                  ..sort(
+                      (a, b) => b.feed.createdAt.compareTo(a.feed.createdAt));
 
                 if (filteredFeeds.isNotEmpty) {
                   return ListView.builder(
@@ -368,30 +369,63 @@ class _EventDetailPageState extends State<EventDetailPage> {
                             ),
                             const SizedBox(height: 10),
                             if (feed.imageSrcs.isNotEmpty)
-                              Container(
-                                height: 300,
-                                width: double.infinity,
-                                child: PageView.builder(
-                                  itemCount: feed.imageSrcs.length,
-                                  itemBuilder: (_, imageIndex) {
-                                    return AspectRatio(
-                                      aspectRatio: 1,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: CachedNetworkImage(
-                                          imageUrl: feed.imageSrcs[imageIndex],
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) =>
-                                              const Center(
-                                            child: CircularProgressIndicator(),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 300,
+                                    width: double.infinity,
+                                    child: PageView.builder(
+                                      controller: _pageController,
+                                      itemCount: feed.imageSrcs.length,
+                                      itemBuilder: (_, imageIndex) {
+                                        return AspectRatio(
+                                          aspectRatio: 1,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  feed.imageSrcs[imageIndex],
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) =>
+                                                  const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      const Icon(Icons.error),
+                                            ),
                                           ),
-                                          errorWidget: (context, url, error) =>
-                                              const Icon(Icons.error),
+                                        );
+                                      },
+                                      onPageChanged: (int page) {
+                                        setState(() {
+                                          currentPage = page;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: List.generate(
+                                        feed.imageSrcs.length, (index) {
+                                      return Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 4),
+                                        width: 8,
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: currentPage == index
+                                              ? widget.calendarColor
+                                              : Colors.grey,
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                      );
+                                    }),
+                                  ),
+                                ],
                               ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -432,10 +466,14 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                Text(
-                                  feed.content,
-                                  style: const TextStyle(
-                                    fontSize: 14,
+                                Expanded(
+                                  child: Text(
+                                    feed.content,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                    softWrap: true,
+                                    overflow: TextOverflow.visible,
                                   ),
                                 ),
                               ],
