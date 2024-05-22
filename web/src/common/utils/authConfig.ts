@@ -1,5 +1,5 @@
-const clientId = process.env.REACT_APP_MICROSOFT_CLIENT_ID as string;
-const tenantId = process.env.REACT_APP_AZURE_TENENT_ID as string;
+// const clientId = process.env.REACT_APP_MICROSOFT_CLIENT_ID as string;
+// const tenantId = process.env.REACT_APP_AZURE_TENENT_ID as string;
 
 export const msalConfig = {
   auth: {

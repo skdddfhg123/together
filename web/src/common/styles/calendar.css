@@ -188,6 +188,8 @@ th.day-6, .day-6 .day { /* 토요일 */
   align-items: center;
   font-weight: 600;
   font-size: large;
+
+  border-radius: 0.125rem;
 }
 
 .tooltip-container .tooltip-kakao {

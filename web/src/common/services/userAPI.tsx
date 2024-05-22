@@ -1,11 +1,11 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 
 import useToast from '@hooks/useToast';
 import * as API from '@utils/api';
 import * as REDIS from '@services/redisAPI';
 import { Cookie, setCookie, deleteCookie } from '@utils/cookie';
 
-import { AllEvent, Calendar, SignInForm, SignUpForm } from '@type/index';
+import { AllEvent, SignInForm, SignUpForm } from '@type/index';
 import {
   useAllEventListStore,
   useSelectedCalendarStore,
