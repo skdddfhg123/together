@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,7 +18,8 @@ import SyncSocialEvent from '@components/Menu/SyncSocialEvent';
 
 import logoImg from '@assets/toogether_noBG.png';
 import menuImg from '@assets/calendar_menu.webp';
-import defaultBanner from '@assets/default_banner.png';
+// import defaultBanner from '@assets/default_banner.png';
+import alerm from '@assets/alermSound.mp3';
 
 import '@styles/main.css';
 import FeedPage from '@pages/Feed/feed';
@@ -31,6 +32,7 @@ export default function MainPage() {
   const { userInfo } = useUserInfoStore();
   const { selectedCalendar } = useSelectedCalendarStore();
 
+  const audioRef = useRef<HTMLAudioElement>(null);
   const { isOn, toggle } = useToggle(false);
   const [toggleFeed, setToggleFeed] = useState<boolean>(false);
   const [tutorial, setTutorial] = useState<boolean>(false);
@@ -93,17 +95,21 @@ export default function MainPage() {
       toast.info(<div dangerouslySetInnerHTML={{ __html: cleanMessage }} />, {
         containerId: 'memberAlert',
       });
-      // console.log(`레디스 - 현재 내 캘린더`, selectedCalendar);
-      // if (selectedCalendar === 'All') return;
-      // await CALENDAR.getGroupAllEvents(selectedCalendar);
-      // await CALENDAR.getMemberAndMemberEvents(selectedCalendar.calendarId);
-      CALENDAR.getMemberAndMemberEvents('666bccbc-5c57-4bd9-b44e-a22dfba3f349');
+      console.log(`메세지 안 캘린더 id`, [parsedMessage, parsedMessage.calendarId]);
+      console.log(`메세지 받았을 때 보고있는 캘린더`, selectedCalendar);
+
+      audioRef.current?.play();
+
+      if (selectedCalendar === 'All') return USER.firstRender();
+
+      await CALENDAR.getGroupAllEvents(selectedCalendar);
+      await CALENDAR.getMemberAndMemberEvents(selectedCalendar.calendarId);
     });
 
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [userInfo, selectedCalendar]);
 
   return (
     <>
@@ -165,6 +171,7 @@ export default function MainPage() {
           <RightMenuTap switchMain={switchingFeedAndCalendar} />
         </aside>
         {tutorial && <Tutorial isOpen={tutorial} onClose={closeTutorial} />}
+        <audio ref={audioRef} src={alerm} preload="auto" />
       </main>
     </>
   );

@@ -6,7 +6,7 @@ import { loginRequest } from '../../common/utils/authConfig';
 
 import { Cookie, setCookie } from '@utils/cookie';
 import * as KAKAO from '@services/KakaoAPI';
-import * as GOOGLE from '@services/googleAPI';
+// import * as GOOGLE from '@services/googleAPI';
 
 import kakao_box from '@assets/kakao_box.png';
 import google_calendar from '@assets/google_calendar.png';
