@@ -182,8 +182,8 @@ export class AuthController {
 
     if(!payload.isFirst)
       isFirst = false;
-    // else
-    //   await this.userService.tutorialComplete(payload.useremail);
+    else
+      await this.userService.tutorialComplete(payload.useremail);
 
     return isFirst;
   }

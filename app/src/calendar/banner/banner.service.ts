@@ -168,6 +168,7 @@ export class BannerService {
       banner = new Banner();
       banner.webBannerUrl = 'none';
       banner.calendar = calendarInfo;
+      calendarInfo.banner = banner;
     }
 
     if(imageFile !== undefined && banner.webBannerUrl !== 'none') {

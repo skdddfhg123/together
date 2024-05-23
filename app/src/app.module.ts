@@ -22,6 +22,7 @@ import { UtilsModule } from './utils/utils.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { RedisGateway } from './webSocket/redis/redis.gateway';
 import { BannerModule } from './calendar/banner/banner.module';
+import { AzureModule } from './auth/azure/azure.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { BannerModule } from './calendar/banner/banner.module';
     CalendarModule,
     GoogleModule,
     KakaoModule,
+    AzureModule,
     FeedModule,
     ImageModule,
     EmojiModule,
