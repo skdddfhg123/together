@@ -33,7 +33,6 @@ export class AzureController {
         // 사용자 정보와 토큰을 반환합니다.
         return req.user;
     }
-    
 
     @Post('calendar')
     @ApiOperation({ summary: 'Outlook 캘린더 API에서 일정 가져오기' })
@@ -47,17 +46,17 @@ export class AzureController {
     ): Promise<Array<SocialEvent>> {
         const azureUser = body.azureAccessToken;
 
-        const isValid = await this.azureService.verifyToken(azureUser);
+        // const isValid = await this.azureService.verifyToken(azureUser);
 
-        if(isValid) {
+        try {
             const outlookCalendars = await this.azureService.fetchCalendarEvents(azureUser);
 
             await this.socialEventService.deleteSocialEvents('azure', payload.userCalendarId)
 
             const savePromises = outlookCalendars.map(event => {
                 const socialEvent = new SocialEventDto();
-                socialEvent.social = 'azure';
-                socialEvent.title = event.summary;
+                socialEvent.social = 'outlook';
+                socialEvent.title = event.subject;
                 socialEvent.startAt = event.start.date || event.start.dateTime;
                 socialEvent.endAt = event.end.date || event.end.dateTime;
                 return this.socialEventService.saveSocialCalendar(socialEvent, payload.userCalendarId);
@@ -67,7 +66,8 @@ export class AzureController {
 
             return resultArray;
         }
-        else {
+        catch(err) {
+            console.log(err);
             throw new UnauthorizedException('Invalid Access Token');
         }
     }
