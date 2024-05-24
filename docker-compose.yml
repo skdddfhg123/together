@@ -78,3 +78,19 @@ services:
       - mongodb
     env_file:
       - .db.env
+
+  web:
+    build:
+      context: ./web  # React 앱이 위치한 디렉터리
+      dockerfile: Dockerfile
+    container_name: react-app
+    ports:
+      - "3005:3005"
+    volumes:
+      - ./web:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - app
+    env_file:
+      - ./web/.env
+

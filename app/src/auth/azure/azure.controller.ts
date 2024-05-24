@@ -18,7 +18,7 @@ export class AzureController {
     constructor(
         private azureService: AzureService,
         private socialEventService: SocialEventService,
-    ) {}
+    ) { }
 
 
     @Get('login')
@@ -51,7 +51,7 @@ export class AzureController {
         try {
             const outlookCalendars = await this.azureService.fetchCalendarEvents(azureUser);
 
-            await this.socialEventService.deleteSocialEvents('azure', payload.userCalendarId)
+            await this.socialEventService.deleteSocialEvents('outlook', payload.userCalendarId)
 
             const savePromises = outlookCalendars.map(event => {
                 const socialEvent = new SocialEventDto();
@@ -66,7 +66,7 @@ export class AzureController {
 
             return resultArray;
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             throw new UnauthorizedException('Invalid Access Token');
         }
@@ -84,7 +84,7 @@ export class AzureController {
         const userCalendarId = payload.userCalendarId;
         const socialEvents = await this.socialEventService.findSocialEventsByUserCalendarId('azure', userCalendarId);
 
-        if(!socialEvents) {
+        if (!socialEvents) {
             throw new HttpException('해당 유저의 데이터가 없습니다.', 404);
         }
 
