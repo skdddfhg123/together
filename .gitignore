@@ -1,0 +1,9 @@
+/data
+/oauth2-test
+/node_modules
+/sessions
+
+config_local.py
+
+.env
+.db.env
