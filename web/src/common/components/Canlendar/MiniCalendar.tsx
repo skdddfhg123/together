@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
-import { isSameDay, startOfMonth, endOfMonth, addDays, parseISO, isWithinInterval } from 'date-fns';
+import React, { useEffect, useCallback, Dispatch, SetStateAction } from 'react';
+import { isSameDay, startOfMonth, endOfMonth, startOfDay, endOfDay, addDays } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
 import * as CALENDAR from '@services/calendarAPI';
@@ -41,7 +41,7 @@ export default React.memo(function MiniCalendar({
     const event = groupEventList.find((event) => {
       const startAt = event.startAt;
       const endAt = event.endAt;
-      return isWithinInterval(day, { start: startAt, end: endAt });
+      return isSameDay(day, startAt) || isSameDay(day, endAt);
     });
 
     if (event) {
@@ -116,9 +116,9 @@ export default React.memo(function MiniCalendar({
       if (selectedDay && isSameDay(day, selectedDay)) dayClasses += ' MchoiceDay';
 
       const isEventDay = groupEventList.some((event) => {
-        const startAt = event.startAt;
-        const endAt = event.endAt;
-        return isWithinInterval(day, { start: startAt, end: endAt });
+        const startAt = startOfDay(new Date(event.startAt));
+        const endAt = endOfDay(new Date(event.endAt));
+        return isSameDay(day, startAt) || isSameDay(day, endAt);
       });
 
       if (isEventDay) dayClasses += ' MeventDay';

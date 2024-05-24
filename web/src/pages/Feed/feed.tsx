@@ -49,7 +49,6 @@ export default function FeedPage({
 
   const fetchFeedList = async () => {
     if (selectedCalendar === 'All') {
-      useToast('warning', '그룹 캘린더를 선택해주세요.');
       onClose();
       return;
     }
