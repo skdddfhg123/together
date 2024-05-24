@@ -4,20 +4,27 @@ import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 @Controller('redis')
 export class RedisController {
-    constructor(private readonly redisService: RedisService) {}
+    constructor(private readonly redisService: RedisService) { }
 
     @Post('publish')
     @ApiOperation({ summary: 'Publish message to a channel' })
-    @ApiBody({ 
+    @ApiBody({
         schema: {
             type: 'object',
             required: ['channel', 'message'],
-            properties: { channel: { type: 'string' } , message: { type: 'string' } },
+            properties: { channel: { type: 'string' }, message: { type: 'string' } },
         },
     })
     publish(@Body() payload: { channel: string; message: string }) {
         const { channel, message } = payload;
         return this.redisService.publish(channel, message);
+    }
+
+    @Get('channel-active/:channel')
+    @ApiOperation({ summary: 'Check if a channel is active' })
+    async isChannelActive(@Param('channel') channel: string): Promise<{ active: boolean }> {
+        const subscriberCount = await this.redisService.getSubscriberCount(channel);
+        return { active: subscriberCount > 0 };
     }
 
     @Get('subscribe/:channel')
@@ -32,11 +39,11 @@ export class RedisController {
         return this.redisService.unsubscribe(channel);
     }
 
-    @ApiBody({ 
+    @ApiBody({
         schema: {
             type: 'object',
             required: ['key', 'value', 'ttl'],
-            properties: { key: { type: 'string' } , value: { type: 'string' } , ttl: { type: 'number' }},
+            properties: { key: { type: 'string' }, value: { type: 'string' }, ttl: { type: 'number' } },
         },
     })
     @Post('set')

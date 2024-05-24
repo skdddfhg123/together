@@ -114,6 +114,7 @@ export class CalendarService {
         try {
             const calendars = await this.calendarRepository
                 .createQueryBuilder("calendar")
+                .leftJoinAndSelect("calendar.banner", "banner")
                 .leftJoinAndSelect("calendar.author", "author")
                 .where("author.userCalendarId = :userCalendarId", { userCalendarId })
                 .andWhere("calendar.isDeleted = false")
@@ -148,6 +149,23 @@ export class CalendarService {
                     .where("usercalendar.userCalendarId IN (:...userCalendarIds)", { userCalendarIds: calendar.attendees })
                     .getMany();
 
+                console.log(calendar.banner);
+
+                if (calendar.banner) {
+                    return {
+                        calendarId: calendar.calendarId,
+                        title: calendar.title,
+                        coverImg: calendar.coverImage,
+                        bannerImg: calendar.banner.webBannerUrl,
+                        type: calendar.type,
+                        createdAt: calendar.registeredAt,
+                        attendees: attendeesInfo.map(usercalendar => ({
+                            nickname: usercalendar.user.nickname,
+                            useremail: usercalendar.user.useremail,
+                            thumbnail: usercalendar.user.thumbnail
+                        }))
+                    };
+                }
                 return {
                     calendarId: calendar.calendarId,
                     title: calendar.title,

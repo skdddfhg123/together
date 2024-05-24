@@ -3,7 +3,7 @@ import Redis, { Redis as RedisClient } from 'ioredis';
 
 @Injectable()
 export class RedisService {
-    private readonly pubClient: RedisClient;
+    private readonly pubClient: RedisClient; // redisclient -> Room??
     private readonly redisClient: RedisClient;
     private readonly logger = new Logger(RedisService.name);
     public readonly subClient: RedisClient;
@@ -21,14 +21,47 @@ export class RedisService {
         this.subClient = new Redis(options);
 
         this.subClient.on('message', (channel, message) => {
+
             this.logger.log(`Received message: ${message} from channel: ${channel}`);
         });
 
         this.subClient.on('error', (error) => {
+
             this.logger.error('Error in Redis SubClient', error);
         });
 
         this.redisClient = new Redis(options);
+    }
+
+    async getSubscriberCount(channel: string): Promise<number> {
+        try {
+            // 'PUBSUB NUMSUB <channel>' 명령을 Redis 서버에 전송
+            const result = await this.redisClient.sendCommand(new Redis.Command('PUBSUB', ['NUMSUB', channel], { replyEncoding: 'utf8' }));
+            const count = parseInt(result[1], 10); // 결과에서 구독자 수 추출
+
+            // 모든 활성 채널 조회
+            this.redisClient.pubsub("CHANNELS", (err, channels) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                console.log("Active channels:", channels);
+            });
+
+            // 특정 패턴과 일치하는 채널 조회
+            this.redisClient.pubsub("CHANNELS", "pattern:*", (err, channels) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                console.log("Matching channels:", channels);
+            });
+
+            return count;
+        } catch (error) {
+            this.logger.error('Error fetching subscriber count', error);
+            throw error;
+        }
     }
 
     async subscribe(channel: string): Promise<void> {

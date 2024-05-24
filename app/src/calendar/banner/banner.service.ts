@@ -16,7 +16,7 @@ export class BannerService {
     private readonly calendarRepository: Repository<Calendar>,
     private readonly awsService: AwsService,
     private readonly imageService: ImageService,
-  ) {}
+  ) { }
 
   // ============================================================================================
   // App Banner
@@ -26,12 +26,12 @@ export class BannerService {
   async getAppBanner(calendarId: string): Promise<UploadAppBannerDto> {
     const banner = await this.bannerRepository.findOne({
       where: {
-        calendar: {calendarId: calendarId}
+        calendar: { calendarId: calendarId }
       },
       relations: ['calendar']
     })
 
-    if(!banner)
+    if (!banner)
       throw new NotFoundException(`Not Found banner through this calendarId: ${calendarId}`);
 
     const getBanner = new UploadAppBannerDto();
@@ -48,14 +48,14 @@ export class BannerService {
 
     let banner = await this.bannerRepository.findOne({
       where: {
-        calendar: {calendarId: calendarId}
+        calendar: { calendarId: calendarId }
       },
       relations: ['calendar']
     })
 
-    if(!banner) {
-      const calendarInfo = await this.calendarRepository.findOneBy({calendarId: calendarId});
-      if(!calendarInfo)
+    if (!banner) {
+      const calendarInfo = await this.calendarRepository.findOneBy({ calendarId: calendarId });
+      if (!calendarInfo)
         throw new NotFoundException(`Not found banner through this calendarId: ${calendarId}`);
 
       isEmpty = true;
@@ -64,19 +64,19 @@ export class BannerService {
       banner.calendar = calendarInfo;
     }
 
-    if(imageFile !== undefined && banner.appBannerUrl !== 'none') {
+    if (imageFile !== undefined && banner.appBannerUrl !== 'none') {
       await this.awsService.imageDeleteInS3('banner', banner.appBannerUrl);
     }
 
     banner.alpha = uploadBannerDto.alpha == undefined ? '100' : uploadBannerDto.alpha;
     banner.textColor = uploadBannerDto.textColor == undefined ? '#000000' : uploadBannerDto.textColor;
     banner.appBannerUrl = imageFile !== undefined ? await this.imageService.bannerImageUpload(imageFile, calendarId + '_app')
-                                               : banner.appBannerUrl === 'none' ? 'none' : banner.appBannerUrl;
-    
+      : banner.appBannerUrl === 'none' ? 'none' : banner.appBannerUrl;
+
     try {
       let savedBanner;
 
-      if(isEmpty) {
+      if (isEmpty) {
         savedBanner = await this.bannerRepository.save(banner);
         return savedBanner;
       }
@@ -91,7 +91,7 @@ export class BannerService {
         return updatedBanner;
       }
     }
-    catch(err) {
+    catch (err) {
       throw new InternalServerErrorException('save banner failed');
     }
   }
@@ -100,15 +100,15 @@ export class BannerService {
   async getBackAppBasic(calendarId: string): Promise<UploadAppBannerDto> {
     const banner = await this.bannerRepository.findOne({
       where: {
-        calendar: {calendarId: calendarId}
+        calendar: { calendarId: calendarId }
       },
       relations: ['calendar']
     })
 
-    if(!banner)
+    if (!banner)
       throw new NotFoundException('There are no options to change');
 
-    if(banner.appBannerUrl !== 'none')
+    if (banner.appBannerUrl !== 'none')
       await this.awsService.imageDeleteInS3('banner', banner.appBannerUrl);
 
     const getBackBanner = new UploadAppBannerDto();
@@ -120,7 +120,7 @@ export class BannerService {
       await this.bannerRepository.update(banner.bannerId, getBackBanner);
       return getBackBanner;
     }
-    catch(err) {
+    catch (err) {
       throw new InternalServerErrorException('back basic is failed');
     }
   }
@@ -133,12 +133,12 @@ export class BannerService {
   async getWebBanner(calendarId: string): Promise<UploadWebBannerDto> {
     const banner = await this.bannerRepository.findOne({
       where: {
-        calendar: {calendarId: calendarId}
+        calendar: { calendarId: calendarId }
       },
       relations: ['calendar']
     })
 
-    if(!banner)
+    if (!banner)
       throw new NotFoundException(`Not Found banner through this calendarId: ${calendarId}`);
 
     const getBanner = new UploadWebBannerDto();
@@ -153,14 +153,14 @@ export class BannerService {
 
     let banner = await this.bannerRepository.findOne({
       where: {
-        calendar: {calendarId: calendarId}
+        calendar: { calendarId: calendarId }
       },
       relations: ['calendar']
     })
 
-    if(!banner) {
-      const calendarInfo = await this.calendarRepository.findOneBy({calendarId: calendarId});
-      if(!calendarInfo)
+    if (!banner) {
+      const calendarInfo = await this.calendarRepository.findOneBy({ calendarId: calendarId });
+      if (!calendarInfo)
         throw new NotFoundException(`Not found calendar this calendarId: ${calendarId}`);
 
       isEmpty = true;
@@ -168,19 +168,20 @@ export class BannerService {
       banner = new Banner();
       banner.webBannerUrl = 'none';
       banner.calendar = calendarInfo;
+      calendarInfo.banner = banner;
     }
 
-    if(imageFile !== undefined && banner.webBannerUrl !== 'none') {
+    if (imageFile !== undefined && banner.webBannerUrl !== 'none') {
       await this.awsService.imageDeleteInS3('banner', banner.webBannerUrl);
     }
 
     banner.webBannerUrl = imageFile !== undefined ? await this.imageService.bannerImageUpload(imageFile, calendarId + '_web')
-                                               : banner.webBannerUrl === 'none' ? 'none' : banner.webBannerUrl;
-    
+      : banner.webBannerUrl === 'none' ? 'none' : banner.webBannerUrl;
+
     try {
       let savedBanner;
 
-      if(isEmpty) {
+      if (isEmpty) {
         savedBanner = await this.bannerRepository.save(banner);
         return savedBanner;
       }
@@ -193,7 +194,7 @@ export class BannerService {
         return updatedBanner;
       }
     }
-    catch(err) {
+    catch (err) {
       throw new InternalServerErrorException('save web banner failed');
     }
   }
@@ -202,15 +203,15 @@ export class BannerService {
   async getBackWebBasic(calendarId: string): Promise<UploadWebBannerDto> {
     const banner = await this.bannerRepository.findOne({
       where: {
-        calendar: {calendarId: calendarId}
+        calendar: { calendarId: calendarId }
       },
       relations: ['calendar']
     })
 
-    if(!banner)
+    if (!banner)
       throw new NotFoundException('There are no options to change');
 
-    if(banner.appBannerUrl !== 'none')
+    if (banner.appBannerUrl !== 'none')
       await this.awsService.imageDeleteInS3('banner', banner.webBannerUrl);
 
     const getBackBanner = new UploadWebBannerDto();
@@ -220,7 +221,7 @@ export class BannerService {
       await this.bannerRepository.update(banner.bannerId, getBackBanner);
       return getBackBanner;
     }
-    catch(err) {
+    catch (err) {
       throw new InternalServerErrorException('back web basic is failed');
     }
   }
