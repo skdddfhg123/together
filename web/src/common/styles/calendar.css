@@ -1,0 +1,229 @@
+.calendar {
+  width: 100%;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+}
+
+#Table {
+  width: 100%;
+  height: 100%;
+
+  border-collapse: collapse;
+}
+
+#Thead {
+  height: 3rem;
+
+  line-height: 3rem;
+}
+
+
+#Tr {
+  height: calc(100% / 5);
+
+  display: flex;
+  justify-content: space-around;
+}
+
+#Td {
+  width: calc(100% / 7);
+  height: 100%;
+  
+  overflow: hidden;
+  padding-bottom: 1.2rem;
+  /* border-top: 1px solid rgb(242, 242, 242); */
+  border-top: 1px solid rgb(222, 222, 222);
+}
+
+.prevMonthDay,
+.nextMonthDay {
+  color: lightgray;
+  font-weight: 200;
+}
+
+.prevMonthDay div,
+.nextMonthDay div,
+.Day div {
+  margin: 0.2rem;
+  padding: 0 0.2rem;
+}
+
+td.Day:hover,
+td.today:hover {
+  box-shadow: 0 0 0 0.5px #0086FF inset;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#event-box {
+  height: 75%;
+  padding: 0.25rem;
+}
+
+#event-box li {
+  padding-left: 0.2rem;
+  margin-bottom: 0.15rem;
+}
+
+.group-event {
+  font-size: x-large;
+  font-weight:600;
+  border-radius: 0.125rem;
+  transition: transform 150ms; 
+
+  white-space: nowrap;
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
+
+.group-event:hover {
+  align-items: center;
+
+  box-shadow: 0 5px 5px -1px rgb(0, 0, 0, 0.5);
+  transform: translateY(-0.05rem);
+
+  white-space: normal;
+  overflow: visible; 
+  text-overflow: clip;
+}
+
+.dayBox {
+  height: 2.5rem;
+  display: flex;
+  align-items: center; 
+}
+
+.day {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  margin-right: 0.3rem;
+  font-size: x-large;
+}
+
+.GroupMember-Box {
+  display: flex;
+  width: 80%;
+}
+
+.GroupMember-Box * {
+  margin-right: 0.3rem;
+}
+
+.GroupMember-Box *:last-child {
+  margin-right: 0;
+}
+
+th.day-0, .day-0 .day { /* 일요일 */
+  color: rgb(212, 85, 85);
+}
+
+th.day-6, .day-6 .day { /* 토요일 */
+  color: rgb(70, 70, 186);
+}
+
+.today .day {
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: x-large;
+  font-weight: bold;
+  
+  color: white;
+  background-color: #0120c9;
+  border-radius: 100%;
+}
+
+.today.choiceDay .day {
+  font-size: x-large;
+}
+
+.choiceDay .day {
+  font-size: xx-large;
+  font-weight: semi-bold;
+}
+
+.choiceDay {
+  background-color: #0086FF25;
+  border-radius: 0.5rem;
+}
+
+
+#kakao-event {
+  background: #F7E600;
+  border-radius: 3px;
+}
+
+#google-event {
+  background:rgb(230, 239, 255);
+  border-radius: 3px;
+
+  box-shadow: 0 0 0 0.5px #0086FF inset;
+}
+
+#outlook-event {
+  background:rgb(90, 90, 90);
+  color: white;
+  border-radius: 3px;
+
+  box-shadow: 0 0 0 0.5px #000000 inset;
+}
+
+#socialImg {
+  height: 2rem;
+}
+
+.social-title {
+  margin-left: 1rem;
+
+}
+
+.tooltip-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-weight: 600;
+  font-size: large;
+
+  border-radius: 0.125rem;
+}
+
+.tooltip-container .tooltip-kakao {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+
+  background-color: rgb(247, 230, 0);
+  color: rgb(58,29,29);
+  border-radius: 3px;
+}
+
+.tooltip-container .tooltip-google {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+
+  background-color: rgb(230, 239, 255);
+  color: rgb(066, 133, 244);
+  border-radius: 3px;
+}
+
+.tooltip-container .tooltip-outlook {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+
+  background-color: rgb(90, 90, 90);
+  color: rgb(255, 255, 255);
+  border-radius: 3px;
+}
