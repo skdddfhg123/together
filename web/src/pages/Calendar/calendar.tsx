@@ -26,7 +26,7 @@ import '@styles/calendar.css';
 
 import kakaoImg from '@assets/KakaoTalk.png';
 import googleImg from '@assets/google_calendar.png';
-import outlookImg from '@assets/outlook_circle.png';
+import outlookImg from '@assets/outlook_square.png';
 
 type CalendarProps = {
   isPrevMonth: boolean;
@@ -192,7 +192,10 @@ export default React.memo(function CalendarPage({
             key={tooltipId}
           >
             <img id="socialImg" src={socialImgMap[event.social]} alt={`${event.social} Event`} />
-            <div className="social-title">{event.social === 'google' ? '구글' : '카카오'} 일정</div>
+            <div className="social-title">
+              {event.social === 'google' ? '구글' : event.social === 'kakao' ? '카카오' : '아웃룩'}{' '}
+              일정
+            </div>
             <Tooltip id={tooltipId} className={socialClassMap[event.social]}>
               <img
                 className="w-36"
@@ -201,7 +204,7 @@ export default React.memo(function CalendarPage({
               />
               <div>
                 <div className="text-4xl text-center">
-                  {event.social === 'google' ? event.title : '데이트'}
+                  {event.social === 'google' || 'outlook' ? event.title : '데이트'}
                 </div>
                 <span className="text-3xl font-bold">
                   {format(event.startAt, 'HH:mm')} ~ {format(event.endAt, 'HH:mm')}{' '}

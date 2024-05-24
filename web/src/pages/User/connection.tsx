@@ -84,9 +84,6 @@ export default function ConnectionPage() {
   return (
     <div className="FLEX-horizC h-200">
       <h1 className="page-title">동기화 관리 페이지</h1>
-      <NavLink className="ANI-btn hover:scale-125 p-5 border rounded-2xl mb-5 text-2xl" to="/main">
-        메인으로 가기
-      </NavLink>
 
       <button className="button kakao-button" onClick={KAKAO.LogIn}>
         <img className="w-6" src={kakao_box} />
@@ -114,6 +111,10 @@ export default function ConnectionPage() {
         <img className="w-6" src={outlook_circle} />
         <p className="mx-auto">Microsoft 로그아웃</p>
       </button>
+
+      <NavLink className="ANI-btn hover:scale-125 p-5 border rounded-2xl mb-5 text-2xl" to="/main">
+        메인으로 가기
+      </NavLink>
     </div>
   );
 }

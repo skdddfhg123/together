@@ -101,11 +101,11 @@ export interface GroupEvent extends DefaultEvent {
   reqMember?: Member[];
 }
 
-export interface GoogleEvent {
+export interface socialEvent {
   startAt: Date;
   endAt: Date;
   title: string;
-  social: 'google';
+  social: 'google' | 'outlook';
   socialEventId: UUID;
 }
 

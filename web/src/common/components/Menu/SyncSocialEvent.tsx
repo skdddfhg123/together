@@ -3,14 +3,13 @@ import { Tooltip } from 'react-tooltip';
 
 import useToast from '@hooks/useToast';
 import * as KAKAO from '@services/KakaoAPI';
-// import * as CALENDAR from '@services/calendarAPI';
-// import * as USER from '@services/userAPI';
 import * as REDIS from '@services/redisAPI';
 import * as GOOGLE from '@services/googleAPI';
+import * as AZURE from '@services/azureAPI';
 import { useSelectedCalendarStore, useSocialEventListStore } from '@store/index';
 
 import syncImg from '@assets/sync.png';
-import { AllEvent, GoogleEvent } from '@type/index';
+import { AllEvent, socialEvent } from '@type/index';
 
 export default function SyncSocialEvent() {
   const { selectedCalendar } = useSelectedCalendarStore();
@@ -47,10 +46,11 @@ export default function SyncSocialEvent() {
       } else return;
 
       const googleRes = await GOOGLE.getEvents();
+      console.log(`google 일정`, googleRes);
       if (googleRes?.data) {
         const googleEvents = googleRes.data
-          .filter((event: GoogleEvent) => event !== null)
-          .map((event: GoogleEvent) => ({
+          .filter((event: socialEvent) => event !== null)
+          .map((event: socialEvent) => ({
             // id: event.socialEventId,
             startAt: event.startAt,
             endAt: event.endAt,
@@ -58,6 +58,21 @@ export default function SyncSocialEvent() {
             title: event.title,
           }));
         socialEvents = [...socialEvents, ...googleEvents];
+      } else return;
+
+      const azureRes = await AZURE.getEvents();
+      console.log(`Outlook 일정`, azureRes);
+      if (azureRes?.data) {
+        const azureEvents = azureRes.data
+          .filter((event: socialEvent) => event !== null)
+          .map((event: socialEvent) => ({
+            // id: event.socialEventId,
+            startAt: event.startAt,
+            endAt: event.endAt,
+            social: 'outlook',
+            title: event.title,
+          }));
+        socialEvents = [...socialEvents, ...azureEvents];
       } else return;
 
       setSocialEventList(socialEvents);

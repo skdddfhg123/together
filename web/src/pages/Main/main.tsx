@@ -19,7 +19,7 @@ import SyncSocialEvent from '@components/Menu/SyncSocialEvent';
 import logoImg from '@assets/toogether_noBG.png';
 import menuImg from '@assets/calendar_menu.webp';
 // import defaultBanner from '@assets/default_banner.png';
-import alerm from '@assets/alermSound.mp3';
+import alerm from '@assets/alermSound2.mp3';
 
 import '@styles/main.css';
 import FeedPage from '@pages/Feed/feed';

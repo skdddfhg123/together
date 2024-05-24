@@ -1,13 +1,14 @@
-// const clientId = process.env.REACT_APP_MICROSOFT_CLIENT_ID as string;
-// const tenantId = process.env.REACT_APP_AZURE_TENENT_ID as string;
+const clientId = process.env.REACT_APP_MICROSOFT_CLIENT_ID as string;
+const tenantId = process.env.REACT_APP_AZURE_TENENT_ID as string;
 
 export const msalConfig = {
   auth: {
-    clientId: 'b23ac01f-6f16-4c7d-9ae9-23b6e445c59e',
-    authority: `https://login.microsoftonline.com/b1b9b246-22b0-47ab-ab54-32487ccc176b`,
+    clientId: '65414a67-5b95-4220-a531-5f3a9e8e11ed',
+    authority:
+      'https://login.microsoftonline.com/common/oauth2/v2.0/authorize/b1b9b246-22b0-47ab-ab54-32487ccc176b',
     // clientId: clientId,
-    // authority: `https://login.microsoftonline.com/${tenantId}`,
-    redirectUri: 'http://toogether.site:3005/connection', // 리디렉션 URI
+    // authority: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize/${tenantId}`,
+    redirectUri: 'http://localhost:3005/connection',
   },
   cache: {
     cacheLocation: 'localStorage',

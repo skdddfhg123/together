@@ -100,13 +100,13 @@ export default function FeedPage({
             </ul> */}
           </section>
         </nav>
-        <button
+        {/* <button
           onClick={onClose}
           className="absolute right-2 p-1 mr-16 text-3xl text-black hover:text-gray-600"
           aria-label="Close"
         >
           &times;
-        </button>
+        </button> */}
         <main className="flex-grow">
           {/* <div className="h-1/8">
             피드 리스트

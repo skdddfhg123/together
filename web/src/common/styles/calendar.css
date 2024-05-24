@@ -166,11 +166,11 @@ th.day-6, .day-6 .day { /* 토요일 */
 }
 
 #outlook-event {
-
-  background:rgb(230, 239, 255);
+  background:rgb(90, 90, 90);
+  color: white;
   border-radius: 3px;
 
-  box-shadow: 0 0 0 0.5px #0086FF inset;
+  box-shadow: 0 0 0 0.5px #000000 inset;
 }
 
 #socialImg {
@@ -223,7 +223,7 @@ th.day-6, .day-6 .day { /* 토요일 */
   align-items: center;
   padding: 1rem;
 
-  background-color: rgb(230, 239, 255);
-  color: rgb(066, 133, 244);
+  background-color: rgb(90, 90, 90);
+  color: rgb(255, 255, 255);
   border-radius: 3px;
 }
