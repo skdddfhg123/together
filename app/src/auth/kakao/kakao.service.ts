@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { TokensService } from 'src/db/tokens/tokens.service';
+import { response } from 'express';
 
 @Injectable()
 export class KakaoService {

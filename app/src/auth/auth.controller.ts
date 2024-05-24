@@ -174,7 +174,14 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('tutorial')
-  async checkProceedTutorial(@getPayload() payload: PayloadResponse): Promise<string> {
-    return await this.userService.tutorialComplete(payload.useremail);
+  async checkProceedTutorial(@getPayload() payload: PayloadResponse): Promise<boolean> {
+    let isFirst = true;
+
+    if (!payload.isFirst)
+      isFirst = false;
+    else
+      await this.userService.tutorialComplete(payload.useremail);
+
+    return isFirst;
   }
 }

@@ -33,4 +33,8 @@ export class GetTokenDto {
     @ApiProperty()
     @IsOptional()
     discordRefreshToken: string;
+    
+    @ApiProperty()
+    @IsOptional()
+    id:string;
 }

@@ -21,6 +21,7 @@ import { EventModule } from './webSocket/event.module';
 import { UtilsModule } from './utils/utils.module';
 import { RedisGateway } from './webSocket/redis/redis.gateway';
 import { BannerModule } from './calendar/banner/banner.module';
+import { AzureModule } from './auth/azure/azure.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -44,6 +45,7 @@ import { AppController } from './app.controller';
     CalendarModule,
     GoogleModule,
     KakaoModule,
+    AzureModule,
     FeedModule,
     ImageModule,
     EmojiModule,
