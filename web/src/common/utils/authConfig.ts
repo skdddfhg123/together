@@ -8,7 +8,7 @@ export const msalConfig = {
       'https://login.microsoftonline.com/common/oauth2/v2.0/authorize/b1b9b246-22b0-47ab-ab54-32487ccc176b',
     // clientId: clientId,
     // authority: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize/${tenantId}`,
-    redirectUri: 'http://localhost:3005/connection',
+    redirectUri: 'http://toogether.site:3005/connection',
   },
   cache: {
     cacheLocation: 'localStorage',

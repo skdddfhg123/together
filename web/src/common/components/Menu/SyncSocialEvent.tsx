@@ -60,20 +60,20 @@ export default function SyncSocialEvent() {
         socialEvents = [...socialEvents, ...googleEvents];
       } else return;
 
-      const azureRes = await AZURE.getEvents();
-      console.log(`Outlook 일정`, azureRes);
-      if (azureRes?.data) {
-        const azureEvents = azureRes.data
-          .filter((event: socialEvent) => event !== null)
-          .map((event: socialEvent) => ({
-            // id: event.socialEventId,
-            startAt: event.startAt,
-            endAt: event.endAt,
-            social: 'outlook',
-            title: event.title,
-          }));
-        socialEvents = [...socialEvents, ...azureEvents];
-      } else return;
+      // const azureRes = await AZURE.getEvents();
+      // console.log(`Outlook 일정`, azureRes);
+      // if (azureRes?.data) {
+      //   const azureEvents = azureRes.data
+      //     .filter((event: socialEvent) => event !== null)
+      //     .map((event: socialEvent) => ({
+      //       // id: event.socialEventId,
+      //       startAt: event.startAt,
+      //       endAt: event.endAt,
+      //       social: 'outlook',
+      //       title: event.title,
+      //     }));
+      //   socialEvents = [...socialEvents, ...azureEvents];
+      // } else return;
 
       setSocialEventList(socialEvents);
     } catch (error) {

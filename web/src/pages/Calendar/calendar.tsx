@@ -193,7 +193,7 @@ export default React.memo(function CalendarPage({
           >
             <img id="socialImg" src={socialImgMap[event.social]} alt={`${event.social} Event`} />
             <div className="social-title">
-              {event.social === 'google' ? '구글' : event.social === 'kakao' ? '카카오' : '아웃룩'}{' '}
+              {event.social === 'google' ? '구글' : event.social === 'kakao' ? '카카오' : '아웃룩'}
               일정
             </div>
             <Tooltip id={tooltipId} className={socialClassMap[event.social]}>
@@ -204,7 +204,7 @@ export default React.memo(function CalendarPage({
               />
               <div>
                 <div className="text-4xl text-center">
-                  {event.social === 'google' || 'outlook' ? event.title : '데이트'}
+                  {event.social === 'google' ? event.title : '데이트'}
                 </div>
                 <span className="text-3xl font-bold">
                   {format(event.startAt, 'HH:mm')} ~ {format(event.endAt, 'HH:mm')}{' '}
