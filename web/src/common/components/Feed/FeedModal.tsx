@@ -85,7 +85,7 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
             >
               <header key="author" className="FLEX-horizC mx-auto text-center h-1/3">
                 {feedInfo.thumbnail ? (
-                  <img className="max-w-24" src={feedInfo.thumbnail} alt="프로필" />
+                  <img className="max-w-24 rounded-full" src={feedInfo.thumbnail} alt="프로필" />
                 ) : (
                   <div className="text-gray-700 text-xl w-24">{feedInfo.nickname}</div>
                 )}
@@ -131,12 +131,15 @@ export default function FeedModal({ feedInfo, isOpen, onClose }: FeedModalProps)
               >
                 <input
                   ref={commentRef}
-                  className="input w-5/6 flex-1 rounded p-2 mr-2 border-gray-300"
+                  className="input w-5/6 flex-1 rounded p-2 mr-4 border-gray-300"
                   maxLength={150}
                   placeholder="댓글을 입력해주세요."
                 />
-                <button type="submit" className="bg-custom-main text-white rounded p-2">
-                  전송
+                <button
+                  type="submit"
+                  className="bg-custom-main mx-auto text-white rounded py-2 px-4"
+                >
+                  입력
                 </button>
               </form>
             </section>
