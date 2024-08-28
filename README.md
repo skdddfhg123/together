@@ -147,26 +147,26 @@
 ### 커뮤니티
   - 실시간 그룹 채팅
 <div align="center">
-  <img width="720" alt="image" src="https://github.com/user-attachments/assets/1e89d16c-b867-4a3b-ab78-b72cbac0b8ba">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/1e89d16c-b867-4a3b-ab78-b72cbac0b8ba">
 </div>
 <br>
 
   - 그룹 채팅 이모지
   > 그룹 내에서 Gif 또는 Img를 통해 새로운 이모지 등록 가능
 <div align="center">
-  <img width="720" alt="image" src="https://github.com/user-attachments/assets/9417cfe2-be4f-4f6b-80fc-b675795fb0ae">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/9417cfe2-be4f-4f6b-80fc-b675795fb0ae">
 </div>
 <br>
 
   - ### 피드 등록
 <div align="center">
-  <img width="720" alt="image" src="https://github.com/user-attachments/assets/653143df-1573-4e18-934c-c2e2e1562daa">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/653143df-1573-4e18-934c-c2e2e1562daa">
 </div>
 <br>
 
   - ### 댓글 등록
 <div align="center">
-  <img width="720" alt="image" src="https://github.com/user-attachments/assets/4a99b4f1-dcce-426f-8dbb-77f2ae15ee59">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/4a99b4f1-dcce-426f-8dbb-77f2ae15ee59">
 </div>
 <br>
 
@@ -174,13 +174,13 @@
   > 그룹 일정이 등록된 날 중, 피드가 생성된 날만 확인 가능 ( 노란색 알림 ) <br>
   > 그룹 일정이 아예 존재하지 않으면 확인 불가 ( 빨간색 알림 )
 <div align="center">
-  <img width="720" alt="image" src="https://github.com/user-attachments/assets/52a037ff-fcd2-4b43-9e01-b2344e33857e">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/52a037ff-fcd2-4b43-9e01-b2344e33857e">
 </div>
 <br> 
 
   - ### 커뮤니티-캘린더 일체화
 <div align="center">
-  <img width="720" alt="image" src="https://github.com/user-attachments/assets/cff06be6-2b13-477b-bfc0-66ad32279d31">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/cff06be6-2b13-477b-bfc0-66ad32279d31">
 </div>
 <br>
 
