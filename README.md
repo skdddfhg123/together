@@ -1,8 +1,24 @@
 ![toogether](https://github.com/user-attachments/assets/237ae461-7123-4248-b0d0-07d0c0fb11ad)
 
+<div align="center">
+  <h3>
+    사이트 이동
+    <br>
+      <a href="http://toogether.site:3005"> 
+        >> Click <<
+      </a>
+  </h3>
+
+|테스트 계정|비밀번호|
+|:------:|:---:|
+|test@test.com|1234|
+
+</div>
+<br>
+
 ## 목차
 
-- [발표 및 시연 영상](#-발표-및-시연-영상-click)
+- [발표 및 시연 영상](#-발표-및-시연-영상-이미지-click)
 - [기획 의도](#-기획-의도)
 - [개발 기간](#%EF%B8%8F-개발-기간)
 - [역할](#-역할)
@@ -15,18 +31,20 @@
 
 <br>
 
-## 🎥 발표 및 시연 영상 (Click)
+## 🎥 발표 및 시연 영상 (이미지 Click)
 <div align="center">
-  <a href="https://youtu.be/UHqKmVlI-4M">
-    <img src="https://github.com/user-attachments/assets/acd53780-70d7-4639-b82a-2c1efc91715d" alt="Video Label">
-  </a>
+  <h3>발표영상</h3>
+  <a href="https://youtu.be/UHqKmVlI-4M"><img width="360" src="https://github.com/user-attachments/assets/f564f1cd-8041-436a-b050-a9399e6fd26f" alt="Video Label" /></a>
+  &nbsp
+  <h3>시연영상</h3>
+  <a href="https://youtu.be/ZNX_kZPNMQ4"><img width="360" src="https://github.com/user-attachments/assets/f7548d09-1fad-453a-a350-c1a79cbcdde3" alt="Video Label" /></a>
 </div>
 
 ## 📝 기획 의도
 
-> 1. 업무 상, 그리고 그 외 목적으로 사용 중인 ***여러 캘린더***의 일정을 하나로 ***통합 관리*** ( Kakao, Google, Outlook)
-> 2. 통합된 나의 일정을 내 그룹 캘린더의 ***멤버들과 공유***하여 모임 일정 결정에 도움
-> 3. 그룹 일정에 사진을 포함한 ***피드와 댓글***을 통해 추억을 기록하고, 공유하는 커뮤니티 제공
+> 1. 업무 상, 그리고 그 외 목적으로 사용 중인 ***여러 캘린더*** 의 일정을 하나로 ***통합 관리*** ( Kakao, Google, Outlook)
+> 2. 통합된 나의 일정을 내 그룹 캘린더의 ***멤버들과 공유*** 하여 모임 일정 결정에 도움
+> 3. 그룹 일정에 사진을 포함한 ***피드와 댓글*** 을 통해 추억을 기록하고, 공유하는 커뮤니티 제공
 
 <br>
 
@@ -74,6 +92,7 @@
   <img height=40px src="https://img.shields.io/badge/Tailwindcss-1daabb.svg?style=flat&logo=tailwind-css&logoColor=white" />
   <img height=40px src="https://img.shields.io/badge/Nginx-%23009639.svg?style=flat&logo=nginx&logoColor=white" />
 </div>
+
 - ### Frontend (Mobile)
 <div>
   <img height=40px src="https://img.shields.io/badge/Flutter-02569B.svg?style=flat&logo=flutter&logoColor=white" />
@@ -88,14 +107,83 @@
 
 ## ⚙️ Architecture
 <div align="center">
-  <img width="511" alt="image" src="https://github.com/user-attachments/assets/61f57719-450c-43b8-9c8e-3e39d6fc6907">
+  <img width="500" alt="image" src="https://github.com/user-attachments/assets/61f57719-450c-43b8-9c8e-3e39d6fc6907">
+  <br>
+  <img width="960" alt="image" src="https://github.com/user-attachments/assets/499c47a2-f051-4c84-bbb2-4d18ec3bf62a">
 </div>
 
 ## ✨ 기능
 
 ### 캘린더
 
+  - ### 소셜 캘린더 동기화
+  > Kakao 캘린더, Google 캘린더, Outlook 캘린더 <br>
+  > 최초 1회 소셜 계정으로 로그인 시 발행된 AccessToken과 refreshToken을 Backend로 전달, Backend에서 API를 활용하여 소셜 일정을 받아와 DB에 저장 및 다시 Frontend로 전달
+<div align="center">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/406eae57-ba48-4bec-9435-39ce13560224">
+</div>
+<br>
+
+  - ### 멤버들의 개인일정 확인
+  > 1. 소셜 캘린더에서 가져온 일정 <br>
+  > 2. 멤버의 다른 그룹캘린더에서 생성한 일정 <br>
+  > 위 두 가지에 대해서 동그한 뱃지 형태로 일정 존재유무 및 시간 확인 가능
+<div align="center">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/f22c7fca-7032-450d-a2c9-0896d0805383">
+</div>
+<br>
+
+  - ### 실시간 알람
+  > Redis Pub/Sub 을 활용하여 그룹 멤버의 소셜 캘린더 동기화, 그룹 일정 등록/삭제 총 3가지에 대해 실시간 알림 제공
+<div align="center">
+  <img width="360" alt="image" src="https://github.com/user-attachments/assets/65d0eb5e-2e99-4c59-a8b8-7d61bd774e00">
+  <img width="360" alt="image" src="https://github.com/user-attachments/assets/4dfab587-0dc6-4953-9498-f173a2ecf0c3">
+  <img width="360" alt="image" src="https://github.com/user-attachments/assets/913102c1-df63-4490-9156-8f2f2aa5e82f">
+</div>
+<br>
+
+---
+
 ### 커뮤니티
+  - 실시간 그룹 채팅
+<div align="center">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/1e89d16c-b867-4a3b-ab78-b72cbac0b8ba">
+</div>
+<br>
+
+  - 그룹 채팅 이모지
+  > 그룹 내에서 Gif 또는 Img를 통해 새로운 이모지 등록 가능
+<div align="center">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/9417cfe2-be4f-4f6b-80fc-b675795fb0ae">
+</div>
+<br>
+
+  - ### 피드 등록
+<div align="center">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/653143df-1573-4e18-934c-c2e2e1562daa">
+</div>
+<br>
+
+  - ### 댓글 등록
+<div align="center">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/4a99b4f1-dcce-426f-8dbb-77f2ae15ee59">
+</div>
+<br>
+
+  - ### 그룹 피드 전체 확인
+  > 그룹 일정이 등록된 날 중, 피드가 생성된 날만 확인 가능 ( 노란색 알림 ) <br>
+  > 그룹 일정이 아예 존재하지 않으면 확인 불가 ( 빨간색 알림 )
+<div align="center">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/52a037ff-fcd2-4b43-9e01-b2344e33857e">
+</div>
+<br> 
+
+  - ### 커뮤니티-캘린더 일체화
+<div align="center">
+  <img width="520" alt="image" src="https://github.com/user-attachments/assets/cff06be6-2b13-477b-bfc0-66ad32279d31">
+</div>
+<br>
+
 
 ## 포스터
 ![3팀_toogether(포스터_small)](https://github.com/user-attachments/assets/097dec2d-1141-48c1-b82c-32a4899ebb83)
