@@ -20,7 +20,7 @@
 
 - [발표 및 시연 영상](#-발표-및-시연-영상-이미지-click)
 - [기획 의도](#-기획-의도)
-- [개발 기간](#%EF%B8%8F-개발-기간)
+- [개발 일정 및 작업일지](#%EF%B8%8F-개발-일정-및-작업일지)
 - [역할](#-역할)
 - [기술 스택](#%EF%B8%8F-기술-스택)
 - [Architechture](#%EF%B8%8F-architecture)
@@ -48,8 +48,10 @@
 
 <br>
 
-## 🗓️ 개발 기간
-2024.04.18 - 2024.05.25 ( 5주 )
+## 🗓️ 개발 일정 및 작업일지
+2024.04.18 - 2024.05.25 ( 5주 ) 
+<br>
+<a href="https://dongmlee.notion.site/Together-17363d39184d4f64b07f001967d9b07b"> 작업일지 </a>
 
 ## 👥 역할
 <table>
@@ -71,6 +73,7 @@
 <div>
   <img height=40px src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white" />
   <img height=40px src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white" />
+  <img height=40px src="https://img.shields.io/badge/mongoDB-47A248?style=flat&logo=MongoDB&logoColor=white" />
 </div>
 <div>
   <img height=40px src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=Redis&logoColor=white" /> 
