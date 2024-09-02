@@ -73,6 +73,7 @@
 <div>
   <img height=40px src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white" />
   <img height=40px src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white" />
+  <img height=40px src="https://img.shields.io/badge/mongoDB-47A248?style=flat&logo=MongoDB&logoColor=white" />
 </div>
 <div>
   <img height=40px src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=Redis&logoColor=white" /> 
