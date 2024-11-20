@@ -1,18 +1,5 @@
 ![toogether](https://github.com/user-attachments/assets/237ae461-7123-4248-b0d0-07d0c0fb11ad)
 
-<div align="center">
-  <h3>
-    사이트 이동
-    <br>
-      <a href="http://toogether.site:3005"> 
-        >> Click <<
-      </a>
-  </h3>
-
-|테스트 계정|비밀번호|
-|:------:|:---:|
-|test@test.com|1234|
-
 </div>
 <br>
 
