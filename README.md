@@ -70,7 +70,7 @@
 
 - ### Backend
 <div>
-  <img height=40px src="https://img.shields.io/badge/Next.js-000000.svg?style=flat&logo=nextdotjs&logoColor=white" />
+  <img height=40px src="https://img.shields.io/badge/NestJS-%23E0234E.svg?style=flat&logo=nestjs&logoColor=white" />
   <img height=40px src="https://img.shields.io/badge/Typescript-007ACC.svg?style=flat&logo=typescript&logoColor=white" />
   <img height=40px src="https://img.shields.io/badge/Docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white" /> 
 </div>
